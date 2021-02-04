@@ -24,7 +24,7 @@ rule info_file_write_by_hash
 
   events:
     $e1.metadata.event_type = "FILE_MODIFICATION"
-    $e1.principal.target.file.sha256 = "199b3890d28a1f5906f4014e73615a268b3c4414f1f71697bf13e0d464258d54"
+    $e1.target.file.sha256 = "199b3890d28a1f5906f4014e73615a268b3c4414f1f71697bf13e0d464258d54"
 
   condition:
     $e1

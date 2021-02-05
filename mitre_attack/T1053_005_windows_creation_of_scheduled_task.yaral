@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-rule mitre_attack_T1546_001_windows_change_default_file_association
+rule T1053_005_windows_creation_of_scheduled_task
 {
   meta:
     author = "Google Cloud Security"

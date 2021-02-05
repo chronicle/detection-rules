@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-rule info_file_powershell_executed
+rule info_command_line_regedit
 {
   meta:
     author = "Google Cloud Security"

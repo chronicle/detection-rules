@@ -276,7 +276,7 @@ def run_rule(http_session: requests.AuthorizedSession, rule: Mapping[str, Any],
 
     retrohunt = poll_retrohunt(http_session, rule["versionId"],
                                retrohunt["retrohuntId"])
-    if 0 < retrohunt["progressPercentage"] < 100:
+    if 0 < retrohunt.get("progressPercentage", 0) < 100:
       print(f"Progress: {retrohunt['progressPercentage']}%")
 
   if not should_exit_soon:

@@ -14,6 +14,7 @@
 #
 """Unit tests for the "evaluate_rules" module."""
 
+import datetime
 import os
 import pathlib
 import tempfile
@@ -103,11 +104,48 @@ def api_function_error():
 
 class EvaluateRulesTest(unittest.TestCase):
 
+  def test_initialize_command_line_args_sanity_checks(self):
+    self.assertIsNone(
+        evaluate_rules.initialize_command_line_args(["-in=foo", "-ig=bar"]))
+    self.assertIsNone(
+        evaluate_rules.initialize_command_line_args(
+            ["-ts", "2021-01-02T03:04:05", "-te", "2020-01-02T03:04:05"]))
+    self.assertIsNone(
+        evaluate_rules.initialize_command_line_args(["--save_results"]))
+    self.assertIsNotNone(
+        evaluate_rules.initialize_command_line_args(["--run_retrohunt"]))
+
+  def test_parse_files_list_empty(self):
+    self.assertEqual([], evaluate_rules.parse_files_list(""))
+
+  def test_parse_files_list_regular(self):
+    self.assertEqual(["a"], evaluate_rules.parse_files_list("a"))
+    self.assertEqual(["a", "b"], evaluate_rules.parse_files_list("a,b"))
+
+  def test_parse_files_list_discard_empty_elements(self):
+    self.assertEqual(["c", "d"], evaluate_rules.parse_files_list(",c,,d,"))
+
+  def test_is_file_in_scope_empty(self):
+    path = pathlib.Path("abc/def/ghi.yaral")
+    self.assertTrue(evaluate_rules.is_file_in_scope(path, [], []))
+
+  def test_is_file_in_scope_include(self):
+    path = pathlib.Path("abc/def/ghi.yaral")
+    self.assertTrue(evaluate_rules.is_file_in_scope(path, ["ghi"], []))
+    self.assertTrue(evaluate_rules.is_file_in_scope(path, ["ghi", "xyz"], []))
+
+    self.assertFalse(evaluate_rules.is_file_in_scope(path, ["xyz"], []))
+
+  def test_is_file_in_scope_ignore(self):
+    path = pathlib.Path("abc/def/ghi.yaral")
+    self.assertFalse(evaluate_rules.is_file_in_scope(path, [], ["def"]))
+    self.assertFalse(evaluate_rules.is_file_in_scope(path, [], ["def", "xyz"]))
+
+    self.assertTrue(evaluate_rules.is_file_in_scope(path, [], ["xyz"]))
+
   @mock.patch.object(requests, "AuthorizedSession", autospec=True)
   @mock.patch.object(evaluate_rules, "create_rule", autospec=True)
-  @mock.patch.object(evaluate_rules, "delete_rule", autospec=True)
-  def test_evaluate_file_succeeded(self, mock_delete_rule, mock_create_rule,
-                                   mock_session):
+  def test_evaluate_file_succeeded(self, mock_create_rule, mock_session):
     path = next(pathlib.Path.cwd().rglob("*.yaral"))
     mock_create_rule.return_value = {
         "ruleId": "ruleId",
@@ -116,13 +154,10 @@ class EvaluateRulesTest(unittest.TestCase):
     }
     evaluate_rules.evaluate_file(mock_session, path, 1)
     mock_create_rule.assert_called_once()
-    mock_delete_rule.assert_called_once()
 
   @mock.patch.object(requests, "AuthorizedSession", autospec=True)
   @mock.patch.object(evaluate_rules, "create_rule", autospec=True)
-  @mock.patch.object(evaluate_rules, "delete_rule", autospec=True)
-  def test_evaluate_file_failed(self, mock_delete_rule, mock_create_rule,
-                                mock_session):
+  def test_evaluate_file_failed(self, mock_create_rule, mock_session):
     path = next(pathlib.Path.cwd().rglob("*.yaral"))
     mock_create_rule.return_value = {
         "ruleId": "ruleId",
@@ -132,7 +167,53 @@ class EvaluateRulesTest(unittest.TestCase):
     }
     evaluate_rules.evaluate_file(mock_session, path, 2)
     mock_create_rule.assert_called_once()
-    mock_delete_rule.assert_called_once()
+
+  @mock.patch.object(requests, "AuthorizedSession", autospec=True)
+  @mock.patch.object(evaluate_rules, "start_retrohunt", autospec=True)
+  @mock.patch.object(evaluate_rules, "poll_retrohunt", autospec=True)
+  @mock.patch.object(evaluate_rules, "list_detections", autospec=True)
+  def test_run_rule(self, mock_list_detections, mock_poll_retrohunt,
+                    mock_start_retrohunt, mock_session):
+    start_time = "2020-01-02T03:04:05Z"
+    end_time = "2021-01-02T03:04:05Z"
+    rule = {
+        "versionId": "versionId",
+    }
+    mock_start_retrohunt.return_value = {
+        "retrohuntStartTime": start_time,
+        "state": "RUNNING",
+        "retrohuntId": "retrohuntId",
+        "progressPercentage": 50,
+    }
+    mock_poll_retrohunt.return_value = {
+        "retrohuntStartTime": start_time,
+        "retrohuntEndTime": end_time,
+        "state": "DONE",
+        "retrohuntId": "retrohuntId",
+        "progressPercentage": 100,
+    }
+    mock_list_detections.return_value = {}
+    evaluate_rules.run_rule(mock_session, rule, start_time, end_time)
+    mock_start_retrohunt.assert_called_once()
+    mock_poll_retrohunt.assert_called_once()
+    mock_list_detections.assert_called_once()
+
+  @mock.patch.object(requests, "AuthorizedSession", autospec=True)
+  @mock.patch.object(evaluate_rules, "list_detections", autospec=True)
+  def test_retrieve_detections(self, mock_list_detections, mock_session):
+    mock_list_detections.side_effect = [{"nextPageToken": "nextPageToken"}, {}]
+    evaluate_rules.retrieve_detections(mock_session, "rule version ID")
+    mock_list_detections.assert_called()
+
+  def test_save_detection_results_empty(self):
+    with tempfile.TemporaryDirectory() as temp_dir:
+      path = pathlib.Path(f"{temp_dir}/rule_file.yaral")
+      evaluate_rules.save_detection_results(path, {})
+
+  def test_save_detection_results_non_empty(self):
+    with tempfile.TemporaryDirectory() as temp_dir:
+      path = pathlib.Path(f"{temp_dir}/rule_file.yaral")
+      evaluate_rules.save_detection_results(path, {"foo": "bar"})
 
   def test_api_decorator_throttle(self):
     self.assertEqual("json", api_function_throttle())
@@ -160,6 +241,85 @@ class EvaluateRulesTest(unittest.TestCase):
 
     actual = evaluate_rules.delete_rule(mock_session, "rule ID")
     self.assertFalse(actual)
+
+  @mock.patch.object(requests, "AuthorizedSession", autospec=True)
+  @mock.patch.object(requests.requests, "Response", autospec=True)
+  def test_start_retrohunt(self, mock_response, mock_session):
+    mock_session.request.return_value = mock_response
+    type(mock_response).status_code = mock.PropertyMock(return_value=200)
+    mock_response.json.return_value = {}
+
+    actual = evaluate_rules.start_retrohunt(mock_session, "rule version ID",
+                                            "2020-01-02T03:04:05Z",
+                                            "2021-01-02T03:04:05Z")
+    self.assertFalse(actual)
+
+  @mock.patch.object(requests, "AuthorizedSession", autospec=True)
+  @mock.patch.object(requests.requests, "Response", autospec=True)
+  def test_poll_retrohunt(self, mock_response, mock_session):
+    mock_session.request.return_value = mock_response
+    type(mock_response).status_code = mock.PropertyMock(return_value=200)
+    mock_response.json.return_value = {}
+
+    actual = evaluate_rules.poll_retrohunt(mock_session, "rule version ID",
+                                           "retrohunt ID")
+    self.assertFalse(actual)
+
+  @mock.patch.object(requests, "AuthorizedSession", autospec=True)
+  @mock.patch.object(requests.requests, "Response", autospec=True)
+  def test_wait_for_retrohunt(self, mock_response, mock_session):
+    mock_session.request.return_value = mock_response
+    type(mock_response).status_code = mock.PropertyMock(return_value=200)
+    mock_response.json.return_value = {}
+
+    actual = evaluate_rules.wait_for_retrohunt(mock_session, "rule version ID",
+                                               "retrohunt ID")
+    self.assertFalse(actual)
+
+  @mock.patch.object(requests, "AuthorizedSession", autospec=True)
+  @mock.patch.object(requests.requests, "Response", autospec=True)
+  def test_list_detections(self, mock_response, mock_session):
+    mock_session.request.return_value = mock_response
+    type(mock_response).status_code = mock.PropertyMock(return_value=200)
+    mock_response.json.return_value = {}
+
+    actual = evaluate_rules.list_detections(mock_session, "rule version ID")
+    self.assertFalse(actual)
+
+  def test_define_time_range_default(self):
+    start_time, end_time = evaluate_rules.define_time_range(None, None, False)
+    self.assertGreater(end_time, start_time)
+
+  def test_define_time_range_cutomized_in_command_line(self):
+    dt = datetime.datetime.now()
+    start_time, end_time = evaluate_rules.define_time_range(
+        dt - datetime.timedelta(days=1), dt, True)
+    self.assertGreater(end_time, start_time)
+
+  def test_iso8601_to_utc_datetime_lower_case(self):
+    expected = datetime.datetime(
+        2021, 1, 2, 3, 4, 5, tzinfo=datetime.timezone.utc)
+    actual = evaluate_rules.iso8601_to_utc_datetime("2021-01-02t03:04:05z")
+    self.assertEqual(expected, actual)
+
+  def test_iso8601_to_utc_datetime_missing_z(self):
+    expected = datetime.datetime(
+        2021, 1, 2, 3, 4, 5, tzinfo=datetime.timezone.utc)
+    actual = evaluate_rules.iso8601_to_utc_datetime("2021-01-02T03:04:05")
+    self.assertEqual(expected, actual)
+
+  def test_iso8601_to_utc_datetime_with_microseconds(self):
+    expected = datetime.datetime(
+        2021, 1, 2, 3, 4, 5, 6, tzinfo=datetime.timezone.utc)
+    actual = evaluate_rules.iso8601_to_utc_datetime(
+        "2021-01-02T03:04:05.000006Z")
+    self.assertEqual(expected, actual)
+
+  def test_datetime_to_iso8601(self):
+    self.assertEqual(
+        "2021-01-02T03:04:05Z",
+        evaluate_rules.datetime_to_iso8601(
+            datetime.datetime(2021, 1, 2, 3, 4, 5)))
 
 
 if __name__ == "__main__":

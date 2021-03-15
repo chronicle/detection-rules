@@ -1,0 +1,17 @@
+rule suspicious_psexec_execution {
+ meta:
+    author = "Samir Bousseaden"
+    description = "detects execution of psexec or paexec with renamed service name, this rule helps to filter out the noise if psexec is used for legit purposes or if attacker uses a different psexec client other than sysinternal one  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/yTfFXsOGHAF5"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "lateral_movement, t1077"
+
+  events:
+(($selection1.metadata.product_event_type = "5145" and re.regex($selection1.target.resource.name, `.*\\IPC$`) and (re.regex($selection1.target.file.full_path, `.*-stdin`) or re.regex($selection1.target.file.full_path, `.*-stdout`) or re.regex($selection1.target.file.full_path, `.*-stderr`))) and not ($selection1.metadata.product_event_type = "5145" and re.regex($selection1.target.resource.name, `.*\\IPC$`) and re.regex($selection1.target.file.full_path, `PSEXESVC.*`)))
+
+  condition:
+    $selection1
+}

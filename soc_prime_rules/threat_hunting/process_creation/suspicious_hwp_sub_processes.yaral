@@ -1,0 +1,17 @@
+rule suspicious_hwp_sub_processes {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious Hangul Word Processor (Hanword) sub processes that could indicate an exploitation  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/llsLDpuL96E6"
+    version = "0.01"
+    created = "2019/10/24"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, defense_evasion, initial_access, t1059, t1202, t1193, g0032"
+
+  events:
+(re.regex($selection.src.process.file.full_path, `.*\\Hwp\.exe`) and re.regex($selection.target.process.file.full_path, `.*\\gbb\.exe`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

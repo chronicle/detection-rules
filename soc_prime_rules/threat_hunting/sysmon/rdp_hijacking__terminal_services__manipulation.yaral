@@ -1,0 +1,17 @@
+rule rdp_hijacking_terminal_services__manipulation {
+ meta:
+    author = "Den Iuzvyk"
+    description = "Detects Terminal Services  Manipulation.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ezMewWhucMGP"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "atatck.t1112, atatck.defense_evasion"
+
+  events:
+($selection.metadata.product_event_type = "13" and re.regex($selection.target.registry.registry_key, `.*System\\CurrentControlSet\\Services\\TermService\\Parameters\\ServiceDll`))
+
+  condition:
+    $selection
+}

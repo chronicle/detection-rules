@@ -1,0 +1,17 @@
+rule possible_system_network_configuration_discovery_sysmonwindows_logs {
+ meta:
+    author = "Roman Ranskyi"
+    description = "Adversaries will likely look for details about the network configuration and settings of systems they access or through information discovery of remote systems.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/SZku7bXNyF1M"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = ""
+    mitre = "Discovery, t1016"
+
+  events:
+(($selection1.target.process.file.full_path = "net.exe" and $selection1.target.process.command_line = "net config") or (($selection1.target.process.file.full_path = "ipconfig.exe" or $selection1.target.process.file.full_path = "netsh.exe" or $selection1.target.process.file.full_path = "arp.exe" or $selection1.target.process.file.full_path = "nbtstat.exe" or $selection1.target.process.file.full_path = "systeminfo.exe") and not ($selection1.metadata.product_event_type = "7")))
+
+  condition:
+    $selection1
+}

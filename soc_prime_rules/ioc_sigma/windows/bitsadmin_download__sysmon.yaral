@@ -1,0 +1,17 @@
+rule bitsadmin_download_sysmon {
+ meta:
+    author = "Michael Haag"
+    description = "Detects usage of bitsadmin downloading a file.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/NkFX55P1CZVt"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204, t1059"
+
+  events:
+($selection.metadata.product_event_type = "1" and re.regex($selection.target.process.file.full_path, `.*\\bitsadmin\.exe`) and (re.regex($selection.target.process.command_line, `.*/transfer`) or re.regex($selection.target.process.command_line, `.*/download`)))
+
+  condition:
+    $selection
+}

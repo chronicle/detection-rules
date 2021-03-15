@@ -1,0 +1,16 @@
+rule program_executions_in_suspicious_folders {
+ meta:
+    author = "Florian Roth"
+    description = "Detects program executions in suspicious non-program folders related to malware or hacking activity  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/7Kk4Ni7briER"
+    version = "0.01"
+    created = "2018/01/23"
+    product = "linux"
+    service = "auditd"
+
+  events:
+($selection.metadata.event_type = "SYSCALL" and (re.regex($selection.target.process.file.full_path, `/tmp/.*`) or re.regex($selection.target.process.file.full_path, `/var/www/.*`) or re.regex($selection.target.process.file.full_path, `/usr/local/apache2/.*`) or re.regex($selection.target.process.file.full_path, `/usr/local/httpd/.*`) or re.regex($selection.target.process.file.full_path, `/var/apache/.*`) or re.regex($selection.target.process.file.full_path, `/srv/www/.*`) or re.regex($selection.target.process.file.full_path, `/home/httpd/html/.*`) or re.regex($selection.target.process.file.full_path, `/var/lib/pgsql/data/.*`) or re.regex($selection.target.process.file.full_path, `/usr/local/mysql/data/.*`) or re.regex($selection.target.process.file.full_path, `/var/lib/mysql/.*`) or re.regex($selection.target.process.file.full_path, `/var/vsftpd/.*`) or re.regex($selection.target.process.file.full_path, `/etc/bind/.*`) or re.regex($selection.target.process.file.full_path, `/var/named/.*`) or re.regex($selection.target.process.file.full_path, `.*/public_html/.*`)))
+
+  condition:
+    $selection
+}

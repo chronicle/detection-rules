@@ -1,0 +1,17 @@
+rule malicious_service_installations {
+ meta:
+    author = "Florian Roth"
+    description = "Detects known malicious service installs that only appear in cases of lateral movement, credential dumping and other suspicious activity  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/DSJDWn96TTAQ"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "system"
+    mitre = "persistence, privilege_escalation, t1050"
+
+  events:
+($selection.metadata.product_event_type = "7045" and (($selection.target.process.command_line = "WCESERVICE" or $selection.target.process.command_line = "WCE SERVICE") or re.regex($selection.target.process.command_line, `.*\\PAExec.*`) or re.regex($selection.target.process.command_line, `winexesvc\.exe.*`) or re.regex($selection.target.process.command_line, `.*\\DumpSvc\.exe`) or $selection.target.process.command_line = "mssecsvc2.0" or re.regex($selection.target.process.command_line, `.* net user .*`) or (re.regex($selection.target.process.command_line, `pwdump.*`) or re.regex($selection.target.process.command_line, `gsecdump.*`) or re.regex($selection.target.process.command_line, `cachedump.*`))))
+
+  condition:
+    $selection
+}

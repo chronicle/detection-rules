@@ -1,0 +1,17 @@
+rule troldesh_ransomware_detector_sysmon {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "TROLDESH Ransomware Detector.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/GcoLVVLG1CcA"
+    version = "0.01"
+    created = "2018/02/28"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204, t1059, Defense Evasion, t1112, Impact, t1486"
+
+  events:
+(($selection1.metadata.product_event_type = "1" and ($selection1.target.file.md5 = "e577944c48edfc65b6f59630b0b0ac625b997f26af3d4bdbe2f534be0fff6f34" or (re.regex($selection1.target.process.file.full_path, `.*\\cmd\.exe`) and re.regex($selection1.target.process.command_line, `.*/c C:\\Users\\admin\\AppData\\Local\\Temp\\rad.*`)))) or ($selection1.metadata.product_event_type = "13" and (re.regex($selection1.target.registry.registry_key, `.*\\Software\\System32\\Configuration\\xi`) or re.regex($selection1.target.registry.registry_key, `.*\\SOFTWARE\\System32\\Configuration\\xi`)) and $selection1.metadata.description = "906D0F2E2F604F839E04" and $selection1.metadata.event_type = "SetValue"))
+
+  condition:
+    $selection1
+}

@@ -1,0 +1,17 @@
+rule remote_execution_via_sql_extended_stored_procedure_xp_cmdshell {
+ meta:
+    author = "Den Iuzvyk"
+    description = "Detects remote execution via sql extended stored procedure xp_cmdshell. Check events 15457, 18454, 33205 in MSSQLSERVER log for correlation.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/necXED4R7vR3"
+    version = "0.01"
+    created = "2019/12/18"
+    product = "windows"
+    service = "process_creation"
+    mitre = "defense_evasion, execution, t1218, t1204, t1059"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\pwsh\.exe`)) and re.regex($selection.src.process.file.full_path, `.*\\sqlservr\.exe`))
+
+  condition:
+    $selection
+}

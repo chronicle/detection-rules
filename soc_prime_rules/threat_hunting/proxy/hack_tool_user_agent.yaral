@@ -1,0 +1,15 @@
+rule hack_tool_user_agent {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious user agent strings user by hack tools in proxy logs  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/zmMGplHFPuC2"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+
+  events:
+(re.regex($selection.src.application, `.*\(hydra\).*`) or re.regex($selection.src.application, `.* arachni/.*`) or re.regex($selection.src.application, `.* BFAC .*`) or re.regex($selection.src.application, `.* brutus .*`) or re.regex($selection.src.application, `.* cgichk .*`) or re.regex($selection.src.application, `.*core-project/1\.0.*`) or re.regex($selection.src.application, `.* crimscanner/.*`) or re.regex($selection.src.application, `.*datacha0s.*`) or re.regex($selection.src.application, `.*dirbuster.*`) or re.regex($selection.src.application, `.*domino hunter.*`) or re.regex($selection.src.application, `.*dotdotpwn.*`) or $selection.src.application = "FHScan Core" or re.regex($selection.src.application, `.*floodgate.*`) or re.regex($selection.src.application, `.*get-minimal.*`) or re.regex($selection.src.application, `.*gootkit auto-rooter scanner.*`) or re.regex($selection.src.application, `.*grendel-scan.*`) or re.regex($selection.src.application, `.* inspath .*`) or re.regex($selection.src.application, `.*internet ninja.*`) or re.regex($selection.src.application, `.*jaascois.*`) or re.regex($selection.src.application, `.* zmeu .*`) or re.regex($selection.src.application, `.*masscan.*`) or re.regex($selection.src.application, `.* metis .*`) or re.regex($selection.src.application, `.*morfeus fucking scanner.*`) or re.regex($selection.src.application, `.*n-stealth.*`) or re.regex($selection.src.application, `.*nsauditor.*`) or re.regex($selection.src.application, `.*pmafind.*`) or re.regex($selection.src.application, `.*security scan.*`) or re.regex($selection.src.application, `.*springenwerk.*`) or re.regex($selection.src.application, `.*teh forest lobster.*`) or re.regex($selection.src.application, `.*toata dragostea.*`) or re.regex($selection.src.application, `.* vega/.*`) or re.regex($selection.src.application, `.*voideye.*`) or re.regex($selection.src.application, `.*webshag.*`) or re.regex($selection.src.application, `.*webvulnscan.*`) or re.regex($selection.src.application, `.* whcc/.*`) or re.regex($selection.src.application, `.* Havij`) or re.regex($selection.src.application, `.*absinthe.*`) or re.regex($selection.src.application, `.*bsqlbf.*`) or re.regex($selection.src.application, `.*mysqloit.*`) or re.regex($selection.src.application, `.*pangolin.*`) or re.regex($selection.src.application, `.*sql power injector.*`) or re.regex($selection.src.application, `.*sqlmap.*`) or re.regex($selection.src.application, `.*sqlninja.*`) or re.regex($selection.src.application, `.*uil2pn.*`) or $selection.src.application = "ruler" or $selection.src.application = "Mozilla/5.0 (Windows; U; Windows NT 5.1; pt-PT; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)")
+
+  condition:
+    $selection
+}

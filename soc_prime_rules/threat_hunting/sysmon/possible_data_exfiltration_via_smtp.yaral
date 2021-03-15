@@ -1,0 +1,17 @@
+rule possible_data_exfiltration_via_smtp {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects when a process initiates an smtp connection, most keylogger variant use smtp to exfiltrate the keystrokes collected..eg hawkeye, agent tesla  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ONtNVVYdHkcz"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "exfiltration, t1048"
+
+  events:
+($selection.metadata.product_event_type = "3" and ($selection.target.port = "587" or $selection.target.port = "465"))
+
+  condition:
+    $selection
+}

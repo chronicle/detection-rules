@@ -1,0 +1,16 @@
+rule cobaltstrike_malleable_onedrive_browsing_traffic_profile {
+ meta:
+    author = "Markus Neis"
+    description = "Detects Malleable OneDrive Profile  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/KN9myumUJzVW"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+    mitre = "t1102"
+
+  events:
+(($selection.network.http.method = "GET" and re.regex($selection.target.url, `.*\?manifest=wac`) and $selection.principal.hostname = "onedrive.live.com") and not (re.regex($selection.target.url, `http.*://onedrive\.live\.com/.*`)))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule detect_possible_discovery_and_collection_of_files {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects the commands executed to discover certain file types(other file types can be added depending on document formats prevalent in an organization) using powershell and findstr command which could be indicative of discovery and collection stage of data exfiltration   License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/K5Q1Smrozv8f"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    category = "process_creation"
+    mitre = "discovery, t1083, collection, t1119"
+
+  events:
+(((re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) and (re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.ppt`) or re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.doc`) or re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.xls`) or re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.pptx`) or re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.docx`) or re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.xlsx`) or re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.pdf`) or re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.csv`) or re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.mdb`) or re.regex($selection.target.process.command_line, `Get-ChildItem -Recurse -Include .*\.pps`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) or ((re.regex($selection.target.process.command_line, `.* findstr .*`) or re.regex($selection.target.process.command_line, `.* findtsr\.exe`)) and (re.regex($selection.target.process.command_line, `.*\.doc`) or re.regex($selection.target.process.command_line, `.*\.docx`) or re.regex($selection.target.process.command_line, `.*\.pdf`) or re.regex($selection.target.process.command_line, `.*\.xls`) or re.regex($selection.target.process.command_line, `.*\.xlsx`) or re.regex($selection.target.process.command_line, `.*\.csv`) or re.regex($selection.target.process.command_line, `.*\.mdb`) or re.regex($selection.target.process.command_line, `.*\.pps`) or re.regex($selection.target.process.command_line, `.*\.pptx`) or re.regex($selection.target.process.command_line, `.*\.ppt`)))) or (re.regex($selection.target.process.file.full_path, `.*\\findstr\.exe`) and (re.regex($selection.target.process.command_line, `.*\.doc`) or re.regex($selection.target.process.command_line, `.*\.docx`) or re.regex($selection.target.process.command_line, `.*\.xls`) or re.regex($selection.target.process.command_line, `.*\.xlsx`) or re.regex($selection.target.process.command_line, `.*\.ppt`) or re.regex($selection.target.process.command_line, `.*\.pptx`) or re.regex($selection.target.process.command_line, `.*\.pps`) or re.regex($selection.target.process.command_line, `.*\.mdb`) or re.regex($selection.target.process.command_line, `.*\.pdf`) or re.regex($selection.target.process.command_line, `.*\.csv`))))
+
+  condition:
+    $selection
+}

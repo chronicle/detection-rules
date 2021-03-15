@@ -1,0 +1,17 @@
+rule roma225_campaign_sysmon {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "Roma225 Campaign Detector.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Nt4cpYc12h0Z"
+    version = "0.01"
+    created = "2018/12/27"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204"
+
+  events:
+($selection.metadata.product_event_type = "1" and ($selection.target.file.md5 = "4211e091dfb33523d675d273bdc109ddecf4ee1c1f5f29e8c82b9d0344dbb6a1" or $selection.target.file.md5 = "e8a765ec824881e1e78defd7c011da735f3e3b954aaf93a4282b6455a1b9afcc" or $selection.target.file.md5 = "702e5cc9462e464c8c29c832fe0d1ecd5cd7740cc2cbceecfd70e566da8194a1"))
+
+  condition:
+    $selection
+}

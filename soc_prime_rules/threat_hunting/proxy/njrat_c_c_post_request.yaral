@@ -1,0 +1,16 @@
+rule njrat_cc_post_request {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects the Command and Control POST request from the NJRAT once it is implanted on an endpoint sending the current status of the Host .e.g Anti-virus status, Operating system version, date of infection  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/psZji1bNylin"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "proxy"
+    mitre = "Command and Control, t1071"
+
+  events:
+(re.regex($selection.target.url, `.*/is-ready`) and (re.regex($selection.src.application, `.*|>plus<|.*`) or re.regex($selection.src.application, `.*|>underworld final<|.*`)))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule kerberos_manipulation {
+ meta:
+    author = "Florian Roth"
+    description = "This method triggers on rare Kerberos Failure Codes caused by manipulations of Kerberos messages  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/CpmgDmBrrqX1"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "credential_access, t1212"
+
+  events:
+(($selection.metadata.product_event_type = "675" or $selection.metadata.product_event_type = "4768" or $selection.metadata.product_event_type = "4769" or $selection.metadata.product_event_type = "4771") and ($selection.security_result.description = "0x9" or $selection.security_result.description = "0xA" or $selection.security_result.description = "0xB" or $selection.security_result.description = "0xF" or $selection.security_result.description = "0x10" or $selection.security_result.description = "0x11" or $selection.security_result.description = "0x13" or $selection.security_result.description = "0x14" or $selection.security_result.description = "0x1A" or $selection.security_result.description = "0x1F" or $selection.security_result.description = "0x21" or $selection.security_result.description = "0x22" or $selection.security_result.description = "0x23" or $selection.security_result.description = "0x24" or $selection.security_result.description = "0x26" or $selection.security_result.description = "0x27" or $selection.security_result.description = "0x28" or $selection.security_result.description = "0x29" or $selection.security_result.description = "0x2C" or $selection.security_result.description = "0x2D" or $selection.security_result.description = "0x2E" or $selection.security_result.description = "0x2F" or $selection.security_result.description = "0x31" or $selection.security_result.description = "0x32" or $selection.security_result.description = "0x3E" or $selection.security_result.description = "0x3F" or $selection.security_result.description = "0x40" or $selection.security_result.description = "0x41" or $selection.security_result.description = "0x43" or $selection.security_result.description = "0x44"))
+
+  condition:
+    $selection
+}

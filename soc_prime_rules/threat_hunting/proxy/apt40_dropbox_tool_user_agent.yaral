@@ -1,0 +1,15 @@
+rule apt40_dropbox_tool_user_agent {
+ meta:
+    author = "Thomas Patzke"
+    description = "Detects suspicious user agent string of APT40 Dropbox tool  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/2Bei4Y4wxbk7"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+
+  events:
+($selection.src.application = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36" and $selection.target.hostname = "api.dropbox.com")
+
+  condition:
+    $selection
+}

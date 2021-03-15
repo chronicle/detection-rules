@@ -1,0 +1,16 @@
+rule atlassian_confluence_download_attachments_remote_code_executiondirectory_traversal {
+ meta:
+    author = "Halil Ibrahim Cosgun"
+    description = "Detects Atlassian Confluence RCE via Attachment Download. Sample regex added to detect directory traversal, it can be improved.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/pCBpTAya0HBi"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "proxy"
+    mitre = "initial_access, persistence, privilege_escalation, T1190, T1100"
+
+  events:
+($selection.network.http.method = "POST" and re.regex($selection.target.url, `/plugins/drag-and-drop/upload\.action\?pageId.*&filename=^\(\?!\..*\\/\.\\/\.\)\.{0,200}$.*&size=.*&mimeType=.*atl_token=.*&name=^\(\?!\..*\\/\.\\/\.\)\.{0,200}$.*`))
+
+  condition:
+    $selection
+}

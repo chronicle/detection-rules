@@ -1,0 +1,17 @@
+rule process_dump_via_comsvcs_dll {
+ meta:
+    author = "Modexp (idea)"
+    description = "Detects process memory dump via comsvcs.dll and rundll32  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/BnuWbd1VgHGv"
+    version = "0.01"
+    created = "2019/09/02"
+    category = "process_creation"
+    product = "windows"
+    mitre = "credential_access, t1003"
+
+  events:
+((re.regex($rundll_image.target.process.file.full_path, `.*\\rundll32\.exe`) or $rundll_image.target.file.full_path = "RUNDLL32.EXE") and ((re.regex($rundll_image.target.process.command_line, `.*comsvcs.*MiniDump.*full.*`) or re.regex($rundll_image.target.process.command_line, `.*comsvcs.*MiniDumpW.*full.*`)) and ($rundll_image.metadata.product_event_type = "4688" or $rundll_image.metadata.product_event_type = "1")))
+
+  condition:
+    $rundll_image
+}

@@ -1,0 +1,17 @@
+rule lazarus_attack_variant {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Detects a Lazarus attack variant via move.exe and reg.exe  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/XK07zRt3m5OF"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, T1059"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (($selection1.target.process.file.full_path = "move.exe" and ($selection1.target.process.command_line = "move \"c:\\perflogs\\1.dat\" \"c:\\programdata\\microsoft\\sqcsvc\\sqcsvc6.ldx\"" or $selection1.target.process.command_line = "move \"c:\\perflogs\\1.dll\" \"c:\\windows\\system32\\sqcsvc.dll\"" or $selection1.target.process.command_line = "move \"c:\\perflogs\\1.dll.mui\" \"c:\\windows\\system32\\sqcsvc.dll.mui\"")) or ($selection1.target.process.file.full_path = "reg.exe" and ($selection1.target.process.command_line = "reg add \"HKLM\\SYSTEM\\ControlSet001\\Services\\sqcsvc\\Parameters\" /v ServiceDll /t REG_EXPAND_SZ /d \"%SystemRoot%\\System32\\sqcsvc.dll\"" or $selection1.target.process.command_line = "reg add \"HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Svchost\" /v sqcsvc /t REG_ MULTI_SZ /d sqcsvc"))))
+
+  condition:
+    $selection1
+}

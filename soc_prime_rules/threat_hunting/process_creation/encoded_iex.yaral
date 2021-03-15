@@ -1,0 +1,17 @@
+rule encoded_iex {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a base64 encoded IEX command string in a process command line  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/5sp2AU3LTPOL"
+    version = "0.01"
+    created = "2019/08/23"
+    category = "process_creation"
+    product = "windows"
+    mitre = "t1086, t1140, execution"
+
+  events:
+((re.regex($selection.target.process.command_line, `.*SUVYIChb.*`) or re.regex($selection.target.process.command_line, `.*lFWCAoW.*`) or re.regex($selection.target.process.command_line, `.*JRVggKF.*`) or re.regex($selection.target.process.command_line, `.*aWV4IChb.*`) or re.regex($selection.target.process.command_line, `.*lleCAoW.*`) or re.regex($selection.target.process.command_line, `.*pZXggKF.*`) or re.regex($selection.target.process.command_line, `.*aWV4IChOZX.*`) or re.regex($selection.target.process.command_line, `.*lleCAoTmV3.*`) or re.regex($selection.target.process.command_line, `.*pZXggKE5ld.*`) or re.regex($selection.target.process.command_line, `.*SUVYIChOZX.*`) or re.regex($selection.target.process.command_line, `.*lFWCAoTmV3.*`) or re.regex($selection.target.process.command_line, `.*JRVggKE5ld.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

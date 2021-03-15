@@ -1,0 +1,17 @@
+rule quarkspwdump_dump_file {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a dump file written by QuarksPwDump password dumper  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/qAu2cCL6bXrg"
+    version = "0.01"
+    created = "2018/02/10"
+    product = "windows"
+    service = "sysmon"
+    mitre = "credential_access, t1003"
+
+  events:
+($selection.metadata.product_event_type = "11" and re.regex($selection.target.file.full_path, `.*\\AppData\\Local\\Temp\\SAM-.*\.dmp.*`))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule poetrat_pythonrat_uses_covid19_lure {
+ meta:
+    author = "Emir Erdogan"
+    description = "Covid19 theme phishing document drop pyhton and execute malware by python  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/9l7TeSLJabOP"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1059, T1012, T1086"
+
+  events:
+(re.regex($selection1.src.process.file.full_path, `.*\\WINWORD\.exe`) and (re.regex($selection1.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\powershell\.exe`)) and (re.regex($selection1.target.process.command_line, `.*/c copy .*.*\.docx .*\.rar && \"C:\\Program Files\\WinRAR\\winRar\.exe\" x -o\+ -ibck .*\.rar .*\.bat && start /b .*\.bat .*\.EXE MICROSOFT WORD`) or re.regex($selection1.target.process.command_line, `C:\\Programs\\Microsoft\\Office\\MSWord\.exe\\\.\.\\\.\.\\\.\.\\\.\..*\\powershell\.exe copy .*.*\.docx .*\.rar; & .*\\WinRAR\.exe x -ibck .*\.rar .*\.exe;Start-Sleep 5;start .*\.EXE MSW`)))
+
+  condition:
+    $selection1
+}

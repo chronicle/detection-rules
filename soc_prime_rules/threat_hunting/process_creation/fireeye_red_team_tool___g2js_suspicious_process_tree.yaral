@@ -1,0 +1,17 @@
+rule fireeye_red_team_tool__g2js_suspicious_process_tree {
+ meta:
+    author = "Sittikorn S, FireEye"
+    description = "This rule has been ported from Fireeye's HXIOC format to SIGMA. It detects the Fireeye tool GadgetToJScript(G2JS).  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/2CudqsJPVCUh"
+    version = "0.01"
+    created = "2020/12/11"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, defense_evasion, t1218.005, t1059"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*userinit\.exe.*`) or re.regex($selection.target.process.file.full_path, `.*colorcpl\.exe.*`)) and (re.regex($selection.src.process.file.full_path, `.*mshta\.exe.*`) or re.regex($selection.src.process.file.full_path, `.*cscript\.exe.*`) or re.regex($selection.src.process.file.full_path, `.*wscript\.exe.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

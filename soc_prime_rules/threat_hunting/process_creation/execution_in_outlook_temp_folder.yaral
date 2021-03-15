@@ -1,0 +1,17 @@
+rule execution_in_outlook_temp_folder {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a suspicious program execution in Outlook temp folder  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/TTOs3evZRJww"
+    version = "0.01"
+    created = "2019/10/01"
+    category = "process_creation"
+    product = "windows"
+    mitre = "initial_access, t1193"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*\\Temporary Internet Files\\Content\.Outlook\\.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

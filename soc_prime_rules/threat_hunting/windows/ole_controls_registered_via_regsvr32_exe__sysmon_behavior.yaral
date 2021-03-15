@@ -1,0 +1,17 @@
+rule ole_controls_registered_via_regsvr32exe_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "Regsvr32.exe is a command-line program used to register and unregister OLE controls  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/1Vp34ZDBjRJ0"
+    version = "0.01"
+    created = "2019/07/06"
+    product = "windows"
+    service = "sysmon"
+    mitre = "defense_evasion, execution, t1117"
+
+  events:
+($selection1.metadata.product_event_type = "1" and $selection1.target.process.file.full_path = "C:\\Windows\\system32\\regsvr32.exe" and re.regex($selection1.target.process.command_line, `regsvr32\.exe /s /u /i:.* .*\.dll`) and $selection1.src.process.file.full_path = "C:\\Windows\\System32\\cmd.exe")
+
+  condition:
+    $selection1
+}

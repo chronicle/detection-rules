@@ -1,0 +1,17 @@
+rule secure_deletion_with_sdelete {
+ meta:
+    author = "Thomas Patzke"
+    description = "Detects renaming of file while deletion with SDelete tool  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/oQbb7ITCipFP"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "defense_evasion, t1107, t1066, s0195"
+
+  events:
+(($selection.metadata.product_event_type = "4656" or $selection.metadata.product_event_type = "4663" or $selection.metadata.product_event_type = "4658") and ((re.regex($selection.target.registry.registry_value_data, `.*\.AAA`) or re.regex($selection.target.registry.registry_value_data, `.*\.ZZZ`)) or (re.regex($selection.target.file.full_path, `.*\.AAA`) or re.regex($selection.target.file.full_path, `.*\.ZZZ`))))
+
+  condition:
+    $selection
+}

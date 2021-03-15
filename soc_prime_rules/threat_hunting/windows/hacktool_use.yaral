@@ -1,0 +1,17 @@
+rule hacktool_use {
+ meta:
+    author = "Florian Roth"
+    description = "This method detects well-known keywords, certain field combination that appear in Windows Eventlog when certain hack tools are used  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/cACTBIbeAVRx"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "discovery, execution, t1087, t1075, t1114, t1059"
+
+  events:
+(($selection1.metadata.product_event_type = "4776" or $selection1.metadata.product_event_type = "4624" or $selection1.metadata.product_event_type = "4625") and $selection1.principal.hostname = "RULER")
+
+  condition:
+    $selection1
+}

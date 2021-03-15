@@ -1,0 +1,17 @@
+rule suspicious_calculator_usage {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious use of calc.exe with command line parameters or in a suspicious directory, which is likely caused by some PoC or detection evasion  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/OBZnYuU21qdX"
+    version = "0.01"
+    created = "2019/02/09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1036"
+
+  events:
+((re.regex($selection1.target.process.command_line, `.*\\calc\.exe .*`) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1")) or ((re.regex($selection1.target.process.file.full_path, `.*\\calc\.exe`) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1")) and not (re.regex($selection1.target.process.file.full_path, `.*\\Windows\\Sys.*`))))
+
+  condition:
+    $selection1
+}

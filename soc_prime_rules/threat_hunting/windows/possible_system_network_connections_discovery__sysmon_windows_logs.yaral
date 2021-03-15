@@ -1,0 +1,17 @@
+rule possible_system_network_connections_discovery_sysmonwindows_logs {
+ meta:
+    author = "Roman Ranskyi"
+    description = "Adversaries may attempt to get a listing of network connections to or from the compromised system they are currently accessing or from remote systems by querying for information over the network.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/h6JZi6LE5mkT"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Discovery, t1049"
+
+  events:
+($selection0.target.process.command_line = "net config" or $selection0.target.process.command_line = "net use" or $selection0.target.process.command_line = "net sessions" or $selection0.target.process.command_line = "net file" or $selection0.target.process.command_line = "net1 config" or $selection0.target.process.command_line = "net1 use" or $selection0.target.process.command_line = "net1 sessions" or $selection0.target.process.command_line = "net1 file" or $selection0.target.process.command_line = "netstat" or $selection0.target.process.command_line = "Get-NetTCPConnection")
+
+  condition:
+    $selection0
+}

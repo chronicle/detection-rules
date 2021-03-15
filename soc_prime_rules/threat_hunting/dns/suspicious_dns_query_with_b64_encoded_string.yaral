@@ -1,0 +1,15 @@
+rule suspicious_dns_query_with_b64_encoded_string {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious DNS queries using base64 encoding  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/v6bVaJ9VCDy3"
+    version = "0.01"
+    created = "2018/05/10"
+    category = "dns"
+
+  events:
+re.regex($selection.target.url, `.*==\..*`)
+
+  condition:
+    $selection
+}

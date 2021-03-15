@@ -1,0 +1,17 @@
+rule uac_bypass_via_sdclt {
+ meta:
+    author = "Omer Yampel"
+    description = "Detects changes to HKCU:\\Software\\Classes\\exefile\\shell\\runas\\command\\isolatedCommand  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/AksQZz5FsrFm"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "defense_evasion, privilege_escalation, t1088, car.2019-04-001"
+
+  events:
+($selection.metadata.product_event_type = "13" and re.regex($selection.target.registry.registry_key, `HKEY_USERS\\.*\\Classes\\exefile\\shell\\runas\\command\\isolatedCommand`))
+
+  condition:
+    $selection
+}

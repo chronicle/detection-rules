@@ -1,0 +1,16 @@
+rule dns_txt_answer_with_possible_execution_strings {
+ meta:
+    author = "Markus Neis"
+    description = "Detects strings used in command execution in DNS TXT Answer  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/eM2RuANUQgh7"
+    version = "0.01"
+    created = "2018/08/08"
+    category = "dns"
+    mitre = "t1071"
+
+  events:
+(re.regex($selection.network.dns.answers.data, `.*IEX.*`) or re.regex($selection.network.dns.answers.data, `.*Invoke-Expression.*`) or re.regex($selection.network.dns.answers.data, `.*cmd\.exe.*`))
+
+  condition:
+    $selection
+}

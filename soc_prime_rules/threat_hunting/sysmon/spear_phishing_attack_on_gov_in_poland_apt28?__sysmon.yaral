@@ -1,0 +1,17 @@
+rule spear_phishing_attack_on_gov_in_poland_apt28_sysmon {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "Detector.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/cAjbIDtS2HSp"
+    version = "0.01"
+    created = "2018/11/17"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204, Persistence, t1060"
+
+  events:
+(($selectionHash.metadata.product_event_type = "1" and ($selectionHash.target.file.md5 = "D7BC8E19721FDD0EEA29DE2B0F17504C7C2F62AD" or $selectionHash.target.file.md5 = "8FB0124DEF0E5A7A12495EDE2A20A9C48A7929A6" or $selectionHash.target.file.md5 = "D14A360FFA7645693EE6E19BC2B64CF7707504C8" or $selectionHash.target.file.md5 = "777DB69F7C22F6481FD2246A0FE444D410281270")) or ($selectionHash.metadata.product_event_type = "13" and re.regex($selectionHash.target.registry.registry_key, `.*\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\AudioMgr`)))
+
+  condition:
+    $selectionHash
+}

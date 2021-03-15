@@ -1,0 +1,16 @@
+rule certutil_encode {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious a certutil command that used to encode files, which is sometimes used for data exfiltration  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/3xvaWdoC0q2R"
+    version = "0.01"
+    created = "2019/02/24"
+    category = "process_creation"
+    product = "windows"
+
+  events:
+((re.regex($selection.target.process.command_line, `certutil -f -encode .*`) or re.regex($selection.target.process.command_line, `certutil\.exe -f -encode .*`) or re.regex($selection.target.process.command_line, `certutil -encode -f .*`) or re.regex($selection.target.process.command_line, `certutil\.exe -encode -f .*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

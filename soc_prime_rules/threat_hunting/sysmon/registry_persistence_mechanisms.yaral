@@ -1,0 +1,17 @@
+rule registry_persistence_mechanisms {
+ meta:
+    author = "Karneades"
+    description = "Detects persistence registry keys  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Z4YGSHNopjyZ"
+    version = "0.01"
+    created = "2018/04/11"
+    product = "windows"
+    service = "sysmon"
+    mitre = "privilege_escalation, persistence, defense_evasion, t1183, car.2013-01-002"
+
+  events:
+($selection_reg1.metadata.product_event_type = "13" and (re.regex($selection_reg1.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options.*\\GlobalFlag`) or re.regex($selection_reg1.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit.*\\ReportingMode`) or re.regex($selection_reg1.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit.*\\MonitorProcess`)) and $selection_reg1.metadata.event_type = "SetValue")
+
+  condition:
+    $selection_reg1
+}

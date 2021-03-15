@@ -1,0 +1,17 @@
+rule nanocore_rat_loaded_by_covid19_update_xlsm_file {
+ meta:
+    author = "Emir Erdogan"
+    description = "NanoCore RAT Loaded By Covid-19 Update XLSM File  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/3PiQpZWwUfZt"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1086, T1064, T1105"
+
+  events:
+(re.regex($selection.src.process.file.full_path, `.*\\excel\.exe`) and re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) and re.regex($selection.target.process.command_line, `.*-executionpolicy bypass -W Hidden -command \(new-object System\.Net\.WebClient\)\.DownloadFile\(.*gbud\.webd\.pl/cli/.*\.exe.*,$env:Temp\+.*\.exe.*\);\(New-Object -com Shell\.Application\)\.ShellExecute\($env:Temp\+.*\.exe.*\)`))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule wmi_event_subscription {
+ meta:
+    author = "Tom Ueltschi (@c_APT_ure)"
+    description = "Detects creation of WMI event subscription persistence method  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/3ptoCPtD5smC"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Persistence, t1084, Execution, t1047"
+
+  events:
+($selector.metadata.product_event_type = "19" or $selector.metadata.product_event_type = "20" or $selector.metadata.product_event_type = "21")
+
+  condition:
+    $selector
+}

@@ -1,0 +1,17 @@
+rule data_exfiltration_detection_with_htran {
+ meta:
+    author = "Furkan Celik"
+    description = "Similar to most of cyber espionage groups, APT10 is main goal is to exfiltrate critical data from victim is environment. In order to exfiltrate data from the victim is network segment that is not connected to internet, a bridge tool is needed to redirect ports and connections between two network segments. In this case threat group deployed hTran to achieve the same functionality. Over the past years we observed Chinese threata groups using htran in their attacks against world. This executable file was seen as java.exe on compromised hosts  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/CBsRA1zfmrfE"
+    version = "0.01"
+    created = "2020/04/12"
+    product = "windows"
+    service = "security"
+    mitre = "T1041, Exfiltration"
+
+  events:
+(re.regex($selection.target.process.command_line, `.*java\.exe %% 1936 0x199c .*java\.exe -ht listenip:8080 -hu username -hp password C&C:443 NULL SID -- 0x0`) and $selection.metadata.product_event_type = "1" and re.regex($selection.target.process.file.full_path, `.*java\.exe`))
+
+  condition:
+    $selection
+}

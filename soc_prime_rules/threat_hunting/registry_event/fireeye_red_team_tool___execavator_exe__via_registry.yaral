@@ -1,0 +1,17 @@
+rule fireeye_red_team_tool__execavatorexe_via_registry {
+ meta:
+    author = "SOC Prime Team, FireEye"
+    description = "This rule has been ported from Fireeye's HXIOC format to SIGMA. It detects the Fireeye tool excavator.exe making a registry change affecting the iphlpsvc6 service.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/eQx73ocSqK7c"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    category = "registry_event"
+    mitre = "credential_access, t1003.001"
+
+  events:
+($selection.metadata.event_type = "SetValue" and re.regex($selection.target.registry.registry_key, `.*CurrentControlSet\\services\\iphlpsvc6\\ImagePath`))
+
+  condition:
+    $selection
+}

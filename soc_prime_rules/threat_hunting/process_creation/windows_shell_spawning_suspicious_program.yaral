@@ -1,0 +1,17 @@
+rule windows_shell_spawning_suspicious_program {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a suspicious child process of a Windows shell  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/pRcHVajnlNI4"
+    version = "0.01"
+    created = "2018/04/06"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, defense_evasion, t1064"
+
+  events:
+(((re.regex($selection.src.process.file.full_path, `.*\\mshta\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\rundll32\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\cscript\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\wscript\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\wmiprvse\.exe`)) and (re.regex($selection.target.process.file.full_path, `.*\\schtasks\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\nslookup\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\certutil\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\bitsadmin\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\mshta\.exe`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not (re.regex($selection.principal.file.full_path, `.*\\ccmcache\\.*`)))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,15 @@
+rule pulse_secure_attack_cve201911510 {
+ meta:
+    author = "Florian Roth"
+    description = "Detects CVE-2019-11510 exploitation attempt - URI contains Guacamole  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/uYtWrniKw8W7"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "webserver"
+
+  events:
+re.regex($selection.target.url, `.*\?/dana/html5acc/guacamole/.*`)
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule a_variant_of_data_stealer_trojan_activity {
+ meta:
+    author = "Emir Erdogan"
+    description = "This rule detects a stealer behaviour. Malware deletes itself  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/f9ZYj4C5CNBg"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1129, T1003, T1114, T1012, T1107"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*/ralord\.exe`) or re.regex($selection.target.process.file.full_path, `.*/lodron\.exe`) or re.regex($selection.target.process.file.full_path, `.*/019\.exe`) or re.regex($selection.target.process.file.full_path, `.*/016\.exe`)) and (re.regex($selection.src.process.file.full_path, `.*/setup_file\.exe`) or re.regex($selection.src.process.file.full_path, `.*/setup_installer\.exe`)))
+
+  condition:
+    $selection
+}

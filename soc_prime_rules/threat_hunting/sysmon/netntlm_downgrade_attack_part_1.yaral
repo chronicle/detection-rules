@@ -1,0 +1,17 @@
+rule netntlm_downgrade_attack {
+ meta:
+    author = "Florian Roth"
+    description = "Detects post exploitation using NetNTLM downgrade attacks  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/XzZiURQ3EeoE"
+    version = "0.01"
+    created = "2018/03/20"
+    product = "windows"
+    service = "sysmon"
+    mitre = "credential_access, t1212"
+
+  events:
+($selection1.metadata.product_event_type = "13" and (re.regex($selection1.target.registry.registry_key, `.*SYSTEM\\.*ControlSet.*\\Control\\Lsa\\lmcompatibilitylevel`) or re.regex($selection1.target.registry.registry_key, `.*SYSTEM\\.*ControlSet.*\\Control\\Lsa\\NtlmMinClientSec`) or re.regex($selection1.target.registry.registry_key, `.*SYSTEM\\.*ControlSet.*\\Control\\Lsa\\RestrictSendingNTLMTraffic`)))
+
+  condition:
+    $selection1
+}

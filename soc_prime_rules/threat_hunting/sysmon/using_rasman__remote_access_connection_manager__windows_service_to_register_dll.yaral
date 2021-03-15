@@ -1,0 +1,17 @@
+rule using_rasman_remote_access_connection_manager_windows_service_to_register_dll {
+ meta:
+    author = "Den Iuzvyk"
+    description = "Detects using RasMan (Remote Access Connection Manager) Windows service to register DLL  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/iyTEEDgZE5gO"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "attck.persistence, attck.t1031"
+
+  events:
+($selection_reg1.metadata.product_event_type = "13" and re.regex($selection_reg1.target.registry.registry_key, `.*\\SYSTEM\\CurrentControlSet\\services\\RasMan\\ThirdParty\\DllName`) and $selection_reg1.metadata.event_type = "SetValue" and re.regex($selection_reg1.metadata.description, `.*\.dll`))
+
+  condition:
+    $selection_reg1
+}

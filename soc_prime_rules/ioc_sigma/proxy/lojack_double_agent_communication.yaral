@@ -1,0 +1,16 @@
+rule lojack_doubleagent_communication {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "Lojack Double-Agent Communication Detection.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ryZLkAa7uswv"
+    version = "0.01"
+    created = "2008/04/01"
+    product = "proxy"
+    mitre = "Command and Control, t1071, t1043"
+
+  events:
+($selection.target.hostname = "sysanalyticweb.com" or $selection.target.hostname = "elaxo.org" or $selection.target.hostname = "ikmtrust.com" or $selection.target.hostname = "lxwo.org")
+
+  condition:
+    $selection
+}

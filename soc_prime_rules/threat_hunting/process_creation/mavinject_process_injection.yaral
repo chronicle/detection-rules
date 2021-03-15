@@ -1,0 +1,17 @@
+rule mavinject_process_injection {
+ meta:
+    author = "Florian Roth"
+    description = "Detects process injection using the signed Windows tool Mavinject32.exe  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/4TmhnXxVIPh5"
+    version = "0.01"
+    created = "2018/12/12"
+    category = "process_creation"
+    product = "windows"
+    mitre = "process_injection, t1055, signed_binary_proxy_execution, t1218"
+
+  events:
+(re.regex($selection.target.process.command_line, `.* /INJECTRUNNING .*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

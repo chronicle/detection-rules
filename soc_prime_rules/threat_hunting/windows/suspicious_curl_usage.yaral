@@ -1,0 +1,17 @@
+rule suspicious_curl_usage {
+ meta:
+    author = "Emir Erdogan"
+    description = "cURL is a command line browser, and often used by attackers to download malware.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/NTrME73OyT8w"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1059, T1188, T1079, T1041"
+
+  events:
+($selection.target.process.file.full_path = "C:\\Windows\\System32\\curl.exe" and $selection.src.process.file.full_path = "C:\\Windows\\System32\\cmd.exe" and (re.regex($selection.target.process.command_line, `.*curl ftp.*`) or re.regex($selection.target.process.command_line, `.*curl --socks5 torproxy.*`) or re.regex($selection.target.process.command_line, `.*curl -F .*\.exe.*`) or re.regex($selection.target.process.command_line, `.*curl --dns-ipv4-addr.*`) or re.regex($selection.target.process.command_line, `.*curl --dns-interface eth1.*`) or re.regex($selection.target.process.command_line, `.*curl --resolve.*`) or re.regex($selection.target.process.command_line, `.*curl --header \"X-Application: BotClient\".*`)))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule schtask_creation_sysmon {
+ meta:
+    author = "Michael Haag, Alexandr Yampolskyi"
+    description = "Detects usage of schtask usage.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/yN2oW0MnSZcJ"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204"
+
+  events:
+($selection.metadata.product_event_type = "1" and $selection.target.process.file.full_path = "schtask.exe")
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule renamed_powershellexe {
+ meta:
+    author = "Tom Ueltschi (@c_APT_ure)"
+    description = "Detects copying and renaming of powershell.exe before execution (RETEFE malware DOC/macro starting Sept 2018)  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/WIUXMdiAiDDv"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "t1086, execution"
+
+  events:
+(($selection.metadata.description = "Windows PowerShell" and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not (((re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell_ise\.exe`)) or $selection.metadata.description = "Windows PowerShell ISE")))
+
+  condition:
+    $selection
+}

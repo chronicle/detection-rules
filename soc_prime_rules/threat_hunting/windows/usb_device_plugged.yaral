@@ -1,0 +1,16 @@
+rule usb_device_plugged {
+ meta:
+    author = "Florian Roth"
+    description = "Detects plugged USB devices  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/KA7Wy5ULX6rX"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "driver-framework"
+
+  events:
+($selection.metadata.product_event_type = "2003" or $selection.metadata.product_event_type = "2100" or $selection.metadata.product_event_type = "2102")
+
+  condition:
+    $selection
+}

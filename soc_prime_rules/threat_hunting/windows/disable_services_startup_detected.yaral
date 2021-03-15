@@ -1,0 +1,17 @@
+rule disable_services_startup_detected {
+ meta:
+    author = "Furkan Celik"
+    description = "A process attempted to disable a common security related service from starting at system boot.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ie8i7NI6fJ5S"
+    version = "0.01"
+    created = "2020/04/17"
+    product = "windows"
+    service = "powershell"
+    mitre = "execution, defense_evasion, t1204, t1059"
+
+  events:
+($selection.target.process.command_line = "cmd.exe /c sc stop wuauserv" or $selection.target.process.command_line = "stop wuauserv")
+
+  condition:
+    $selection
+}

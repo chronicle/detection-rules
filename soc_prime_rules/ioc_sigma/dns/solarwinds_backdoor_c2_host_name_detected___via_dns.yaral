@@ -1,0 +1,16 @@
+rule solarwinds_backdoor_c2_host_name_detected_via_dns {
+ meta:
+    author = "SOC Prime Team, Fireeye"
+    description = "This rule was converted from the FireEye hxioc DNS rules. This rule identifies the Sunburst C2 channel used in the compromise.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/xfKZkoseYXo7"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "dns"
+    mitre = "command_and_control, t1071.001"
+
+  events:
+(re.regex($selection.network.dns.questions.name, `.*avsvmcloud\.com`) or re.regex($selection.network.dns.questions.name, `.*databasegalore\.com`) or re.regex($selection.network.dns.questions.name, `.*deftsecurity\.com`) or re.regex($selection.network.dns.questions.name, `.*freescanonline\.com`) or re.regex($selection.network.dns.questions.name, `.*panhardware\.com`) or re.regex($selection.network.dns.questions.name, `.*thedoccloud\.com`) or re.regex($selection.network.dns.questions.name, `.*incomeupdate\.com`) or re.regex($selection.network.dns.questions.name, `.*zupertech\.com`) or re.regex($selection.network.dns.questions.name, `.*digitalcollege\.org`) or re.regex($selection.network.dns.questions.name, `.*virtualdataserver\.com`))
+
+  condition:
+    $selection
+}

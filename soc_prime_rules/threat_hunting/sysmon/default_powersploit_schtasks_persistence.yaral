@@ -1,0 +1,17 @@
+rule default_powersploit_schtasks_persistence {
+ meta:
+    author = "Markus Neis"
+    description = "Detects the creation of a schtask via PowerSploit Default Configuration  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/MbHasyqcmAzU"
+    version = "0.01"
+    created = "2018/03/06"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, persistence, privilege_escalation, t1053, t1086, s0111, g0022, g0060"
+
+  events:
+(re.regex($selection.src.process.file.full_path, `.*\\Powershell\.exe`) and (re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*ONLOGON.*`) or re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*DAILY.*`) or re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*ONIDLE.*`) or re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*HOURLY.*`)))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,16 @@
+rule suspicious_program_location_process_starts {
+ meta:
+    author = "Florian Roth"
+    description = "Detects programs running in suspicious files system locations  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/N5l3cc8EJMOX"
+    version = "0.01"
+    created = "2019/01/15"
+    category = "process_creation"
+    product = "windows"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*\\$Recycle\.bin`) or re.regex($selection.target.process.file.full_path, `.*\\Users\\Public\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Perflogs\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\Fonts\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\IME\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\addins\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\debug\\.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

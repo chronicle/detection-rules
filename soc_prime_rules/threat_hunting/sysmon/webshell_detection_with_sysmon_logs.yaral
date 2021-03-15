@@ -1,0 +1,17 @@
+rule webshell_detection_with_sysmon_logs {
+ meta:
+    author = "Emir Erdogan"
+    description = "It only detects a webshell on a IIS webservers.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/yDGqouUvPgjp"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "privilege_escalation, Web_Shell, t1100"
+
+  events:
+(re.regex($selection.src.process.file.full_path, `.*\\w3wp\.exe`) and re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`))
+
+  condition:
+    $selection
+}

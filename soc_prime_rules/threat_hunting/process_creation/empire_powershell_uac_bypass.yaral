@@ -1,0 +1,17 @@
+rule empire_powershell_uac_bypass {
+ meta:
+    author = "Ecco"
+    description = "Detects some Empire PowerShell UAC bypass methods  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/XcuVOk5Dd9JM"
+    version = "0.01"
+    created = "2019/08/30"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, privilege_escalation, t1088, car.2019-04-001"
+
+  events:
+((re.regex($selection.target.process.command_line, `.* -NoP -NonI -w Hidden -c $x=$\(\(gp HKCU:Software\\\\Microsoft\\\\Windows Update\)\.Update\).*`) or re.regex($selection.target.process.command_line, `.* -NoP -NonI -c $x=$\(\(gp HKCU:Software\\\\Microsoft\\\\Windows Update\)\.Update\);.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

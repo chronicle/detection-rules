@@ -1,0 +1,17 @@
+rule fireeye_red_team_tool__adpasshunt_via_cmdline {
+ meta:
+    author = "SOC Prime Team, FireEye"
+    description = "This rule has been ported from Fireeye's HXIOC format to SIGMA. It detects the Fireeye tool AdPassHunt  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/tsijmAbr9pzp"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "credential_access, t1003.003, t1552.006"
+
+  events:
+(re.regex($selection_image.target.process.file.full_path, `.*\\adpasshunt\.exe`) or (re.regex($selection_image.target.process.command_line, `.*dc.*`) and re.regex($selection_image.target.process.command_line, `.*domain.*`) and re.regex($selection_image.target.process.command_line, `.*action.*`) and ($selection_image.metadata.product_event_type = "4688" or $selection_image.metadata.product_event_type = "1") and (re.regex($selection_image.target.process.command_line, `.*gpp.*`) or re.regex($selection_image.target.process.command_line, `.*ad.*`))))
+
+  condition:
+    $selection_image
+}

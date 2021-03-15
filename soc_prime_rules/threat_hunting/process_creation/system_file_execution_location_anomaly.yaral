@@ -1,0 +1,17 @@
+rule system_file_execution_location_anomaly {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a Windows program executable started in a suspicious folder  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/CM8o7YQwzMny"
+    version = "0.01"
+    created = "2017/11/27"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion"
+
+  events:
+(((re.regex($selection.target.process.file.full_path, `.*\\svchost\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\rundll32\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\services\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\regsvr32\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\spoolsv\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\lsass\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\smss\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\csrss\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\conhost\.exe`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not ((re.regex($selection.target.process.file.full_path, `.*\\System32\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\SysWow64\\.*`))))
+
+  condition:
+    $selection
+}

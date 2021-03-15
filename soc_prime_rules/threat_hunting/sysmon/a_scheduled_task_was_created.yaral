@@ -1,0 +1,17 @@
+rule a_scheduled_task_was_created {
+ meta:
+    author = "Florian Roth(original) Lee Archinal(Updated)"
+    description = "This detectes when a registry key is set under \\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Schedule\\TaskCache\\Tasks\\  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/nnJBPo7RT9Rh"
+    version = "0.01"
+    created = "2019/04/30"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, persistence, privelege_escalation, t1053, s0111"
+
+  events:
+((($selection1.metadata.product_event_type = "1" and re.regex($selection1.target.process.file.full_path, `.*\\schtasks\.exe`) and re.regex($selection1.target.process.command_line, `.* /create .*`)) or ($selection1.metadata.product_event_type = "12" and $selection1.target.process.file.full_path = "C:\\Windows\\System32\\schtasks.exe")) or ($selection1.metadata.product_event_type = "13" and re.regex($selection1.target.registry.registry_key, `.*\\Schedule\\TaskCache\\Tasks\\`)))
+
+  condition:
+    $selection1
+}

@@ -1,0 +1,16 @@
+rule psexec_tool_execution {
+ meta:
+    author = "Thomas Patzke"
+    description = "Detects PsExec service installation and execution events (service and Sysmon)  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/YNK3AGI5NCcQ"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    mitre = "execution, t1035, s0029"
+
+  events:
+(($service_installation.target.process.command_line = "PSEXESVC" and (($service_installation.metadata.product_event_type = "7045" and re.regex($service_installation.target.process.command_line, `.*\\PSEXESVC\.exe`)) or $service_installation.metadata.product_event_type = "7036")) or ($service_installation.metadata.product_event_type = "1" and re.regex($service_installation.target.process.file.full_path, `.*\\PSEXESVC\.exe`) and $service_installation.src.user.user_display_name = "NT AUTHORITY\\SYSTEM"))
+
+  condition:
+    $service_installation
+}

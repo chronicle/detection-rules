@@ -1,0 +1,17 @@
+rule ursnif_trojan_detection_cmd_obfuscation {
+ meta:
+    author = "Emir Erdogan"
+    description = "Most popular banking trojan which is called as ursnif uses obfuscated command prompt  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/phnp9PkFC7Zm"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1047, T1497, T1080, T1007, T1082, T1071, T1064, T1113, T1091, T1105, T1060, T1012, T1093, T1027, T1036"
+
+  events:
+($selection.target.process.file.full_path = "C:\\Windows\\System32\\Rundll32.exe" and re.regex($selection.src.process.file.full_path, `C:\\Windows\\System32\\cmd\.exe.*`) and re.regex($selection.target.process.command_line, `.*C:\\ProgramData\\ZyGHisczAWv\.dll,Dl^lRegi^sterSe^rver.*`))
+
+  condition:
+    $selection
+}

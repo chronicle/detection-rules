@@ -1,0 +1,17 @@
+rule suspicious_command_line_contains_azure_tokencachedat_as_argument_via_cmdline {
+ meta:
+    author = "SOC Prime Team"
+    description = "TokenCache.dat is a clear-text JSON file containing the AccessKey for the current Azure session.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/MzSiYeDJ9PvW"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "credential_access, lateral_movement, defense_evasion, t1003, t1528, t1527"
+
+  events:
+(re.regex($selection.target.process.command_line, `.*TokenCache\.dat.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

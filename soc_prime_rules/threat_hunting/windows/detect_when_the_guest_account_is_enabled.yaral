@@ -1,0 +1,17 @@
+rule detect_when_the_guest_account_is_enabled {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects when the guest account in windows Operating system is enabled, its best practise to disable the account since it has no password.Attempts to enable it should be investigated  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/We4KiQFjMbik"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "Windows"
+    service = "security"
+    mitre = "defense_evasion, t1078"
+
+  events:
+($selection.metadata.product_event_type = "4722" and ($selection.src.user.user_display_name = "guest" or $selection.src.user.user_display_name = "Guest"))
+
+  condition:
+    $selection
+}

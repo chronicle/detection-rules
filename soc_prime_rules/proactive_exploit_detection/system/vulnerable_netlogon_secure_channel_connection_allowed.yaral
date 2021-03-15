@@ -1,0 +1,15 @@
+rule vulnerable_netlogon_secure_channel_connection_allowed {
+  meta:
+    author = "NVISO"
+    description = "Detects that a vulnerable Netlogon secure channel connection was allowed, which could be an indicator of CVE-2020-1472.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/S4U7tNVmkwFr"
+    version = "0.01"
+    created = "2020/09/15"
+
+  events:
+    $event.metadata.product_log_id = "5829"
+
+  condition:
+    $event
+}
+

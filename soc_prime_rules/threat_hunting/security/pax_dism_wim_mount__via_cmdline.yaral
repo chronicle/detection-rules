@@ -1,0 +1,17 @@
+rule pax_dism_wim_mount_via_cmdline {
+ meta:
+    author = "SOC Prime Team, Fireeye"
+    description = "Identifies dism processes consistent with the arguments used by the tool PXE and Loot (PAX).  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/6jghgqKDHRlA"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "credential_access, t1552, t1552.001"
+
+  events:
+(re.regex($selection.target.process.command_line, `.*WimFile.*`) and re.regex($selection.target.process.command_line, `.*MountDir.*`) and re.regex($selection.target.process.command_line, `.*LogPath.*`) and re.regex($selection.target.process.command_line, `.*index.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

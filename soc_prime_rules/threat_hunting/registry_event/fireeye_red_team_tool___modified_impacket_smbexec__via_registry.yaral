@@ -1,0 +1,17 @@
+rule fireeye_red_team_tool__modified_impacket_smbexec_via_registry {
+ meta:
+    author = "SOC Prime Team, FireEye"
+    description = "This rule has been ported from Fireeye's HXIOC format to SIGMA. It detects a modified implmentation of SMBEXEC by FireEye.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/4IT79zFKCNZA"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    category = "registry_event"
+    mitre = "lateral_movement, execution, t1021.002, t1543.003, t1036.004"
+
+  events:
+((re.regex($selection1.target.registry.registry_key, `.*ImagePath.*`) and re.regex($selection1.metadata.description, `.*%COMSPEC%.*`) and re.regex($selection1.metadata.description, `.*/q.*`) and re.regex($selection1.metadata.description, `.*/k.*`) and re.regex($selection1.metadata.description, `.*echo.*`)) or ($selection1.metadata.event_type = "SetValue" and re.regex($selection1.target.registry.registry_key, `.*CurrentControlSet\\Services.*`) and (re.regex($selection1.target.registry.registry_key, `.*Windows Update Control Service.*`) or re.regex($selection1.target.registry.registry_key, `.*Windows 10 Defender.*`) or re.regex($selection1.target.registry.registry_key, `.*Windows License Key Activation.*`) or re.regex($selection1.target.registry.registry_key, `.*Office 365 Proxy.*`) or re.regex($selection1.target.registry.registry_key, `.*Microsoft Security Center.*`) or re.regex($selection1.target.registry.registry_key, `.*Windows  Update.*`) or re.regex($selection1.target.registry.registry_key, `.*Secure Token Messaging Service.*`) or re.regex($selection1.target.registry.registry_key, `.*Background Action Manager.*`) or re.regex($selection1.target.registry.registry_key, `.*OneDrive Sync Center.*`))))
+
+  condition:
+    $selection1
+}

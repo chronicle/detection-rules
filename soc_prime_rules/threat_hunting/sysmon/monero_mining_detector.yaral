@@ -1,0 +1,17 @@
+rule monero_mining_detector {
+ meta:
+    author = "Lee Archinal"
+    description = "This content detects activity relating to the Monero Cryptominer  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/8O8jC7J18wzs"
+    version = "0.01"
+    created = "2019/06/05"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Impact, attackt1496"
+
+  events:
+(($selection1.metadata.product_event_type = "11" and (re.regex($selection1.target.file.full_path, `.*%Temp%\\kkk1\.log`) or re.regex($selection1.target.file.full_path, `.*%Temp%\\pp2\.log`) or re.regex($selection1.target.file.full_path, `.*%Temp%\\333\.log`) or re.regex($selection1.target.file.full_path, `.*%Temp%\\kk4\.log`) or re.regex($selection1.target.file.full_path, `.*%Temp%\\kk5\.log`))) or ($selection1.metadata.product_event_type = "1" and $selection1.target.process.file.full_path = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" and $selection1.target.process.command_line = "powershell -nop -w hidden -ep bypass { \"IEX (New-Object Net.WebClient).downloadstring\""))
+
+  condition:
+    $selection1
+}

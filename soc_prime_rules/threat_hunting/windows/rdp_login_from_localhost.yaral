@@ -1,0 +1,17 @@
+rule rdp_login_from_localhost {
+ meta:
+    author = "Thomas Patzke"
+    description = "RDP login with localhost source address may be a tunnelled login  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/0fYJxulh13jk"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "Lateral Movement, t1076, Command And Control, t1071, t1043"
+
+  events:
+($selection.metadata.product_event_type = "4624" and $selection.extensions.auth.mechanism = "10" and ($selection.principal.ip = "::1" or $selection.principal.ip = "127.0.0.1"))
+
+  condition:
+    $selection
+}

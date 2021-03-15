@@ -1,0 +1,17 @@
+rule rubeus_hack_tool {
+ meta:
+    author = "Florian Roth"
+    description = "Detects command line parameters used by Rubeus hack tool  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/tW6hpj6cabMx"
+    version = "0.01"
+    created = "2018/12/19"
+    category = "process_creation"
+    product = "windows"
+    mitre = "credential_access, t1003, s0005"
+
+  events:
+((re.regex($selection.target.process.command_line, `.* asreproast .*`) or re.regex($selection.target.process.command_line, `.* dump /service:krbtgt .*`) or re.regex($selection.target.process.command_line, `.* kerberoast .*`) or re.regex($selection.target.process.command_line, `.* createnetonly /program:.*`) or re.regex($selection.target.process.command_line, `.* ptt /ticket:.*`) or re.regex($selection.target.process.command_line, `.* /impersonateuser:.*`) or re.regex($selection.target.process.command_line, `.* renew /ticket:.*`) or re.regex($selection.target.process.command_line, `.* asktgt /user:.*`) or re.regex($selection.target.process.command_line, `.* harvest /interval:.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,15 @@
+rule docker_user_agent {
+ meta:
+    author = "Simon Lavigne"
+    description = "Detects docker user agent strings in proxy logs when a user runs the 'docker push' command.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/QUznqcdWU6GP"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+
+  events:
+(re.regex($selection.src.application, `docker/.*`) and $selection.network.http.method = "PUT")
+
+  condition:
+    $selection
+}

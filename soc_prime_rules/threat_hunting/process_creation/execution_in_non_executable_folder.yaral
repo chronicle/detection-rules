@@ -1,0 +1,17 @@
+rule execution_in_nonexecutable_folder {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a suspicious exection from an uncommon folder  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/RVIFEay7irsd"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1036"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*\\$Recycle\.bin`) or re.regex($selection.target.process.file.full_path, `.*\\Users\\All Users\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Users\\Default\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Users\\Public\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Perflogs\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\config\\systemprofile\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\Fonts\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\IME\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\addins\\.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule turla_backdoor_sysmon {
+ meta:
+    author = "Dmitriy Dyakon, SOC Prime"
+    description = "Turla Backdoor Detector.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/vYABlVudO8eM"
+    version = "0.01"
+    created = "2018/01/02"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1064, T1100, Command and Control"
+
+  events:
+($selection_hashes.metadata.product_event_type = "1" and ($selection_hashes.target.file.md5 = "fd898c5a4cd57c3e9cef41f6fd4f71a7" or $selection_hashes.target.file.md5 = "9dab3dd7b7e7f4980397da908fbc9ff7" or $selection_hashes.target.file.md5 = "3eb5f44492ce1147790450d950954a52"))
+
+  condition:
+    $selection_hashes
+}

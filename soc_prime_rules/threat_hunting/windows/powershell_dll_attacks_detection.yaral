@@ -1,0 +1,17 @@
+rule powershell_dll_attacks_detection {
+ meta:
+    author = "Furkan Celik"
+    description = "Powershell does not equal powershell.exe. Adversaries may use powershell dlls to perform their malicious powershell activities. ou can detect and monitor binaries that use Powershell dlls.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Lodp4fCSb8o9"
+    version = "0.01"
+    created = "2020/04/24"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, T1086"
+
+  events:
+($selection.metadata.product_event_type = "7" and (re.regex($selection.target.process.file.full_path, `.*\\system\.reflection\.dll`) or re.regex($selection.target.process.file.full_path, `.*\\system\.managment\.automation\.ni\.dll`) or re.regex($selection.target.process.file.full_path, `.*\\system\.managment\.automation\.dll`)))
+
+  condition:
+    $selection
+}

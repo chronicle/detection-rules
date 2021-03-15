@@ -1,0 +1,17 @@
+rule powershell_rundll32_remote_thread_creation {
+ meta:
+    author = "Florian Roth"
+    description = "Detects PowerShell remote thread creation in Rundll32.exe  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/JRTpas1oMjDJ"
+    version = "0.01"
+    created = "2018/06/25"
+    product = "windows"
+    service = "sysmon"
+    mitre = "defense_evasion, execution, t1085, t1086"
+
+  events:
+($selection.metadata.product_event_type = "8" and re.regex($selection.src.process.file.full_path, `.*\\powershell\.exe`) and re.regex($selection.target.process.file.full_path, `.*\\rundll32\.exe`))
+
+  condition:
+    $selection
+}

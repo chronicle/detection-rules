@@ -1,0 +1,17 @@
+rule possible_abusing_ads {
+ meta:
+    author = "Roman Ranskyi"
+    description = "After translation, DELETE delete double quotes in search (ELK or Graylog)! Adversaries may store malicious data or binaries in file attribute metadata instead of directly in files. This may be done to evade some defenses, such as static indicator scanning tools and anti-virus.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/cuq9E3B90blE"
+    version = "0.01"
+    created = "2019/05/27"
+    product = "windows"
+    service = "sysmon"
+    mitre = "defense_evasion, t1096"
+
+  events:
+(re.regex($selection0.target.process.file.full_path, `.*:.*`) or re.regex($selection0.src.process.file.full_path, `.*:.*`))
+
+  condition:
+    $selection0
+}

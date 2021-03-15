@@ -1,0 +1,16 @@
+rule phishing_campaign_using_zoom_invites {
+ meta:
+    author = "Osman Demir"
+    description = "A new phishing campaign started that acts as a Zoom video conference invitation to obtain Microsoft credentials from users.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/3VenDiAFwIuY"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+    mitre = "T1192, initial_access"
+
+  events:
+($selection.security_result.action = "allowed" and ($selection.target.url = "https://r.smore.com/c?u=pastell.in/ca07-b36n5-65m-c53b-o26v-62h-e79-t56e-c44?e5=REDACTED[@]company.com" or $selection.target.url = "http://www.pastell.in/ca07-b36n5-65m-c53b-o26v-62h-e79-t56e-c44" or $selection.target.url = "https://logonmicrosftonlinezoomconference.azureedge.net"))
+
+  condition:
+    $selection
+}

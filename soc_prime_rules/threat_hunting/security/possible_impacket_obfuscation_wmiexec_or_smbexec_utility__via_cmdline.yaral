@@ -1,0 +1,17 @@
+rule possible_impacketobfuscation_wmiexec_or_smbexec_utility_via_cmdline {
+ meta:
+    author = "SOC Prime Team, Fireeye"
+    description = "Impacket-Obfuscation is a slightly obfuscated version of the open source Impacket framework. This IOC looks for artifacts from the execution of SMBEXEC/WMIEXEC python script which is part of Impacket-Obfuscation framework.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/OzLZ6gLruXjQ"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "persistence, privilege_escalation, execution, lateral_movement, t1047, t1021.002, t1543.003"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and ((re.regex($selection1.target.process.command_line, `.*cmd.*`) and re.regex($selection1.target.process.command_line, `.*/K.*`) and re.regex($selection1.target.process.command_line, `.*/Q.*`)) or (re.regex($selection1.target.process.command_line, `.*/q.*`) or re.regex($selection1.target.process.command_line, `.*/K.*`) or re.regex($selection1.target.process.command_line, `.*echo.*`) or re.regex($selection1.target.process.command_line, `.*%CoMSpEC%.*`))))
+
+  condition:
+    $selection1
+}

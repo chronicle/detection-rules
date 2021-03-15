@@ -1,0 +1,17 @@
+rule suspicious_gup_usage {
+ meta:
+    author = "Florian Roth"
+    description = "Detects execution of the Notepad++ updater in a suspicious directory, which is often used in DLL side-loading attacks  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/2NmEHPwIziCI"
+    version = "0.01"
+    created = "2019/02/06"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1073"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*\\GUP\.exe`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not ((re.regex($selection.target.process.file.full_path, `C:\\Users\\.*\\AppData\\Local\\Notepad\+\+\\updater\\gup\.exe`) or re.regex($selection.target.process.file.full_path, `C:\\Users\\.*\\AppData\\Roaming\\Notepad\+\+\\updater\\gup\.exe`) or $selection.target.process.file.full_path = "C:\\Program Files\\Notepad++\\updater\\gup.exe" or $selection.target.process.file.full_path = "C:\\Program Files (x86)\\Notepad++\\updater\\gup.exe")))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule encoded_frombase64string {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a base64 encoded FromBase64String keyword in a process command line  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/bZM3R651aDgG"
+    version = "0.01"
+    created = "2019/08/24"
+    category = "process_creation"
+    product = "windows"
+    mitre = "t1086, t1140, execution, defense_evasion"
+
+  events:
+((re.regex($selection.target.process.command_line, `.*OjpGcm9tQmFzZTY0U3RyaW5n.*`) or re.regex($selection.target.process.command_line, `.*o6RnJvbUJhc2U2NFN0cmluZ.*`) or re.regex($selection.target.process.command_line, `.*6OkZyb21CYXNlNjRTdHJpbm.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

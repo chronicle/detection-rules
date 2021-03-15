@@ -1,0 +1,15 @@
+rule windows_powershell_webdav_user_agent {
+ meta:
+    author = "Florian Roth"
+    description = "Detects Windows PowerShell Web Access  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/YCaVXPO7wDAX"
+    version = "0.01"
+    created = "2018/04/06"
+    category = "proxy"
+
+  events:
+re.regex($selection.src.application, `Microsoft-WebDAV-MiniRedir/.*`)
+
+  condition:
+    $selection
+}

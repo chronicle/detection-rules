@@ -1,0 +1,17 @@
+rule abusing_managebdewsf {
+ meta:
+    author = "Den Iuzvyk"
+    description = "Detects abusing of deprecated manage-bde.wsf. Tampering with manage-bde.wsf to run things in unattended ways.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/9WtUBfP8HJWR"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, t1204, t1059"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*\\cscript\.exe`) and re.regex($selection.target.process.command_line, `.*cscript manage-bde\.wsf.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

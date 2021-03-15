@@ -1,0 +1,17 @@
+rule sysmon_state_and_configuration_changed {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "Detects sysmon state and configuration change.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/IclREjJdDTfK"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Defense Evasion, t1089"
+
+  events:
+($selection1.metadata.product_event_type = "4" or $selection1.metadata.product_event_type = "16")
+
+  condition:
+    $selection1
+}

@@ -1,0 +1,17 @@
+rule suspicious_schtasks_creation_possible_windows_0day_lpe_aka_polarbear_by_sandboxescaper {
+ meta:
+    author = "Roman Ranskyi"
+    description = "Possible task scheduler .job import arbitrary DACL write.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Q9PtOg89jvkq"
+    version = "0.01"
+    created = "2019/05/22"
+    product = "windows"
+    service = "process_creation"
+    mitre = "Execution, Privilege Escalation, t1053"
+
+  events:
+(($selection.metadata.product_event_type = "1" or $selection.metadata.product_event_type = "4688") and $selection.target.process.command_line = "schtasks" and $selection.target.process.command_line = "/change" and $selection.target.process.command_line = "/TN" and $selection.target.process.command_line = "/RU" and $selection.target.process.command_line = "/RP")
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule avg_antivirus__avast_antivirus_dll_search_order_hijacking_and_potential_abuses {
+ meta:
+    author = "Osman Demir"
+    description = "Detects CVE-2019-17093 exploitation attempt  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/R0SEcSK57U7m"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "persistence, privilege_escalation, defense_evasion, T1038"
+
+  events:
+(($selection1.metadata.product_event_type = "7" and re.regex($selection1.target.process.file.full_path, `.*/AVGSvc\.exe`) and $selection1.target.process.file.full_path = "C:\\Windows\\System32\\wbem\\wbemcomn.dll") or ($selection1.metadata.product_event_type = "11" and ($selection1.target.file.full_path = "C:\\Program Files\\System32\\wbemcomn.dll" or $selection1.target.file.full_path = "C:\\Windows\\System32\\wbem\\wbemcomn.dll")))
+
+  condition:
+    $selection1
+}

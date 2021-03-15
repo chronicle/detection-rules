@@ -1,0 +1,17 @@
+rule detect_crackmapexec_mimikatz_module_footprint_on_a_victim_machine {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects crackmapexec Mimikatz module obfuscated powershell activity on a victim endpoint  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/05G2LOW8X5VP"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "Windows"
+    service = "sysmon"
+    mitre = "credential_dumping, t1003, powershell, t1086"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`)) and (re.regex($selection.target.process.command_line, `.*91,78,101,116.*`) or re.regex($selection.target.process.command_line, `.*91t78v101v116.*`) or re.regex($selection.target.process.command_line, `.*91,78@101@116.*`) or re.regex($selection.target.process.command_line, `.*91 ,78 ,101, 116 , 46 , 83.*`)))
+
+  condition:
+    $selection
+}

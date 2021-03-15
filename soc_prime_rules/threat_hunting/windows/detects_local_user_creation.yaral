@@ -1,0 +1,17 @@
+rule detects_local_user_creation {
+ meta:
+    author = "Patrick Bareiss"
+    description = "Detects local user creation on windows servers, which shouldn't happen in an Active Directory environment. Apply this Sigma Use Case on your windows server logs and not on your DC logs.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/H9s4oY07BUtS"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "persistence, t1136"
+
+  events:
+$selection.metadata.product_event_type = "4720"
+
+  condition:
+    $selection
+}

@@ -1,0 +1,15 @@
+rule flash_player_update_from_suspicious_location {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a flashplayer update from an unofficial location  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/HD39fwuyNdgn"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+
+  events:
+((re.regex($selection.target.url, `.*/install_flash_player\.exe`) or re.regex($selection.target.url, `.*/flash_install\.php.*`)) and not (re.regex($selection.target.url, `.*\.adobe\.com/.*`)))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,16 @@
+rule possible_f5_bigip_tmui_attack_cve20205902_part_1 {
+ meta:
+    author = "Roman Ranskyi"
+    description = "Detects possible CVE-2020-5902 exploitation attempt against F5 BIG-IP, The Traffic Management User Interface (TMUI) Attack.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/a3bYpIF6od6C"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+    mitre = "initial_access, t1190"
+
+  events:
+((re.regex($selection.target.url, `.*/tmui/login\.jsp.*`) and (re.regex($selection.target.url, `.*\.\.;.*`) or re.regex($selection.target.url, `.*\.\./.*`))) or (re.regex($selection.target.url, `.*/tmui/login\.jsp.*`) and (re.regex($selection.target.url, `.*\?command=.*`) or re.regex($selection.target.url, `.*\+admin.*`) or re.regex($selection.target.url, `.*;id.*`) or re.regex($selection.target.url, `.*/nc.*`) or re.regex($selection.target.url, `.*/sh.*`) or re.regex($selection.target.url, `.*/bash.*`) or re.regex($selection.target.url, `.*/curl.*`) or re.regex($selection.target.url, `.*authproperties\.jsp.*`) or re.regex($selection.target.url, `.*getTabSet\.jsp.*`) or re.regex($selection.target.url, `.*;/tmui/.*`) or re.regex($selection.target.url, `.*/passwd.*`) or re.regex($selection.target.url, `.*/shadow.*`))))
+
+  condition:
+    $selection
+}

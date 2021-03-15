@@ -1,0 +1,16 @@
+rule lsass_access_detected_via_attack_surface_reduction {
+ meta:
+    author = "Markus Neis"
+    description = "Detects Access to LSASS Process  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/jgYfMr0VH05h"
+    version = "0.01"
+    created = "2018/08/26"
+    product = "windows_defender"
+    mitre = "credential_access, t1003"
+
+  events:
+($selection.metadata.product_event_type = "1121" and re.regex($selection.target.file.full_path, `.*\\lsass\.exe`))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule suspicious_xor_encoded_powershell_command_line {
+ meta:
+    author = "Sami Ruohonen"
+    description = "Detects suspicious powershell process which includes bxor command, alternatvide obfuscation method to b64 encoded commands.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/z7Wd6yerF4gU"
+    version = "0.01"
+    created = "2018/09/05"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, t1086"
+
+  events:
+(re.regex($selection.target.process.command_line, `.* -bxor.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule notepadexe_dll_search_order_hijackingsysmon {
+ meta:
+    author = "Den Iuzvyk"
+    description = "notepad++.exe DLL search order hijacking  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/f4mYKTC1T7yd"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "sysmon"
+    product = "windows"
+    mitre = "persistence, defense_evasion, t1073, t1038"
+
+  events:
+(($selection.metadata.product_event_type = "7" and re.regex($selection.target.process.file.full_path, `.*notepad\+\+\.exe`) and re.regex($selection.target.process.file.full_path, `.*dbghelp\.dll`)) and not (re.regex($selection.target.process.file.full_path, `.*Windows\\System32.*`)))
+
+  condition:
+    $selection
+}

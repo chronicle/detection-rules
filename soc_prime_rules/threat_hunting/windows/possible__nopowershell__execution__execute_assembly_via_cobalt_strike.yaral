@@ -1,0 +1,17 @@
+rule possible_nopowershell_execution_executeassembly_via_cobalt_strike {
+ meta:
+    author = "Roman Ranskyi"
+    description = "NoPowerShell is a tool implemented in C# which supports executing PowerShell-like commands while remaining invisible to any PowerShell logging mechanisms.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Zc3fssbaQYWw"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1086, Defense Evasion, t1055"
+
+  events:
+($selection0.metadata.product_event_type = "8" and re.regex($selection0.target.process.file.file_metadata.pe.import_hash, `.*0B80`))
+
+  condition:
+    $selection0
+}

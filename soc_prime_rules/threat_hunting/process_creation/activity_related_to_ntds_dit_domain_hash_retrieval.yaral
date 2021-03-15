@@ -1,0 +1,17 @@
+rule activity_related_to_ntdsdit_domain_hash_retrieval {
+ meta:
+    author = "Florian Roth, Michael Haag"
+    description = "Detects suspicious commands that could be related to activity that uses volume shadow copy to steal and retrieve hashes from the NTDS.dit file remotely  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Rp79M4izVSNy"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "credential_access, t1003"
+
+  events:
+(($selection.target.process.command_line = "vssadmin.exe Delete Shadows" or $selection.target.process.command_line = "vssadmin create shadow /for=C:" or re.regex($selection.target.process.command_line, `copy \\\\\?\\GLOBALROOT\\Device\\.*\\windows\\ntds\\ntds\.dit`) or re.regex($selection.target.process.command_line, `copy \\\\\?\\GLOBALROOT\\Device\\.*\\config\\SAM`) or $selection.target.process.command_line = "vssadmin delete shadows /for=C:" or $selection.target.process.command_line = "reg SAVE HKLM\\SYSTEM " or re.regex($selection.target.process.command_line, `esentutl\.exe /y /vss .*\\ntds\.dit.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

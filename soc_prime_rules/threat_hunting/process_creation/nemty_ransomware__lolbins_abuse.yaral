@@ -1,0 +1,17 @@
+rule nemty_ransomware_lolbins_abuse {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Detects an attempt of Nemty Ransmoware in order to abuse LOLBins via command-line parameters  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/U4PcKi5sLUuE"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, T1197, S0190"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (($selection1.target.process.file.full_path = "cmd.exe" and (re.regex($selection1.target.process.command_line, ` /c bitsadmin /transfer getitman /download /priority high http.*://.*\..*\..*\..*/jp\.exe %temp%.*\.exe&start %temp%.*\.exe,0,.*`) or re.regex($selection1.target.process.command_line, ` /c bitsadmin /transfer getitman /download /priority high https://.*\..*\..*\..*/.*\.exe %temp%.*\.exe&start %temp%.*\.exe,0,.*`))) or ($selection1.target.process.file.full_path = "bitsadmin.exe" and (re.regex($selection1.target.process.command_line, ` bitsadmin /transfer getitman /download /priority high http://.*\..*\..*\..*/jp\.exe %temp%.*\.exe&start %temp%.*\.exe,0,.*`) or re.regex($selection1.target.process.command_line, ` bitsadmin /transfer getitman /download /priority high https://.*\..*\..*\..*/.*\.exe %temp%.*\.exe&start %temp%.*\.exe,0,.*`)))))
+
+  condition:
+    $selection1
+}

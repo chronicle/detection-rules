@@ -1,0 +1,17 @@
+rule powershell_amsi_bypass_via_net_reflection {
+ meta:
+    author = "Markus Neis"
+    description = "Detects Request to amsiInitFailed that can be used to disable AMSI Scanning  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/5mi5iziSFLmj"
+    version = "0.01"
+    created = "2018/08/17"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, defense_evasion, t1086"
+
+  events:
+(re.regex($selection1.target.process.command_line, `.*System\.Management\.Automation\.AmsiUtils.*`) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and re.regex($selection1.target.process.command_line, `.*amsiInitFailed.*`))
+
+  condition:
+    $selection1
+}

@@ -1,0 +1,17 @@
+rule account_tampering__suspicious_failed_logon_reasons {
+ meta:
+    author = "Florian Roth"
+    description = "This method uses uncommon error codes on failed logons to determine suspicious activity and tampering with accounts that have been disabled or somehow restricted.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/O5OvzzX3zD8E"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "persistence, privilege_escalation, t1078"
+
+  events:
+(($selection.metadata.product_event_type = "4625" or $selection.metadata.product_event_type = "4776") and ($selection.security_result.description = "0xC0000072" or $selection.security_result.description = "0xC000006F" or $selection.security_result.description = "0xC0000070" or $selection.security_result.description = "0xC0000413" or $selection.security_result.description = "0xC000018C"))
+
+  condition:
+    $selection
+}

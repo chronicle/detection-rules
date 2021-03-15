@@ -1,0 +1,17 @@
+rule snatch_ransomware_sysmon_behaviour {
+ meta:
+    author = "Emir Erdogan"
+    description = "Snatch ransomware reboots PCs into Safe Mode to bypass protection  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/sG12jPLP3NJF"
+    version = "0.01"
+    created = "2019/12/10"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1486, T1022, T1313"
+
+  events:
+(($selection1.target.process.command_line = "net stop SuperBackupMan" or $selection1.target.process.command_line = "vssadmin delete shadows /all /quiet" or $selection1.target.process.command_line = "sc  start SuperBackupMan" or $selection1.target.process.command_line = "bcdedit.exe /set {current} safeboot minimal" or $selection1.target.process.command_line = "shutdown /r /f /t 00") or ($selection1.metadata.product_event_type = "11" and (re.regex($selection1.target.file.full_path, `.*\.snatch.*`) or re.regex($selection1.target.file.full_path, `.*\.jimm.*`) or re.regex($selection1.target.file.full_path, `.*\.googl.*`) or re.regex($selection1.target.file.full_path, `.*\.dglnl.*`) or re.regex($selection1.target.file.full_path, `.*\.ohwqg.*`) or re.regex($selection1.target.file.full_path, `.*\.wvtr0.*`) or re.regex($selection1.target.file.full_path, `.*\.hceem.*`))))
+
+  condition:
+    $selection1
+}

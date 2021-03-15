@@ -1,0 +1,17 @@
+rule fallout_rig_ek_delivers_raccoon_stealer {
+ meta:
+    author = "Emir Erdogan"
+    description = "Raccoon Stealer  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/9lYIAZKxCWzK"
+    version = "0.01"
+    created = "2019/11/24"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1140, T1059, T1005, T1022, T1105, T1057"
+
+  events:
+(((re.regex($selection1.target.process.file.full_path, `.*\\cvtres\.exe`) and re.regex($selection1.src.process.file.full_path, `.*\\csc\.exe`)) or ($selection1.metadata.product_event_type = "1" and (re.regex($selection1.target.process.file.full_path, `.*\\csc\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\AyJWa1N0\.tmp`)) and re.regex($selection1.src.process.file.full_path, `.*\\powershell\.exe`))) or (re.regex($selection1.target.process.file.full_path, `.*\\cmd\.exe`) and re.regex($selection1.src.process.file.full_path, `.*\\AyJWa1N0\.tmp`)))
+
+  condition:
+    $selection1
+}

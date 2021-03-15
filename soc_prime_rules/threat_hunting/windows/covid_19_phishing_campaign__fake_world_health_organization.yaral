@@ -1,0 +1,17 @@
+rule covid19_phishing_campaign_fake_world_health_organization {
+ meta:
+    author = "Emir Erdogan"
+    description = "Coronovirus themed malware is downloaded via fake WHO phsihing email  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/xyaUex2Ka9Lq"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1129, T1060, T1053, T1059"
+
+  events:
+(($selection1.src.process.file.full_path = "C:\\Windows\\system32\\cmd.exe" and (($selection1.target.process.file.full_path = "C:\\Windows\\system32\\findstr.exe" and re.regex($selection1.target.process.command_line, `findstr\.exe  \"TVNDRgAAAA\" .*\\AppData\\Local\\Temp\\\\g4ZokyumBB2gDn\.tmp`)) or (re.regex($selection1.target.process.file.full_path, `.*\\AppData\\Local\\Temp\\msoia\.exe`) and re.regex($selection1.target.process.command_line, `.*\\AppData\\Local\\Temp\\\\msoia\.exe  -decode .*AppData\\Local\\Temp\\\\cSi1r0uywDNvDu\.tmp .*\\AppData\\Local\\Temp\\\\oGhPGUDC03tURV\.tmp`)))) or (re.regex($selection1.target.process.file.full_path, `.*\\OFFICE12\\Wordcnvpxy\.exe`) and re.regex($selection1.src.process.file.full_path, `.*MSOSTYLE\.exe`)))
+
+  condition:
+    $selection1
+}

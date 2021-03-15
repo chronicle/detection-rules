@@ -1,0 +1,16 @@
+rule abusing_attribexe_to_change_file_attributes {
+ meta:
+    author = "Sreeman"
+    description = "Detects possible abuse of attrib.exe to hide files and folder or to mark a file as a system file  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/djaZYE9kUyp8"
+    version = "0.01"
+    created = "2020/03/01"
+    product = "Windows"
+    mitre = "t1158, defense_evasion, persistence"
+
+  events:
+(re.regex($selection.target.process.command_line, `.*attrib\.exe \+h.*`) or re.regex($selection.target.process.command_line, `.*attrib\.exe \+s.*`) or re.regex($selection.target.process.command_line, `.*attrib\.exe \+r.*`) or re.regex($selection.target.process.command_line, `.*attrib\.exe -h.*`) or re.regex($selection.target.process.command_line, `.*attrib\.exe -s.*`) or re.regex($selection.target.process.command_line, `.*attrib\.exe -r.*`))
+
+  condition:
+    $selection
+}

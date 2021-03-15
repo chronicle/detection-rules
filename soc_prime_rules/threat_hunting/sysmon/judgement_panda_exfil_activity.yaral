@@ -1,0 +1,17 @@
+rule judgement_panda_exfil_activity {
+ meta:
+    author = "Florian Roth"
+    description = "Detects Russian group activity as described in Global Threat Report 2019 by Crowdstrike  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/YpQlxpB0evj5"
+    version = "0.01"
+    created = "2019/02/21"
+    category = "process_creation"
+    product = "windows"
+    mitre = "credential_access, t1081, t1003"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and ((re.regex($selection1.target.process.file.full_path, `.*\\xcopy\.exe`) and re.regex($selection1.target.process.command_line, `.* /S /E /C /Q /H \\.*`)) or (re.regex($selection1.target.process.file.full_path, `.*\\adexplorer\.exe`) and re.regex($selection1.target.process.command_line, `.* -snapshot \"\" c:\\users\\.*`))))
+
+  condition:
+    $selection1
+}

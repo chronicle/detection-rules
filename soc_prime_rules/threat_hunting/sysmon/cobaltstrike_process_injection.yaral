@@ -1,0 +1,17 @@
+rule cobaltstrike_process_injection {
+ meta:
+    author = "Olaf Hartong, Florian Roth"
+    description = "Detects a possible remote threat creation with certain characteristics which are typical for Cobalt Strike beacons  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/0my4NPTHAeXn"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "process_injection, t1055"
+
+  events:
+($selection.metadata.product_event_type = "8" and re.regex($selection.target.process.file.file_metadata.pe.import_hash, `.*0B80`))
+
+  condition:
+    $selection
+}

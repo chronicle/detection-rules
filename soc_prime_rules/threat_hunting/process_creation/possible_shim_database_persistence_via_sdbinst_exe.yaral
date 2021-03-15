@@ -1,0 +1,17 @@
+rule possible_shim_database_persistence_via_sdbinstexe {
+ meta:
+    author = "Markus Neis, Den Iuzvyk"
+    description = "Detects installation of a new shim using sdbinst.exe. A shim can be used to load malicious DLLs into applications.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/BUTmMgSdr90c"
+    version = "0.01"
+    created = "2019/01/16"
+    category = "process_creation"
+    product = "windows"
+    mitre = "persistence, t1138"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*\\sdbinst\.exe`) and ($selection.target.process.command_line = "-q" or $selection.target.process.command_line = "-p") and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

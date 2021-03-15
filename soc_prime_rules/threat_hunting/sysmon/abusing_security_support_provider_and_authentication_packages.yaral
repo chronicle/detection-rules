@@ -1,0 +1,17 @@
+rule abusing_security_support_provider_and_authentication_packages {
+ meta:
+    author = "Den Iuzvyk"
+    description = "Detects activity that abuses Windows Security Support Provider (SSP) and Authentication Packages (AP) that come in the form of DLLs that get injected into LSASS.exe process on system boot or dynamically via AddSecurityPackage API.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ypWF0MglYDTe"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, t1204, t1059"
+
+  events:
+($selection_reg1.metadata.product_event_type = "13" and $selection_reg1.target.registry.registry_key = "HKLM\\system\\currentcontrolset\\control\\lsa\\Security Packages" and $selection_reg1.metadata.event_type = "SetValue")
+
+  condition:
+    $selection_reg1
+}

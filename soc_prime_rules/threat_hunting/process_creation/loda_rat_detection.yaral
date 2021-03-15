@@ -1,0 +1,17 @@
+rule loda_rat_detection {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Loda is a Remote Access Trojan with spying capabilities  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/yO2dtTK5tKlD"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, T1059"
+
+  events:
+($selection1.target.process.file.full_path = "cmd.exe" and (re.regex($selection1.target.process.command_line, `cmd\.exe & /C CD C:/ & msiexec\.exe /i http.*://lcodigo\.com/apiW/config/uploads/tmp/.*\.msi /quiet`) or re.regex($selection1.target.process.command_line, `cmd\.exe & /C CD C:/ & msiexec\.exe /i http.*://.*\.com/api.*/config/uploads/tmp/.*\.msi /quiet`)) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1"))
+
+  condition:
+    $selection1
+}

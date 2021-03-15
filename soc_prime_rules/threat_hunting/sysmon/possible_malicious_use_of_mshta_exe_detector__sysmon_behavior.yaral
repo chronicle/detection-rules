@@ -1,0 +1,17 @@
+rule possible_malicious_use_of_mshtaexe_detector_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "None  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/qbS3BGOfVnpN"
+    version = "0.01"
+    created = "2019/09/20"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, t1170"
+
+  events:
+($selection1.metadata.product_event_type = "1" and ((re.regex($selection1.target.process.file.full_path, `.*\\mshta\.exe`) and (re.regex($selection1.target.process.command_line, `.*javascript.*`) or re.regex($selection1.target.process.command_line, `.*vbscript.*`) or re.regex($selection1.target.process.command_line, `.*\.hta.*`) or re.regex($selection1.target.process.command_line, `.*http.*`))) or (re.regex($selection1.target.process.file.full_path, `.*\\schtasks\.exe`) and re.regex($selection1.target.process.command_line, `.*/tr mshta\.exe.*`))))
+
+  condition:
+    $selection1
+}

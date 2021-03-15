@@ -1,0 +1,17 @@
+rule suspicious_rundll32_activity {
+ meta:
+    author = "juju4"
+    description = "Detects suspicious process related to rundll32 based on arguments  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/wkXXRDEjMA9b"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, execution, t1085"
+
+  events:
+((re.regex($selection.target.process.command_line, `.*\\rundll32\.exe.* url\.dll,.*OpenURL .*`) or re.regex($selection.target.process.command_line, `.*\\rundll32\.exe.* url\.dll,.*OpenURLA .*`) or re.regex($selection.target.process.command_line, `.*\\rundll32\.exe.* url\.dll,.*FileProtocolHandler .*`) or re.regex($selection.target.process.command_line, `.*\\rundll32\.exe.* zipfldr\.dll,.*RouteTheCall .*`) or re.regex($selection.target.process.command_line, `.*\\rundll32\.exe.* Shell32\.dll,.*Control_RunDLL .*`) or re.regex($selection.target.process.command_line, `.*\\rundll32\.exe javascript:.*`) or re.regex($selection.target.process.command_line, `.* url\.dll,.*OpenURL .*`) or re.regex($selection.target.process.command_line, `.* url\.dll,.*OpenURLA .*`) or re.regex($selection.target.process.command_line, `.* url\.dll,.*FileProtocolHandler .*`) or re.regex($selection.target.process.command_line, `.* zipfldr\.dll,.*RouteTheCall .*`) or re.regex($selection.target.process.command_line, `.* Shell32\.dll,.*Control_RunDLL .*`) or re.regex($selection.target.process.command_line, `.* javascript:.*`) or re.regex($selection.target.process.command_line, `.*\.RegisterXLL.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

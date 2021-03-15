@@ -1,0 +1,17 @@
+rule psexec_execution {
+ meta:
+    author = "Samir Bousseaden, Den Iuzvyk(Sigma)"
+    description = "Detects PsExec execution namedpipe  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ppnrt394Cr9C"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "lateral_movement, t1077"
+
+  events:
+(($selection1.metadata.product_event_type = "5145" and (re.regex($selection1.target.file.full_path, `.*-stdin.*`) or re.regex($selection1.target.file.full_path, `.*-stdout.*`) or re.regex($selection1.target.file.full_path, `.*-stderr.*`))) and not (re.regex($selection1.target.file.full_path, `.*psexecsvc.*`)))
+
+  condition:
+    $selection1
+}

@@ -1,0 +1,17 @@
+rule suspicious_execution_from_outlook {
+ meta:
+    author = "Markus Neis"
+    description = "Detects EnableUnsafeClientMailRules used for Script Execution from Outlook  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/MWUcNxv3VHwN"
+    version = "0.01"
+    created = "2018/12/27"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, t1059, t1202"
+
+  events:
+(re.regex($clientMailRules.target.process.command_line, `.*EnableUnsafeClientMailRules.*`) or (re.regex($clientMailRules.src.process.file.full_path, `.*\\outlook\.exe`) and re.regex($clientMailRules.target.process.command_line, `.*\\.*\.exe`)))
+
+  condition:
+    $clientMailRules
+}

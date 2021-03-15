@@ -1,0 +1,17 @@
+rule offensive_tool_maliciousdllgenerator_dll_side_loadingsysmon {
+ meta:
+    author = "Den Iuzvyk"
+    description = "Detects winword.exe  and UserAccountControlSettings.exe dll side loading attack.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/yDjiDpQrd2iF"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "sysmon"
+    product = "windows"
+    mitre = "persistence, defense_evasion, t1073, t1038"
+
+  events:
+((($selection_uacs.metadata.product_event_type = "7" and re.regex($selection_uacs.target.process.file.full_path, `.*UserAccountControlSettings\.exe`) and re.regex($selection_uacs.target.process.file.full_path, `.*cryptbase\.dll`)) and not (re.regex($selection_uacs.target.process.file.full_path, `.*Windows\\System32.*`))) or (($selection_uacs.metadata.product_event_type = "7" and re.regex($selection_uacs.target.process.file.full_path, `.*winword\.exe`) and re.regex($selection_uacs.target.process.file.full_path, `.*oart\.dll`)) and not (re.regex($selection_uacs.target.process.file.full_path, `.*Program Files.*\\Microsoft Office\\root\\Office16\\.*`))))
+
+  condition:
+    $selection_uacs
+}

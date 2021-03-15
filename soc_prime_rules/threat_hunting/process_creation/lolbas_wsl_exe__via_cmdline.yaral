@@ -1,0 +1,17 @@
+rule lolbas_wslexe_via_cmdline {
+ meta:
+    author = "Den Iuzvyk"
+    description = "Detects usage of wsl.exe  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/O189cebA03ON"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, t1204, T1202"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (re.regex($selection1.src.process.file.full_path, `.*\\wsl\.exe`) or (re.regex($selection1.target.process.file.full_path, `.*\\wsl\.exe`) and (re.regex($selection1.target.process.command_line, `.*--exec.*`) or re.regex($selection1.target.process.command_line, `.*-e.*`) or re.regex($selection1.target.process.command_line, `.*-u.*`)))))
+
+  condition:
+    $selection1
+}

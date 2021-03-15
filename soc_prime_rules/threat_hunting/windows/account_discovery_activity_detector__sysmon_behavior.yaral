@@ -1,0 +1,17 @@
+rule account_discovery_activity_detector_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "This detects characteristics of account discovrery activity that adversaries could use  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/brYNYpaT19cv"
+    version = "0.01"
+    created = "2019/07/06"
+    product = "windows"
+    service = "sysmon"
+    mitre = "discovery, t1087"
+
+  events:
+($selection1.metadata.product_event_type = "1" and ($selection1.target.process.file.full_path = "C:\\Windows\\System32\\net.exe" or $selection1.target.process.file.full_path = "C:\\Windows\\System32\\query.exe") and ($selection1.target.process.command_line = "net user" or $selection1.target.process.command_line = "net user /domain" or $selection1.target.process.command_line = "dir c:\\Users\\" or $selection1.target.process.command_line = "cmdkey.exe /list" or $selection1.target.process.command_line = "net localgroup \"Users\"" or $selection1.target.process.command_line = "net localgroup" or $selection1.target.process.command_line = "get-localuser" or $selection1.target.process.command_line = "get-localgroupmembers -group Users" or $selection1.target.process.command_line = "ls C:/Users" or $selection1.target.process.command_line = "get-childitem C:\\Users\\" or re.regex($selection1.target.process.command_line, `get-aduser -filter .*`) or $selection1.target.process.command_line = "get-localgroup" or $selection1.target.process.command_line = "query user") and ($selection1.src.process.file.full_path = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" or $selection1.src.process.file.full_path = "C:\\Windows\\System32\\cmd.exe"))
+
+  condition:
+    $selection1
+}

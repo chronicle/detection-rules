@@ -1,0 +1,17 @@
+rule detect_hawkeye_keylogger_on_your_windows_endpoints {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects hawkeye keylogger variants activity that utilise modules from nirsoft software password recovery tools  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/UfASCTRThrpD"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "Windows"
+    category = "process_creation"
+    mitre = "t1003, credential access"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.* \\vbc\.exe.*`) and (re.regex($selection.target.process.command_line, `.* /stext.*`) or re.regex($selection.target.process.command_line, `.* /scomma.*`) or re.regex($selection.target.process.command_line, `.*\\AppData\\Local\\Temp\\holdermail\.txt.*`) or re.regex($selection.target.process.command_line, `.*\\AppData\\Local\\Temp\\holderwb\.txt.*`) or re.regex($selection.target.process.command_line, `.*\\Roaming\\pidloc\.txt.*`) or re.regex($selection.target.process.command_line, `.*\\Roaming\\pidloc\.txt.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

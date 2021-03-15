@@ -1,0 +1,17 @@
+rule data_exfiltration_attempt_via_bitsadmin {
+ meta:
+    author = "Emir Erdogan"
+    description = "Using bitsadmin to exfiltrate data  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/HjIK6Euup7w0"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "sysmon"
+    product = "windows"
+    mitre = "T1020, T1041, T1011"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*\\bitsadmin\.exe`) and re.regex($selection.target.process.command_line, `.*bitsadmin\.exe /TRANSFER HelpCenterUpload /UPLOAD /PRIORITY.*`))
+
+  condition:
+    $selection
+}

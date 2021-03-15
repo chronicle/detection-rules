@@ -1,0 +1,17 @@
+rule remote_system_discovery__ping_sweep {
+ meta:
+    author = "Ariel Millahuel"
+    description = "This rule detects an attempt to identify remote systems via ping sweep  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/fctdvCuWhicV"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "discovery, T1018"
+
+  events:
+($selection1.target.process.file.full_path = "ping.exe" and (re.regex($selection1.target.process.command_line, `.* for /l %i in \(1,1,254\) do ping -n 1 -w 100 192\.168\.1\.%i .*`) or re.regex($selection1.target.process.command_line, `.*for /l %i in \(1,1,254\) do ping -n 1 -w 100 .*\..*\..*\.%i.*`)) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1"))
+
+  condition:
+    $selection1
+}

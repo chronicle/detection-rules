@@ -1,0 +1,17 @@
+rule possible_libvlcdll_hijack_via_imageload {
+ meta:
+    author = "SOC Prime Team, Fireeye"
+    description = "Identifies possible DLL search order hijacking of LIBVLC.dll based on image loads from unexpected locations.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/2kasRzsrPd6f"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "image_load"
+    product = "windows"
+    mitre = "persistence, privilege_escalation, defense_evasion, t1574, t1574.001"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*LIBVLC\.dll.*`) and re.regex($selection.target.process.file.full_path, `.*videolan.*`))
+
+  condition:
+    $selection
+}

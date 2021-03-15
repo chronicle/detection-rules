@@ -1,0 +1,17 @@
+rule new_run_key_pointing_to_suspicious_folder {
+ meta:
+    author = "Florian Roth, Markus Neis"
+    description = "Detects suspicious new RUN key element pointing to an executable in a suspicious folder  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Yvh1ZbwRtP5h"
+    version = "0.01"
+    created = "2018/08/25"
+    product = "windows"
+    service = "sysmon"
+    mitre = "persistence, t1060"
+
+  events:
+($selection.metadata.product_event_type = "13" and (re.regex($selection.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\.*`) or re.regex($selection.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\\.*`)) and (re.regex($selection.metadata.description, `C:\\Windows\\Temp\\.*`) or re.regex($selection.metadata.description, `.*\\AppData\\.*`) or re.regex($selection.metadata.description, `C:\\$Recycle\.bin\\.*`) or re.regex($selection.metadata.description, `C:\\Temp\\.*`) or re.regex($selection.metadata.description, `C:\\Users\\Public\\.*`) or re.regex($selection.metadata.description, `C:\\Users\\Default\\.*`) or re.regex($selection.metadata.description, `C:\\Users\\Desktop\\.*`)))
+
+  condition:
+    $selection
+}

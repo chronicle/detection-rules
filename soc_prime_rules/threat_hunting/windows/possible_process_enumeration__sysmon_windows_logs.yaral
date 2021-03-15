@@ -1,0 +1,17 @@
+rule possible_process_enumeration_sysmonwindows_logs {
+ meta:
+    author = "Roman Ranskyi"
+    description = "Adversaries may attempt to get information about running processes on a system. Information obtained could be used to gain an understanding of common software running on systems within the network.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/GnIdeJaSAljy"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "Discovery, t1057"
+
+  events:
+(($selection.target.process.command_line = "tasklist.exe" or re.regex($selection.target.process.command_line, `Get-Process.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule renamed_zoho_dctask64 {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a renamed dctask64.exe used for process injection, command execution, process creation with a signed binary by ZOHO Corporation  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/wfYCrYVLytlB"
+    version = "0.01"
+    created = "2020/01/28"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1055"
+
+  events:
+(($selection.target.file.md5 = "6834B1B94E49701D77CCB3C0895E1AFD" and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not (re.regex($selection.target.process.file.full_path, `.*\\dctask64\.exe`)))
+
+  condition:
+    $selection
+}

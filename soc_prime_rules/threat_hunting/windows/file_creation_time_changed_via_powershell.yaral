@@ -1,0 +1,17 @@
+rule file_creation_time_changed_via_powershell {
+ meta:
+    author = "Lee Archinal (content) Aric Gady (threat emulation)"
+    description = "Detects Timestomping activities through PowerShell  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/wkd7GTCCV5bF"
+    version = "0.01"
+    created = "2019/06/30"
+    product = "windows"
+    service = "sysmon"
+    mitre = "defense_evasion, t1099"
+
+  events:
+($selection.metadata.product_event_type = "2" and re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`))
+
+  condition:
+    $selection
+}

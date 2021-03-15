@@ -1,0 +1,16 @@
+rule active_directory_as_a_c2_command__control {
+ meta:
+    author = "Furkan Celik"
+    description = "Active Directory is a Central Authentication and Access control. It isimportant to control it. The service name does not appear either. The importantthing is to check the displayname  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/OKZFiQZslmEi"
+    version = "0.01"
+    created = "2020/02/03"
+    product = "windows"
+    service = "security"
+
+  events:
+$selection.metadata.product_event_type = "5136"
+
+  condition:
+    $selection
+}

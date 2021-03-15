@@ -1,0 +1,16 @@
+rule lsassexe_detected_running_from_a_suspicious_location {
+ meta:
+    author = "Lee Archinal"
+    description = "This detects Lsass.exe not running from C:\\Windows\\System32\\lsass.exe  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/KlCGqOlBfkoe"
+    version = "0.01"
+    created = "2019/07/08"
+    product = "windows"
+    service = "sysmon"
+
+  events:
+(($selection1.metadata.product_event_type = "1" and re.regex($selection1.target.process.file.full_path, `.*lsass\.exe`)) and not ($selection1.target.process.file.full_path = "C:\\Windows\\System32\\lsass.exe"))
+
+  condition:
+    $selection1
+}

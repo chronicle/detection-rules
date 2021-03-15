@@ -1,0 +1,16 @@
+rule flawedammyy_rat_detection_proxy {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "FlawedAmmyy RAT Detection Through Proxy.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/MwMcHa7iZkn1"
+    version = "0.01"
+    created = "2018/07/11"
+    product = "proxy"
+    mitre = "Command and Control, t1071"
+
+  events:
+(($selectionSRC.target.url = "chimachinenow.com" or $selectionSRC.target.url = "highlandfamily.org" or $selectionSRC.target.url = "intra.cfecgcaquitaine.com" or $selectionSRC.target.url = "motifahsap.com" or $selectionSRC.target.url = "sittalhaphedver.com" or $selectionSRC.target.url = "wassronledorhad.in" or $selectionSRC.target.url = "balzantruck.com" or $selectionSRC.target.url = "buyviagraoverthecounterusabb.net" or $selectionSRC.target.url = "fifa2018start.info" or $selectionSRC.target.url = "buyviagraoverthecounterusabb.net/documents/B123456789012.js" or $selectionSRC.target.url = "chimachinenow.com/kjdhc783" or $selectionSRC.target.url = "highlandfamily.org/kjdhc783" or $selectionSRC.target.url = "intra.cfecgcaquitaine.com/kjdhc783" or $selectionSRC.target.url = "motifahsap.com/kjdhc783" or $selectionSRC.target.url = "sittalhaphedver.com/p66/kjdhc783" or $selectionSRC.target.url = "wassronledorhad.in/q2/index.php" or $selectionSRC.target.url = "balzantruck.com/45rt.exe") or ($selectionSRC.principal.ip = "179.60.146.3" or $selectionSRC.principal.ip = "185.176.221.54" or $selectionSRC.principal.ip = "179.60.146.3" or $selectionSRC.principal.ip = "194.165.16.11") or ($selectionSRC.target.ip = "179.60.146.3" or $selectionSRC.target.ip = "185.176.221.54" or $selectionSRC.target.ip = "179.60.146.3" or $selectionSRC.target.ip = "194.165.16.11"))
+
+  condition:
+    $selectionSRC
+}

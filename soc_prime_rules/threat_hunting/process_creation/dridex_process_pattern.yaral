@@ -1,0 +1,16 @@
+rule dridex_process_pattern {
+ meta:
+    author = "Florian Roth"
+    description = "Detects typical Dridex process patterns  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/GN1qQlT3qRCj"
+    version = "0.01"
+    created = "2019/01/10"
+    category = "process_creation"
+    product = "windows"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (re.regex($selection1.target.process.command_line, `.*\\svchost\.exe C:\\Users\\.*\\Desktop\\.*`) or (re.regex($selection1.src.process.file.full_path, `.*\\svchost\.exe.*`) and (re.regex($selection1.target.process.command_line, `.*whoami\.exe /all`) or re.regex($selection1.target.process.command_line, `.*net\.exe view`)))))
+
+  condition:
+    $selection1
+}

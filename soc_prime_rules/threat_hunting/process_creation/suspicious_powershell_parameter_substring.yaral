@@ -1,0 +1,17 @@
+rule suspicious_powershell_parameter_substring {
+ meta:
+    author = "Florian Roth (rule), Daniel Bohannon (idea), Roberto Rodriguez (Fix)"
+    description = "Detects suspicious PowerShell invocation with a parameter substring  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/4brkB1aA8Gzp"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, t1086"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*\\Powershell\.exe`) and ($selection.target.process.command_line = " -windowstyle h " or $selection.target.process.command_line = " -windowstyl h" or $selection.target.process.command_line = " -windowsty h" or $selection.target.process.command_line = " -windowst h" or $selection.target.process.command_line = " -windows h" or $selection.target.process.command_line = " -windo h" or $selection.target.process.command_line = " -wind h" or $selection.target.process.command_line = " -win h" or $selection.target.process.command_line = " -wi h" or $selection.target.process.command_line = " -win h " or $selection.target.process.command_line = " -win hi " or $selection.target.process.command_line = " -win hid " or $selection.target.process.command_line = " -win hidd " or $selection.target.process.command_line = " -win hidde " or $selection.target.process.command_line = " -NoPr " or $selection.target.process.command_line = " -NoPro " or $selection.target.process.command_line = " -NoProf " or $selection.target.process.command_line = " -NoProfi " or $selection.target.process.command_line = " -NoProfil " or $selection.target.process.command_line = " -nonin " or $selection.target.process.command_line = " -nonint " or $selection.target.process.command_line = " -noninte " or $selection.target.process.command_line = " -noninter " or $selection.target.process.command_line = " -nonintera " or $selection.target.process.command_line = " -noninterac " or $selection.target.process.command_line = " -noninteract " or $selection.target.process.command_line = " -noninteracti " or $selection.target.process.command_line = " -noninteractiv " or $selection.target.process.command_line = " -ec " or $selection.target.process.command_line = " -encodedComman " or $selection.target.process.command_line = " -encodedComma " or $selection.target.process.command_line = " -encodedComm " or $selection.target.process.command_line = " -encodedCom " or $selection.target.process.command_line = " -encodedCo " or $selection.target.process.command_line = " -encodedC " or $selection.target.process.command_line = " -encoded " or $selection.target.process.command_line = " -encode " or $selection.target.process.command_line = " -encod " or $selection.target.process.command_line = " -enco " or $selection.target.process.command_line = " -en ") and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

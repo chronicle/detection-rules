@@ -1,0 +1,17 @@
+rule ta505_group_targets_the_us_retail_industry_sysmon {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "TA505 Group targets the US retail industry.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/kbMD763xeQ8z"
+    version = "0.01"
+    created = "2018/12/06"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204"
+
+  events:
+($selection.metadata.product_event_type = "1" and ($selection.target.file.md5 = "9206f08916ab6f9708d81a6cf2f916e2f606fd048a6b2355a39db97e258d0883" or $selection.target.file.md5 = "06c637ac62cab511c5c42e142855ba0447a1c8ac8ee4b0f1f8b00faa5310fe9f" or $selection.target.file.md5 = "609b0a416f9b16a6df9b967dc32cd739402af31566e019a8fb8abdf3cb573e30"))
+
+  condition:
+    $selection
+}

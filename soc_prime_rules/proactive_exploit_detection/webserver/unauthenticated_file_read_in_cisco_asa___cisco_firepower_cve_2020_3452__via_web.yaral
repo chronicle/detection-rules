@@ -1,0 +1,16 @@
+rule unauthenticated_file_read_in_cisco_asa__cisco_firepower_cve20203452_via_web {
+ meta:
+    author = "Roman Ranskyi"
+    description = "Detects CVE-2020-3452, path traversal exploitation attempt against Cisco ASA & Cisco Firepower. Need to watch internal and external exploitation attempts. For more generic path traversal detection need to take away selection_patterns part.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/A4uayJwRAGGA"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "webserver"
+    mitre = "initial_access, t1190"
+
+  events:
+((re.regex($selection_traversal.target.url, `.*\.\./.*`) or re.regex($selection_traversal.target.url, `.*/\.\..*`) or re.regex($selection_traversal.target.url, `.*=\.\.&.*`)) and re.regex($selection_traversal.target.url, `.*CSCOE.*`))
+
+  condition:
+    $selection_traversal
+}

@@ -1,0 +1,17 @@
+rule suspicious_msiexec_directory {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious msiexec process starts in an uncommon directory  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/sPtJr5zlR7VX"
+    version = "0.01"
+    created = "2019/11/14"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1036"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*\\msiexec\.exe`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not ((re.regex($selection.target.process.file.full_path, `C:\\Windows\\System32\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\SysWOW64\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\WinSxS\\.*`))))
+
+  condition:
+    $selection
+}

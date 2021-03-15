@@ -1,0 +1,17 @@
+rule executables_started_in_suspicious_folder {
+ meta:
+    author = "Florian Roth"
+    description = "Detects process starts of binaries from a suspicious folder  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/N6BOqcTesDDt"
+    version = "0.01"
+    created = "2017/10/14"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1036"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `C:\\PerfLogs\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\$Recycle\.bin\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Intel\\Logs\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Users\\Default\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Users\\Public\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Users\\NetworkService\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\Fonts\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\Debug\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\Media\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\Help\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\addins\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\repair\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\security\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\RSA\\MachineKeys\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Windows\\system32\\config\\systemprofile\\.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

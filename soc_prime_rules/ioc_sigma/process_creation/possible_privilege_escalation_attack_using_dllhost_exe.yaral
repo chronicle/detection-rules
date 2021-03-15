@@ -1,0 +1,17 @@
+rule possible_privilege_escalation_attack_using_dllhostexe {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Detects two processes that uses dllhost after an UAC Bypass was done. If you detect this activity in your environment you probably was victim of attackrs and potentially of the LockBit Ransomware  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/85JVc4DzNZV7"
+    version = "0.01"
+    created = "2019/12/11"
+    category = "process_creation"
+    product = "windows"
+    mitre = "t1218, t1218.003, defense_evasion"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*dllhost\.exe`) and (re.regex($selection.target.process.command_line, `.*Windows\\.*\\DllHost\.exe /Processid:{3E5FC7F9-9A51-4367-9063-A120244FBEC7}.*`) or re.regex($selection.target.process.command_line, `.*Windows\\.*\\DllHost\.exe /Processid:{D2E7041B-2927-42fb-8E9F-7CE93B6DC937}.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

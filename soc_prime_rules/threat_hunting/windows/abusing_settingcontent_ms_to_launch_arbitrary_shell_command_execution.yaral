@@ -1,0 +1,16 @@
+rule abusing_settingcontentms_to_launch_arbitrary_shell_command_execution {
+ meta:
+    author = "Sreeman"
+    description = "None  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/C5xyVr16NfbZ"
+    version = "0.01"
+    created = "2020/03/13"
+    product = "Windows"
+    mitre = "t1204, t1193, execution, initial_access"
+
+  events:
+(re.regex($selection.target.process.command_line, `.*\.SettingContent-ms.*`) and not (re.regex($selection.target.file.full_path, `.*immersivecontrolpanel.*`)))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,15 @@
+rule windows_powershell_user_agent {
+ meta:
+    author = "Florian Roth"
+    description = "Detects Windows PowerShell Web Access  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/xzB8yjUPmYM3"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+
+  events:
+re.regex($selection.src.application, `.* WindowsPowerShell/.*`)
+
+  condition:
+    $selection
+}

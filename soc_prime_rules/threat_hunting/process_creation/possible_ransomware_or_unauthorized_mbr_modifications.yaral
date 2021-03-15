@@ -1,0 +1,17 @@
+rule possible_ransomware_or_unauthorized_mbr_modifications {
+ meta:
+    author = "@neu5ron"
+    description = "Detects, possibly, malicious unauthorized usage of bcdedit.exe  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/MQ4AnLs4Jrnq"
+    version = "0.01"
+    created = "2019/02/07"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1070, persistence, t1067"
+
+  events:
+(re.regex($selection.target.process.command_line, `.*\\bcdedit\.exe`) and (re.regex($selection.target.process.command_line, `.*delete.*`) or re.regex($selection.target.process.command_line, `.*deletevalue.*`) or re.regex($selection.target.process.command_line, `.*import.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

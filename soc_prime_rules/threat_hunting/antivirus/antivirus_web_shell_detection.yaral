@@ -1,0 +1,16 @@
+rule antivirus_web_shell_detection {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a highly relevant Antivirus alert that reports a web shell  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/NFNBlkuPv7R5"
+    version = "0.01"
+    created = "2018/09/09"
+    product = "antivirus"
+    mitre = "persistence, t1100"
+
+  events:
+(re.regex($selection.target.registry.registry_value_data, `PHP/Backdoor.*`) or re.regex($selection.target.registry.registry_value_data, `JSP/Backdoor.*`) or re.regex($selection.target.registry.registry_value_data, `ASP/Backdoor.*`) or re.regex($selection.target.registry.registry_value_data, `Backdoor\.PHP.*`) or re.regex($selection.target.registry.registry_value_data, `Backdoor\.JSP.*`) or re.regex($selection.target.registry.registry_value_data, `Backdoor\.ASP.*`) or re.regex($selection.target.registry.registry_value_data, `.*Webshell.*`))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,16 @@
+rule certutil_activity_via_proxy {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule can be used to hunt for Living of the Land activity from certutil from proxy server logs.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/E64jgRkkRkTS"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "proxy"
+    mitre = "command&control, T1105, defense-evasion, T1140"
+
+  events:
+($selection.src.application = "CertUtil URL Agent" or re.regex($selection.src.application, `Microsoft-CryptoAPI/.*`))
+
+  condition:
+    $selection
+}

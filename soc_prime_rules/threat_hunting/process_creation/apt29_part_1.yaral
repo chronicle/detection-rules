@@ -1,0 +1,16 @@
+rule apt29 {
+ meta:
+    author = "Florian Roth"
+    description = "This method detects a suspicious powershell command line combination as used by APT29 in a campaign against US think tanks  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/EID3KC4B5JxZ"
+    version = "0.01"
+    created = "2018/12/04"
+    product = "windows"
+    service = "sysmon"
+
+  events:
+($selection.metadata.product_event_type = "1" and re.regex($selection.target.process.command_line, `.*-noni -ep bypass $.*`))
+
+  condition:
+    $selection
+}

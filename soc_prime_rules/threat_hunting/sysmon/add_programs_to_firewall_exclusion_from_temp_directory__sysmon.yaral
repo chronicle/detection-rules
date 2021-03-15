@@ -1,0 +1,17 @@
+rule add_programs_to_firewall_exclusion_from_temp_directory_sysmon {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "Add Programs To Firewall Exclusion From Temp Directory.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/KYjU6HWSJiqm"
+    version = "0.01"
+    created = "2019/02/25"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204, t1059"
+
+  events:
+($selection.metadata.product_event_type = "1" and re.regex($selection.target.process.file.full_path, `.*\\netsh\.exe`) and re.regex($selection.target.process.command_line, `.*netsh firewall add allowedprogram \"C:\\Users\\admin\\AppData\\Local\\Temp.*`) and re.regex($selection.target.process.command_line, `.*ENABLE`))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule mssql_server_backdoor_detection_vollgar {
+ meta:
+    author = "Emir Erdogan"
+    description = "Newly discovered Vollgar attack uses brute force to infect vulnerable Microsoft SQL servers at a high rate.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/JjWtzMSfOzEp"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1005, T1190"
+
+  events:
+($selection.metadata.product_event_type = "11" and ($selection.target.file.full_path = "C:\\ProgramData\\wget.vbs" or re.regex($selection.target.file.full_path, `.*\\SQLAGENTIDC\.exe`) or $selection.target.file.full_path = "C:\\RECYCLER\\wget.vbs" or $selection.target.file.full_path = "C:\\ProgramData\\emsda.vbs" or $selection.target.file.full_path = "C:\\RECYCLER\\emsda.vbs" or re.regex($selection.target.file.full_path, `.*\\SQLAGENTSWA\.exe`) or re.regex($selection.target.file.full_path, `.*\\SQLIOMDSD\.exe`) or re.regex($selection.target.file.full_path, `.*\\SQLSernsf\.exe`) or $selection.target.file.full_path = "C:\\Program Files (x86)\\Microsoft SQL Server\\SQLSerasi.exe" or $selection.target.file.full_path = "C:\\Users\\MSSQL~1\\AppData\\Local\\Temp\\startas.bat" or $selection.target.file.full_path = "C:\\Users\\MSSQLSERVER\\AppData\\Local\\Temp\\startas.bat" or $selection.target.file.full_path = "C:\\Windows\\Temp\\startas.bat" or $selection.target.file.full_path = "C:\\Windows\\ServiceProfiles\\NetworkService\\AppData\\Local\\Temp\\startas.bat" or $selection.target.file.full_path = "C:\\Users\\MSSQLSERVER\\AppData\\Local\\Temp\\startae.bat" or $selection.target.file.full_path = "C:\\Windows\\Temp\\startae.bat" or $selection.target.file.full_path = "C:\\Windows\\ServiceProfiles\\NetworkService\\AppData\\Local\\Temp\\startae.bat"))
+
+  condition:
+    $selection
+}

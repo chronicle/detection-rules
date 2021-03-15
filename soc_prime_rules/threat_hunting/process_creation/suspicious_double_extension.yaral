@@ -1,0 +1,17 @@
+rule suspicious_double_extension {
+ meta:
+    author = "Florian Roth (rule), @blu3_team (idea)"
+    description = "Detects suspicious use of an .exe extension after a non-executable file extension like .pdf.exe, a set of spaces or underlines to cloak the executable file in spear phishing campaigns  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/chS8s3XyvnA5"
+    version = "0.01"
+    created = "2019/06/26"
+    category = "process_creation"
+    product = "windows"
+    mitre = "initial_access, t1193"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*\.doc\.exe`) or re.regex($selection.target.process.file.full_path, `.*\.docx\.exe`) or re.regex($selection.target.process.file.full_path, `.*\.xls\.exe`) or re.regex($selection.target.process.file.full_path, `.*\.xlsx\.exe`) or re.regex($selection.target.process.file.full_path, `.*\.ppt\.exe`) or re.regex($selection.target.process.file.full_path, `.*\.pptx\.exe`) or re.regex($selection.target.process.file.full_path, `.*\.rtf\.exe`) or re.regex($selection.target.process.file.full_path, `.*\.pdf\.exe`) or re.regex($selection.target.process.file.full_path, `.*\.txt\.exe`) or re.regex($selection.target.process.file.full_path, `.*      \.exe`) or re.regex($selection.target.process.file.full_path, `.*______\.exe`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

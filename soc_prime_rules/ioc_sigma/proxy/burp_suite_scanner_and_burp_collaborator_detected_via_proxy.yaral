@@ -1,0 +1,16 @@
+rule burp_suite_scanner_and_burp_collaborator_detected_via_proxy {
+ meta:
+    author = "Emir Erdogan"
+    description = "Burp Suite Scanner Activirt Detected via Proxy  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/QhIyqc5Qdl6m"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+    mitre = "T1190, T1210"
+
+  events:
+re.regex($selection.target.url, `.*burpcollaborator.*`)
+
+  condition:
+    $selection
+}

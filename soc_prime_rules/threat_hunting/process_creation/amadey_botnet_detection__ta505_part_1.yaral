@@ -1,0 +1,17 @@
+rule amadey_botnet_detection_ta505 {
+ meta:
+    author = "Ariel Millahuel"
+    description = "This rule detects a bot called Amadey. This one is used in order to collect information victim's environment, though it can also deliver other malware. The threat actor is considered TA505  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/oETtTqqsUAmk"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, T1059"
+
+  events:
+($selection1.metadata.product_event_type = "13" and (re.regex($selection1.target.registry.registry_key, `.*\\Software\\Microsoft\\Windows\\CurrentVersion\\Run.*`) or re.regex($selection1.target.registry.registry_key, `.*\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders.*`)) and (re.regex($selection1.metadata.description, `.* rundll32 C:\\Users.*\\AppData\\Local\\Temp\\cred\.dll, Main.*`) or re.regex($selection1.metadata.description, `.* rundll32 C:\\Users.*\\AppData\\Local\\Temp.*\.dll, Main.*`) or re.regex($selection1.metadata.description, `.*C:\\ProgramData\\87e4c89e95.*`) or re.regex($selection1.metadata.description, `.*C:\\ProgramData\\87.*`)))
+
+  condition:
+    $selection1
+}

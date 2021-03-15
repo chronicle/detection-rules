@@ -1,0 +1,17 @@
+rule malicious_utilization_of_mofcompexe_via_cmd {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Detects the invocation of mofcomp.exe via CMD in order to execute an malicious script  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/gi7fSTwClhB3"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, S0106"
+
+  events:
+($selection1.target.process.file.full_path = "cmd.exe" and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and ((re.regex($selection1.target.process.command_line, `.* cmd /c mofcomp\.exe C:\\Windows\\temp.*\.rar .*`) or re.regex($selection1.target.process.command_line, `.* cmd /c del C:\\Windows\\temp.*\.rar .*`) or re.regex($selection1.target.process.command_line, `.* cmd /c mofcomp\.exe C:\\Windows\\temp.*\..*  .*`) or re.regex($selection1.target.process.command_line, `.* cmd /c del C:\\Windows\\temp.*\..* .*`)) or (re.regex($selection1.target.process.command_line, `.* cmd /c mofcomp\.exe C:\\Users.*\\AppData\\Local\\Temp.*\..* .*`) or re.regex($selection1.target.process.command_line, `.* cmd /c del C:\\Users.*\\AppData\\Local\\Temp.*\..* .*`))))
+
+  condition:
+    $selection1
+}

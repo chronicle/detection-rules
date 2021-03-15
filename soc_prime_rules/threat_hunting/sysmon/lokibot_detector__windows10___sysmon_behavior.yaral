@@ -1,0 +1,17 @@
+rule lokibot_detector_windows10_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "This content detects a sample of the LokiBot as observed in a private malware lab and detonated on a Windows 10 machine.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/R26MTl0rrjvg"
+    version = "0.01"
+    created = "2020/08/10"
+    product = "windows"
+    service = "sysmon"
+    mitre = "defense_evasion, execution, persistence, privilege_escalation, t1085, t1053"
+
+  events:
+($selection1.metadata.product_event_type = "1" and (((($selection1.target.process.file.full_path = "C:\\Windows\\SysWOW64\\Fondue.exe" or $selection1.target.process.file.full_path = "C:\\Windows\\System32\\Fondue.exe" or $selection1.target.process.file.full_path = "C:\\Windows\\System32\\OptionalFeatures.exe") and ($selection1.target.process.command_line = "C:\\Windows\\system32\\fondue.exe /enable-feature:NetFx3 /caller-name:mscoreei.dll" or $selection1.target.process.command_line = "C:\\Windows\\sysnative\\FonDUE.EXE /enable-feature:NetFx3 /caller-name:mscoreei.dll" or $selection1.target.process.command_line = "C:\\Windows\\system32\\OptionalFeatures.EXE /enable-feature:NetFx3 /caller-name:mscoreei.dll")) or ($selection1.target.process.file.full_path = "C:\\Windows\\System32\\rundll32.exe" and re.regex($selection1.target.process.command_line, `C:\\Windows\\System32\\rundll32\.exe C:\\Windows\\System32\\shell32\.dll,SHCreateLocalServerRunDll .* -Embedding`))) or ($selection1.target.process.file.full_path = "C:\\Windows\\SysWOW64\\schtasks.exe" and re.regex($selection1.target.process.command_line, `C:\\Windows\\System32\\schtasks\.exe /Create /TN Updates\\&startupname& /XML .*\\AppData\\Local\\Temp.*\.tmp`))))
+
+  condition:
+    $selection1
+}

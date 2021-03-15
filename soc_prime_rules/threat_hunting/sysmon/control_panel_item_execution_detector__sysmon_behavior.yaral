@@ -1,0 +1,17 @@
+rule control_panel_item_execution_detector_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "This content detects behavior as described on the Mitre Att&ck Matrix Technique 1196  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Hgch2MWfl9KX"
+    version = "0.01"
+    created = "2019/09/19"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, t1196"
+
+  events:
+(($selection1.metadata.product_event_type = "1" and ((((($selection1.target.process.file.full_path = "C:\\Windows\\System32\\control.exe" and re.regex($selection1.target.process.command_line, `.*\.cpl`)) or ($selection1.target.process.file.full_path = "C:\\Windows\\System32\\rundll32.exe" and re.regex($selection1.target.process.command_line, `C:\\Windows\\system32\\rundll32\.exe Shell32\.dll,Control_RunDLL .*\.cpl`))) or ($selection1.target.process.file.full_path = "C:\\Windows\\SysWOW64\\rundll32.exe" and re.regex($selection1.target.process.command_line, `C:\\Windows\\SysWOW64\\rundll32\.exe C:\\Windows\\SysWOW64\\shell32\.dll .*\.cpl`))) or ($selection1.src.process.file.full_path = "C:\\Windows\\SysWOW64\\rundll32.exe" and re.regex($selection1.src.process.command_line, `C:\\Windows\\SysWOW64\\rundll\.32\.exe .*\.cpl`))) or ($selection1.src.process.file.full_path = "C:\\Windows\\System32\\rundll32.exe" and re.regex($selection1.src.process.command_line, `C:\\Windows\\System32\\rundll32\.exe Shell32\.dll,Control_RunDLL .*\.cpl`)))) or ($selection1.metadata.product_event_type = "7" and $selection1.target.process.file.full_path = "C:\\Window\\SysWOW64\\rundll32.exe" and re.regex($selection1.target.process.file.full_path, `.*\.cpl`)))
+
+  condition:
+    $selection1
+}

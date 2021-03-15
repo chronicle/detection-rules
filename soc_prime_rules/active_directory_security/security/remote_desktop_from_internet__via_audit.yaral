@@ -1,0 +1,17 @@
+rule remote_desktop_from_internet_via_audit {
+ meta:
+    author = "SOC Prime Team"
+    description = "Detects RDP logons from non-private ip ranges. RDP & Local Administrator accounts are often targeted for remote access.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/DS3MRqpI1PBa"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "initial_access, t1076, t1078"
+
+  events:
+(($selection1.metadata.product_event_type = "4624" and $selection1.extensions.auth.mechanism = "10") and not ((re.regex($selection1.principal.ip, `10\..*`) or re.regex($selection1.principal.ip, `192\.168\..*`) or re.regex($selection1.principal.ip, `172\.31.*`) or re.regex($selection1.principal.ip, `172\.30\..*`) or re.regex($selection1.principal.ip, `172\.29\..*`) or re.regex($selection1.principal.ip, `172\.28\..*`) or re.regex($selection1.principal.ip, `172\.27\..*`) or re.regex($selection1.principal.ip, `172\.26\..*`) or re.regex($selection1.principal.ip, `172\.25\..*`) or re.regex($selection1.principal.ip, `172\.24\..*`) or re.regex($selection1.principal.ip, `172\.23\..*`) or re.regex($selection1.principal.ip, `172\.21\..*`) or re.regex($selection1.principal.ip, `172\.20\..*`) or re.regex($selection1.principal.ip, `172\.19\..*`) or re.regex($selection1.principal.ip, `172\.18\..*`) or re.regex($selection1.principal.ip, `172\.17\..*`) or re.regex($selection1.principal.ip, `172\.16\..*`) or re.regex($selection1.principal.ip, `fd.*`) or re.regex($selection1.principal.ip, `fc.*`) or re.regex($selection1.principal.ip, `127\.0\.0\.1.*`) or re.regex($selection1.principal.ip, `::1.*`))))
+
+  condition:
+    $selection1
+}

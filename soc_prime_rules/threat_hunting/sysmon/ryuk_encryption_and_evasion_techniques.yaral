@@ -1,0 +1,17 @@
+rule ryuk_encryption_and_evasion_techniques {
+ meta:
+    author = "Osman Demir"
+    description = "Detects Ryuk Ransomware  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/9lnBk5qhd9IV"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1486, Impact, T1137, Persistence"
+
+  events:
+(($selection.metadata.product_event_type = "1" and (re.regex($selection.target.process.command_line, `icacls \"C:.*\" /grant Everyone:F /T /C /Q`) or $selection.target.process.command_line = "\"C:\\Windows\\System32\\net.exe\" stop \"audioendpointbuilder\" /y" or $selection.target.process.command_line = "\"C:\\Windows\\System32\\net.exe\" stop \"samss\" /y")) or ($selection.metadata.product_event_type = "11" and (re.regex($selection.target.file.full_path, `C:\\Users.*\\Pictures.*\.RYK`) or $selection.target.file.full_path = "C:\\Users\\admin\\AppData\\Roaming\\Microsoft\\Word\\STARTUP\\RyukReadMe.html")))
+
+  condition:
+    $selection
+}

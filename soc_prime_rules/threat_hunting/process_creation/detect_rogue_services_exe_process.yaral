@@ -1,0 +1,17 @@
+rule detect_rogue_servicesexe_process {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects an anomaly whereby services.exe is not a child process of wininit.exe this could be indicative of a rogue services.exe process.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/o0fZpHsb5w5B"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "process_creation"
+    mitre = "defense_evasion, t1036"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*\\services\.exe`) and not ($selection.src.process.file.full_path = "C:\\Windows\\System32\\wininit.exe"))
+
+  condition:
+    $selection
+}

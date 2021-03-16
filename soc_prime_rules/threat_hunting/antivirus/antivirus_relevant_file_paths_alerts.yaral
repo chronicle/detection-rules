@@ -1,0 +1,15 @@
+rule antivirus_relevant_file_paths_alerts {
+ meta:
+    author = "Florian Roth"
+    description = "Detects an Antivirus alert in a highly relevant file path or with a relevant file name  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/gso6d8QPIE6x"
+    version = "0.01"
+    created = "2018/09/09"
+    product = "antivirus"
+
+  events:
+(re.regex($selection.target.file.full_path, `C:\\Windows\\Temp\\.*`) or re.regex($selection.target.file.full_path, `C:\\Temp\\.*`) or re.regex($selection.target.file.full_path, `.*\\\\Client\\.*`) or re.regex($selection.target.file.full_path, `C:\\PerfLogs\\.*`) or re.regex($selection.target.file.full_path, `C:\\Users\\Public\\.*`) or re.regex($selection.target.file.full_path, `C:\\Users\\Default\\.*`) or re.regex($selection.target.file.full_path, `.*\.ps1`) or re.regex($selection.target.file.full_path, `.*\.vbs`) or re.regex($selection.target.file.full_path, `.*\.bat`) or re.regex($selection.target.file.full_path, `.*\.chm`) or re.regex($selection.target.file.full_path, `.*\.xml`) or re.regex($selection.target.file.full_path, `.*\.txt`) or re.regex($selection.target.file.full_path, `.*\.jsp`) or re.regex($selection.target.file.full_path, `.*\.jspx`) or re.regex($selection.target.file.full_path, `.*\.asp`) or re.regex($selection.target.file.full_path, `.*\.aspx`) or re.regex($selection.target.file.full_path, `.*\.php`) or re.regex($selection.target.file.full_path, `.*\.war`) or re.regex($selection.target.file.full_path, `.*\.hta`) or re.regex($selection.target.file.full_path, `.*\.lnk`) or re.regex($selection.target.file.full_path, `.*\.scf`) or re.regex($selection.target.file.full_path, `.*\.wsf`) or re.regex($selection.target.file.full_path, `.*\.wsh`))
+
+  condition:
+    $selection
+}

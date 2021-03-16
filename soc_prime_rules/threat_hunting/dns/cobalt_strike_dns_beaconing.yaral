@@ -1,0 +1,15 @@
+rule cobalt_strike_dns_beaconing {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious DNS queries known from Cobalt Strike beacons  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/2FdcmmsHHL0h"
+    version = "0.01"
+    created = "2018/05/10"
+    category = "dns"
+
+  events:
+(re.regex($selection.target.url, `aaa\.stage\..*`) or re.regex($selection.target.url, `post\.1.*`))
+
+  condition:
+    $selection
+}

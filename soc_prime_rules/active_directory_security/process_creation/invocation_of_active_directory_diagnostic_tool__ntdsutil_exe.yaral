@@ -1,0 +1,17 @@
+rule invocation_of_active_directory_diagnostic_tool_ntdsutilexe {
+ meta:
+    author = "Thomas Patzke"
+    description = "Detects execution of ntdsutil.exe, which can be used for various attacks against the NTDS database (NTDS.DIT)  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/WeCGGZ763x50"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "credential_access, t1003"
+
+  events:
+(re.regex($selection.target.process.command_line, `.*\\ntdsutil.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

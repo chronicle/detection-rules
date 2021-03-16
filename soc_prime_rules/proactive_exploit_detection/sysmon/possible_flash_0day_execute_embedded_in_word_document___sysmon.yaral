@@ -1,0 +1,17 @@
+rule possible_flash_0day_execute_embedded_in_word_document_sysmon {
+ meta:
+    author = "Roman Ranskyi"
+    description = "An active exploitation of a zero-day vulnerability in Adobe Flash via a Microsoft Office document.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/q7MAkDhbW5Bb"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, t1203, t1059.003"
+
+  events:
+(re.regex($selection.src.process.file.full_path, `.*WINWORD\.exe`) and re.regex($selection.target.process.command_line, `.*&&.*`) and re.regex($selection.target.process.command_line, `.*%~dp0.*`) and re.regex($selection.target.process.command_line, `.*-inul.*`) and re.regex($selection.target.process.command_line, `.*rar.*`) and re.regex($selection.target.process.command_line, `.*-o\+.*`) and re.regex($selection.target.process.command_line, `.* e .*`) and re.regex($selection.target.process.command_line, `.*\.jpg.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

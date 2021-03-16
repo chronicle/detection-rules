@@ -1,0 +1,17 @@
+rule adwind_rat__jrat_part_2 {
+ meta:
+    author = "Florian Roth, Tom Ueltschi"
+    description = "Detects javaw.exe in AppData folder as used by Adwind / JRAT  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/4VPNvKK4SGiZ"
+    version = "0.01"
+    created = "2017/11/10"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, t1064"
+
+  events:
+($selection.metadata.product_event_type = "13" and re.regex($selection.target.registry.registry_key, `REGISTRY\\MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run.*`) and re.regex($selection.metadata.description, `%AppData%\\Roaming\\Oracle\\bin\\.*`))
+
+  condition:
+    $selection
+}

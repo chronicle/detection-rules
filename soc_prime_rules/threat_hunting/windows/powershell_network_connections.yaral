@@ -1,0 +1,16 @@
+rule powershell_network_connections {
+ meta:
+    author = "Florian Roth"
+    description = "Detetcs a Powershell process that opens network connections - check for suspicious target ports and target systems - adjust to your environment (e.g. extend filters with company's ip range')  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/rSdOQZRfGOI7"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+
+  events:
+(($selection.metadata.product_event_type = "3" and re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`)) and not ((re.regex($selection.target.ip, `10\..*`) or re.regex($selection.target.ip, `192\.168\..*`) or re.regex($selection.target.ip, `172\..*`) or $selection.target.ip = "127.0.0.1") and $selection.target.ip = "false" and $selection.src.user.user_display_name = "NT AUTHORITY\\SYSTEM"))
+
+  condition:
+    $selection
+}

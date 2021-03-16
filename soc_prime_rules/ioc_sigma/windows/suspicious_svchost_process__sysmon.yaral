@@ -1,0 +1,17 @@
+rule suspicious_svchost_process_sysmon {
+ meta:
+    author = "Florian Roth, Alexandr Yampolskyi"
+    description = "Detects a suspicious svchost process start.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ATfcTbGr3AcM"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1059"
+
+  events:
+(($selection.metadata.product_event_type = "1" and $selection.target.process.file.full_path = "svchost.exe") and not ($selection.metadata.product_event_type = "1" and (re.regex($selection.target.process.command_line, `.*\\services\.exe`) or re.regex($selection.target.process.command_line, `.*\\MsMpEng\.exe`))))
+
+  condition:
+    $selection
+}

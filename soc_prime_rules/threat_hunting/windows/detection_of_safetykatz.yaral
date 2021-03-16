@@ -1,0 +1,17 @@
+rule detection_of_safetykatz {
+ meta:
+    author = "Markus Neis"
+    description = "Detects possible SafetyKatz Behaviour  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/bx1gtxYzjwHz"
+    version = "0.01"
+    created = "2018/07/24"
+    product = "windows"
+    service = "sysmon"
+    mitre = "credential_access, T1003"
+
+  events:
+($selection.metadata.product_event_type = "11" and re.regex($selection.target.file.full_path, `.*\\Temp\\debug\.bin`))
+
+  condition:
+    $selection
+}

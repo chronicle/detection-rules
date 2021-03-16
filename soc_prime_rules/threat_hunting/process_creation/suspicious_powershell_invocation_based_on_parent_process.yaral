@@ -1,0 +1,17 @@
+rule suspicious_powershell_invocation_based_on_parent_process {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious powershell invocations from interpreters or unusual programs  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/8bKj8RKQidUa"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, t1086"
+
+  events:
+(((re.regex($selection.src.process.file.full_path, `.*\\wscript\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\cscript\.exe`)) and re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not (re.regex($selection.principal.file.full_path, `.*\\Health Service State\\.*`)))
+
+  condition:
+    $selection
+}

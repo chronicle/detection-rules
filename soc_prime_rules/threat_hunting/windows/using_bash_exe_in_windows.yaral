@@ -1,0 +1,16 @@
+rule using_bashexe_in_windows {
+ meta:
+    author = "Amir heidari"
+    description = "This content monitor usage of the bash.exe that could be malicious  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/NlKGdt8sHx15"
+    version = "0.01"
+    created = "2020/02/22"
+    product = "windows"
+    service = "sysmon"
+
+  events:
+($selection1.metadata.product_event_type = "1" and re.regex($selection1.target.process.file.full_path, `.*\\\\bash\.exe`))
+
+  condition:
+    $selection1
+}

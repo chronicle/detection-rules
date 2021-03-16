@@ -1,0 +1,17 @@
+rule psexec_detector {
+ meta:
+    author = "Lee Archinal"
+    description = "Detects PSExec being run on a machine  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/xCNohGCqCRpO"
+    version = "0.01"
+    created = "2019/04/29"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Defense_evasion, t1112, Execution, t1059"
+
+  events:
+($selection.metadata.product_event_type = "1" and re.regex($selection.target.process.file.full_path, `.*\\PsExec\.exe`))
+
+  condition:
+    $selection
+}

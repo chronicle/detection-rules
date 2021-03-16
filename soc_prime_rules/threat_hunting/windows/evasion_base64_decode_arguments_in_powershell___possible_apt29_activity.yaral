@@ -1,0 +1,17 @@
+rule evasion_base64_decode_arguments_in_powershell_possible_apt29_activity {
+ meta:
+    author = "Roman Ranskyi"
+    description = "Powershell command included some specific obfuscation, which may indicate attempts to bypass specific detection logic.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/3p8pj24VPYHD"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Defense Evasion, t1027, Execution, t1086"
+
+  events:
+($selection0.metadata.product_event_type = "1" and $selection0.target.process.command_line = "'FromBase\\'+0x40+\\'String\\'")
+
+  condition:
+    $selection0
+}

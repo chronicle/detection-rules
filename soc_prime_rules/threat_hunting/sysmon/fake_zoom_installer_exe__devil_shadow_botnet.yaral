@@ -1,0 +1,17 @@
+rule fake_zoom_installerexe_devil_shadow_botnet {
+ meta:
+    author = "Emir Erdogan"
+    description = "This rule detects to devil shadow botnet activities with fake zoom installer exe.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/UPInonyraJtb"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "windows"
+    product = "sysmon"
+    mitre = "T1055, T1179, T1215, T1065, T1045"
+
+  events:
+(((re.regex($selection.src.process.file.full_path, `.*/Zoominstaller\.exe `) or re.regex($selection.src.process.file.full_path, `.*/wscript\.exe`)) and re.regex($selection.target.process.file.full_path, `.*/cmd\.exe`) and re.regex($selection.target.process.command_line, `.*pyclient\.cmd.*`)) or (re.regex($selection.src.process.file.full_path, `.*/cmd\.exe`) and (re.regex($selection.target.process.file.full_path, `.*/tasklist\.exe`) or re.regex($selection.target.process.file.full_path, `.*/attrib\.exe`) or re.regex($selection.target.process.file.full_path, `.*/reg\.exe`)) and (re.regex($selection.target.process.command_line, `.*D3ViL ShaDow.*`) or re.regex($selection.target.process.command_line, `.*botnet.*`) or re.regex($selection.target.process.command_line, `.*boot-startup\.vbs.*`))))
+
+  condition:
+    $selection
+}

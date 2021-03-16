@@ -1,0 +1,17 @@
+rule combination_of__wevtutil_and_fsutil_to_avoid_forensics_analysis {
+ meta:
+    author = "Ariel Millahuel"
+    description = "This rule detects the combination of wevtutil and fsutil to avoid forensics analysis  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/k1cjcKua96bW"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "test_capabilities, t1358"
+
+  events:
+(($selection1.target.process.file.full_path = "wevtutil.exe" or $selection1.target.process.file.full_path = "fsutil.exe") and re.regex($selection1.target.process.command_line, `.* wevtutil cl Setup & wevtutil cl System & wevtutil cl Security & wevtutil cl Application & fsutil usn deletejournal /D %.*% .*`) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1"))
+
+  condition:
+    $selection1
+}

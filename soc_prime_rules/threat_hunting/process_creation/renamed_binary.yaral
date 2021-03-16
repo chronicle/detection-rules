@@ -1,0 +1,17 @@
+rule renamed_binary {
+ meta:
+    author = "Matthew Green - @mgreen27"
+    description = "Detects the execution of a renamed binary often used by attackers or malware leveraging new Sysmon OriginalFileName datapoint.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/hDRbtGWpAJv8"
+    version = "0.01"
+    created = "2019/06/15"
+    category = "process_creation"
+    product = "windows"
+    mitre = "t1036, defense_evasion"
+
+  events:
+((($selection.target.file.full_path = "cmd.exe" or $selection.target.file.full_path = "powershell.exe" or $selection.target.file.full_path = "powershell_ise.exe" or $selection.target.file.full_path = "psexec.exe" or $selection.target.file.full_path = "psexec.c" or $selection.target.file.full_path = "cscript.exe" or $selection.target.file.full_path = "wscript.exe" or $selection.target.file.full_path = "mshta.exe" or $selection.target.file.full_path = "regsvr32.exe" or $selection.target.file.full_path = "wmic.exe" or $selection.target.file.full_path = "certutil.exe" or $selection.target.file.full_path = "rundll32.exe" or $selection.target.file.full_path = "cmstp.exe" or $selection.target.file.full_path = "msiexec.exe" or $selection.target.file.full_path = "7z.exe" or $selection.target.file.full_path = "winrar.exe") and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not ((re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell_ise\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\psexec\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\psexec64\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\cscript\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\wscript\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\mshta\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\regsvr32\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\wmic\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\certutil\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\rundll32\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\cmstp\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\msiexec\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\7z\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\winrar\.exe`))))
+
+  condition:
+    $selection
+}

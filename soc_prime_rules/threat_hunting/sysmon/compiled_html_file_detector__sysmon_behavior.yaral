@@ -1,0 +1,17 @@
+rule compiled_html_file_detector_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "This content detects the distribution of a compiled html file as detected by Sysmon.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/zNL0GdeTL6kt"
+    version = "0.01"
+    created = "2019/09/16"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, t1223"
+
+  events:
+(($selection1.metadata.product_event_type = "1" and $selection1.target.process.file.full_path = "C:\\Windows\\hh.exe" and re.regex($selection1.target.process.command_line, `.*.*\.chm`)) or ($selection1.metadata.product_event_type = "13" and $selection1.target.process.file.full_path = "C:\\WINDOWS\\hh.exe"))
+
+  condition:
+    $selection1
+}

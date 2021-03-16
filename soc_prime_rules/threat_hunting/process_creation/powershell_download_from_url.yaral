@@ -1,0 +1,17 @@
+rule powershell_download_from_url {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a Powershell process that contains download commands in its command line string  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/7h2cvCX8ofdj"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "t1086, execution"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) and (re.regex($selection.target.process.command_line, `.*new-object system\.net\.webclient\)\.downloadstring\(.*`) or re.regex($selection.target.process.command_line, `.*new-object system\.net\.webclient\)\.downloadfile\(.*`) or re.regex($selection.target.process.command_line, `.*new-object net\.webclient\)\.downloadstring\(.*`) or re.regex($selection.target.process.command_line, `.*new-object net\.webclient\)\.downloadfile\(.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

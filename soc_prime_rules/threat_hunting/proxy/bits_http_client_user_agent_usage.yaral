@@ -1,0 +1,16 @@
+rule bits_http_client_useragent_usage {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule can be used to hunt for anomalous trafic initiated to external hosts in proxy logs  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Z15hUenKYohQ"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "proxy"
+    mitre = "defense_evasion, t1197"
+
+  events:
+re.regex($selection.src.application, `Microsoft BITS.*`)
+
+  condition:
+    $selection
+}

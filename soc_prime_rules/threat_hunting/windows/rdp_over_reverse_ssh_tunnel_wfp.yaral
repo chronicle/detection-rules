@@ -1,0 +1,17 @@
+rule rdp_over_reverse_ssh_tunnel_wfp {
+ meta:
+    author = "Samir Bousseaden"
+    description = "Detects svchost hosting RDP termsvcs communicating with the loopback address and on TCP port 3389  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/284JD7CFSKOt"
+    version = "0.01"
+    created = "2019/02/16"
+    product = "windows"
+    service = "security"
+    mitre = "defense_evasion, command_and_control, t1076, car.2013-07-002"
+
+  events:
+($selection.metadata.product_event_type = "5156" and (($selection.principal.port = "3389" and (re.regex($selection.target.ip, `127\..*`) or $selection.target.ip = "::1")) or ($selection.target.port = "3389" and (re.regex($selection.principal.ip, `127\..*`) or $selection.principal.ip = "::1"))))
+
+  condition:
+    $selection
+}

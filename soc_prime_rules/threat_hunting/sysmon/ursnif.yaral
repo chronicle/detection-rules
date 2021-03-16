@@ -1,0 +1,17 @@
+rule ursnif {
+ meta:
+    author = "megan201296"
+    description = "Detects new registry key created by Ursnif malware.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/BjobB0UXw8vv"
+    version = "0.01"
+    created = "2019/02/13"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, t1112"
+
+  events:
+($selection.metadata.product_event_type = "13" and re.regex($selection.target.registry.registry_key, `.*\\Software\\AppDataLow\\Software\\Microsoft\\.*`))
+
+  condition:
+    $selection
+}

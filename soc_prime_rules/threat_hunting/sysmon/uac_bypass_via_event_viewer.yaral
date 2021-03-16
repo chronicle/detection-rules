@@ -1,0 +1,17 @@
+rule uac_bypass_via_event_viewer {
+ meta:
+    author = "Florian Roth"
+    description = "Detects UAC bypass method using Windows event viewer  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/EIBSd85RV69M"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "defense_evasion, privilege_escalation, t1088"
+
+  events:
+(($methregistry.metadata.product_event_type = "13" and re.regex($methregistry.target.registry.registry_key, `HKEY_USERS\\.*\\mscfile\\shell\\open\\command`)) or (($methregistry.metadata.product_event_type = "1" and re.regex($methregistry.src.process.file.full_path, `.*\\eventvwr\.exe`)) and not (re.regex($methregistry.target.process.file.full_path, `.*\\mmc\.exe`))))
+
+  condition:
+    $methregistry
+}

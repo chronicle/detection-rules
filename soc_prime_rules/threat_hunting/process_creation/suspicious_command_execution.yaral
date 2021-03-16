@@ -1,0 +1,17 @@
+rule suspicious_command_execution {
+ meta:
+    author = "Den Iuzvyk"
+    description = "Detects suspicious command execution  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/HkEeVAuNeql1"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, t1204, t1059"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) and re.regex($selection.target.process.command_line, `.*rd.*`) and re.regex($selection.target.process.command_line, `.*/s.*`) and re.regex($selection.target.process.command_line, `.*/q.*`) and re.regex($selection.target.process.command_line, `.*timeout.*`) and re.regex($selection.target.process.command_line, `.* del .*`) and re.regex($selection.target.process.command_line, `.*\.exe.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

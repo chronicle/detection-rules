@@ -1,0 +1,15 @@
+rule detects_powershell_attack_via_av_ids {
+ meta:
+    author = "Osman Demir"
+    description = "Detects powershell attacks from antivurus logs  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/6f6EnV5jiP2o"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "antivirus"
+
+  events:
+($selection.target.registry.registry_value_data = "Powershell Injection Attack" or $selection.target.registry.registry_value_data = "ICMP PowerShell Shell Activity" or $selection.target.registry.registry_value_data = "Powershell Payload Web Delivery" or $selection.target.registry.registry_value_data = "Malicious PowerShell Script Download" or $selection.target.registry.registry_value_data = "Powershell Empire Activity" or $selection.target.registry.registry_value_data = "W97M.Downloader Powershell Activity")
+
+  condition:
+    $selection
+}

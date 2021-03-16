@@ -1,0 +1,17 @@
+rule possible_system_time_discovery_sysmonwindows_logs {
+ meta:
+    author = "Roman Ranskyi"
+    description = "The system time is set and stored by the Windows Time Service within a domain to maintain time synchronization between systems and services in an enterprise network. (use for Letheral Movement via task scheduler)  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/B45YWxGdDpdW"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "Discovery, t1124, Execution, t1059"
+
+  events:
+(($selection0.target.process.command_line = "net time" or $selection0.target.process.command_line = "net1 time" or $selection0.target.process.command_line = "Get-Date") or ($selection0.target.process.file.full_path = "net.exe" or $selection0.target.process.file.full_path = "net1.exe" or $selection0.target.process.file.full_path = "w32tm.exe"))
+
+  condition:
+    $selection0
+}

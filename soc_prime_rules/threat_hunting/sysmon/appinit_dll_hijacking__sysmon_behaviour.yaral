@@ -1,0 +1,17 @@
+rule appinit_dll_hijacking_sysmon_behaviour {
+ meta:
+    author = "Emir Erdogan"
+    description = "it can be used the AppInit_DLL functionality to achieve persistence by ensuring that every user mode process that is spawned will load its malicious DLL  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/DwmH4mVgWexR"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1103, T1055"
+
+  events:
+($selection.src.process.file.full_path = "C:\\Windows\\System32\\cmd.exe" and $selection.target.process.file.full_path = "C:\\Windows\\System32\\reg.exe" and (re.regex($selection.target.process.command_line, `.*HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\LoadAppInit_DLLs.*`) or re.regex($selection.target.process.command_line, `.*HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\LoadAppInit_DLLs.*`) or re.regex($selection.target.process.command_line, `.*HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\WindowsAppInit_DLLs.*`) or re.regex($selection.target.process.command_line, `.*HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\AppInit_DLLs.*`)))
+
+  condition:
+    $selection
+}

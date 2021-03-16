@@ -1,0 +1,17 @@
+rule powershell_encoded_command_sysmon {
+ meta:
+    author = "Michael Haag, Alexandr Yampolskyi"
+    description = "Detects usage of Powershell Encoded Commands.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/jgJIAiHq2tb5"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204, t1059"
+
+  events:
+($selection.metadata.product_event_type = "1" and re.regex($selection.target.process.file.full_path, `.*powershell\.exe`) and (re.regex($selection.target.process.command_line, `.*base64.*`) or re.regex($selection.target.process.command_line, `.*-enc.*`) or re.regex($selection.target.process.command_line, `.*-enco.*`) or re.regex($selection.target.process.command_line, `.*-encod.*`) or re.regex($selection.target.process.command_line, `.*-encode.*`) or re.regex($selection.target.process.command_line, `.*-encoded.*`) or re.regex($selection.target.process.command_line, `.*-ec.*`) or re.regex($selection.target.process.command_line, `.*-en.*`) or re.regex($selection.target.process.command_line, `.*-encodedC.*`) or re.regex($selection.target.process.command_line, `.*-encodedCo.*`) or re.regex($selection.target.process.command_line, `.*-encodedCom.*`) or re.regex($selection.target.process.command_line, `.*-encodedComm.*`) or re.regex($selection.target.process.command_line, `.*-encodedComma.*`) or re.regex($selection.target.process.command_line, `.*-encodedComman.*`) or re.regex($selection.target.process.command_line, `.*-encodedCommand.*`)))
+
+  condition:
+    $selection
+}

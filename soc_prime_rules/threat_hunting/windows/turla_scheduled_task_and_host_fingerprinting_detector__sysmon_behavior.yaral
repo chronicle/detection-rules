@@ -1,0 +1,17 @@
+rule turla_scheduled_task_and_host_fingerprinting_detector_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "Detects characteristics of the Turla strain of malware  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/r41f6zmCydPt"
+    version = "0.01"
+    created = "2019/07/17"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1059, t1065, t1129, Persistence, t1050, Privilege_Escalation, t1055, Defense_Evasion"
+
+  events:
+(($selection1.metadata.product_event_type = "1" and ((re.regex($selection1.target.process.file.full_path, `.*cmd\.exe`) and ($selection1.target.process.command_line = "cmd.exe /c schtasks /creaet /SC MINUTE /MO 30 /TR %localappdata%\\\\VirtualStore\\\\certcheck.exe /TN VerifiedPublisherCertCheck /F" or re.regex($selection1.target.process.command_line, `cmd\.exe /c net use .*\\c$ .* /user:administrator & copy /y .*\\c$\\users\\public\\documents\\i\.js $documents\\j\.js & $documents\\j\.js`))) or ($selection1.target.process.command_line = "tasklist /v" or $selection1.target.process.command_line = "gpresult /z" or $selection1.target.process.command_line = "dir \\x22%programfiles%\\x5cKaspersky Lab\\x22" or $selection1.target.process.command_line = "tracert www.google.com"))) or ($selection1.metadata.product_event_type = "11" and re.regex($selection1.target.file.full_path, `C:\\Users.*\\AppData\\Roaming\\Microsofx5ct235\.dat`)))
+
+  condition:
+    $selection1
+}

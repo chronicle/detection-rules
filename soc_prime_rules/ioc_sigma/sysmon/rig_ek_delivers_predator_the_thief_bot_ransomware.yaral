@@ -1,0 +1,17 @@
+rule rig_ek_delivers_predator_the_thiefbot_ransomware {
+ meta:
+    author = "Emir Erdogan"
+    description = "Rig EK Delivers Predator the thief&Bot Ransomware  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/rOXcOaqX6q1R"
+    version = "0.01"
+    created = "2019/11/24"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1486, T1059"
+
+  events:
+((((re.regex($selection1.target.process.file.full_path, `.*\\socks111atx\.exe`) and re.regex($selection1.src.process.file.full_path, `.*\\radD8D54\.tmp\.exe`)) or ($selection1.metadata.product_event_type = "1" and re.regex($selection1.target.process.file.full_path, `.*\\regsvr32\.exe`) and (re.regex($selection1.target.process.command_line, `.*\\D5F4\.tmp\.dll`) or re.regex($selection1.target.process.command_line, `.*\\CD2D\.tmp\.dll`)))) or (re.regex($selection1.target.process.command_line, `.*ping 127\.0\.0\.1 && del.*`) and re.regex($selection1.src.process.file.full_path, `.*\\radD8D54\.tmp\.exe`))) and (re.regex($selection1.target.process.file.full_path, `.*\\notepad\.exe`) and re.regex($selection1.target.process.command_line, `.*\\FILES ENCRYPTED\.txt`)))
+
+  condition:
+    $selection1
+}

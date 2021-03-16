@@ -1,0 +1,17 @@
+rule malicious_behaviour_on_user_login_microsoft_windows__c0d0s0_group_behavior_part_1 {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Detects malicious registry values and unusual AppData folder modification related also to c0d0s0 group.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/L7ZaPMOEyDMa"
+    version = "0.01"
+    created = "2019/11/21"
+    category = "file_event"
+    product = "windows"
+    mitre = "persistence, privilege_escalation, t1112, t1547, t1547.001"
+
+  events:
+(re.regex($selection3.target.file.full_path, `.*AppData\\.*\\fakerx86\.exe.*`) or re.regex($selection3.target.file.full_path, `.*AppData\\.*\\dbgeng\.dll.*`))
+
+  condition:
+    $selection3
+}

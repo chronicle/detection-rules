@@ -1,0 +1,16 @@
+rule wannacry_ransomware_via_sysmon {
+ meta:
+    author = "Florian Roth (rule), Tom U. @c_APT_ure (collection)"
+    description = "Detects WannaCry ransomware activity via Sysmon  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md. @c_APT_ure (collection)."
+    reference = "https://tdm.socprime.com/tdm/info/MDzDoSUuSPpn"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and ((re.regex($selection1.target.process.file.full_path, `.*\\tasksche\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\mssecsvc\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\taskdl\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\@WanaDecryptor@.*`) or re.regex($selection1.target.process.file.full_path, `.*\\taskhsvc\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\taskse\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\111\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\lhdfrgui\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\diskpart\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\linuxnew\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\wannacry\.exe`)) or (re.regex($selection1.target.process.command_line, `.*vssadmin delete shadows.*`) or re.regex($selection1.target.process.command_line, `.*icacls .* /grant Everyone:F /T /C /Q.*`) or re.regex($selection1.target.process.command_line, `.*bcdedit /set {default} recoveryenabled no.*`) or re.regex($selection1.target.process.command_line, `.*wbadmin delete catalog -quiet.*`) or re.regex($selection1.target.process.command_line, `.*@Please_Read_Me@\.txt.*`))))
+
+  condition:
+    $selection1
+}

@@ -1,0 +1,17 @@
+rule strike_network_inventory_explorer__unquoted_service_path {
+ meta:
+    author = "Osman Demir"
+    description = "Detects 10-Strike Network Inventory Explorer for Windows Unquoted Search Path explotation  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/IHxTBuFZaCor"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "persistence, privilege_escalation, T1034"
+
+  events:
+(($selection1.metadata.product_event_type = "1" and ($selection1.target.process.file.full_path = "C:\\InventoryWebServer.exe" or $selection1.target.process.file.full_path = "C:\\Program Files\\InventoryWebServer.exe")) or ($selection1.metadata.product_event_type = "11" and ($selection1.target.file.full_path = "C:\\InventoryWebServer.exe" or $selection1.target.file.full_path = "C:\\Program Files\\InventoryWebServer.exe")))
+
+  condition:
+    $selection1
+}

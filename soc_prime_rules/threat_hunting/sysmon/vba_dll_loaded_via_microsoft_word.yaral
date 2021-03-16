@@ -1,0 +1,17 @@
+rule vba_dll_loaded_via_microsoft_word {
+ meta:
+    author = "Antonlovesdnb"
+    description = "Detects DLL's Loaded Via Word Containing VBA Macros  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/zpEb6DTunUyO"
+    version = "0.01"
+    created = "2020/02/19"
+    product = "windows"
+    service = "sysmon"
+    mitre = "initial_access, t1193"
+
+  events:
+($selection.metadata.product_event_type = "7" and (re.regex($selection.target.process.file.full_path, `.*\\winword\.exe.*`) or re.regex($selection.target.process.file.full_path, `.*\\powerpnt\.exe.*`) or re.regex($selection.target.process.file.full_path, `.*\\excel\.exe.*`) or re.regex($selection.target.process.file.full_path, `.*\\outlook\.exe.*`)) and (re.regex($selection.target.process.file.full_path, `.*\\VBE7\.DLL.*`) or re.regex($selection.target.process.file.full_path, `.*\\VBEUI\.DLL.*`) or re.regex($selection.target.process.file.full_path, `.*\\VBE7INTL\.DLL.*`)))
+
+  condition:
+    $selection
+}

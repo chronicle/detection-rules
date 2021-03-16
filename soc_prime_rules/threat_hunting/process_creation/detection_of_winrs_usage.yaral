@@ -1,0 +1,17 @@
+rule detection_of_winrs_usage {
+ meta:
+    author = "Sreeman"
+    description = "Windows Remote Shell (WinRS) is a command line tool that is part of Windows 2008 and later. If WinRM is enabled this utility can be used to execute commands on a host remotely.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/anp657rEE5hG"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "lateral movement, execution, t1028"
+
+  events:
+(($selection.target.process.command_line = "winrs -r" or $selection.target.process.command_line = "winrs /r") and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

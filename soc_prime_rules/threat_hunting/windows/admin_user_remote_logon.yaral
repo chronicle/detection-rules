@@ -1,0 +1,17 @@
+rule admin_user_remote_logon {
+ meta:
+    author = "juju4"
+    description = "Detect remote login by Administrator user depending on internal pattern  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/fyr8h8H43sLG"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "lateral_movement, t1078"
+
+  events:
+($selection.metadata.product_event_type = "4624" and $selection.extensions.auth.mechanism = "10" and $selection.src.application = "Negotiate" and re.regex($selection.src.user.user_display_name, `Admin-.*`))
+
+  condition:
+    $selection
+}

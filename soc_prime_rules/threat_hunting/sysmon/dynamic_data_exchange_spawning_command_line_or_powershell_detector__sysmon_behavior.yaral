@@ -1,0 +1,17 @@
+rule dynamic_data_exchange_spawning_commandline_or_powershell_detector_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "This content detects behavior as described on the Mitre Att&ck Matrix Technique 1173  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/2M39ZVXp2FBg"
+    version = "0.01"
+    created = "2019/09/19"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, t1173"
+
+  events:
+($selection1.metadata.product_event_type = "1" and re.regex($selection1.src.process.file.full_path, `.*\\Microsoft Office.*`) and ($selection1.target.process.file.full_path = "C:\\Windows\\SysWOW64\\cmd.exe" or $selection1.target.process.file.full_path = "C:\\Windows\\system32\\cmd.exe" or re.regex($selection1.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\.exe`)))
+
+  condition:
+    $selection1
+}

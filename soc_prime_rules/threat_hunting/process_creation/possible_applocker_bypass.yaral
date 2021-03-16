@@ -1,0 +1,17 @@
+rule possible_applocker_bypass {
+ meta:
+    author = "juju4"
+    description = "Detects execution of executables that can be used to bypass Applocker whitelisting  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/yzPJ2jDeOwGR"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1118, t1121, t1127, t1170"
+
+  events:
+((re.regex($selection.target.process.command_line, `.*\\msdt\.exe.*`) or re.regex($selection.target.process.command_line, `.*\\installutil\.exe.*`) or re.regex($selection.target.process.command_line, `.*\\regsvcs\.exe.*`) or re.regex($selection.target.process.command_line, `.*\\regasm\.exe.*`) or re.regex($selection.target.process.command_line, `.*\\msbuild\.exe.*`) or re.regex($selection.target.process.command_line, `.*\\ieexec\.exe.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

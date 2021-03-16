@@ -1,0 +1,17 @@
+rule rottenpotato_like_attack_pattern {
+ meta:
+    author = "@SBousseaden, Florian Roth"
+    description = "Detects logon events that have characteristics of events generated during an attack with RottenPotato and the like  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/T4UNTURyJXHP"
+    version = "0.01"
+    created = "2019/11/15"
+    product = "windows"
+    service = "security"
+    mitre = "privilege_escalation, credential_access, t1171"
+
+  events:
+($selection.metadata.product_event_type = "4624" and $selection.extensions.auth.mechanism = "3" and $selection.target.user.user_display_name = "ANONYMOUS_LOGON" and $selection.principal.hostname = "-" and $selection.principal.ip = "127.0.0.1")
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule ryuk_ransomware_hash_detected {
+ meta:
+    author = "Furkan Celik"
+    description = "While most ransomware is spread using spam email and exploit kits, Ryuk is delivered as a payload of the Emotet and Trickbot malware. Looking at the encryption process and ransom demands, Ryuk is targeting big enterprises in the hopes of large payoffs.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Zv9JvW4XauTo"
+    version = "0.01"
+    created = "2020/03/28"
+    product = "windows"
+    service = "security"
+    mitre = "impact, T1486"
+
+  events:
+(($selection.target.file.md5 = "5AC0F050F93F86E69026FAEA1FBB4450" or $selection.target.file.md5 = "6CDCB9F86972EFC4CFCE4B06B6BE053A" or $selection.target.file.md5 = "31BD0F224E7E74EEE2847F43AAE23974") and $selection.metadata.product_event_type = "1")
+
+  condition:
+    $selection
+}

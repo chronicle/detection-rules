@@ -1,0 +1,17 @@
+rule adwind_detection {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Detects AdWind activity (also known as AlienSpy, Frutas, Unrecom, Sockrat, JSocket and jRat)  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Jmv4SBdDT533"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, defense_evation, t1059, t1112"
+
+  events:
+((($selection1.target.process.file.full_path = "cmd.exe" or $selection1.target.process.file.full_path = "javaw.exe") and (re.regex($selection1.target.process.command_line, `.* cmd\.exe /C cscript\.exe C:\\Users.*\\AppData\\Local\\Temp\\Retrive5740188186602551395\.vbs .*`) or re.regex($selection1.target.process.command_line, `.* cmd\.exe /C cscript\.exe C:\\Users.*\\AppData\\Local\\Temp.*\.vbs  .*`) or re.regex($selection1.target.process.command_line, `.*  C:\\Program Files\\Java\\jre1\.8\.0_92\\bin\\javaw\.exe\" -jar C:\\Users.*\\AppData\\Roaming\\uyrysfn\.txt .*`) or re.regex($selection1.target.process.command_line, ` .*C:\\Program Files\\Java\\jre1\.8\.0_92\\bin\\javaw\.exe -jar C:\\Users.*\\AppData\\Roaming.*\.txt.* `)) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1")) or ($selection1.metadata.product_event_type = "13" and re.regex($selection1.target.registry.registry_key, `.*  .*\\Software\\Microsoft\\Windows\\CurrentVersion\\Run .* `) and re.regex($selection1.metadata.description, `.* C:\\Users\\admin\\AppData\\Roaming\\Oracle\\bin\\javaw\.exe -jar C:\\Users\\admin\\Oracle Corporations\\Oracles Java\.jar .*`)))
+
+  condition:
+    $selection1
+}

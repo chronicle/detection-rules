@@ -1,0 +1,17 @@
+rule diskshadow_and_vshadow_launch_detection {
+ meta:
+    author = "Eugene Nechiporenko, SOC Prime"
+    description = "This rule detects execution vshadow.exe and diskshadow.exe  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/yRULJ5D4Sl1b"
+    version = "0.01"
+    created = "2018/04/25"
+    product = "windows"
+    service = "process_creation"
+    mitre = "Credential Access, t1003, Persistence, t1060, t1053"
+
+  events:
+(re.regex($selection1.src.process.file.full_path, `.*\\vshadow\.exe`) or re.regex($selection1.src.process.file.full_path, `.*\\diskshadow\.exe`) or (re.regex($selection1.target.process.command_line, `.*vshadow\.exe -nw -exec=.*`) or re.regex($selection1.target.process.command_line, `.*diskshadow\.exe /s \?:\\\\.*`)))
+
+  condition:
+    $selection1
+}

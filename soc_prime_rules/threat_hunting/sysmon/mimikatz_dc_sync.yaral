@@ -1,0 +1,17 @@
+rule mimikatz_dc_sync {
+ meta:
+    author = "Benjamin Delpy, Florian Roth"
+    description = "Detects Mimikatz DC sync security events  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/MXlCJYUO0gW6"
+    version = "0.01"
+    created = "2018/06/03"
+    product = "windows"
+    service = "security"
+    mitre = "credential_access, s0002, t1003"
+
+  events:
+($selection.metadata.product_event_type = "4662" and (re.regex($selection.target.process.file.file_metadata.pe.import_hash, `.*Replicating Directory Changes All.*`) or re.regex($selection.target.process.file.file_metadata.pe.import_hash, `.*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2.*`)))
+
+  condition:
+    $selection
+}

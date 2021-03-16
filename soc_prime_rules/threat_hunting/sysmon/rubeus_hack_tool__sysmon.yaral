@@ -1,0 +1,17 @@
+rule rubeus_hack_tool_sysmon {
+ meta:
+    author = "Florian Roth, Roman Ranskyi"
+    description = "Detects command line parameters used by Rubeus hack tool  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/QsEVU1yRKtOw"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "t1003, Credential Access, Lateral Movement, t1075, t1097"
+
+  events:
+($selection.metadata.product_event_type = "1" and (re.regex($selection.target.process.command_line, `.* asreproast .*`) or re.regex($selection.target.process.command_line, `.* dump /service:krbtgt .*`) or re.regex($selection.target.process.command_line, `.* kerberoast .*`) or re.regex($selection.target.process.command_line, `.* createnetonly /program:.*`) or re.regex($selection.target.process.command_line, `.* ptt /ticket:.*`) or re.regex($selection.target.process.command_line, `.* /impersonateuser:.*`) or re.regex($selection.target.process.command_line, `.* renew /ticket:.*`) or re.regex($selection.target.process.command_line, `.* asktgt /user:.*`) or re.regex($selection.target.process.command_line, `.* harvest /interval:.*`)))
+
+  condition:
+    $selection
+}

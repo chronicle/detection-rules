@@ -1,0 +1,17 @@
+rule sticky_key_like_backdoor_usage {
+ meta:
+    author = "Florian Roth, @twjackomo"
+    description = "Detects the usage and installation of a backdoor that uses an option to register a malicious debugger for built-in tools that are accessible in the login screen  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/GSl0T6YKFl3F"
+    version = "0.01"
+    created = "2018/03/15"
+    product = "windows"
+    service = "sysmon"
+    mitre = "privilege_escalation, persistence, t1015"
+
+  events:
+(($selection_process.metadata.product_event_type = "1" and re.regex($selection_process.src.process.file.full_path, `.*\\winlogon\.exe`) and (re.regex($selection_process.target.process.command_line, `.*\\cmd\.exe sethc\.exe .*`) or re.regex($selection_process.target.process.command_line, `.*\\cmd\.exe utilman\.exe .*`) or re.regex($selection_process.target.process.command_line, `.*\\cmd\.exe osk\.exe .*`) or re.regex($selection_process.target.process.command_line, `.*\\cmd\.exe Magnify\.exe .*`) or re.regex($selection_process.target.process.command_line, `.*\\cmd\.exe Narrator\.exe .*`) or re.regex($selection_process.target.process.command_line, `.*\\cmd\.exe DisplaySwitch\.exe .*`))) or ($selection_process.metadata.product_event_type = "13" and (re.regex($selection_process.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\sethc\.exe\\Debugger`) or re.regex($selection_process.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\utilman\.exe\\Debugger`) or re.regex($selection_process.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\osk\.exe\\Debugger`) or re.regex($selection_process.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\Magnify\.exe\\Debugger`) or re.regex($selection_process.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\Narrator\.exe\\Debugger`) or re.regex($selection_process.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\DisplaySwitch\.exe\\Debugger`)) and $selection_process.metadata.event_type = "SetValue"))
+
+  condition:
+    $selection_process
+}

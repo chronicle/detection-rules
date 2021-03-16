@@ -1,0 +1,17 @@
+rule betabot_neurevt_sysmon {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "BetaBot is a stealer software.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/t7qirtXwX0n2"
+    version = "0.01"
+    created = "2019/01/13"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204"
+
+  events:
+($selection.metadata.product_event_type = "1" and ($selection.target.file.md5 = "b4576437f4b06d438a03a9f8f0776cde" or $selection.target.file.md5 = "a0763d3332bb87595ed6303ab3cdb8fff7dd1e976ee161003a62316fea332941"))
+
+  condition:
+    $selection
+}

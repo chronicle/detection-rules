@@ -1,0 +1,17 @@
+rule detect_service_creation_by_metasploit_on_victim_machine {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects when a service is created by metasploit(e.g psexec) via powershell on a victim endpoint  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/nHv2Sd3eaLs2"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "Windows"
+    service = "security"
+    mitre = "execution, powershell, t1086"
+
+  events:
+($selection.metadata.product_event_type = "7045" and re.regex($selection.target.process.command_line, `%COMSPEC% /b /c start /b /min powershell\.exe -nop -w hidden -noni -c.*`))
+
+  condition:
+    $selection
+}

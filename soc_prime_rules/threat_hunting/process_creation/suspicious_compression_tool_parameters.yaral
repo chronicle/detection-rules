@@ -1,0 +1,17 @@
+rule suspicious_compression_tool_parameters {
+ meta:
+    author = "Florian Roth, Samir Bousseaden"
+    description = "Detects suspicious command line arguments of common data compression tools  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/SVetAYGcvAHb"
+    version = "0.01"
+    created = "2019/10/15"
+    category = "process_creation"
+    product = "windows"
+    mitre = "collection, t1560.001, exfiltration, t1020, t1002"
+
+  events:
+(((re.regex($falsepositive.target.process.command_line, `.* -p.*`) or re.regex($falsepositive.target.process.command_line, `.* -ta.*`) or re.regex($falsepositive.target.process.command_line, `.* -tb.*`) or re.regex($falsepositive.target.process.command_line, `.* -sdel.*`) or re.regex($falsepositive.target.process.command_line, `.* -dw.*`) or re.regex($falsepositive.target.process.command_line, `.* -hp.*`)) and (re.regex($falsepositive.target.file.full_path, `7z.*\.exe`) or re.regex($falsepositive.target.file.full_path, `.*rar\.exe`) or re.regex($falsepositive.target.file.full_path, `.*Command.*Line.*RAR.*`)) and ($falsepositive.metadata.product_event_type = "4688" or $falsepositive.metadata.product_event_type = "1")) and not (re.regex($falsepositive.src.process.file.full_path, `C:\\Program.*`)))
+
+  condition:
+    $falsepositive
+}

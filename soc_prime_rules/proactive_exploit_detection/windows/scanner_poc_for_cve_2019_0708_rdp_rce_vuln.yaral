@@ -1,0 +1,17 @@
+rule scanner_poc_for_cve20190708_rdp_rce_vuln {
+ meta:
+    author = "Florian Roth (rule), Adam Bradbury (idea)"
+    description = "Detects the use of a scanner by zerosum0x0 that discovers targets vulnerable to  CVE-2019-0708 RDP RCE aka BlueKeep  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/dxSqHBcCVylk"
+    version = "0.01"
+    created = "2019/06/02"
+    product = "windows"
+    service = "security"
+    mitre = "lateral_movement, t1210, car.2013-07-002"
+
+  events:
+($selection.metadata.product_event_type = "4625" and $selection.src.user.user_display_name = "AAAAAAA")
+
+  condition:
+    $selection
+}

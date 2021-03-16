@@ -1,0 +1,17 @@
+rule danabot_trojan_sysmon {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "DanaBot, a stealthy banking Trojan.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/2mQEBdEK2hMS"
+    version = "0.01"
+    created = "2019/01/09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204"
+
+  events:
+($selection.metadata.product_event_type = "1" and $selection.target.file.md5 = "76A64FD17CD1E7C59B8BDE7AA9209854")
+
+  condition:
+    $selection
+}

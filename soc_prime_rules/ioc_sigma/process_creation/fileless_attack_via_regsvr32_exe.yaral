@@ -1,0 +1,17 @@
+rule fileless_attack_via_regsvr32exe {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Detects suspicious behavior in the utilization of regsvr32.exe and also a possible fileless attack via this executable.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/KO6EuyFYoCN8"
+    version = "0.01"
+    created = "2019/11/26"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, defense evasion, t1218, t1218.010, t1059, t1059.003"
+
+  events:
+(re.regex($selection.target.process.command_line, `.*regsvr32.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1") and re.regex($selection.target.process.command_line, `.*/s.*`) and re.regex($selection.target.process.command_line, `.*/i.*`) and (re.regex($selection.target.process.command_line, `.*\.txt.*`) or re.regex($selection.target.process.command_line, `.*\.dll.*`)))
+
+  condition:
+    $selection
+}

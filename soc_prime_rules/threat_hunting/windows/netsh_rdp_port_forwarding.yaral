@@ -1,0 +1,17 @@
+rule netsh_rdp_port_forwarding {
+ meta:
+    author = "Florian Roth"
+    description = "Detects netsh commands that configure a port forwarding of port 3389 used for RDP.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/YIsKEJkoUCKj"
+    version = "0.01"
+    created = "2019/01/29"
+    category = "process_creation"
+    product = "windows"
+    mitre = "lateral_movement"
+
+  events:
+(re.regex($selection.target.process.command_line, `netsh i.* p.*=3389 c.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,16 @@
+rule emotet_process_creation {
+ meta:
+    author = "Florian Roth"
+    description = "Detects all Emotet like process executions that are not covered by the more generic rules  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/9U8NXanTx6TC"
+    version = "0.01"
+    created = "2019/09/30"
+    category = "process_creation"
+    product = "windows"
+
+  events:
+((re.regex($selection.target.process.command_line, `.* -e PAA.*`) or re.regex($selection.target.process.command_line, `.* -en PAA.*`) or re.regex($selection.target.process.command_line, `.* -enc PAA.*`) or re.regex($selection.target.process.command_line, `.* -enco PAA.*`) or re.regex($selection.target.process.command_line, `.* -encod PAA.*`) or re.regex($selection.target.process.command_line, `.*JABlAG4AdgA6AHUAcwBlAHIAcAByAG8AZgBpAGwAZQ.*`) or re.regex($selection.target.process.command_line, `.*QAZQBuAHYAOgB1AHMAZQByAHAAcgBvAGYAaQBsAGUA.*`) or re.regex($selection.target.process.command_line, `.*kAGUAbgB2ADoAdQBzAGUAcgBwAHIAbwBmAGkAbABlA.*`) or re.regex($selection.target.process.command_line, `.*IgAoACcAKgAnACkAOwAkA.*`) or re.regex($selection.target.process.command_line, `.*IAKAAnACoAJwApADsAJA.*`) or re.regex($selection.target.process.command_line, `.*iACgAJwAqACcAKQA7ACQA.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

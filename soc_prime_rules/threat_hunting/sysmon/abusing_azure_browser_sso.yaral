@@ -1,0 +1,17 @@
+rule abusing_azure_browser_sso {
+ meta:
+    author = "Den Iuzvyk"
+    description = "Detects abusing  Azure Browser SSO by requesting  OAuth 2.0 refresh tokens for an Azure-AD-authenticated Windows user (i.e. the machine is joined to Azure AD and a user logs in with their Azure AD account) wanting to perform SSO authentication in the browser. An attacker can use this to authenticate to Azure AD in a browser as that user.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/sX0F2FNTmN68"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "sysmon"
+    product = "windows"
+    mitre = "defense_evasion, privilege_escalation, t1073"
+
+  events:
+(($selection_dll.metadata.product_event_type = "7" and re.regex($selection_dll.target.process.file.full_path, `.*MicrosoftAccountTokenProvider\.dll`)) and not ((re.regex($selection_dll.target.process.file.full_path, `.*BackgroundTaskHost\.exe`) or re.regex($selection_dll.target.process.file.full_path, `.*devenv\.exe`) or re.regex($selection_dll.target.process.file.full_path, `.*iexplore\.exe`) or re.regex($selection_dll.target.process.file.full_path, `.*MicrosoftEdge\.exe`))))
+
+  condition:
+    $selection_dll
+}

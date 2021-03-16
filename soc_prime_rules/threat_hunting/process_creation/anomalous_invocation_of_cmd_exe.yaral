@@ -1,0 +1,17 @@
+rule anomalous_invocation_of_cmdexe {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects when the cmd.exe is launched in a suspicious manner   License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/mOAjyJi9nUPK"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    category = "process_creation"
+    mitre = "defense_evasion"
+
+  events:
+(re.regex($selection1.target.process.file.full_path, `.*cmd\.exe`) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (re.regex($selection1.src.process.file.full_path, `.*rundll32\.exe`) or re.regex($selection1.src.process.file.full_path, `.*httpd\.exe`) or re.regex($selection1.src.process.file.full_path, `.*svchost\.exe`) or re.regex($selection1.src.process.file.full_path, `.*w3wp\.exe`)))
+
+  condition:
+    $selection1
+}

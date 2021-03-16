@@ -1,0 +1,17 @@
+rule wastedlocker_ransomware_hunting_initial_access_and_compromise {
+ meta:
+    author = "Ariel Millahuel"
+    description = "This rule its part of Cisco Talos investigation about this ransomware, and includes a lot of ATT&CK techniques that i'll be writing in different rules.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/cexuKikgrGxH"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "initial_access, T1189"
+
+  events:
+($selection1.target.process.file.full_path = "wscript.exe" and re.regex($selection1.target.process.command_line, `wscript\.exe C:\\Users.*\\AppData\\Local\\Temp\\Temp1_Chrome\.Update\.b343b0\.zip\\Chrome\.Update\.c9a747\.js`) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1"))
+
+  condition:
+    $selection1
+}

@@ -1,0 +1,17 @@
+rule wmi_persistence__command_line_event_consumer {
+ meta:
+    author = "Thomas Patzke"
+    description = "Detects WMI command line event consumers  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ZHaoWoHcidKo"
+    version = "0.01"
+    created = "2018/03/07"
+    product = "windows"
+    service = "sysmon"
+    mitre = "t1084, persistence"
+
+  events:
+($selection.metadata.product_event_type = "7" and $selection.target.process.file.full_path = "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe" and $selection.target.process.file.full_path = "wbemcons.dll")
+
+  condition:
+    $selection
+}

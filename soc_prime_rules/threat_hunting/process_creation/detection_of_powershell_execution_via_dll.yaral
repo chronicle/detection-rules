@@ -1,0 +1,17 @@
+rule detection_of_powershell_execution_via_dll {
+ meta:
+    author = "Markus Neis"
+    description = "Detects PowerShell Strings applied to rundllas seen in PowerShdll.dll  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/YGMicuRcvEJn"
+    version = "0.01"
+    created = "2018/08/25"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, t1086"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (re.regex($selection1.target.process.file.full_path, `.*\\rundll32\.exe`) or re.regex($selection1.metadata.description, `.*Windows-Hostprozess \(Rundll32\).*`)) and (re.regex($selection1.target.process.command_line, `.*Default\.GetString.*`) or re.regex($selection1.target.process.command_line, `.*FromBase64String.*`)))
+
+  condition:
+    $selection1
+}

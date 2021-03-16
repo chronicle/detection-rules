@@ -1,0 +1,15 @@
+rule possible_anything_cpl_or_anything_dll_hijack__via_imageload {
+  meta:
+    author = "SOC Prime Team, FireEye"
+    description = "This rule has been ported from Fireeye's HXIOC format to SIGMA. It detects anything.cpl being loaded by any process.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "['https://github.com/fireeye/red_team_tool_countermeasures/blob/ac479ae150e1541445023952f569b7ca0d190b7b/rules/DUEDLLIGENCE/supplemental/hxioc/anything.cpl%20Hijack%20(Methodology).ioc', 'https://github.com/fireeye/red_team_tool_countermeasures/blob/ac479ae150e1541445023952f569b7ca0d190b7b/rules/DUEDLLIGENCE/supplemental/hxioc/anything.dll%20Hijack%20(Methodology).ioc', 'https://github.com/fireeye/red_team_tool_countermeasures/blob/master/LICENSE.txt']"
+    version = "0.01"
+    created = "2020-12-10"
+
+  events:
+    (re.regex($event.target.process.file.full_path, `anything.cpl`) or re.regex($event.target.process.file.full_path, `anything.dll`))
+
+  condition:
+    $event
+}
+

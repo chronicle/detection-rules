@@ -1,0 +1,17 @@
+rule whoami_execution_part_1 {
+ meta:
+    author = "Florian Roth"
+    description = "Detects the execution of whoami, which is often used by attackers after exloitation / privilege escalation but rarely used by administrators  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/uA0vQNIJsZGW"
+    version = "0.01"
+    created = "2018/05/22"
+    product = "windows"
+    service = "security"
+    mitre = "discovery, t1033"
+
+  events:
+($selection.metadata.product_event_type = "4688" and re.regex($selection.target.process.command_line, `.*\\whoami\.exe`))
+
+  condition:
+    $selection
+}

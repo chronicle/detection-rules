@@ -1,0 +1,17 @@
+rule security_eventlog_cleared {
+ meta:
+    author = "Florian Roth"
+    description = "Some threat groups tend to delete the local 'Security' Eventlog using certain utitlities  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/NCP61uVfKSmw"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "defense_evasion, t1070"
+
+  events:
+($selection.metadata.product_event_type = "517" or $selection.metadata.product_event_type = "1102" or $selection.metadata.product_event_type = "104")
+
+  condition:
+    $selection
+}

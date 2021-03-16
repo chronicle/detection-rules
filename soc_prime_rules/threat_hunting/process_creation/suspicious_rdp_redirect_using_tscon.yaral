@@ -1,0 +1,16 @@
+rule suspicious_rdp_redirect_using_tscon {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a suspicious RDP session redirect using tscon.exe  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Q2ta1itwSt1J"
+    version = "0.01"
+    created = "2018/03/17"
+    category = "process_creation"
+    product = "windows"
+
+  events:
+(re.regex($selection.target.process.command_line, `.* /dest:rdp-tcp:.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

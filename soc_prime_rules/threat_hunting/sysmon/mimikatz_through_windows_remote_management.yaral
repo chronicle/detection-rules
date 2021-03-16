@@ -1,0 +1,17 @@
+rule mimikatz_through_windows_remote_management {
+ meta:
+    author = "Patryk Prauze - ING Tech"
+    description = "Detects usage of mimikatz through WinRM protocol by monitoring access to lsass process by wsmprovhost.exe.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/mV7fqMpJNxlu"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "credential_access, execution, t1003, t1028, s0005"
+
+  events:
+($selection.metadata.product_event_type = "10" and $selection.target.process.file.full_path = "C:\\windows\\system32\\lsass.exe" and $selection.src.process.file.full_path = "C:\\Windows\\system32\\wsmprovhost.exe")
+
+  condition:
+    $selection
+}

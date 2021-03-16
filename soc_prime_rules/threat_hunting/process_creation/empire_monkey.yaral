@@ -1,0 +1,17 @@
+rule empire_monkey {
+ meta:
+    author = "Markus Neis"
+    description = "Detects EmpireMonkey APT reported Activity  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/jFbYfF51ECXh"
+    version = "0.01"
+    created = "2019/04/02"
+    category = "process_creation"
+    product = "windows"
+    mitre = "t1086, execution"
+
+  events:
+(re.regex($selection_cutil.target.process.command_line, `.*/i:%APPDATA%\\logs\.txt scrobj\.dll`) and (re.regex($selection_cutil.target.process.file.full_path, `.*\\cutil\.exe`) or $selection_cutil.metadata.description = "Microsoft(C) Registerserver"))
+
+  condition:
+    $selection_cutil
+}

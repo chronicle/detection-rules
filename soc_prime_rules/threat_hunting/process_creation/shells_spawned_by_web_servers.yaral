@@ -1,0 +1,17 @@
+rule shells_spawned_by_web_servers {
+ meta:
+    author = "Thomas Patzke"
+    description = "Web servers that spawn shell processes could be the result of a successfully placed web shell or an other attack  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/DMh5UZGcjb2L"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "privilege_escalation, persistence, t1100"
+
+  events:
+((re.regex($selection.src.process.file.full_path, `.*\\w3wp\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\httpd\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\nginx\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\php-cgi\.exe`)) and (re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\sh\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\bash\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

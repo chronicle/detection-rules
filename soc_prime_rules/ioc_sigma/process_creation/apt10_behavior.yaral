@@ -1,0 +1,17 @@
+rule apt10_behavior {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Detects an ATP10's technique that uses Windows \"certutil.exe\" functionality for payload decoding  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/eG23WH8AEKB0"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, T1059"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (($selection1.target.process.file.full_path = "cmd.exe" and (re.regex($selection1.target.process.command_line, `.*/c certutil -decode C:\\ProgramData\\padre1\.txt C:\\ProgramData.*\\GUP\.txt.*`) or re.regex($selection1.target.process.command_line, `.*/c certutil -decode C:\\ProgramData\\padre2\.txt C:\\ProgramData.*\\libcurl\.txt.*`) or re.regex($selection1.target.process.command_line, `.* /c certutil -decode C:\\ProgramData\\padre3\.txt C:\\ProgramData.*\\3F2E3AB9 .*`))) or ($selection1.target.process.file.full_path = "esentutl.exe" and (re.regex($selection1.target.process.command_line, `.* /y C:\\ProgramData.*\\GUP\.txt /d C:\\ProgramData\\GUP\.exe /o .*`) or re.regex($selection1.target.process.command_line, `.* /y C:\\ProgramData.*\\libcurl\.txt /d C:\\ProgramData\\libcurl\.dll /o .*`)))))
+
+  condition:
+    $selection1
+}

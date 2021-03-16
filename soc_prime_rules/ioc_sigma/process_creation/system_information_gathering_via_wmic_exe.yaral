@@ -1,0 +1,17 @@
+rule system_information_gathering_via_wmicexe {
+ meta:
+    author = "Ariel Millahuel"
+    description = "Detects the utilization of wmic.exe in order to obtain specific system information. This action is related to the \"System Information Discovery\" Technique  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/XQ4U0cK8mOwf"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, discovery, t1064, t1082"
+
+  events:
+(re.regex($selection1.target.process.file.full_path, `.*wmic\.exe`) and (re.regex($selection1.target.process.command_line, `.* .* DESKTOPMONITOR get pnpdeviceid .*`) or re.regex($selection1.target.process.command_line, `.* .* SOUNDDEV get pnpdeviceid .*`) or re.regex($selection1.target.process.command_line, `.* .* bios get serialnumber .*`) or re.regex($selection1.target.process.command_line, `.* .* baseboard get serialnumber .*`) or re.regex($selection1.target.process.command_line, `.* .* diskdrive get pnpdeviceid .*`) or re.regex($selection1.target.process.command_line, `.* .* cpu get processorid .*`)) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1"))
+
+  condition:
+    $selection1
+}

@@ -1,0 +1,17 @@
+rule stop_ransomware_and_vidar_ransomware_detection {
+ meta:
+    author = "Ariel Millahuel"
+    description = "This rule detects the behavior of a combination between STOP Ransomware and Vidar Ransomware. Both threats are used in combination in order to steal information after a phishing attack was succesfully executed  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/eLntKUKd5pKY"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "execution, T1059"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (($selection1.target.process.file.full_path = "cmd.exe" and (re.regex($selection1.target.process.command_line, `/c taskkill /im 5\.exe /f & erase C:\\Users.*\\AppData\\Local\\Temp.*\\5\.exe & exit`) or re.regex($selection1.target.process.command_line, `/c taskkill /im .*\.exe /f & erase C:\\Users.*\\AppData\\Local\\Temp.*.*\.exe & exit`))) or ($selection1.target.process.file.full_path = "icacls.exe" and re.regex($selection1.target.process.command_line, `icacls C:\\Users.*\\AppData\\Local.*\\deny .*S-1-1-0:\(Ol\)\(Cl\)\(DE,DC\)`))))
+
+  condition:
+    $selection1
+}

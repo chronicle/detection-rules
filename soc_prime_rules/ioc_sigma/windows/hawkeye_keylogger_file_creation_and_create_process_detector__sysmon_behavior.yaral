@@ -1,0 +1,17 @@
+rule hawkeye_keylogger_file_creation_and_create_process_detector_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "Detects characteristics of the Hawkeye Keylogger strain of malware  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Mge8t2HyZUCa"
+    version = "0.01"
+    created = "2019/07/15"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, t1059, t1204, Defense_evasion, t1112"
+
+  events:
+(re.regex($selection1.target.process.file.full_path, `C:\\Windows\\Microsoft\.NET\\Framework.*\\vbc\.exe`) and (($selection1.metadata.product_event_type = "11" and re.regex($selection1.target.file.full_path, `C:\\Users.*\\AppData\\Local\\Temp.*\.tmp`)) or ($selection1.metadata.product_event_type = "1" and re.regex($selection1.target.process.command_line, `.* /stext \"\"C:\\Users.*\\AppData\\Local\\Temp.*\.tmp`))))
+
+  condition:
+    $selection1
+}

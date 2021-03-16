@@ -1,0 +1,16 @@
+rule roma225_campaign_firewallproxy {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "Roma225 Campaign Detector.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/OGds5qpBp0cL"
+    version = "0.01"
+    created = "2018/12/27"
+    product = "proxy"
+    mitre = "Command and Control, t1071"
+
+  events:
+(($SelectionSRC.principal.ip = "138.36.3.228" or $SelectionSRC.principal.ip = "184.75.209.169" or $SelectionSRC.principal.ip = "177.85.98.242") or ($SelectionSRC.target.ip = "138.36.3.228" or $SelectionSRC.target.ip = "184.75.209.169" or $SelectionSRC.target.ip = "177.85.98.242") or ($SelectionSRC.target.url = "https://minhacasaminhavidacdt.blogspot.com" or $SelectionSRC.target.url = "https://pocasideiascdt.blogspot.com" or $SelectionSRC.target.url = "http://cdtmaster.com.br") or (re.regex($SelectionSRC.target.hostname, `.*office365update\.duckdns\.org.*`) or re.regex($SelectionSRC.target.hostname, `.*systen32\.ddns\.net.*`)))
+
+  condition:
+    $SelectionSRC
+}

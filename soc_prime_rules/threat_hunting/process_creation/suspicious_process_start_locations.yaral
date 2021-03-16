@@ -1,0 +1,17 @@
+rule suspicious_process_start_locations {
+ meta:
+    author = "juju4"
+    description = "Detects suspicious process run from unusual locations  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/n8xWUUuUJ3Ev"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1036, car.2013-05-002"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*:\\RECYCLER\\.*`) or re.regex($selection.target.process.file.full_path, `.*:\\SystemVolumeInformation\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\\\Windows\\\\Tasks\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\\\Windows\\\\debug\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\\\Windows\\\\fonts\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\\\Windows\\\\help\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\\\Windows\\\\drivers\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\\\Windows\\\\addins\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\\\Windows\\\\cursors\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\\\Windows\\\\system32\\tasks\\.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

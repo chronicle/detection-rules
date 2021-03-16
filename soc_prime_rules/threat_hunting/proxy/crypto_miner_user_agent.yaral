@@ -1,0 +1,15 @@
+rule crypto_miner_user_agent {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious user agent strings used by crypto miners in proxy logs  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ONlbvog75WoW"
+    version = "0.01"
+    created = "2019/10/21"
+    category = "proxy"
+
+  events:
+(re.regex($selection.src.application, `XMRig .*`) or re.regex($selection.src.application, `ccminer.*`))
+
+  condition:
+    $selection
+}

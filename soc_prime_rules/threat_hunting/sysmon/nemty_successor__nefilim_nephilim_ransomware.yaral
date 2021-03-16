@@ -1,0 +1,17 @@
+rule nemty_successor_nefilimnephilim_ransomware {
+ meta:
+    author = "Emir Erdogan"
+    description = "Ransomware families NEMTY, Nefilim and Nephilim continue to evolve and merge, taking on aspects of other successful variants that aim to encrypt and extort.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/lC8zLKPM5tEv"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1486, T1490, T1089"
+
+  events:
+(re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) and re.regex($selection.target.process.command_line, `.*/c bcdedit /set {default} bootstatuspolicy ignoreallfailures & bcdedit /set {default} recoveryenabled no & wbadmin delete catalog -quiet & wmic shadowcopy delete`))
+
+  condition:
+    $selection
+}

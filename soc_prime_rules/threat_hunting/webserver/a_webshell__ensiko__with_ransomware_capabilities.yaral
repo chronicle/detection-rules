@@ -1,0 +1,16 @@
+rule a_webshell_ensiko_with_ransomware_capabilities {
+ meta:
+    author = "Osman Demir"
+    description = "Ensiko is a PHP web shell with ransomware capabilities that targets various platforms such as Linux, Windows, macOS, or any other platform that has PHP installed. The malware has the capability to remotely control the system and accept commands to perform malicious activities on the infected machine.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/COgjQByoceJW"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "webserver"
+    mitre = "T1505, Persistence"
+
+  events:
+(($selection.network.http.method = "POST" and $selection.network.http.response_code = "200" and (re.regex($selection.target.url, `.*/webshell/shell\.php`) or re.regex($selection.target.url, `.*/webshell/shell\.php\?ganteng`)) and ($selection.target.url = "passwrd=RaBiitch&action=login&hide=&usrname=RaBiitch" or $selection.target.url = "key=password&method=1&submit=Submit")) or $selection.target.file.md5 = "5fdbf87b7f74327e9132b5edb5c217bdcf49fe275945d502ad675c1dd46e3db5")
+
+  condition:
+    $selection
+}

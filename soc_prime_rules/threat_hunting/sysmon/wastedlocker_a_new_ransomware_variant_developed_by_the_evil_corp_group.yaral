@@ -1,0 +1,17 @@
+rule wastedlocker_a_new_ransomware_variant_developed_by_the_evil_corp_group {
+ meta:
+    author = "Osman Demir"
+    description = "Detects Wastedlocker  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/PYGGqXXI8HiF"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1486, Impact"
+
+  events:
+($selection.metadata.product_event_type = "1" and (($selection.target.process.command_line = "C:\\Windows\\system32\\WindowsPowershell\\v1.0\\powershell.exe Set-MpPreference -DisableBehaviorMonitoring $true ; Set-MpPreference -MAPSReporting 0 ; Set-MpPreference -ExclusionProcess rundll32.exe ; Set-MpPreference -ExclusionExtension dll" or $selection.target.process.command_line = "C:\\Windows\\System32\\netsh.exe advfirewall firewall add rule name=\"Rundll32\" dir=out action=allow protocol=any program=\"C:\\Windows\\system32\\rundll32.exe") or (($selection.target.process.file.full_path = "vssadmin.exe" or $selection.target.process.file.full_path = "sc.exe" or $selection.target.process.file.full_path = "net.exe" or $selection.target.process.file.full_path = "net1.exe" or $selection.target.process.file.full_path = "netsh.exe" or $selection.target.process.file.full_path = "cscript.exe" or $selection.target.process.file.full_path = "wscript.exe") and (re.regex($selection.target.process.command_line, `.*Delete Shadows /all /quiet.*`) or re.regex($selection.target.process.command_line, `.*resize shadowstorage.*`) or re.regex($selection.target.process.command_line, `.*stop NetBackup BMR MTFTP Service /y.*`) or re.regex($selection.target.process.command_line, `.*\.jse.*`) or re.regex($selection.target.process.command_line, `.*\.js.*`) or re.regex($selection.target.process.command_line, `.*\.zip.*`) or re.regex($selection.target.process.command_line, `.*stop BMR Boot Service /y.*`) or re.regex($selection.target.process.command_line, `.*stop avpsus /y.*`) or re.regex($selection.target.process.command_line, `.*sc stop WinDefend/y.*`) or re.regex($selection.target.process.command_line, `.*sc config WinDefend start= disabled /y.*`) or re.regex($selection.target.process.command_line, `.*config SQLTELEMETRY start= disabled.*`) or re.regex($selection.target.process.command_line, `.*config SQLWriter start= disabled.*`) or re.regex($selection.target.process.command_line, `.*config SstpSvc start= disabled.*`)))))
+
+  condition:
+    $selection
+}

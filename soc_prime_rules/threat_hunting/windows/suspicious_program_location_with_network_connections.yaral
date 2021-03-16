@@ -1,0 +1,16 @@
+rule suspicious_program_location_with_network_connections {
+ meta:
+    author = "Florian Roth"
+    description = "Detects programs with network connections running in suspicious files system locations  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/V8bXzAfIswMu"
+    version = "0.01"
+    created = "2017/03/19"
+    product = "windows"
+    service = "sysmon"
+
+  events:
+($selection.metadata.product_event_type = "3" and (re.regex($selection.target.process.file.full_path, `.*\\$Recycle\.bin`) or re.regex($selection.target.process.file.full_path, `.*\\Users\\All Users\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Users\\Default\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Users\\Public\\.*`) or re.regex($selection.target.process.file.full_path, `C:\\Perflogs\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\config\\systemprofile\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\Fonts\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\IME\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\addins\\.*`)))
+
+  condition:
+    $selection
+}

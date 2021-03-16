@@ -1,0 +1,17 @@
+rule ekanssnake_ransomware_sysmon_detection {
+ meta:
+    author = "Ariel Millahuel"
+    description = "EKANS/SNAKE is a Malware that attempts to attack ICS (Industrial Control Systems) environments  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/NaOKwNFrbyKd"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "defense_evasion, T1112"
+
+  events:
+($selection1.metadata.product_event_type = "13" and (re.regex($selection1.target.registry.registry_key, `.*\\DefaultObjectStore\\LruList\\.*`) or re.regex($selection1.target.registry.registry_key, `.*\\DefaultObjectStore\\LruList\\00000000000002FC\\.*`) or re.regex($selection1.target.registry.registry_key, `.*\\DefaultObjectStore\\ObjectTable\\E8\\.*`) or re.regex($selection1.target.registry.registry_key, `.*\\DefaultObjectStore\\ObjectTable\\E9\\.*`) or re.regex($selection1.target.registry.registry_key, `.*\\CurrentVersion\\NetworkList\\Nla\\Cache\\Intranet\\.*`)))
+
+  condition:
+    $selection1
+}

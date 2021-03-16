@@ -1,0 +1,17 @@
+rule registry_persistence_via_explorer_run_key {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a possible persistence mechanism using RUN key for Windows Explorer and poiting to a suspicious folder  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/SZRBqzOpfBHs"
+    version = "0.01"
+    created = "2018/07/18"
+    product = "windows"
+    service = "sysmon"
+    mitre = "persistence, t1060, capec.270"
+
+  events:
+($selection.metadata.product_event_type = "13" and re.regex($selection.target.registry.registry_key, `.*\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run`) and (re.regex($selection.metadata.description, `C:\\Windows\\Temp\\.*`) or re.regex($selection.metadata.description, `C:\\ProgramData\\.*`) or re.regex($selection.metadata.description, `.*\\AppData\\.*`) or re.regex($selection.metadata.description, `C:\\$Recycle\.bin\\.*`) or re.regex($selection.metadata.description, `C:\\Temp\\.*`) or re.regex($selection.metadata.description, `C:\\Users\\Public\\.*`) or re.regex($selection.metadata.description, `C:\\Users\\Default\\.*`)))
+
+  condition:
+    $selection
+}

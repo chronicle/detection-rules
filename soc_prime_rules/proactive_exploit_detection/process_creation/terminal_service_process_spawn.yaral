@@ -1,0 +1,17 @@
+rule terminal_service_process_spawn {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a process spawned by the terminal service server process (this could be an indicator for an exploitation of CVE-2019-0708)  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/FKzDvmj7GHii"
+    version = "0.01"
+    created = "2019/05/22"
+    product = "windows"
+    category = "process_creation"
+    mitre = "car.2013-07-002"
+
+  events:
+((re.regex($selection.src.process.command_line, `.*\\svchost\.exe.*termsvcs`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not (re.regex($selection.target.process.file.full_path, `.*\\rdpclip\.exe`)))
+
+  condition:
+    $selection
+}

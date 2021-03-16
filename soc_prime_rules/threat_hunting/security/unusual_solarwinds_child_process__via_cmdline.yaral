@@ -1,0 +1,17 @@
+rule unusual_solarwinds_child_process_via_cmdline {
+ meta:
+    author = "SOC Prime Team, Fireeye"
+    description = "This rule was converted from the FireEye hxioc rule. This rule identifies unusual solarwinds child processes.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/umzMouc3Fp23"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "initial_access, t1195.002"
+
+  events:
+((re.regex($selection.src.process.file.full_path, `.*\\solarwinds\.businesslayerhost\.exe`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not ((re.regex($selection.target.process.file.full_path, `.*\\SolarWinds\\Orion\\APM\\APMServiceControl\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\SolarWinds\\Orion\\ExportToPDFCmd\.Exe`) or re.regex($selection.target.process.file.full_path, `.*\\SolarWinds\.Credentials\\SolarWinds\.Credentials\.Orion\.WebApi\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\SolarWinds\\Orion\\Topology\\SolarWinds\.Orion\.Topology\.Calculator\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\SolarWinds\\Orion\\Database-Maint\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\SolarWinds\.Orion\.ApiPoller\.Service\\SolarWinds\.Orion\.ApiPoller\.Service\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\Windows\\SysWOW64\\WerFault\.exe`))))
+
+  condition:
+    $selection
+}

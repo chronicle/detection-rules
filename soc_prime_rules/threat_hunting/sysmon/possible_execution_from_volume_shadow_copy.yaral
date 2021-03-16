@@ -1,0 +1,17 @@
+rule possible_execution_from_volume_shadow_copy {
+ meta:
+    author = "Roman Ranskyi, SBousseaden"
+    description = "DELETE delete double quotes in search (ELK or Graylog)! Detects suspicious execution from shadow copy.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/MYxVDBxNBI8g"
+    version = "0.01"
+    created = "2019/05/28"
+    product = "windows"
+    service = "sysmon"
+    mitre = "defense_evasion"
+
+  events:
+(re.regex($selection0.target.process.file.full_path, `HarddiskVolumeShadowCopy.*`) or re.regex($selection0.target.process.command_line, `HarddiskVolumeShadowCopy.*`))
+
+  condition:
+    $selection0
+}

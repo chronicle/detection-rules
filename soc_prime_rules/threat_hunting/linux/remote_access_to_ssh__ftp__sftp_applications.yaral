@@ -1,0 +1,17 @@
+rule remote_access_to_ssh_ftp_sftp_applications {
+ meta:
+    author = "Osman Demir"
+    description = "Detects unauthorized access  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/0es5ppHJjdqw"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "linux"
+    service = "sshd"
+    mitre = "t1078, persistence, privilege_escalation, initial_access"
+
+  events:
+((($selection.src.application = "ssh" or $selection.src.application = "sftp" or $selection.src.application = "ftp") and ($selection.target.ip = "172.16.0.0/16" or $selection.target.ip = "192.168.0.0/16" or $selection.target.ip = "10.0.0.0/8")) or ((($selection.target.port = "22" or $selection.target.port = "21") and ($selection.target.ip = "172.16.0.0/16" or $selection.target.ip = "192.168.0.0/16" or $selection.target.ip = "10.0.0.0/8")) and not (($selection.principal.ip = "allowed ip address list" or $selection.principal.ip = "172.16.0.0/16" or $selection.principal.ip = "192.168.0.0/16" or $selection.principal.ip = "10.0.0.0/8"))))
+
+  condition:
+    $selection
+}

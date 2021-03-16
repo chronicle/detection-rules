@@ -1,0 +1,16 @@
+rule citrix_netscaler_attack_cve201919781 {
+ meta:
+    author = "Arnim Rupp, Florian Roth"
+    description = "Detects CVE-2019-19781 exploitation attempt against Citrix Netscaler, Application Delivery Controller and Citrix Gateway Attack  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/H34f94kvk9Pg"
+    version = "0.01"
+    created = "2020/01/02"
+    category = "webserver"
+    mitre = "initial_access, t1190"
+
+  events:
+(re.regex($selection.target.url, `.*/\.\./vpns/.*`) or re.regex($selection.target.url, `.*/vpns/cfg/smb\.conf`) or re.regex($selection.target.url, `.*/vpns/portal/scripts/.*\.pl.*`))
+
+  condition:
+    $selection
+}

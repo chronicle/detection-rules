@@ -1,0 +1,17 @@
+rule netexe_execution {
+ meta:
+    author = "Michael Haag, Mark Woan (improvements)"
+    description = "Detects execution of Net.exe, whether suspicious or benign.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/hjvQrbDaxQZN"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "s0039, lateral_movement, discovery"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*\\net\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\net1\.exe`)) and (re.regex($selection.target.process.command_line, `.* group.*`) or re.regex($selection.target.process.command_line, `.* localgroup.*`) or re.regex($selection.target.process.command_line, `.* user.*`) or re.regex($selection.target.process.command_line, `.* view.*`) or re.regex($selection.target.process.command_line, `.* share`) or re.regex($selection.target.process.command_line, `.* accounts.*`) or re.regex($selection.target.process.command_line, `.* use.*`) or re.regex($selection.target.process.command_line, `.* stop .*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

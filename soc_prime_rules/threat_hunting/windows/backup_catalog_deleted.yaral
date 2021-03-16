@@ -1,0 +1,17 @@
+rule backup_catalog_deleted {
+ meta:
+    author = "Florian Roth (rule), Tom U. @c_APT_ure (collection)"
+    description = "Detects backup catalog deletions  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md. @c_APT_ure (collection)."
+    reference = "https://tdm.socprime.com/tdm/info/xYQ2JRWcDe0l"
+    version = "0.01"
+    created = "2017/05/12"
+    product = "windows"
+    service = "application"
+    mitre = "defense_evasion, t1107, t1070.004"
+
+  events:
+($selection.metadata.product_event_type = "524" and $selection.src.application = "Microsoft-Windows-Backup")
+
+  condition:
+    $selection
+}

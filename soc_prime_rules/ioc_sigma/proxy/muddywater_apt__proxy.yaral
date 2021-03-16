@@ -1,0 +1,16 @@
+rule muddywater_apt_proxy {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "MuddyWater APT Detector.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/01RzFtYR4i2N"
+    version = "0.01"
+    created = "2018/11/28"
+    product = "proxy"
+    mitre = "Command and Control, t1071"
+
+  events:
+($selectionURL.target.url = "https://savephotos.net/e6N0RQ80" or $selectionURL.target.url = "http://sagawa-zz.com/sagawa.apk" or re.regex($selectionURL.target.url, `http://59\.105\.6\.230//servlet/.*`) or $selectionURL.target.url = "http://118.160.115.74/admin/index.jsp")
+
+  condition:
+    $selectionURL
+}

@@ -1,0 +1,17 @@
+rule unusual_solarwinds_file_creation_via_filewrite {
+ meta:
+    author = "SOC Prime Team, Fireeye"
+    description = "This rule was converted from the FireEye hxioc rule. This rule identifies unusual file write events by a Solar Winds executable.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/19EQlEAuOgoe"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "file_event"
+    product = "windows"
+    mitre = "initial_access, t1195.002"
+
+  events:
+((re.regex($selection.target.process.file.full_path, `.*\\solarwinds\.businesslayerhost\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\SolarWindws\.BusinessLayerHostx64\.exe`)) and (re.regex($selection.target.file.full_path, `.*\.exe`) or re.regex($selection.target.file.full_path, `.*\.jpg`) or re.regex($selection.target.file.full_path, `.*\.ps1`) or re.regex($selection.target.file.full_path, `.*\.png`) or re.regex($selection.target.file.full_path, `.*\.dll`)))
+
+  condition:
+    $selection
+}

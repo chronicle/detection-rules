@@ -1,0 +1,17 @@
+rule addition_of_sid_history_to_active_directory_object {
+ meta:
+    author = "Thomas Patzke, @atc_project (improvements)"
+    description = "An attacker can use the SID history attribute to gain additional privileges.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/p8j8cDNgTyKF"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "security"
+    mitre = "persistence, privilege_escalation, t1178"
+
+  events:
+(($selection1.metadata.product_event_type = "4765" or $selection1.metadata.product_event_type = "4766") or ($selection1.metadata.product_event_type = "4738" and not (($selection1.target.process.product_specific_process_id = "-" or $selection1.target.process.product_specific_process_id = "%%1793"))))
+
+  condition:
+    $selection1
+}

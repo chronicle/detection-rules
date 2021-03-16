@@ -1,0 +1,17 @@
+rule keylogger_detector_sysmon {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "keylogger is a simple standalone executable that sets global keyboard hooks and writes all keystrokes into a file in an encrypted form.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/w9X8xmoNK3LJ"
+    version = "0.01"
+    created = "2018/06/01"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1204"
+
+  events:
+($selection.metadata.product_event_type = "1" and ($selection.target.file.md5 = "21921864D2F1AB2761C36031A2E1D2C00C9B304A" or $selection.target.file.md5 = "3C2D0615BEF6F88FED6E308D4F45B6133080C74F" or $selection.target.file.md5 = "91E8346910E0E6783ACFC4F2B9A745C81BD7573A"))
+
+  condition:
+    $selection
+}

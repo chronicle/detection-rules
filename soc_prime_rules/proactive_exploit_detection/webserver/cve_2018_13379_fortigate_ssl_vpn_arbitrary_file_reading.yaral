@@ -1,0 +1,16 @@
+rule cve201813379_fortigate_ssl_vpn_arbitrary_file_reading {
+ meta:
+    author = "Sittikorn S"
+    description = "FortiOS system file leak through SSL VPN via specially crafted HTTP resource requests. This exploit read /dev/cmdb/sslvpn_websession file, this file contains login and passwords in (clear/text). This vulnerability affect ( FortiOS 5.6.3 to 5.6.7 and FortiOS 6.0.0 to 6.0.4 ).  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/q2rxxJduwXF3"
+    version = "0.01"
+    created = "2020/11/23"
+    category = "webserver"
+    mitre = "initial_access, t1190, t1212"
+
+  events:
+re.regex($selection.target.url, `.*/remote/fgt_lang\?lang=/\.\./\.\./\.\./\.\.//////////dev/cmdb/sslvpn_websession.*`)
+
+  condition:
+    $selection
+}

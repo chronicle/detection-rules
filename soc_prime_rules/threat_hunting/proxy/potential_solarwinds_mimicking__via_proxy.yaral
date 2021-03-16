@@ -1,0 +1,16 @@
+rule potential_solarwinds_mimicking_via_proxy {
+ meta:
+    author = "SOC Prime Team, Fireeye"
+    description = "This rule was converted from the FireEye hxioc rule. This rule identifies traffic mimiking solarwinds to non-solarwinds domains.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Nm4lEAilmxW9"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+    mitre = "initial_access, t1195.002"
+
+  events:
+((re.regex($selection.target.url, `.*/swip/events.*`) or re.regex($selection.target.url, `.*/swip/systemdescription.*`) or re.regex($selection.target.url, `.*/swip/upload\.ashx.*`) or re.regex($selection.target.url, `.*/swip/upd.*`)) and not (re.regex($selection.target.hostname, `.*solarwinds\.com`)))
+
+  condition:
+    $selection
+}

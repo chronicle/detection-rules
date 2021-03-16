@@ -1,0 +1,16 @@
+rule detect_cmdexe_obfuscation {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects when cmd.exe has been obfuscated this could indicate possible malicious activity, tools like cobalt strike and metasploit also use the environment variable COMSPEC.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/tJrqTgxJlPrb"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "Windows"
+    mitre = "defense_evasion, t1027"
+
+  events:
+((re.regex($selection_commandline.target.process.command_line, `%COMSPEC:.*`) or re.regex($selection_commandline.target.process.command_line, `%comspec:.*`) or re.regex($selection_commandline.target.process.command_line, `.* %comspec:.*`) or re.regex($selection_commandline.target.process.command_line, `%COMSPEC%.*`) or re.regex($selection_commandline.target.process.command_line, ` .*%COMSPEC%.*`) or re.regex($selection_commandline.target.process.command_line, `%COMSPEC%.*`) or re.regex($selection_commandline.target.process.command_line, `%COMSPEC:.*`) or re.regex($selection_commandline.target.process.command_line, `%comspec:.*`) or re.regex($selection_commandline.target.process.command_line, `%Co^m^S^p^Ec^%.*`) or re.regex($selection_commandline.target.process.command_line, `.* %Co^m^S^p^Ec^%.*`)) or (re.regex($selection_commandline.target.process.command_line, `%Co^m^S^p^Ec^%.*`) or re.regex($selection_commandline.target.process.command_line, `%COMSPEC:.*`) or re.regex($selection_commandline.target.process.command_line, `%comspec:.*`) or re.regex($selection_commandline.target.process.command_line, `%COMSPEC%.*`)))
+
+  condition:
+    $selection_commandline
+}

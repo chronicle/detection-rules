@@ -1,0 +1,16 @@
+rule mustang_panda_dropper {
+ meta:
+    author = "Florian Roth"
+    description = "Detects specific process parameters as used by Mustang Panda droppers  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/Im4AdMvRZZgJ"
+    version = "0.01"
+    created = "2019/10/30"
+    category = "process_creation"
+    product = "windows"
+
+  events:
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and ((re.regex($selection1.target.process.command_line, `.*Temp\\wtask\.exe /create.*`) or re.regex($selection1.target.process.command_line, `.*%windir:~-3,1%%PUBLIC:~-9,1%.*`) or re.regex($selection1.target.process.command_line, `.*/E:vbscript .* C:\\Users.*\.txt\" /F`) or re.regex($selection1.target.process.command_line, `.*/tn \"Security Script .*`) or re.regex($selection1.target.process.command_line, `.*%windir:~-1,1%.*`)) or re.regex($selection1.target.process.file.full_path, `.*Temp\\winwsh\.exe`)))
+
+  condition:
+    $selection1
+}

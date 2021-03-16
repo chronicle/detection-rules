@@ -1,0 +1,16 @@
+rule usage_of_sysinternals_tools {
+ meta:
+    author = "Markus Neis"
+    description = "Detects the usage of Sysinternals Tools due to accepteula key beeing added to Registry  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/fUvy5yjtefoK"
+    version = "0.01"
+    created = "2017/08/28"
+    product = "windows"
+    service = "sysmon"
+
+  events:
+(($selection1.metadata.product_event_type = "13" and re.regex($selection1.target.registry.registry_key, `.*\\EulaAccepted`)) or ($selection1.metadata.product_event_type = "1" and re.regex($selection1.target.process.command_line, `.* -accepteula.*`)))
+
+  condition:
+    $selection1
+}

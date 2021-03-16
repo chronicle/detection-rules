@@ -1,0 +1,17 @@
+rule suspicious_scheduled_task {
+ meta:
+    author = "Emir Erdogan"
+    description = "Detection of suspicious scheduled tasks  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/1ULlEDq8oA0b"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1053, T1168"
+
+  events:
+(re.regex($selection.target.process.command_line, `.*schtasks\.exe /create /sc MINUTE /tn SystemSoundsServices /tr \"regsvr32\.exe\".*`) or re.regex($selection.target.process.command_line, `.*/s /n /u /i:http:.*`))
+
+  condition:
+    $selection
+}

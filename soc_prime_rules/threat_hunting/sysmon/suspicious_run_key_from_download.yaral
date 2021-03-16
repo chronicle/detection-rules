@@ -1,0 +1,17 @@
+rule suspicious_run_key_from_download {
+ meta:
+    author = "Florian Roth"
+    description = "Detects the suspicious RUN keys created by software located in Download or temporary Outlook/Internet Explorer directories  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/WmJZ5Utwyr12"
+    version = "0.01"
+    created = "2019/10/01"
+    product = "windows"
+    service = "sysmon"
+    mitre = "persistence, t1060"
+
+  events:
+($selection.metadata.product_event_type = "13" and (re.regex($selection.target.process.file.full_path, `.*\\Downloads\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Temporary Internet Files\\Content\.Outlook\\.*`) or re.regex($selection.target.process.file.full_path, `.*\\Local Settings\\Temporary Internet Files\\.*`)) and re.regex($selection.target.registry.registry_key, `.*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\.*`))
+
+  condition:
+    $selection
+}

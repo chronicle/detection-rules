@@ -1,0 +1,17 @@
+rule suspicious_certutil_command {
+ meta:
+    author = "Florian Roth, juju4, keepwatch"
+    description = "Detects a suspicious Microsoft certutil execution with sub commands like 'decode' sub command, which is sometimes used to decode malicious code with the built-in certutil utility  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/U9NlSjqYrWvZ"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1140, t1105, s0189, g0007"
+
+  events:
+((re.regex($selection.target.process.command_line, `.* -decode .*`) or re.regex($selection.target.process.command_line, `.* /decode .*`) or re.regex($selection.target.process.command_line, `.* -decodehex .*`) or re.regex($selection.target.process.command_line, `.* /decodehex .*`) or re.regex($selection.target.process.command_line, `.* -urlcache .*`) or re.regex($selection.target.process.command_line, `.* /urlcache .*`) or re.regex($selection.target.process.command_line, `.* -verifyctl .*`) or re.regex($selection.target.process.command_line, `.* /verifyctl .*`) or re.regex($selection.target.process.command_line, `.* -encode .*`) or re.regex($selection.target.process.command_line, `.* /encode .*`) or re.regex($selection.target.process.command_line, `.*certutil.* -URL.*`) or re.regex($selection.target.process.command_line, `.*certutil.* /URL.*`) or re.regex($selection.target.process.command_line, `.*certutil.* -ping.*`) or re.regex($selection.target.process.command_line, `.*certutil.* /ping.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

@@ -1,0 +1,16 @@
+rule microsoft_teams_phishing_email {
+ meta:
+    author = "Osman Demir"
+    description = "Detects Phishing Email  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/0KZv4DodlqT8"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+    mitre = "T1192, initial_access"
+
+  events:
+($selection.security_result.action = "allowed" and ($selection.target.url = "https://us19.campaign-archive.com/?u=0dce22c9638fc90b5c17ea20a&id=6652f42d20" or $selection.target.url = "https://imunodar.com/wp-content/plugins/wp-picaso/Teams"))
+
+  condition:
+    $selection
+}

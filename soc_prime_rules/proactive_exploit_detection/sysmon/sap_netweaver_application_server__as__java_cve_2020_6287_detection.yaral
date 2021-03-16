@@ -1,0 +1,17 @@
+rule sap_netweaver_application_server_as_java_cve20206287_detection {
+ meta:
+    author = "Furkan Celik"
+    description = "It is a critical vulnerability in the LM Configuration Wizard component of the \"SAP NetWeaver Application Server (AS) Java\" platform, allowing unauthenticated users to run code. If it is successfully exploited, high authority users can be created, unlimited authority to SAP systems, commands can be run with SAP service user rights.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/IpNtUupYw88W"
+    version = "0.01"
+    created = "2020/07/16"
+    product = "windows"
+    service = "sysmon"
+    mitre = "T1190, vulnerability_scanning, T1059, execution"
+
+  events:
+($selection.metadata.product_event_type = "1" and ($selection.metadata.description = "7.31" or $selection.metadata.description = "7.4" or $selection.metadata.description = "7.3" or $selection.metadata.description = "7.5") and $selection.metadata.product_name = "SAP NetWeaver")
+
+  condition:
+    $selection
+}

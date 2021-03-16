@@ -1,0 +1,17 @@
+rule detect_when_a_process_tries_to_allow_execution_of_malicious_email_attachments {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects when a process tries to access the Windows attachment manager, this could be an attempt to allow the execution of malicious files types in email attachments   License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/qBNzmWxZbugs"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "process_creation"
+    mitre = "defense_evasion, attck.t1112"
+
+  events:
+re.regex($selection.target.process.command_line, `.*\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Attachments`)
+
+  condition:
+    $selection
+}

@@ -1,0 +1,17 @@
+rule powershell_base64_encoded_shellcode {
+ meta:
+    author = "Florian Roth"
+    description = "Detects Base64 encoded Shellcode  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/RtwpJThpBzv8"
+    version = "0.01"
+    created = "2018/11/17"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1036"
+
+  events:
+(re.regex($selection1.target.process.command_line, `.*AAAAYInlM.*`) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (re.regex($selection1.target.process.command_line, `.*OiCAAAAYInlM.*`) or re.regex($selection1.target.process.command_line, `.*OiJAAAAYInlM.*`)))
+
+  condition:
+    $selection1
+}

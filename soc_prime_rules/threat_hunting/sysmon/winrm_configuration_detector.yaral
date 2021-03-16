@@ -1,0 +1,17 @@
+rule winrm_configuration_detector {
+ meta:
+    author = "Lee Archinal"
+    description = "This detects when WinRM configuration has changed  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/UHjYhGSzEQSJ"
+    version = "0.01"
+    created = "2019/04/30"
+    product = "windows"
+    service = "sysmon"
+    mitre = "lateral_movement, execution, t1028"
+
+  events:
+($selection.metadata.product_event_type = "1" and $selection.target.process.command_line = "winrm/config/listener" and re.regex($selection.target.process.file.full_path, `.*\\cscript\.exe`))
+
+  condition:
+    $selection
+}

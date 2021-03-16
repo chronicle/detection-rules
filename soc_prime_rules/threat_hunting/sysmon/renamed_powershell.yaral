@@ -1,0 +1,17 @@
+rule renamed_powershell {
+ meta:
+    author = "Florian Roth"
+    description = "Detects the execution of a renamed PowerShell often used by attackers or malware  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/VUM6x3MrZB0F"
+    version = "0.01"
+    created = "2019/08/22"
+    product = "windows"
+    service = "sysmon"
+    mitre = "car.2013-05-009"
+
+  events:
+(($selection.metadata.description = "Windows PowerShell" and $selection.metadata.description = "Microsoft Corporation") and not (re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`)))
+
+  condition:
+    $selection
+}

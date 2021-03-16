@@ -1,0 +1,16 @@
+rule office_macro_starts_cmd {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a Windows command line executable started from Microsoft Word or Excel  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/G1MCKmrJFFAl"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+
+  events:
+($selection.metadata.product_event_type = "1" and (re.regex($selection.src.process.file.full_path, `.*\\WINWORD\.EXE`) or re.regex($selection.src.process.file.full_path, `.*\\EXCEL\.EXE`)) and re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`))
+
+  condition:
+    $selection
+}

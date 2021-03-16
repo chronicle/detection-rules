@@ -1,0 +1,17 @@
+rule psexec_process_has_terminated {
+ meta:
+    author = "Lee Archinal"
+    description = "This detects when PsExec's process ends.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/ciE6swnMJ5Xh"
+    version = "0.01"
+    created = "2019/04/29"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Defense_evasion, t1112, Execution, t1059"
+
+  events:
+($selection.metadata.product_event_type = "5" and re.regex($selection.target.process.file.full_path, `.*\\psexec\.exe`))
+
+  condition:
+    $selection
+}

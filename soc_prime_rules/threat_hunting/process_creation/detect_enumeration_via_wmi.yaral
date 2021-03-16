@@ -1,0 +1,17 @@
+rule detect_enumeration_via_wmi {
+ meta:
+    author = "Joseph Kamau"
+    description = "This rule detects when wmic is used to conduct discovery activity on windows operating system.Adversaries use this technique to gather information of the host they have compromised  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/DbuPvE09LpJq"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "Windows"
+    category = "process_creation"
+    mitre = "discovery, t1087, t1135, t1518"
+
+  events:
+((re.regex($selection.target.process.command_line, `.* wmic useraccount get /ALL.*`) or re.regex($selection.target.process.command_line, `.* wmic useraccount list.*`) or re.regex($selection.target.process.command_line, `.* wmic startup list brief.*`) or re.regex($selection.target.process.command_line, `.* wmic share list.*`) or re.regex($selection.target.process.command_line, `.* wmic service get.*`) or re.regex($selection.target.process.command_line, `.* wmic qfe get description,installedOn /format:csv.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

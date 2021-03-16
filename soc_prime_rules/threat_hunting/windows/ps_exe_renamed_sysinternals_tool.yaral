@@ -1,0 +1,17 @@
+rule psexe_renamed_sysinternals_tool {
+ meta:
+    author = "Florian Roth"
+    description = "Detects renamed SysInternals tool execution with a binary named ps.exe as used by Dragonfly APT group and documented in TA17-293A report  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/OyqeW0U5pwZB"
+    version = "0.01"
+    created = "2017/10/22"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, g0035, t1036, car.2013-05-009"
+
+  events:
+($selection.target.process.command_line = "ps.exe -accepteula" and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

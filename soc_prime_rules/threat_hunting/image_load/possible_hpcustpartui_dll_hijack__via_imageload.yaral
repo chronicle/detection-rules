@@ -1,0 +1,17 @@
+rule possible_hpcustpartuidll_hijack_via_imageload {
+ meta:
+    author = "SOC Prime Team, FireEye"
+    description = "This rule has been ported from Fireeye's HXIOC format to SIGMA. It detects hpcustpartui.dll being loaded from unusual locations.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/rkyIZhC9HQ6B"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "image_load"
+    product = "windows"
+    mitre = "persistence, privilege_escalation, defense_evasion, t1574.001"
+
+  events:
+(re.regex($selection_image.target.process.file.full_path, `.*\\hpcustpartui\.dll`) and not ((re.regex($selection_image.target.process.file.full_path, `.*Program Files\\HP\\.*`) or re.regex($selection_image.target.process.file.full_path, `.*Program Files \(x86\)\\HP\\.*`) or re.regex($selection_image.target.process.file.full_path, `.*PROGRA~.*`) or re.regex($selection_image.target.process.file.full_path, `.*Program Files \(x86\)\\Trend Micro\\.*`) or re.regex($selection_image.target.process.file.full_path, `.*Program Files\\Trend Micro\\.*`))))
+
+  condition:
+    $selection_image
+}

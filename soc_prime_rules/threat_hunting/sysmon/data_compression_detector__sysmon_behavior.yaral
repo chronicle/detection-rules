@@ -1,0 +1,17 @@
+rule data_compression_detector_sysmon_behavior {
+ meta:
+    author = "Lee Archinal"
+    description = "This content detects characteristcs of data compression as described by the Mitre Att&ck Framework Technique T1002  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/2L88AmwSHepe"
+    version = "0.01"
+    created = "2019/09/20"
+    product = "windows"
+    service = "sysmon"
+    mitre = "execution, t1002"
+
+  events:
+((($selection1.metadata.product_event_type = "11" and re.regex($selection1.target.process.file.full_path, `.*\.powershell\.exe`) and re.regex($selection1.target.file.full_path, `.*\.zip`)) or ($selection1.metadata.product_event_type = "1" and re.regex($selection1.target.process.file.full_path, `.*rar\.exe`) and re.regex($selection1.target.process.command_line, `.*\.rar`))) or ($selection1.metadata.product_event_type = "11" and re.regex($selection1.target.process.file.full_path, `.*rar\.exe`) and re.regex($selection1.target.file.full_path, `.*\.rar`)))
+
+  condition:
+    $selection1
+}

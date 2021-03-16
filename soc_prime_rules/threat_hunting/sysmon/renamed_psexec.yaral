@@ -1,0 +1,17 @@
+rule renamed_psexec {
+ meta:
+    author = "Florian Roth"
+    description = "Detects the execution of a renamed PsExec often used by attackers or malware  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/QOSajcAZW9Ds"
+    version = "0.01"
+    created = "2019/05/21"
+    product = "windows"
+    service = "sysmon"
+    mitre = "car.2013-05-009"
+
+  events:
+(($selection.metadata.description = "Execute processes remotely" and $selection.metadata.product_name = "Sysinternals PsExec") and not ((re.regex($selection.target.process.file.full_path, `.*\\PsExec\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\PsExec64\.exe`))))
+
+  condition:
+    $selection
+}

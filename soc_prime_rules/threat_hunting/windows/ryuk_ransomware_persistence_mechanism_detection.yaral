@@ -1,0 +1,17 @@
+rule ryuk_ransomware_persistence_mechanism_detection {
+ meta:
+    author = "Furkan Celik"
+    description = "Ryuk adds the following registry key so it will execute at every login. It uses the command below to create a registry key  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/vQwDMgA92Or3"
+    version = "0.01"
+    created = "2020/03/30"
+    product = "windows"
+    service = "security"
+    mitre = "persistence, T1183"
+
+  events:
+($selection.target.process.command_line = "C:\\Windows\\System32\\cmd.exe\" /C REG ADD \"HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\"" or re.regex($selection.target.process.command_line, `/v \"svchos\" /t REG_SZ /d \"C:\\Users\\Public.*\.exe\" /f`))
+
+  condition:
+    $selection
+}

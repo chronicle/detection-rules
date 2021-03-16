@@ -1,0 +1,16 @@
+rule draytek_preauth_remote_root_rce {
+ meta:
+    author = "Osman Demir"
+    description = "Detects (CVE-2020-8515) Exploit Attempts  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/IUTjrXadriLa"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "webserver"
+    mitre = "t1190, initial_access"
+
+  events:
+($selection_one.network.http.method = "POST" and re.regex($selection_one.target.url, `.*/cgi-bin/mainfunction\.cgi`) and $selection_one.network.http.response_code = "200" and re.regex($selection_one.target.url, `.*action=login&keyPath='/bin/cat${IFS}/etc/passwd'&loginUser=a&loginPwd=a.*`))
+
+  condition:
+    $selection_one
+}

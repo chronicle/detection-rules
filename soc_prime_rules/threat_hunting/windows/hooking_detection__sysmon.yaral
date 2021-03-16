@@ -1,0 +1,17 @@
+rule hooking_detection_sysmon {
+ meta:
+    author = "Roman Ranskyi"
+    description = "Similar to Process Injection, adversaries may use hooking to load and execute malicious code within the context of another process, masking the execution while also allowing access to the process's memory and possibly elevated privileges. Installing hooking mechanisms may also provide Persistence via continuous invocation when the functions are called through normal use.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/e1wE1JpXqpHg"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Credential Access, t1179"
+
+  events:
+($selection0.metadata.product_event_type = "1" and $selection0.target.process.command_line = "/INJECTRUNNING" and $selection0.target.process.file.full_path = "mavinject.exe")
+
+  condition:
+    $selection0
+}

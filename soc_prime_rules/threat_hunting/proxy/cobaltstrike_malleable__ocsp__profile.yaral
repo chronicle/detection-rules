@@ -1,0 +1,16 @@
+rule cobaltstrike_malleable_ocsp_profile {
+ meta:
+    author = "Markus Neis"
+    description = "Detects Malleable (OCSP) Profile with Typo (OSCP) in URL  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/6Yxsy6nD2drx"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "proxy"
+    mitre = "t1102"
+
+  events:
+(re.regex($selection.target.url, `.*/oscp/.*`) and $selection.principal.hostname = "ocsp.verisign.com")
+
+  condition:
+    $selection
+}

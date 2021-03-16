@@ -1,0 +1,17 @@
+rule msiexec_web_install {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious msiexec process starts with web addreses as parameter  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/T5M5JJ1YfyiQ"
+    version = "0.01"
+    created = "2018/02/09"
+    category = "process_creation"
+    product = "windows"
+    mitre = "defense_evasion, t1218.007, command_and_control, t1105"
+
+  events:
+(re.regex($selection.target.process.command_line, `.* msiexec.*://.*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

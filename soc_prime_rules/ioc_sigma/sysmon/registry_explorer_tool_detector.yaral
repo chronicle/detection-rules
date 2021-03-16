@@ -1,0 +1,17 @@
+rule registry_explorer_tool_detector {
+ meta:
+    author = "Lee Archinal"
+    description = "The detects Registry Explorer tool RECmd.exe running on a system  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/jdIbxsEwQETd"
+    version = "0.01"
+    created = "2019/05/08"
+    product = "windows"
+    service = "sysmon"
+    mitre = "discovery, t1012"
+
+  events:
+($selection.metadata.product_event_type = "1" and re.regex($selection.target.process.file.full_path, `.*\\RECmd\.exe`))
+
+  condition:
+    $selection
+}

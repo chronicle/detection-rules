@@ -1,0 +1,17 @@
+rule rundll32_internet_connection {
+ meta:
+    author = "Florian Roth"
+    description = "Detects a rundll32 that communicates with public IP addresses  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/0Zg55ZhTC6ZE"
+    version = "0.01"
+    created = "2017/11/04"
+    product = "windows"
+    service = "sysmon"
+    mitre = "t1085, defense_evasion, execution"
+
+  events:
+(($selection.metadata.product_event_type = "3" and re.regex($selection.target.process.file.full_path, `.*\\rundll32\.exe`)) and not ((re.regex($selection.target.ip, `10\..*`) or re.regex($selection.target.ip, `192\.168\..*`) or re.regex($selection.target.ip, `172\..*`))))
+
+  condition:
+    $selection
+}

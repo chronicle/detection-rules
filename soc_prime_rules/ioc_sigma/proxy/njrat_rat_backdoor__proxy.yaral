@@ -1,0 +1,16 @@
+rule njrat_ratbackdoor_proxy {
+ meta:
+    author = "Alexandr Yampolskyi, SOC Prime"
+    description = "NjRAT RAT/Backdoor Detector.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/InMMGPzClfBy"
+    version = "0.01"
+    created = "2016/11/24"
+    product = "proxy"
+    mitre = "Command and Control, t1071"
+
+  events:
+($selectionURL.target.url = "http://ghancommercialbank.com/msn/newclient.exe" or $selectionURL.target.url = "http://f.top4top.net/p_3667b75e1.png" or $selectionURL.target.url = "http://f.top4top.net/p_42526hb61.png" or $selectionURL.target.url = "http://cdn.discordapp.com/attachments/482228034632548363/506077641061826561/doublepumpcheck.exe" or $selectionURL.target.url = "http://cdn.discordapp.com/attachments/482925954109276160/507526114491498496/photoshop.exe" or $selectionURL.target.url = "https://cdn.discordapp.com/attachments/436298448665575427/481620773501534208/111111111.exe" or $selectionURL.target.url = "http://ldrldr.icu/njr.exe" or $selectionURL.target.url = "http://kapitanbomba.hopto.org/file.exe" or $selectionURL.target.url = "https://s3.us-east-2.amazonaws.com/qued/xwizard.exe" or $selectionURL.target.url = "https://cdn.discordapp.com/attachments/498525611422121996/507533173954183170/Server.exe")
+
+  condition:
+    $selectionURL
+}

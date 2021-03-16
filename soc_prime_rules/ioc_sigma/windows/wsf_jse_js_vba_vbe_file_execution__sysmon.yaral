@@ -1,0 +1,17 @@
+rule wsfjsejsvbavbe_file_execution_sysmon {
+ meta:
+    author = "Michael Haag, Alexandr Yampolskyi"
+    description = "Detects suspicious file execution by wscript and cscript.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/KOI4etWKDUTa"
+    version = "0.01"
+    created = "2021-03-09"
+    product = "windows"
+    service = "sysmon"
+    mitre = "Execution, t1059, t1204"
+
+  events:
+($selection.metadata.product_event_type = "1" and (re.regex($selection.target.process.file.full_path, `.*wscript\.exe`) or re.regex($selection.target.process.file.full_path, `.*cscript\.exe`)) and (re.regex($selection.target.process.command_line, `.*\.jse.*`) or re.regex($selection.target.process.command_line, `.*\.vbe.*`) or re.regex($selection.target.process.command_line, `.*\.js.*`) or re.regex($selection.target.process.command_line, `.*\.vba.*`)))
+
+  condition:
+    $selection
+}

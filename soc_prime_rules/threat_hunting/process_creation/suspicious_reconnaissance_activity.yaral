@@ -1,0 +1,16 @@
+rule suspicious_reconnaissance_activity {
+ meta:
+    author = "Florian Roth"
+    description = "Detects suspicious command line activity on Windows systems  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    reference = "https://tdm.socprime.com/tdm/info/1H6XajuNzAYw"
+    version = "0.01"
+    created = "2021-03-09"
+    category = "process_creation"
+    product = "windows"
+
+  events:
+(($selection.target.process.command_line = "net group \"domain admins\" /domain" or $selection.target.process.command_line = "net localgroup administrators") and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+
+  condition:
+    $selection
+}

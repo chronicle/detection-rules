@@ -16,5 +16,13 @@ To automate rule creation, APIs are available to create/update/delete rules.
 Detailed instructions can be found in your Chronicle instance under
 documentation:
 
-* Detection UI: https://&lt;your chronicle instance&gt;/docs/detection-engine/detection-engine-ui.html
-* Detection API: https://&lt;your chronicle instance&gt;/docs/detection-engine/detection-engine-api.html
+## Documentation
+
+* Detection API:
+  https://cloud.google.com/chronicle/docs/reference/detection-engine-api
+* Detection UI:
+  https://cloud.google.com/chronicle/docs/how-to#monitoring-events-using-rules
+
+## Code Samples
+
+https://github.com/chronicle/api-samples-python/tree/master/detect/v2

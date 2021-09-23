@@ -18,10 +18,17 @@ documentation:
 
 ## Documentation
 
-* Detection API:
-  https://cloud.google.com/chronicle/docs/reference/detection-engine-api
-* Detection UI:
-  https://cloud.google.com/chronicle/docs/how-to#monitoring-events-using-rules
+Detection API and UI:
+
+*   https://cloud.google.com/chronicle/docs/reference/detection-engine-api
+*   https://cloud.google.com/chronicle/docs/how-to#monitoring-events-using-rules
+
+YARA-L 2.0 rules and UDM:
+
+*   https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-overview
+*   https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-syntax
+*   https://cloud.google.com/chronicle/docs/unified-data-model/udm-usage
+*   https://cloud.google.com/chronicle/docs/reference/udm-field-list
 
 ## Code Samples
 

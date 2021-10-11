@@ -1,0 +1,53 @@
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule ttp_sshLateralMovement {
+  meta:
+    //
+    // Attackers will attempt to pivot to other assets once they compromise
+    // a cloud instance.   One technique attackers could potentially use for
+    // lateral movement is to generate a new SSH keypair and push it to other
+    // assets.   Strong IAM policies can prevent this technique's efficacy.
+    //
+    //
+    // This rule triggers on the presense of a new ssh-keys metadata addition.
+    //
+    // Known False Positives:
+    //    Legitimate processes used to provision SSH access.
+    //
+    author = "Google Cloud Security"
+    date = "2021-09-30"
+    tactic = "TA0008"
+    tags = "behavior"
+    severity = "medium"
+    technique = "T1021.004"
+    description = "Attempted Lateral Movement via SSH metadata pivoting"
+    reference = "https://pentestbook.six2dez.com/enumeration/cloud/gcp,https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys"
+
+  events:
+    $gcp.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT"
+    $gcp.metadata.product_event_type = "v1.compute.instances.setMetadata"
+    $gcp.metadata.ingestion_labels.key = "MetadataKey"
+    $gcp.metadata.ingestion_labels.value = "ssh-keys"
+    $gcp.security_result.action = "ALLOW"
+
+    // Customize to your specific range of authorized devices, accounts, etc.
+    // net.ip_in_range_cidr($gcp.principal.ip, "8.8.8.8/32")
+
+  condition:
+    $gcp
+}
+

@@ -1,0 +1,43 @@
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule workspace_oauth_high_privilege_unsanctioned_applications {
+  meta:
+    author = "Google Cloud Security"
+    description = "Monitors high privilege or potentially abused OAuth scopes being granted to potentially unsanctioned applications."
+    severity = "LOW"
+    tactics = "T1528"
+
+  events:
+    $workspace.metadata.vendor_name = "Google Workspace"
+    $workspace.metadata.product_name = "token"
+    $workspace.metadata.product_event_type = "authorize"
+
+    // monitor OAuth scopes - use a Reference List if this becomes too large
+    ( $workspace.target.user.attribute.roles.name = "https://mail.google.com" or
+      $workspace.target.user.attribute.roles.name = "https://www.googleapis.com/auth/gmail" or
+      $workspace.target.user.attribute.roles.name = "https://www.googleapis.com/auth/drive" or
+      $workspace.target.user.attribute.roles.name = "https://www.googleapis.com/auth/ediscovery" or
+      $workspace.target.user.attribute.roles.name = "https://www.googleapis.com/auth/admin" )
+    $workspace.security_result.action = "ALLOW"
+
+    // Exclude allowed OAuth integrated applications. Lists are case sensitive
+    //not  $workspace.target.application in %allowed_workspace_applications
+
+  condition:
+    $workspace
+
+}

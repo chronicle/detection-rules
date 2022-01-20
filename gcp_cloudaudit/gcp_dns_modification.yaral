@@ -1,0 +1,55 @@
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule gcp_dns_modification {
+  meta:
+    author = "Google Cloud Security"
+    description = "Monitors DNS creation or deletion activity from non-service accounts."
+    severity = "LOW"
+    implementation = "Update principal and target email_address exclusions, e.g., person performing the change, and the account being changed."
+
+  events:
+    $gcp.metadata.vendor_name = "Google Cloud Platform"
+    (
+      $gcp.metadata.product_event_type = "dns.changes.create" or
+      $gcp.metadata.product_event_type = "dns.changes.delete"
+    )
+
+    $gcp.security_result.action = "ALLOW"
+
+    //capture variables
+    $gcp.target.resource.name = $resourceName
+    $gcp.target.cloud.project.name = $projectName
+
+    // exclude system account changes
+    not (
+          $gcp.principal.user.email_addresses = /system.gserviceaccount.com/
+    )
+
+    // exclude target service accounts or groups
+    // e.g., only detect a user performing config changes
+    not ( $gcp.target.user.email_addresses = /^serviceAccount/ or
+        $gcp.target.user.email_addresses = /^group/ )
+
+    //optionally, exclude on User Agent
+    //not $gcp.network.http.user_agent != /Terraform/ nocase
+
+  match:
+    $resourceName, $projectName over 15m
+
+  condition:
+    $gcp
+}

@@ -1,0 +1,32 @@
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule workspace_gmail_settings_changed {
+  meta:
+    author = "Google Cloud Security"
+    description = "An admin has changed GMail settings"
+    severity = "LOW"
+    url = "https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-gmail-settings#CHANGE_GMAIL_SETTING"
+
+  events:
+    $workspace.metadata.vendor_name        = "Google Workspace"
+    $workspace.metadata.product_name       = /admin/ nocase
+    $workspace.metadata.product_event_type = /change_gmail_setting/ nocase
+
+  condition:
+    $workspace
+}
+

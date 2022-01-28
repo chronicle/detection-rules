@@ -23,7 +23,7 @@ rule gcp_firewall_rule_changes {
     cis_version = "1.2"
     cis_control = "2.7"
     tactic = "TA0005"
-    technique = "T1562.004
+    technique = "T1562.004"
 
   events:
     $gcp.metadata.vendor_name = "Google Cloud Platform"

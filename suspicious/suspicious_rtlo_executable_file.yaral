@@ -1,0 +1,22 @@
+rule Suspicious_RTLO_Executable_File {
+  meta:
+      Author = "ag-michael (https://github.com/ag-michael)"
+      severity = "Medium"
+      Description = "Detects an executable being written to disk or executed where a right-to-left-override character in the file name is crafted in a way that can mislead users to believe it has a different extension"
+      Tactic = "TA0005"
+      Technique = "T1036.002"
+      Reference = "https://attack.mitre.org/techniques/T1036/002/"
+      yara_version = "YL2.0" 
+      rule_version = "1.0"
+  events:
+       $endpoint.target.file.full_path = /.*‮[\w\d]{2,5}\.(exe|bat|js|vbs|hta|vbe|jse|sct|wsf|xsl|cpl|xll)/
+or $endpoint.principal.process.command_line = /.*‮[\w\d]{2,5}\.(exe|bat|js|vbs|hta|vbe|jse|sct|wsf|xsl|cpl|xll)/
+or $endpoint.target.process.command_line  = /.*‮[\w\d]{2,5}\.(exe|bat|js|vbs|hta|vbe|jse|sct|wsf|xsl|cpl|xll)/
+		
+
+  condition:
+    $endpoint 
+}
+
+    
+

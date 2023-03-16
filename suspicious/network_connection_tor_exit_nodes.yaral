@@ -1,0 +1,46 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule network_connection_tor_exit_nodes {
+  meta:
+    author = "Google Cloud Security"
+    description = "Network Connection associated with a Tor Exit Node"
+    severity = "High"
+
+  events:
+    // Network Connection Event
+    $e.metadata.event_type = "NETWORK_CONNECTION"
+    $e.target.ip = $tor_ip
+
+    // Tor IP search in GCTI Feed
+    $tor.graph.entity.artifact.ip = $tor_ip
+    $tor.graph.metadata.entity_type = "IP_ADDRESS"
+    $tor.graph.metadata.threat.threat_feed_name = "Tor Exit Nodes"
+    $tor.graph.metadata.source_type = "GLOBAL_CONTEXT"
+    $tor.graph.metadata.vendor_name = "Google Cloud Threat Intelligence"
+    $tor.graph.metadata.product_name = "GCTI Feed"
+
+  match:
+    $tor_ip over 1h
+
+  outcome:
+    $tor_ips = array_distinct($tor_ip)
+    $tor_geoip_country = array_distinct($e.target.ip_geo_artifact.location.country_or_region)
+    $tor_geoip_state = array_distinct($e.target.ip_geo_artifact.location.state)
+
+  condition:
+    $e and $tor
+}

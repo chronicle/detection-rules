@@ -10,7 +10,7 @@ rule detect_rogue_servicesexe_process {
     mitre = "defense_evasion, t1036"
 
   events:
-(re.regex($selection.target.process.file.full_path, `.*\\services\.exe`) and not ($selection.src.process.file.full_path = "C:\\Windows\\System32\\wininit.exe"))
+(re.regex($selection.target.process.file.full_path, `.*\\services\.exe`) and not ($selection.principal.process.file.full_path = "C:\\Windows\\System32\\wininit.exe"))
 
   condition:
     $selection

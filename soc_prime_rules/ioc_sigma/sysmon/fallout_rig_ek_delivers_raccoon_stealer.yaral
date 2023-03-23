@@ -10,7 +10,7 @@ rule fallout_rig_ek_delivers_raccoon_stealer {
     mitre = "T1140, T1059, T1005, T1022, T1105, T1057"
 
   events:
-(((re.regex($selection1.target.process.file.full_path, `.*\\cvtres\.exe`) and re.regex($selection1.src.process.file.full_path, `.*\\csc\.exe`)) or ($selection1.metadata.product_event_type = "1" and (re.regex($selection1.target.process.file.full_path, `.*\\csc\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\AyJWa1N0\.tmp`)) and re.regex($selection1.src.process.file.full_path, `.*\\powershell\.exe`))) or (re.regex($selection1.target.process.file.full_path, `.*\\cmd\.exe`) and re.regex($selection1.src.process.file.full_path, `.*\\AyJWa1N0\.tmp`)))
+(((re.regex($selection1.target.process.file.full_path, `.*\\cvtres\.exe`) and re.regex($selection1.principal.process.file.full_path, `.*\\csc\.exe`)) or ($selection1.metadata.product_event_type = "1" and (re.regex($selection1.target.process.file.full_path, `.*\\csc\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\AyJWa1N0\.tmp`)) and re.regex($selection1.principal.process.file.full_path, `.*\\powershell\.exe`))) or (re.regex($selection1.target.process.file.full_path, `.*\\cmd\.exe`) and re.regex($selection1.principal.process.file.full_path, `.*\\AyJWa1N0\.tmp`)))
 
   condition:
     $selection1

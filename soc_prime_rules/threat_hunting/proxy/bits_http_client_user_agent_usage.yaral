@@ -9,7 +9,7 @@ rule bits_http_client_useragent_usage {
     mitre = "defense_evasion, t1197"
 
   events:
-re.regex($selection.src.application, `Microsoft BITS.*`)
+re.regex($selection.principal.application, `Microsoft BITS.*`)
 
   condition:
     $selection

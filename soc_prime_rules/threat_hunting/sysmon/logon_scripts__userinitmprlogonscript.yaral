@@ -10,7 +10,7 @@ rule logon_scripts_userinitmprlogonscript {
     mitre = "t1037, persistence, lateral_movement"
 
   events:
-(((($exec_selection.metadata.product_event_type = "1" and re.regex($exec_selection.src.process.file.full_path, `.*\\userinit\.exe`)) and not (re.regex($exec_selection.target.process.file.full_path, `.*\\explorer\.exe`) and re.regex($exec_selection.target.process.command_line, `.*\\netlogon\.bat`))) or (($exec_selection.metadata.product_event_type = "11" or $exec_selection.metadata.product_event_type = "12" or $exec_selection.metadata.product_event_type = "13" or $exec_selection.metadata.product_event_type = "14") and re.regex($exec_selection.target.registry.registry_key, `.*UserInitMprLogonScript.*`))) or ($exec_selection.metadata.product_event_type = "1" and re.regex($exec_selection.target.process.command_line, `.*UserInitMprLogonScript.*`)))
+(((($exec_selection.metadata.product_event_type = "1" and re.regex($exec_selection.principal.process.file.full_path, `.*\\userinit\.exe`)) and not (re.regex($exec_selection.target.process.file.full_path, `.*\\explorer\.exe`) and re.regex($exec_selection.target.process.command_line, `.*\\netlogon\.bat`))) or (($exec_selection.metadata.product_event_type = "11" or $exec_selection.metadata.product_event_type = "12" or $exec_selection.metadata.product_event_type = "13" or $exec_selection.metadata.product_event_type = "14") and re.regex($exec_selection.target.registry.registry_key, `.*UserInitMprLogonScript.*`))) or ($exec_selection.metadata.product_event_type = "1" and re.regex($exec_selection.target.process.command_line, `.*UserInitMprLogonScript.*`)))
 
   condition:
     $exec_selection

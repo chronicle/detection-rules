@@ -10,7 +10,7 @@ rule eventlog_cleared {
     mitre = "defense_evasion, t1070, car.2016-04-002"
 
   events:
-($selection.metadata.product_event_type = "104" and $selection.src.application = "Microsoft-Windows-Eventlog")
+($selection.metadata.product_event_type = "104" and $selection.principal.application = "Microsoft-Windows-Eventlog")
 
   condition:
     $selection

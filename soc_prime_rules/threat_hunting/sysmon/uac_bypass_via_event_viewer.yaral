@@ -10,7 +10,7 @@ rule uac_bypass_via_event_viewer {
     mitre = "defense_evasion, privilege_escalation, t1088"
 
   events:
-(($methregistry.metadata.product_event_type = "13" and re.regex($methregistry.target.registry.registry_key, `HKEY_USERS\\.*\\mscfile\\shell\\open\\command`)) or (($methregistry.metadata.product_event_type = "1" and re.regex($methregistry.src.process.file.full_path, `.*\\eventvwr\.exe`)) and not (re.regex($methregistry.target.process.file.full_path, `.*\\mmc\.exe`))))
+(($methregistry.metadata.product_event_type = "13" and re.regex($methregistry.target.registry.registry_key, `HKEY_USERS\\.*\\mscfile\\shell\\open\\command`)) or (($methregistry.metadata.product_event_type = "1" and re.regex($methregistry.principal.process.file.full_path, `.*\\eventvwr\.exe`)) and not (re.regex($methregistry.target.process.file.full_path, `.*\\mmc\.exe`))))
 
   condition:
     $methregistry

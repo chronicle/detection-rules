@@ -9,7 +9,7 @@ rule psexec_tool_execution {
     mitre = "execution, t1035, s0029"
 
   events:
-(($service_installation.target.process.command_line = "PSEXESVC" and (($service_installation.metadata.product_event_type = "7045" and re.regex($service_installation.target.process.command_line, `.*\\PSEXESVC\.exe`)) or $service_installation.metadata.product_event_type = "7036")) or ($service_installation.metadata.product_event_type = "1" and re.regex($service_installation.target.process.file.full_path, `.*\\PSEXESVC\.exe`) and $service_installation.src.user.user_display_name = "NT AUTHORITY\\SYSTEM"))
+(($service_installation.target.process.command_line = "PSEXESVC" and (($service_installation.metadata.product_event_type = "7045" and re.regex($service_installation.target.process.command_line, `.*\\PSEXESVC\.exe`)) or $service_installation.metadata.product_event_type = "7036")) or ($service_installation.metadata.product_event_type = "1" and re.regex($service_installation.target.process.file.full_path, `.*\\PSEXESVC\.exe`) and $service_installation.principal.user.user_display_name = "NT AUTHORITY\\SYSTEM"))
 
   condition:
     $service_installation

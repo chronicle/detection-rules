@@ -10,7 +10,7 @@ rule mshta_spwaned_by_svchost_as_seen_in_lethalhta_sysmon {
     mitre = "Execution, t1204, t1059"
 
   events:
-($selection.metadata.product_event_type = "1" and re.regex($selection.src.process.file.full_path, `.*\\svchost\.exe`) and re.regex($selection.target.process.command_line, `.*/mshta\.exe`))
+($selection.metadata.product_event_type = "1" and re.regex($selection.principal.process.file.full_path, `.*\\svchost\.exe`) and re.regex($selection.target.process.command_line, `.*/mshta\.exe`))
 
   condition:
     $selection

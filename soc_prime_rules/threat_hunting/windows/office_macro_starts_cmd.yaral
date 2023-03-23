@@ -9,7 +9,7 @@ rule office_macro_starts_cmd {
     service = "sysmon"
 
   events:
-($selection.metadata.product_event_type = "1" and (re.regex($selection.src.process.file.full_path, `.*\\WINWORD\.EXE`) or re.regex($selection.src.process.file.full_path, `.*\\EXCEL\.EXE`)) and re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`))
+($selection.metadata.product_event_type = "1" and (re.regex($selection.principal.process.file.full_path, `.*\\WINWORD\.EXE`) or re.regex($selection.principal.process.file.full_path, `.*\\EXCEL\.EXE`)) and re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`))
 
   condition:
     $selection

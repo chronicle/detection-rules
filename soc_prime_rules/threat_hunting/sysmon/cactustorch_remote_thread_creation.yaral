@@ -10,7 +10,7 @@ rule cactustorch_remote_thread_creation {
     mitre = "execution, t1055, t1064"
 
   events:
-($selection.metadata.product_event_type = "8" and (re.regex($selection.src.process.file.full_path, `.*\\System32\\cscript\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\System32\\wscript\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\System32\\mshta\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\winword\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\excel\.exe`)) and re.regex($selection.target.process.file.full_path, `.*\\SysWOW64\\.*`) and $selection.src.application = "")
+($selection.metadata.product_event_type = "8" and (re.regex($selection.principal.process.file.full_path, `.*\\System32\\cscript\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\System32\\wscript\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\System32\\mshta\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\winword\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\excel\.exe`)) and re.regex($selection.target.process.file.full_path, `.*\\SysWOW64\\.*`) and $selection.principal.application = "")
 
   condition:
     $selection

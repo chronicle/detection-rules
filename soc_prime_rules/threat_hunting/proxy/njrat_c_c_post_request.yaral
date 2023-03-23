@@ -9,7 +9,7 @@ rule njrat_cc_post_request {
     mitre = "Command and Control, t1071"
 
   events:
-(re.regex($selection.target.url, `.*/is-ready`) and (re.regex($selection.src.application, `.*|>plus<|.*`) or re.regex($selection.src.application, `.*|>underworld final<|.*`)))
+(re.regex($selection.target.url, `.*/is-ready`) and (re.regex($selection.principal.application, `.*|>plus<|.*`) or re.regex($selection.principal.application, `.*|>underworld final<|.*`)))
 
   condition:
     $selection

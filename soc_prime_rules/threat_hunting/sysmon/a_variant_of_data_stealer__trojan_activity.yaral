@@ -10,7 +10,7 @@ rule a_variant_of_data_stealer_trojan_activity {
     mitre = "T1129, T1003, T1114, T1012, T1107"
 
   events:
-((re.regex($selection.target.process.file.full_path, `.*/ralord\.exe`) or re.regex($selection.target.process.file.full_path, `.*/lodron\.exe`) or re.regex($selection.target.process.file.full_path, `.*/019\.exe`) or re.regex($selection.target.process.file.full_path, `.*/016\.exe`)) and (re.regex($selection.src.process.file.full_path, `.*/setup_file\.exe`) or re.regex($selection.src.process.file.full_path, `.*/setup_installer\.exe`)))
+((re.regex($selection.target.process.file.full_path, `.*/ralord\.exe`) or re.regex($selection.target.process.file.full_path, `.*/lodron\.exe`) or re.regex($selection.target.process.file.full_path, `.*/019\.exe`) or re.regex($selection.target.process.file.full_path, `.*/016\.exe`)) and (re.regex($selection.principal.process.file.full_path, `.*/setup_file\.exe`) or re.regex($selection.principal.process.file.full_path, `.*/setup_installer\.exe`)))
 
   condition:
     $selection

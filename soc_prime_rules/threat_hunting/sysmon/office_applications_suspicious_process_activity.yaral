@@ -9,7 +9,7 @@ rule office_applications_suspicious_process_activity {
     service = "sysmon"
 
   events:
-($selection.metadata.product_event_type = "1" and ($selection.src.process.file.full_path = "excel.exe" or $selection.src.process.file.full_path = "msaccess.exe" or $selection.src.process.file.full_path = "outlook.exe" or $selection.src.process.file.full_path = "powerpnt.exe" or $selection.src.process.file.full_path = "winword.exe") and ($selection.target.process.file.full_path = "powershell.exe" or $selection.target.process.file.full_path = "cmd.exe"))
+($selection.metadata.product_event_type = "1" and ($selection.principal.process.file.full_path = "excel.exe" or $selection.principal.process.file.full_path = "msaccess.exe" or $selection.principal.process.file.full_path = "outlook.exe" or $selection.principal.process.file.full_path = "powerpnt.exe" or $selection.principal.process.file.full_path = "winword.exe") and ($selection.target.process.file.full_path = "powershell.exe" or $selection.target.process.file.full_path = "cmd.exe"))
 
   condition:
     $selection

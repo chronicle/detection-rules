@@ -10,7 +10,7 @@ rule agenttesla_rat_detection {
     mitre = "T1053, T1081"
 
   events:
-($selection.src.process.file.full_path = "8cab6413fdc97e9cc90607b3a49175a7.exe" and (re.regex($selection.target.process.file.full_path, `.*RegSvcs\.exe`) or $selection.target.process.file.full_path = "C:\\Windows\\System32\\schtasks.exe") and re.regex($selection.target.process.command_line, `.*/Create /TN \"Updates\\ZwqpnECNvoWf\" /XML \"C:\\Users\\admin\\AppData\\Local\\Temp\\tmp6CEB\.tmp\"`))
+($selection.principal.process.file.full_path = "8cab6413fdc97e9cc90607b3a49175a7.exe" and (re.regex($selection.target.process.file.full_path, `.*RegSvcs\.exe`) or $selection.target.process.file.full_path = "C:\\Windows\\System32\\schtasks.exe") and re.regex($selection.target.process.command_line, `.*/Create /TN \"Updates\\ZwqpnECNvoWf\" /XML \"C:\\Users\\admin\\AppData\\Local\\Temp\\tmp6CEB\.tmp\"`))
 
   condition:
     $selection

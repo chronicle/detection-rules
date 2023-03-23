@@ -10,7 +10,7 @@ rule suspicious_execution_from_outlook {
     mitre = "execution, t1059, t1202"
 
   events:
-(re.regex($clientMailRules.target.process.command_line, `.*EnableUnsafeClientMailRules.*`) or (re.regex($clientMailRules.src.process.file.full_path, `.*\\outlook\.exe`) and re.regex($clientMailRules.target.process.command_line, `.*\\.*\.exe`)))
+(re.regex($clientMailRules.target.process.command_line, `.*EnableUnsafeClientMailRules.*`) or (re.regex($clientMailRules.principal.process.file.full_path, `.*\\outlook\.exe`) and re.regex($clientMailRules.target.process.command_line, `.*\\.*\.exe`)))
 
   condition:
     $clientMailRules

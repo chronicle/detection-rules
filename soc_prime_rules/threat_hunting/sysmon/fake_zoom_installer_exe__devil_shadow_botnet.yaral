@@ -10,7 +10,7 @@ rule fake_zoom_installerexe_devil_shadow_botnet {
     mitre = "T1055, T1179, T1215, T1065, T1045"
 
   events:
-(((re.regex($selection.src.process.file.full_path, `.*/Zoominstaller\.exe `) or re.regex($selection.src.process.file.full_path, `.*/wscript\.exe`)) and re.regex($selection.target.process.file.full_path, `.*/cmd\.exe`) and re.regex($selection.target.process.command_line, `.*pyclient\.cmd.*`)) or (re.regex($selection.src.process.file.full_path, `.*/cmd\.exe`) and (re.regex($selection.target.process.file.full_path, `.*/tasklist\.exe`) or re.regex($selection.target.process.file.full_path, `.*/attrib\.exe`) or re.regex($selection.target.process.file.full_path, `.*/reg\.exe`)) and (re.regex($selection.target.process.command_line, `.*D3ViL ShaDow.*`) or re.regex($selection.target.process.command_line, `.*botnet.*`) or re.regex($selection.target.process.command_line, `.*boot-startup\.vbs.*`))))
+(((re.regex($selection.principal.process.file.full_path, `.*/Zoominstaller\.exe `) or re.regex($selection.principal.process.file.full_path, `.*/wscript\.exe`)) and re.regex($selection.target.process.file.full_path, `.*/cmd\.exe`) and re.regex($selection.target.process.command_line, `.*pyclient\.cmd.*`)) or (re.regex($selection.principal.process.file.full_path, `.*/cmd\.exe`) and (re.regex($selection.target.process.file.full_path, `.*/tasklist\.exe`) or re.regex($selection.target.process.file.full_path, `.*/attrib\.exe`) or re.regex($selection.target.process.file.full_path, `.*/reg\.exe`)) and (re.regex($selection.target.process.command_line, `.*D3ViL ShaDow.*`) or re.regex($selection.target.process.command_line, `.*botnet.*`) or re.regex($selection.target.process.command_line, `.*boot-startup\.vbs.*`))))
 
   condition:
     $selection

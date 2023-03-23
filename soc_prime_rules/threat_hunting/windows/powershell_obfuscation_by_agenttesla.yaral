@@ -10,7 +10,7 @@ rule powershell_obfuscation_by_agenttesla {
     mitre = "T1064, T1060, T1081, T1130"
 
   events:
-((re.regex($selection1.target.process.file.full_path, `.*\\powershell`) and (re.regex($selection1.target.process.command_line, `Powershell $VN=\( '104{100e121'\.SpLiT\('!X_AeZuG{%'\) |fOreACh-oBjeCt{[CHar]\($_-BXOR 0x21 \) }\) -joIN '';sal MUM $VN;$BCmiLrM=@\(.*`) or re.regex($selection1.target.process.command_line, `Powershell '\(&'\+'\(G'\+'C'\+'###'\.replace\('###','M'\)\+' .*W-'\+'O.*\)'\+ 'Ne'\+'t\.'\+'W'\+'eb'\+'C'\+'li'\+'ent\)'\+'\.D'\+'ow'\+'nl'\+'oad'\+'F'\+'il'\+'e\(''.*File\.vbs.*`))) or (re.regex($selection1.target.process.file.full_path, `.*\\RegAsm\.exe`) and re.regex($selection1.src.process.file.full_path, `.*\\InstallUtil\.exe`)))
+((re.regex($selection1.target.process.file.full_path, `.*\\powershell`) and (re.regex($selection1.target.process.command_line, `Powershell $VN=\( '104{100e121'\.SpLiT\('!X_AeZuG{%'\) |fOreACh-oBjeCt{[CHar]\($_-BXOR 0x21 \) }\) -joIN '';sal MUM $VN;$BCmiLrM=@\(.*`) or re.regex($selection1.target.process.command_line, `Powershell '\(&'\+'\(G'\+'C'\+'###'\.replace\('###','M'\)\+' .*W-'\+'O.*\)'\+ 'Ne'\+'t\.'\+'W'\+'eb'\+'C'\+'li'\+'ent\)'\+'\.D'\+'ow'\+'nl'\+'oad'\+'F'\+'il'\+'e\(''.*File\.vbs.*`))) or (re.regex($selection1.target.process.file.full_path, `.*\\RegAsm\.exe`) and re.regex($selection1.principal.process.file.full_path, `.*\\InstallUtil\.exe`)))
 
   condition:
     $selection1

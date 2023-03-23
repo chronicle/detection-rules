@@ -8,7 +8,7 @@ rule crypto_miner_user_agent {
     category = "proxy"
 
   events:
-(re.regex($selection.src.application, `XMRig .*`) or re.regex($selection.src.application, `ccminer.*`))
+(re.regex($selection.principal.application, `XMRig .*`) or re.regex($selection.principal.application, `ccminer.*`))
 
   condition:
     $selection

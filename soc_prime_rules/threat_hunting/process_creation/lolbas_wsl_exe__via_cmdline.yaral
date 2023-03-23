@@ -10,7 +10,7 @@ rule lolbas_wslexe_via_cmdline {
     mitre = "execution, t1204, T1202"
 
   events:
-(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (re.regex($selection1.src.process.file.full_path, `.*\\wsl\.exe`) or (re.regex($selection1.target.process.file.full_path, `.*\\wsl\.exe`) and (re.regex($selection1.target.process.command_line, `.*--exec.*`) or re.regex($selection1.target.process.command_line, `.*-e.*`) or re.regex($selection1.target.process.command_line, `.*-u.*`)))))
+(($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (re.regex($selection1.principal.process.file.full_path, `.*\\wsl\.exe`) or (re.regex($selection1.target.process.file.full_path, `.*\\wsl\.exe`) and (re.regex($selection1.target.process.command_line, `.*--exec.*`) or re.regex($selection1.target.process.command_line, `.*-e.*`) or re.regex($selection1.target.process.command_line, `.*-u.*`)))))
 
   condition:
     $selection1

@@ -10,7 +10,7 @@ rule suspicious_compression_tool_parameters {
     mitre = "collection, t1560.001, exfiltration, t1020, t1002"
 
   events:
-(((re.regex($falsepositive.target.process.command_line, `.* -p.*`) or re.regex($falsepositive.target.process.command_line, `.* -ta.*`) or re.regex($falsepositive.target.process.command_line, `.* -tb.*`) or re.regex($falsepositive.target.process.command_line, `.* -sdel.*`) or re.regex($falsepositive.target.process.command_line, `.* -dw.*`) or re.regex($falsepositive.target.process.command_line, `.* -hp.*`)) and (re.regex($falsepositive.target.file.full_path, `7z.*\.exe`) or re.regex($falsepositive.target.file.full_path, `.*rar\.exe`) or re.regex($falsepositive.target.file.full_path, `.*Command.*Line.*RAR.*`)) and ($falsepositive.metadata.product_event_type = "4688" or $falsepositive.metadata.product_event_type = "1")) and not (re.regex($falsepositive.src.process.file.full_path, `C:\\Program.*`)))
+(((re.regex($falsepositive.target.process.command_line, `.* -p.*`) or re.regex($falsepositive.target.process.command_line, `.* -ta.*`) or re.regex($falsepositive.target.process.command_line, `.* -tb.*`) or re.regex($falsepositive.target.process.command_line, `.* -sdel.*`) or re.regex($falsepositive.target.process.command_line, `.* -dw.*`) or re.regex($falsepositive.target.process.command_line, `.* -hp.*`)) and (re.regex($falsepositive.target.file.full_path, `7z.*\.exe`) or re.regex($falsepositive.target.file.full_path, `.*rar\.exe`) or re.regex($falsepositive.target.file.full_path, `.*Command.*Line.*RAR.*`)) and ($falsepositive.metadata.product_event_type = "4688" or $falsepositive.metadata.product_event_type = "1")) and not (re.regex($falsepositive.principal.process.file.full_path, `C:\\Program.*`)))
 
   condition:
     $falsepositive

@@ -10,7 +10,7 @@ rule possible_msbuild_abuse_via_cmdline {
     mitre = "defense_evasion, execution, t1127"
 
   events:
-(((re.regex($selection.target.process.command_line, `.*noconsolelogger.*`) or re.regex($selection.target.process.command_line, `.*noconlog.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not ((re.regex($selection.target.process.command_line, `.*msbuild\.exe.*`) or re.regex($selection.target.process.file.full_path, `.*\\msbuild\.exe`) or (re.regex($selection.src.process.file.full_path, `.*\.0\\bin\\nact\.exe.*`) or re.regex($selection.src.process.file.full_path, `.*\\MSBuild\\15\.0\\Bin\\amd64\\Tracker\.exe.*`) or re.regex($selection.src.process.file.full_path, `.*:\\Program Files\\dotnet\\dotnet\.exe.*`)))))
+(((re.regex($selection.target.process.command_line, `.*noconsolelogger.*`) or re.regex($selection.target.process.command_line, `.*noconlog.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not ((re.regex($selection.target.process.command_line, `.*msbuild\.exe.*`) or re.regex($selection.target.process.file.full_path, `.*\\msbuild\.exe`) or (re.regex($selection.principal.process.file.full_path, `.*\.0\\bin\\nact\.exe.*`) or re.regex($selection.principal.process.file.full_path, `.*\\MSBuild\\15\.0\\Bin\\amd64\\Tracker\.exe.*`) or re.regex($selection.principal.process.file.full_path, `.*:\\Program Files\\dotnet\\dotnet\.exe.*`)))))
 
   condition:
     $selection

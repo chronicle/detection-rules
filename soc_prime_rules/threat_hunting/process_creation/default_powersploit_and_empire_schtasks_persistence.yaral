@@ -10,7 +10,7 @@ rule default_powersploit_and_empire_schtasks_persistence {
     mitre = "execution, persistence, privilege_escalation, t1053, t1086, s0111, g0022, g0060, car.2013-08-001"
 
   events:
-(re.regex($selection.src.process.file.full_path, `.*\\powershell\.exe`) and (re.regex($selection.target.process.command_line, `.*schtasks.*/Create.*/SC .*ONLOGON.*/TN .*Updater.*/TR .*powershell.*`) or re.regex($selection.target.process.command_line, `.*schtasks.*/Create.*/SC .*DAILY.*/TN .*Updater.*/TR .*powershell.*`) or re.regex($selection.target.process.command_line, `.*schtasks.*/Create.*/SC .*ONIDLE.*/TN .*Updater.*/TR .*powershell.*`) or re.regex($selection.target.process.command_line, `.*schtasks.*/Create.*/SC .*Updater.*/TN .*Updater.*/TR .*powershell.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+(re.regex($selection.principal.process.file.full_path, `.*\\powershell\.exe`) and (re.regex($selection.target.process.command_line, `.*schtasks.*/Create.*/SC .*ONLOGON.*/TN .*Updater.*/TR .*powershell.*`) or re.regex($selection.target.process.command_line, `.*schtasks.*/Create.*/SC .*DAILY.*/TN .*Updater.*/TR .*powershell.*`) or re.regex($selection.target.process.command_line, `.*schtasks.*/Create.*/SC .*ONIDLE.*/TN .*Updater.*/TR .*powershell.*`) or re.regex($selection.target.process.command_line, `.*schtasks.*/Create.*/SC .*Updater.*/TN .*Updater.*/TR .*powershell.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
 
   condition:
     $selection

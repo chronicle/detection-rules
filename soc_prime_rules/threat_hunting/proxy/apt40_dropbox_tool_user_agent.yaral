@@ -8,7 +8,7 @@ rule apt40_dropbox_tool_user_agent {
     category = "proxy"
 
   events:
-($selection.src.application = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36" and $selection.target.hostname = "api.dropbox.com")
+($selection.principal.application = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36" and $selection.target.hostname = "api.dropbox.com")
 
   condition:
     $selection

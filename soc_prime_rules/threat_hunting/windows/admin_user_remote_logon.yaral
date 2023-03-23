@@ -10,7 +10,7 @@ rule admin_user_remote_logon {
     mitre = "lateral_movement, t1078"
 
   events:
-($selection.metadata.product_event_type = "4624" and $selection.extensions.auth.mechanism = "10" and $selection.src.application = "Negotiate" and re.regex($selection.src.user.user_display_name, `Admin-.*`))
+($selection.metadata.product_event_type = "4624" and $selection.extensions.auth.mechanism = "10" and $selection.principal.application = "Negotiate" and re.regex($selection.principal.user.user_display_name, `Admin-.*`))
 
   condition:
     $selection

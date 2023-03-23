@@ -10,7 +10,7 @@ rule poetrat_pythonrat_uses_covid19_lure {
     mitre = "T1059, T1012, T1086"
 
   events:
-(re.regex($selection1.src.process.file.full_path, `.*\\WINWORD\.exe`) and (re.regex($selection1.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\powershell\.exe`)) and (re.regex($selection1.target.process.command_line, `.*/c copy .*.*\.docx .*\.rar && \"C:\\Program Files\\WinRAR\\winRar\.exe\" x -o\+ -ibck .*\.rar .*\.bat && start /b .*\.bat .*\.EXE MICROSOFT WORD`) or re.regex($selection1.target.process.command_line, `C:\\Programs\\Microsoft\\Office\\MSWord\.exe\\\.\.\\\.\.\\\.\.\\\.\..*\\powershell\.exe copy .*.*\.docx .*\.rar; & .*\\WinRAR\.exe x -ibck .*\.rar .*\.exe;Start-Sleep 5;start .*\.EXE MSW`)))
+(re.regex($selection1.principal.process.file.full_path, `.*\\WINWORD\.exe`) and (re.regex($selection1.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection1.target.process.file.full_path, `.*\\powershell\.exe`)) and (re.regex($selection1.target.process.command_line, `.*/c copy .*.*\.docx .*\.rar && \"C:\\Program Files\\WinRAR\\winRar\.exe\" x -o\+ -ibck .*\.rar .*\.bat && start /b .*\.bat .*\.EXE MICROSOFT WORD`) or re.regex($selection1.target.process.command_line, `C:\\Programs\\Microsoft\\Office\\MSWord\.exe\\\.\.\\\.\.\\\.\.\\\.\..*\\powershell\.exe copy .*.*\.docx .*\.rar; & .*\\WinRAR\.exe x -ibck .*\.rar .*\.exe;Start-Sleep 5;start .*\.EXE MSW`)))
 
   condition:
     $selection1

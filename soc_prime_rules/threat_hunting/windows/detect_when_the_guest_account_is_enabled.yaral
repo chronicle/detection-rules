@@ -10,7 +10,7 @@ rule detect_when_the_guest_account_is_enabled {
     mitre = "defense_evasion, t1078"
 
   events:
-($selection.metadata.product_event_type = "4722" and ($selection.src.user.user_display_name = "guest" or $selection.src.user.user_display_name = "Guest"))
+($selection.metadata.product_event_type = "4722" and ($selection.principal.user.user_display_name = "guest" or $selection.principal.user.user_display_name = "Guest"))
 
   condition:
     $selection

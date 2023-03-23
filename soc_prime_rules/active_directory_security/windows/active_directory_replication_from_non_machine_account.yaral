@@ -10,7 +10,7 @@ rule active_directory_replication_from_non_machine_account {
     mitre = "credential_access, t1003"
 
   events:
-(($selection.metadata.product_event_type = "4662" and $selection.target.process.access_mask = "0x100" and (re.regex($selection.target.process.file.file_metadata.pe.import_hash, `.*1131f6aa-9c07-11d1-f79f-00c04fc2dcd2.*`) or re.regex($selection.target.process.file.file_metadata.pe.import_hash, `.*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2.*`) or re.regex($selection.target.process.file.file_metadata.pe.import_hash, `.*89e95b76-444d-4c62-991a-0facbeda640c.*`))) and not (re.regex($selection.src.user.user_display_name, `.*$`)))
+(($selection.metadata.product_event_type = "4662" and $selection.target.process.access_mask = "0x100" and (re.regex($selection.target.process.file.file_metadata.pe.import_hash, `.*1131f6aa-9c07-11d1-f79f-00c04fc2dcd2.*`) or re.regex($selection.target.process.file.file_metadata.pe.import_hash, `.*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2.*`) or re.regex($selection.target.process.file.file_metadata.pe.import_hash, `.*89e95b76-444d-4c62-991a-0facbeda640c.*`))) and not (re.regex($selection.principal.user.user_display_name, `.*$`)))
 
   condition:
     $selection

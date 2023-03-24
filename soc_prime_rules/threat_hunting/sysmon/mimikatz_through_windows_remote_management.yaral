@@ -10,7 +10,7 @@ rule mimikatz_through_windows_remote_management {
     mitre = "credential_access, execution, t1003, t1028, s0005"
 
   events:
-($selection.metadata.product_event_type = "10" and $selection.target.process.file.full_path = "C:\\windows\\system32\\lsass.exe" and $selection.src.process.file.full_path = "C:\\Windows\\system32\\wsmprovhost.exe")
+($selection.metadata.product_event_type = "10" and $selection.target.process.file.full_path = "C:\\windows\\system32\\lsass.exe" and $selection.principal.process.file.full_path = "C:\\Windows\\system32\\wsmprovhost.exe")
 
   condition:
     $selection

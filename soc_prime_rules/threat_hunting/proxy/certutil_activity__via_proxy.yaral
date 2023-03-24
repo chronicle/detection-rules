@@ -9,7 +9,7 @@ rule certutil_activity_via_proxy {
     mitre = "command&control, T1105, defense-evasion, T1140"
 
   events:
-($selection.src.application = "CertUtil URL Agent" or re.regex($selection.src.application, `Microsoft-CryptoAPI/.*`))
+($selection.principal.application = "CertUtil URL Agent" or re.regex($selection.principal.application, `Microsoft-CryptoAPI/.*`))
 
   condition:
     $selection

@@ -8,7 +8,7 @@ rule docker_user_agent {
     category = "proxy"
 
   events:
-(re.regex($selection.src.application, `docker/.*`) and $selection.network.http.method = "PUT")
+(re.regex($selection.principal.application, `docker/.*`) and $selection.network.http.method = "PUT")
 
   condition:
     $selection

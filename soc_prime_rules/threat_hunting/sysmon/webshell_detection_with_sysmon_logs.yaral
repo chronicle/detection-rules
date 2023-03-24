@@ -10,7 +10,7 @@ rule webshell_detection_with_sysmon_logs {
     mitre = "privilege_escalation, Web_Shell, t1100"
 
   events:
-(re.regex($selection.src.process.file.full_path, `.*\\w3wp\.exe`) and re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`))
+(re.regex($selection.principal.process.file.full_path, `.*\\w3wp\.exe`) and re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`))
 
   condition:
     $selection

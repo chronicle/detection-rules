@@ -10,7 +10,7 @@ rule backup_catalog_deleted {
     mitre = "defense_evasion, t1107, t1070.004"
 
   events:
-($selection.metadata.product_event_type = "524" and $selection.src.application = "Microsoft-Windows-Backup")
+($selection.metadata.product_event_type = "524" and $selection.principal.application = "Microsoft-Windows-Backup")
 
   condition:
     $selection

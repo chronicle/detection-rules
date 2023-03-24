@@ -8,7 +8,7 @@ rule windows_powershell_user_agent {
     category = "proxy"
 
   events:
-re.regex($selection.src.application, `.* WindowsPowerShell/.*`)
+re.regex($selection.principal.application, `.* WindowsPowerShell/.*`)
 
   condition:
     $selection

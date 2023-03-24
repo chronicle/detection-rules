@@ -8,7 +8,7 @@ rule windows_powershell_webdav_user_agent {
     category = "proxy"
 
   events:
-re.regex($selection.src.application, `Microsoft-WebDAV-MiniRedir/.*`)
+re.regex($selection.principal.application, `Microsoft-WebDAV-MiniRedir/.*`)
 
   condition:
     $selection

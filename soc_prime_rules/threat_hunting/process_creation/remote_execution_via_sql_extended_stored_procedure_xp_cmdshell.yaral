@@ -10,7 +10,7 @@ rule remote_execution_via_sql_extended_stored_procedure_xp_cmdshell {
     mitre = "defense_evasion, execution, t1218, t1204, t1059"
 
   events:
-((re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\pwsh\.exe`)) and re.regex($selection.src.process.file.full_path, `.*\\sqlservr\.exe`))
+((re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\pwsh\.exe`)) and re.regex($selection.principal.process.file.full_path, `.*\\sqlservr\.exe`))
 
   condition:
     $selection

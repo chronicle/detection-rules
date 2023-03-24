@@ -9,7 +9,7 @@ rule netwalker_ransomware_detection {
     mitre = "t1486"
 
   events:
-(re.regex($selection.target.process.file.full_path, `.*vssadmin\.exe`) and re.regex($selection.src.process.file.full_path, `.*qeSw\.exe`) and $selection.target.process.command_line = "vssadmin.exe delete shadows /all /quiet")
+(re.regex($selection.target.process.file.full_path, `.*vssadmin\.exe`) and re.regex($selection.principal.process.file.full_path, `.*qeSw\.exe`) and $selection.target.process.command_line = "vssadmin.exe delete shadows /all /quiet")
 
   condition:
     $selection

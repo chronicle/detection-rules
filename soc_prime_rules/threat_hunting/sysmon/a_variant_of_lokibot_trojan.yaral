@@ -10,7 +10,7 @@ rule a_variant_of_lokibot_trojan {
     mitre = "T1081, T1566, T1192"
 
   events:
-(($selection.target.process.file.full_path = "C:\\Windows\\system32\\dllhost.exe" and re.regex($selection.src.process.file.full_path, `.*\\v\.exe`)) or re.regex($selection.src.hostname, `.*shehig\.com.*`))
+(($selection.target.process.file.full_path = "C:\\Windows\\system32\\dllhost.exe" and re.regex($selection.principal.process.file.full_path, `.*\\v\.exe`)) or re.regex($selection.principal.hostname, `.*shehig\.com.*`))
 
   condition:
     $selection

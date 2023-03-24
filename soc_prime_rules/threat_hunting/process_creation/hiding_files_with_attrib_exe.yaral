@@ -10,7 +10,7 @@ rule hiding_files_with_attribexe {
     mitre = "defense_evasion, persistence, t1158"
 
   events:
-((re.regex($selection.target.process.file.full_path, `.*\\attrib\.exe`) and re.regex($selection.target.process.command_line, `.* \+h .*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not ((re.regex($selection.target.process.command_line, `.*\\desktop\.ini .*`) or (re.regex($selection.src.process.file.full_path, `.*\\cmd\.exe`) and re.regex($selection.target.process.command_line, `\+R \+H \+S \+A \\.*\.cui`) and re.regex($selection.src.process.command_line, `C:\\WINDOWS\\system32\\.*\.bat`)))))
+((re.regex($selection.target.process.file.full_path, `.*\\attrib\.exe`) and re.regex($selection.target.process.command_line, `.* \+h .*`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1")) and not ((re.regex($selection.target.process.command_line, `.*\\desktop\.ini .*`) or (re.regex($selection.principal.process.file.full_path, `.*\\cmd\.exe`) and re.regex($selection.target.process.command_line, `\+R \+H \+S \+A \\.*\.cui`) and re.regex($selection.principal.process.command_line, `C:\\WINDOWS\\system32\\.*\.bat`)))))
 
   condition:
     $selection

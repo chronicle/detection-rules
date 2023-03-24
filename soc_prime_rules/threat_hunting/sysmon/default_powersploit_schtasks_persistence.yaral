@@ -10,7 +10,7 @@ rule default_powersploit_schtasks_persistence {
     mitre = "execution, persistence, privilege_escalation, t1053, t1086, s0111, g0022, g0060"
 
   events:
-(re.regex($selection.src.process.file.full_path, `.*\\Powershell\.exe`) and (re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*ONLOGON.*`) or re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*DAILY.*`) or re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*ONIDLE.*`) or re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*HOURLY.*`)))
+(re.regex($selection.principal.process.file.full_path, `.*\\Powershell\.exe`) and (re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*ONLOGON.*`) or re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*DAILY.*`) or re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*ONIDLE.*`) or re.regex($selection.target.process.command_line, `.*\\schtasks\.exe.*/Create.*/RU.*system.*/SC.*HOURLY.*`)))
 
   condition:
     $selection

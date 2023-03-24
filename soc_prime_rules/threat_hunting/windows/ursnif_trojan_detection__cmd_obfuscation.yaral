@@ -10,7 +10,7 @@ rule ursnif_trojan_detection_cmd_obfuscation {
     mitre = "T1047, T1497, T1080, T1007, T1082, T1071, T1064, T1113, T1091, T1105, T1060, T1012, T1093, T1027, T1036"
 
   events:
-($selection.target.process.file.full_path = "C:\\Windows\\System32\\Rundll32.exe" and re.regex($selection.src.process.file.full_path, `C:\\Windows\\System32\\cmd\.exe.*`) and re.regex($selection.target.process.command_line, `.*C:\\ProgramData\\ZyGHisczAWv\.dll,Dl^lRegi^sterSe^rver.*`))
+($selection.target.process.file.full_path = "C:\\Windows\\System32\\Rundll32.exe" and re.regex($selection.principal.process.file.full_path, `C:\\Windows\\System32\\cmd\.exe.*`) and re.regex($selection.target.process.command_line, `.*C:\\ProgramData\\ZyGHisczAWv\.dll,Dl^lRegi^sterSe^rver.*`))
 
   condition:
     $selection

@@ -10,7 +10,7 @@ rule ms_office_product_spawning_exe_in_user_dir {
     mitre = "execution, defense_evasion, t1059, t1202, FIN7, car.2013-05-002"
 
   events:
-((re.regex($selection.src.process.file.full_path, `.*\\WINWORD\.EXE`) or re.regex($selection.src.process.file.full_path, `.*\\EXCEL\.EXE`) or re.regex($selection.src.process.file.full_path, `.*\\POWERPNT\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\MSPUB\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\VISIO\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\OUTLOOK\.EXE`)) and re.regex($selection.target.process.file.full_path, `C:\\users\\.*\.exe`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+((re.regex($selection.principal.process.file.full_path, `.*\\WINWORD\.EXE`) or re.regex($selection.principal.process.file.full_path, `.*\\EXCEL\.EXE`) or re.regex($selection.principal.process.file.full_path, `.*\\POWERPNT\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\MSPUB\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\VISIO\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\OUTLOOK\.EXE`)) and re.regex($selection.target.process.file.full_path, `C:\\users\\.*\.exe`) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
 
   condition:
     $selection

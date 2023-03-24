@@ -10,7 +10,7 @@ rule access_to_admin_share {
     mitre = "lateral_movement, t1077"
 
   events:
-(($selection.metadata.product_event_type = "5140" and $selection.target.resource.name = "Admin$") and not (re.regex($selection.src.user.user_display_name, `.*$`)))
+(($selection.metadata.product_event_type = "5140" and $selection.target.resource.name = "Admin$") and not (re.regex($selection.principal.user.user_display_name, `.*$`)))
 
   condition:
     $selection

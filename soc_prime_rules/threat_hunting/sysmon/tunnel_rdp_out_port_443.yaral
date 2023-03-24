@@ -10,7 +10,7 @@ rule tunnel_rdp_out_port_443 {
     mitre = "T1076"
 
   events:
-($selection.src.process.file.full_path = "C:\\Windows\\System32\\cmd.exe" and $selection.target.process.file.full_path = "C:\\Windows\\System32\\reg.exe" and re.regex($selection.target.process.command_line, `reg  add .*\\Control\\TerminalServer\\WinStations\\RDP-Tcp.* /v PortNumber /t  REG_DWORD /d 443 /f`))
+($selection.principal.process.file.full_path = "C:\\Windows\\System32\\cmd.exe" and $selection.target.process.file.full_path = "C:\\Windows\\System32\\reg.exe" and re.regex($selection.target.process.command_line, `reg  add .*\\Control\\TerminalServer\\WinStations\\RDP-Tcp.* /v PortNumber /t  REG_DWORD /d 443 /f`))
 
   condition:
     $selection

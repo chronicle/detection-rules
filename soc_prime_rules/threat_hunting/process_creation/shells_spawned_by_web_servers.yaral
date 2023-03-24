@@ -10,7 +10,7 @@ rule shells_spawned_by_web_servers {
     mitre = "privilege_escalation, persistence, t1100"
 
   events:
-((re.regex($selection.src.process.file.full_path, `.*\\w3wp\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\httpd\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\nginx\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\php-cgi\.exe`)) and (re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\sh\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\bash\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+((re.regex($selection.principal.process.file.full_path, `.*\\w3wp\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\httpd\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\nginx\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\php-cgi\.exe`)) and (re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\sh\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\bash\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
 
   condition:
     $selection

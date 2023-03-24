@@ -10,7 +10,7 @@ rule mmc_spawning_windows_shell {
     mitre = "lateral_movement, t1175"
 
   events:
-(re.regex($selection.src.process.file.full_path, `.*\\mmc\.exe`) and (re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\wscript\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\cscript\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\sh\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\bash\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\reg\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\regsvr32\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\BITSADMIN.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
+(re.regex($selection.principal.process.file.full_path, `.*\\mmc\.exe`) and (re.regex($selection.target.process.file.full_path, `.*\\cmd\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\wscript\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\cscript\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\sh\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\bash\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\reg\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\regsvr32\.exe`) or re.regex($selection.target.process.file.full_path, `.*\\BITSADMIN.*`)) and ($selection.metadata.product_event_type = "4688" or $selection.metadata.product_event_type = "1"))
 
   condition:
     $selection

@@ -10,7 +10,7 @@ rule ole_controls_registered_via_regsvr32exe_sysmon_behavior {
     mitre = "defense_evasion, execution, t1117"
 
   events:
-($selection1.metadata.product_event_type = "1" and $selection1.target.process.file.full_path = "C:\\Windows\\system32\\regsvr32.exe" and re.regex($selection1.target.process.command_line, `regsvr32\.exe /s /u /i:.* .*\.dll`) and $selection1.src.process.file.full_path = "C:\\Windows\\System32\\cmd.exe")
+($selection1.metadata.product_event_type = "1" and $selection1.target.process.file.full_path = "C:\\Windows\\system32\\regsvr32.exe" and re.regex($selection1.target.process.command_line, `regsvr32\.exe /s /u /i:.* .*\.dll`) and $selection1.principal.process.file.full_path = "C:\\Windows\\System32\\cmd.exe")
 
   condition:
     $selection1

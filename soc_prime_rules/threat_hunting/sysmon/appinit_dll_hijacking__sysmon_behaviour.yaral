@@ -10,7 +10,7 @@ rule appinit_dll_hijacking_sysmon_behaviour {
     mitre = "T1103, T1055"
 
   events:
-($selection.src.process.file.full_path = "C:\\Windows\\System32\\cmd.exe" and $selection.target.process.file.full_path = "C:\\Windows\\System32\\reg.exe" and (re.regex($selection.target.process.command_line, `.*HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\LoadAppInit_DLLs.*`) or re.regex($selection.target.process.command_line, `.*HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\LoadAppInit_DLLs.*`) or re.regex($selection.target.process.command_line, `.*HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\WindowsAppInit_DLLs.*`) or re.regex($selection.target.process.command_line, `.*HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\AppInit_DLLs.*`)))
+($selection.principal.process.file.full_path = "C:\\Windows\\System32\\cmd.exe" and $selection.target.process.file.full_path = "C:\\Windows\\System32\\reg.exe" and (re.regex($selection.target.process.command_line, `.*HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\LoadAppInit_DLLs.*`) or re.regex($selection.target.process.command_line, `.*HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\LoadAppInit_DLLs.*`) or re.regex($selection.target.process.command_line, `.*HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\WindowsAppInit_DLLs.*`) or re.regex($selection.target.process.command_line, `.*HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\AppInit_DLLs.*`)))
 
   condition:
     $selection

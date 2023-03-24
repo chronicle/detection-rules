@@ -10,7 +10,7 @@ rule anomalous_invocation_of_cmdexe {
     mitre = "defense_evasion"
 
   events:
-(re.regex($selection1.target.process.file.full_path, `.*cmd\.exe`) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (re.regex($selection1.src.process.file.full_path, `.*rundll32\.exe`) or re.regex($selection1.src.process.file.full_path, `.*httpd\.exe`) or re.regex($selection1.src.process.file.full_path, `.*svchost\.exe`) or re.regex($selection1.src.process.file.full_path, `.*w3wp\.exe`)))
+(re.regex($selection1.target.process.file.full_path, `.*cmd\.exe`) and ($selection1.metadata.product_event_type = "4688" or $selection1.metadata.product_event_type = "1") and (re.regex($selection1.principal.process.file.full_path, `.*rundll32\.exe`) or re.regex($selection1.principal.process.file.full_path, `.*httpd\.exe`) or re.regex($selection1.principal.process.file.full_path, `.*svchost\.exe`) or re.regex($selection1.principal.process.file.full_path, `.*w3wp\.exe`)))
 
   condition:
     $selection1

@@ -10,7 +10,7 @@ rule diskshadow_and_vshadow_launch_detection {
     mitre = "Credential Access, t1003, Persistence, t1060, t1053"
 
   events:
-(re.regex($selection1.src.process.file.full_path, `.*\\vshadow\.exe`) or re.regex($selection1.src.process.file.full_path, `.*\\diskshadow\.exe`) or (re.regex($selection1.target.process.command_line, `.*vshadow\.exe -nw -exec=.*`) or re.regex($selection1.target.process.command_line, `.*diskshadow\.exe /s \?:\\\\.*`)))
+(re.regex($selection1.principal.process.file.full_path, `.*\\vshadow\.exe`) or re.regex($selection1.principal.process.file.full_path, `.*\\diskshadow\.exe`) or (re.regex($selection1.target.process.command_line, `.*vshadow\.exe -nw -exec=.*`) or re.regex($selection1.target.process.command_line, `.*diskshadow\.exe /s \?:\\\\.*`)))
 
   condition:
     $selection1

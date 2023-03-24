@@ -10,7 +10,7 @@ rule remote_access_to_ssh_ftp_sftp_applications {
     mitre = "t1078, persistence, privilege_escalation, initial_access"
 
   events:
-((($selection.src.application = "ssh" or $selection.src.application = "sftp" or $selection.src.application = "ftp") and ($selection.target.ip = "172.16.0.0/16" or $selection.target.ip = "192.168.0.0/16" or $selection.target.ip = "10.0.0.0/8")) or ((($selection.target.port = "22" or $selection.target.port = "21") and ($selection.target.ip = "172.16.0.0/16" or $selection.target.ip = "192.168.0.0/16" or $selection.target.ip = "10.0.0.0/8")) and not (($selection.principal.ip = "allowed ip address list" or $selection.principal.ip = "172.16.0.0/16" or $selection.principal.ip = "192.168.0.0/16" or $selection.principal.ip = "10.0.0.0/8"))))
+((($selection.principal.application = "ssh" or $selection.principal.application = "sftp" or $selection.principal.application = "ftp") and ($selection.target.ip = "172.16.0.0/16" or $selection.target.ip = "192.168.0.0/16" or $selection.target.ip = "10.0.0.0/8")) or ((($selection.target.port = "22" or $selection.target.port = "21") and ($selection.target.ip = "172.16.0.0/16" or $selection.target.ip = "192.168.0.0/16" or $selection.target.ip = "10.0.0.0/8")) and not (($selection.principal.ip = "allowed ip address list" or $selection.principal.ip = "172.16.0.0/16" or $selection.principal.ip = "192.168.0.0/16" or $selection.principal.ip = "10.0.0.0/8"))))
 
   condition:
     $selection

@@ -10,7 +10,7 @@ rule suspicious_parent_of_cscexe {
     mitre = "defense_evasion, t1036"
 
   events:
-($selection.metadata.product_event_type = "1" and re.regex($selection.target.process.file.full_path, `.*\\csc\.exe.*`) and (re.regex($selection.src.process.file.full_path, `.*\\wscript\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\cscript\.exe`) or re.regex($selection.src.process.file.full_path, `.*\\mshta\.exe`)))
+($selection.metadata.product_event_type = "1" and re.regex($selection.target.process.file.full_path, `.*\\csc\.exe.*`) and (re.regex($selection.principal.process.file.full_path, `.*\\wscript\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\cscript\.exe`) or re.regex($selection.principal.process.file.full_path, `.*\\mshta\.exe`)))
 
   condition:
     $selection

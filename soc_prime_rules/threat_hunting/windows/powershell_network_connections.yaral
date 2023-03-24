@@ -9,7 +9,7 @@ rule powershell_network_connections {
     service = "sysmon"
 
   events:
-(($selection.metadata.product_event_type = "3" and re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`)) and not ((re.regex($selection.target.ip, `10\..*`) or re.regex($selection.target.ip, `192\.168\..*`) or re.regex($selection.target.ip, `172\..*`) or $selection.target.ip = "127.0.0.1") and $selection.target.ip = "false" and $selection.src.user.user_display_name = "NT AUTHORITY\\SYSTEM"))
+(($selection.metadata.product_event_type = "3" and re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`)) and not ((re.regex($selection.target.ip, `10\..*`) or re.regex($selection.target.ip, `192\.168\..*`) or re.regex($selection.target.ip, `172\..*`) or $selection.target.ip = "127.0.0.1") and $selection.target.ip = "false" and $selection.principal.user.user_display_name = "NT AUTHORITY\\SYSTEM"))
 
   condition:
     $selection

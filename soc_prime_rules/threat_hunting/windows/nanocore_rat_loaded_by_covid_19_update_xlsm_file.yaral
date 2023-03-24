@@ -10,7 +10,7 @@ rule nanocore_rat_loaded_by_covid19_update_xlsm_file {
     mitre = "T1086, T1064, T1105"
 
   events:
-(re.regex($selection.src.process.file.full_path, `.*\\excel\.exe`) and re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) and re.regex($selection.target.process.command_line, `.*-executionpolicy bypass -W Hidden -command \(new-object System\.Net\.WebClient\)\.DownloadFile\(.*gbud\.webd\.pl/cli/.*\.exe.*,$env:Temp\+.*\.exe.*\);\(New-Object -com Shell\.Application\)\.ShellExecute\($env:Temp\+.*\.exe.*\)`))
+(re.regex($selection.principal.process.file.full_path, `.*\\excel\.exe`) and re.regex($selection.target.process.file.full_path, `.*\\powershell\.exe`) and re.regex($selection.target.process.command_line, `.*-executionpolicy bypass -W Hidden -command \(new-object System\.Net\.WebClient\)\.DownloadFile\(.*gbud\.webd\.pl/cli/.*\.exe.*,$env:Temp\+.*\.exe.*\);\(New-Object -com Shell\.Application\)\.ShellExecute\($env:Temp\+.*\.exe.*\)`))
 
   condition:
     $selection

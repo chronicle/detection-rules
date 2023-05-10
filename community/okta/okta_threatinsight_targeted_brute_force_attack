@@ -1,0 +1,36 @@
+rule okta_threatinsight_targeted_brute_force_attack {
+
+  meta:
+    author = "Chronicle Security"
+    description = "Okta ThreatInsight detects access requests from known malicious IPs targeting a specific org."
+    reference = "https://help.okta.com/en-us/Content/Topics/Security/threat-insight/configure-threatinsight-system-log.htm"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Brute Force"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $bruteforce.metadata.product_name = "Okta"
+    $bruteforce.metadata.vendor_name = "Okta"
+    $bruteforce.metadata.event_type = "USER_UNCATEGORIZED"
+    $bruteforce.metadata.product_event_type = "security.attack.start"
+    $bruteforce.principal.user.userid = $userid
+
+  match:
+    $userid over 1h
+
+  outcome:
+    $mitre_attack_tactic = array_distinct("Credential Access")
+    $mitre_attack_technique = array_distinct("Brute Force")
+    $principal_user_userid = array_distinct($bruteforce.principal.user.userid)
+    $principal_user_email_addresses = array_distinct($bruteforce.principal.user.email_addresses)
+    $security_result_summary = array_distinct($bruteforce.security_result.summary)
+    $security_result_severity = array_distinct($bruteforce.security_result.severity)
+
+  condition:
+    $bruteforce
+}

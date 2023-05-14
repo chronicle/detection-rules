@@ -1,7 +1,7 @@
 rule fireeye_red_team_tool__modified_impacket_smbexec_via_cmdline {
  meta:
     author = "SOC Prime Team, FireEye"
-    description = "This rule has been ported from Fireeye's HXIOC format to SIGMA. It detects a modified implmentation of SMBEXEC by FireEye.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    description = "This rule has been ported from Fireeye's HXIOC format to SIGMA. It detects a modified implementation of SMBEXEC by FireEye.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
     reference = "https://tdm.socprime.com/tdm/info/s9SkiVROFfIJ"
     version = "0.01"
     created = "2021-03-09"

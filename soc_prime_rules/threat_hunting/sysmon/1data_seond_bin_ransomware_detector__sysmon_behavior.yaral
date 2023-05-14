@@ -1,7 +1,7 @@
 rule data_seondbin_ransomware_detector_sysmon_behavior {
  meta:
     author = "Lee Archinal"
-    description = "This content detects charactaristics of a strain of malware that focuses on 1data_seond.bin file  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    description = "This content detects characteristics of a strain of malware that focuses on 1data_seond.bin file  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
     reference = "https://tdm.socprime.com/tdm/info/amTLjZ42fdAs"
     version = "0.01"
     created = "2019/06/13"

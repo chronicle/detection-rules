@@ -1,7 +1,7 @@
 rule stop_ransomware_and_vidar_ransomware_detection {
  meta:
     author = "Ariel Millahuel"
-    description = "This rule detects the behavior of a combination between STOP Ransomware and Vidar Ransomware. Both threats are used in combination in order to steal information after a phishing attack was succesfully executed  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    description = "This rule detects the behavior of a combination between STOP Ransomware and Vidar Ransomware. Both threats are used in combination in order to steal information after a phishing attack was successfully executed  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
     reference = "https://tdm.socprime.com/tdm/info/eLntKUKd5pKY"
     version = "0.01"
     created = "2021-03-09"

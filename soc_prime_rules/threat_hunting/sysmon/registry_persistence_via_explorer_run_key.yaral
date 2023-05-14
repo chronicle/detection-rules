@@ -1,7 +1,7 @@
 rule registry_persistence_via_explorer_run_key {
  meta:
     author = "Florian Roth"
-    description = "Detects a possible persistence mechanism using RUN key for Windows Explorer and poiting to a suspicious folder  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    description = "Detects a possible persistence mechanism using RUN key for Windows Explorer and pointing to a suspicious folder  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
     reference = "https://tdm.socprime.com/tdm/info/SZRBqzOpfBHs"
     version = "0.01"
     created = "2018/07/18"

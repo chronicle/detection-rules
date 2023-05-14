@@ -1,7 +1,7 @@
 rule poetrat_pythonrat_uses_covid19_lure {
  meta:
     author = "Emir Erdogan"
-    description = "Covid19 theme phishing document drop pyhton and execute malware by python  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    description = "Covid19 theme phishing document drop python and execute malware by python  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
     reference = "https://tdm.socprime.com/tdm/info/9l7TeSLJabOP"
     version = "0.01"
     created = "2021-03-09"

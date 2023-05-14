@@ -23,7 +23,7 @@ rule ttp_sshLateralMovement {
     // assets.   Strong IAM policies can prevent this technique's efficacy.
     //
     //
-    // This rule triggers on the presense of a new ssh-keys metadata addition.
+    // This rule triggers on the presence of a new ssh-keys metadata addition.
     //
     // Known False Positives:
     //    Legitimate processes used to provision SSH access.

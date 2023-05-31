@@ -1,0 +1,74 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule mitre_attack_T1021_002_windows_admin_share_with_asset_entity {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Net use commands for SMB/Windows admin shares based on asset entity group"
+    mitre_attack_tactic = "Lateral Movement"
+    mitre_attack_technique = "Remote Services: SMB/Windows Admin Shares"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1021/002/"
+    mitre_attack_version = "v13.1"
+    type = "alert"
+    tags = "asset entity"
+    platform = "Windows"
+    assumption = "Assumes ingestion of Windows assets to entity graph"
+    data_source = "microsoft sysmon, microsoft windows events"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $process.metadata.event_type = "PROCESS_LAUNCH"
+    $process.target.process.command_line = /net.*use.*(C|ADMIN|IPC)\$/ nocase
+    $process.principal.ip = $ip
+
+    // Correlate with asset entity data
+    $asset.graph.entity.ip = $ip
+    $asset.graph.metadata.entity_type = "ASSET"
+    $asset.graph.metadata.source_type = "ENTITY_CONTEXT"
+    $asset.graph.entity.asset.platform_software.platform = "WINDOWS"
+    // Can be modified to focus rule on different groups or removed if not needed
+    $asset.graph.relations.entity.group.group_display_name = "Domain Computers"
+
+  match:
+    $ip over 5m
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = array_distinct("Lateral Movement")
+    $mitre_attack_technique = array_distinct("Remote Services: SMB/Windows Admin Shares")
+    $mitre_attack_technique_id = array_distinct("T1021.002")
+    $event_count = count_distinct($process.metadata.id)
+    // added to populate alert graph with additional context
+    // Commented out principal.hostname because principal.ip is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$principal_hostname = array_distinct($process.principal.hostname)
+    $principal_process_pid = array_distinct($process.principal.process.pid)
+    $principal_process_command_line = array_distinct($process.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
+    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($process.principal.user.userid)
+
+  condition:
+    $process and $asset
+}

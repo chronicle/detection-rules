@@ -5,6 +5,8 @@ This repository contains sample detection rules for use within Chronicle.
 Rules within the [soc_prime_rules](soc_prime_rules) directory were created by
 SOC Prime and made available to Chronicle Customers.
 
+Rules within the [community](community) directory were created by the Security Adoption engineering team. These rules take advantage of the latest YARA-L syntax, provide a starter set of rules that can be used with Chronicle's entity graph as well as for other use cases or as inspiration for new use cases.
+
 ## Getting Started
 
 Rules can be created within your Chronicle instance by using the Rules Editor.

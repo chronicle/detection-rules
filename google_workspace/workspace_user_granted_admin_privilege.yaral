@@ -25,7 +25,7 @@ rule workspace_user_granted_admin_privilege {
     $workspace.metadata.vendor_name        = "Google Workspace"
     $workspace.metadata.product_name       = /admin/ nocase
     $workspace.metadata.product_event_type = /assign_role/ nocase
-    $workspace.about.labels.key            = "role_name"
+    $workspace.about.labels.key            = "role_name" nocase
 
     //this is a generic regex match of all possible Admin Roles, please see above URL to restrict to specific roles if required
     $workspace.about.labels.value          = /_ADMIN_ROLE/ nocase

@@ -22,15 +22,15 @@ rule workspace_admin_login_without_2fa {
     tactics = "M1032"
 
   events:
-    $workspace.metadata.vendor_name        = "Google Workspace"
-    $workspace.metadata.event_type         = "USER_LOGIN"
+    $workspace.metadata.vendor_name             = "Google Workspace"
+    $workspace.metadata.event_type              = "USER_LOGIN"
     // contextual enrichment comes from the WORKSPACE_USERS integration
-    $workspace.target.user.user_role       = "ADMINISTRATOR"
-    $workspace.security_result.action      = "ALLOW"
-    $workspace.target.user.email_addresses = $superUser
+    $workspace.target.user.attribute.roles.type = "ADMINISTRATOR"
+    $workspace.security_result.action           = "ALLOW"
+    $workspace.target.user.email_addresses      = $superUser
 
-    any $workspace.about.labels.key = "is_second_factor"
-    any $workspace.about.labels.value = "false"
+    any $workspace.about.user.attribute.labels.key   = "is_second_factor"
+    any $workspace.about.user.attribute.labels.value = "false"
 
     //Exclusions
     // - add excluded users here

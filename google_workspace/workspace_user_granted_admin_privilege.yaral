@@ -22,13 +22,13 @@ rule workspace_user_granted_admin_privilege {
     url = "https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-delegated-admin-settings"
 
   events:
-    $workspace.metadata.vendor_name        = "Google Workspace"
-    $workspace.metadata.product_name       = /admin/ nocase
-    $workspace.metadata.product_event_type = /assign_role/ nocase
-    $workspace.about.labels.key            = "role_name"
+    $workspace.metadata.vendor_name              = "Google Workspace"
+    $workspace.metadata.product_name             = /admin/ nocase
+    $workspace.metadata.product_event_type       = /assign_role/ nocase
+    $workspace.about.user.attribute.labels.key   = "role_name"
 
     //this is a generic regex match of all possible Admin Roles, please see above URL to restrict to specific roles if required
-    $workspace.about.labels.value          = /_ADMIN_ROLE/ nocase
+    $workspace.about.user.attribute.labels.value = /_ADMIN_ROLE/ nocase
 
   condition:
     $workspace

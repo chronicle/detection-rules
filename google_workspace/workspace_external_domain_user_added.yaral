@@ -23,9 +23,9 @@ rule workspace_external_domain_user_added {
   events:
     $workspace.metadata.vendor_name = "Google Workspace"
     $workspace.metadata.product_event_type = "ADD_GROUP_MEMBER"
-    $workspace.about.labels.key = "USER_EMAIL"
+    $workspace.about.user.attribute.labels.key = "USER_EMAIL"
     //Please replace @YOURDOMAIN with your actual domain
-    not $workspace.about.labels.value = /@YOURDOMAIN/ nocase
+    not $workspace.about.user.attribute.labels.value = /@YOURDOMAIN/ nocase
 
   condition:
     $workspace

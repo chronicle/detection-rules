@@ -30,8 +30,8 @@ rule workspace_public_documents {
     // - shared_externally, Shared with explicit users/groups external to the domain.
 
     (
-        any $workspace.about.labels.key = "visibility" and
-        any $workspace.about.labels.value = "public_on_the_web"
+        any $workspace.about.user.attribute.labels.key   = "visibility" and
+        any $workspace.about.user.attribute.labels.value = "public_on_the_web"
     )
 
     // exclude view and download for already existing public documents

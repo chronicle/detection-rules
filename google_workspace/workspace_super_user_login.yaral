@@ -21,11 +21,11 @@ rule workspace_super_user_login {
     severity = "HIGH"
 
   events:
-    $workspace.metadata.vendor_name        = "Google Workspace"
-    $workspace.metadata.event_type         = "USER_LOGIN"
-    $workspace.target.user.user_role       = "ADMINISTRATOR"
-    $workspace.security_result.action      = "ALLOW"
-    $workspace.target.user.email_addresses = $superUser
+    $workspace.metadata.vendor_name             = "Google Workspace"
+    $workspace.metadata.event_type              = "USER_LOGIN"
+    $workspace.target.user.attribute.roles.type = "ADMINISTRATOR"
+    $workspace.security_result.action           = "ALLOW"
+    $workspace.target.user.email_addresses      = $superUser
 
     //Exclusions
     // - add excluded users here

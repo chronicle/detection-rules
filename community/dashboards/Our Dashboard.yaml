@@ -1,0 +1,366 @@
+lookml:
+- dashboard: our_dashboard
+  description: ""
+  elements:
+  - col: 0
+    column_limit: 50
+    defaults_version: 1
+    explore: events
+    fields:
+    - events__principal__ip.events__principal__ip
+    - events__target__ip.events__target__ip
+    - events.count
+    filters:
+      events.metadata__event_type_enum_name: '"NETWORK_CONNECTION"'
+      events__target__ip.events__target__ip: -8.8.8.8,-9.9.9.9
+    height: 6
+    label_density: 25
+    legend_position: center
+    limit: 10
+    limit_displayed_rows: false
+    listen:
+      Time Range: events.time_filter
+    model: cn
+    name: Top Talkers by Count - Principal -> Target IP
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 11
+    show_null_labels: false
+    show_silhouette: false
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - events.count desc 0
+    stacking: ""
+    title: Top Talkers by Count - Principal -> Target IP
+    totals_color: '#808080'
+    trellis: ""
+    type: looker_bar
+    width: 16
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 0
+    column_limit: 50
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: rule_detections
+    fields:
+    - rule_detections.severity_int
+    - rule_detections.severity_visual
+    - rule_detections.count
+    filters:
+      rule_detections.severity_visual: -EMPTY
+    header_font_size: 12
+    header_text_alignment: left
+    height: 4
+    hidden_fields:
+    - rule_detections.severity_int
+    hide_row_totals: false
+    hide_totals: false
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time Range: rule_detections.detection__detection_timestamp_date
+    model: cn
+    name: Detections By Severity
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 1
+    rows_font_size: 12
+    show_null_labels: false
+    show_row_numbers: true
+    show_silhouette: false
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - rule_detections.severity_int
+    stacking: ""
+    table_theme: white
+    title: Detections By Severity
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_text: true
+    type: looker_grid
+    width: 6
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 16
+    column_limit: 50
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    dynamic_fields:
+    - _kind_hint: dimension
+      _type_hint: number
+      category: dimension
+      dimension: total_bytes
+      expression: ${events.network__received_bytes} + ${events.network__sent_bytes}
+      label: Total Bytes
+      value_format: null
+      value_format_name: null
+    - _kind_hint: measure
+      _type_hint: number
+      based_on: total_bytes
+      category: measure
+      expression: null
+      label: Sum of Total Bytes
+      measure: sum_of_total_bytes
+      type: sum
+      value_format: null
+      value_format_name: null
+    - _kind_hint: measure
+      _type_hint: number
+      args:
+      - sum_of_total_bytes
+      based_on: sum_of_total_bytes
+      calculation_type: percent_of_column_sum
+      category: table_calculation
+      label: Percent of  Sum of Total Bytes
+      source_field: sum_of_total_bytes
+      table_calculation: percent_of_sum_of_total_bytes
+      value_format: null
+      value_format_name: percent_0
+    - _kind_hint: measure
+      _type_hint: number
+      args:
+      - events.count
+      based_on: events.count
+      calculation_type: percent_of_column_sum
+      category: table_calculation
+      label: Percent of UDM Count
+      source_field: events.count
+      table_calculation: percent_of_udm_count
+      value_format: null
+      value_format_name: percent_0
+    enable_conditional_formatting: false
+    explore: events
+    fields:
+    - events__principal__ip.events__principal__ip
+    - events.count
+    - sum_of_total_bytes
+    filters:
+      events.metadata__event_type_enum_name: '"NETWORK_CONNECTION"'
+      events.network__received_bytes: NOT NULL
+      events.network__sent_bytes: NOT NULL
+    header_font_size: 12
+    header_text_alignment: left
+    height: 4
+    hide_row_totals: false
+    hide_totals: false
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time Range: events.time_filter
+    model: cn
+    name: IP Address by Sum of Total Bytes
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 11
+    rows_font_size: 12
+    show_null_labels: false
+    show_row_numbers: true
+    show_silhouette: false
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - events.count desc 0
+    stacking: ""
+    table_theme: white
+    title: IP Address by Sum of Total Bytes
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_text: true
+    type: looker_grid
+    width: 8
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 6
+    column_limit: 50
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: rule_detections
+    fields:
+    - rule_detections.count
+    - rule_detections.detection__detection_timestamp_date
+    - rule_detections.severity
+    fill_fields:
+    - rule_detections.detection__detection_timestamp_date
+    filters:
+      rule_detections.severity_visual: -EMPTY
+    header_font_size: 12
+    header_text_alignment: left
+    height: 8
+    hidden_fields: []
+    hidden_pivots: {}
+    hide_row_totals: false
+    hide_totals: false
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time Range: rule_detections.detection__detection_timestamp_date
+    model: cn
+    name: Detections By Severity By Date
+    ordering: none
+    pivots:
+    - rule_detections.severity
+    plot_size_by_field: false
+    point_style: none
+    row: 1
+    rows_font_size: 12
+    show_null_labels: false
+    show_null_points: true
+    show_row_numbers: true
+    show_silhouette: false
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - rule_detections.severity
+    - rule_detections.detection__detection_timestamp_date desc
+    stacking: ""
+    table_theme: white
+    title: Detections By Severity By Date
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_text: true
+    type: looker_area
+    width: 18
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - body_text: |+
+      <img src="https://support.chronicle.security/resource/1667925630000/Chronicle_Logo" width="95%">
+
+    col: 0
+    height: 4
+    name: ""
+    row: 5
+    subtitle_text: ""
+    title_text: ""
+    type: text
+    width: 6
+  - col: 7
+    height: 1
+    name: button_16974
+    rich_content_json: '{"text":"Main Dashboard","description":"","newTab":true,"alignment":"center","size":"medium","style":"FILLED","color":"#8997b4","href":"https://demo.backstory.chronicle.security/dashboards?name=c16%3A%3Amain&time=5+day"}'
+    row: 0
+    type: button
+    width: 4
+  - col: 12
+    height: 1
+    name: button_16975
+    rich_content_json: '{"text":"Rule Detections","description":"","newTab":true,"alignment":"center","size":"medium","style":"FILLED","color":"#8997b4","href":"https://demo.backstory.chronicle.security/dashboards?name=c16%3A%3Arule_detections&time=5+day"}'
+    row: 0
+    type: button
+    width: 4
+  - body_text: '[{"type":"h1","children":[{"text":"Detection Status","color":"hsl(0,
+      0%, 78%)"}]}]'
+    col: 0
+    height: 1
+    name: ' (2)'
+    rich_content_json: '{"format":"slate"}'
+    row: 0
+    subtitle_text: ""
+    title_text: ""
+    type: text
+    width: 7
+  - body_text: '[{"type":"h1","children":[{"text":"Network Traffic","color":"hsl(0,
+      0%, 78%)"}]},{"type":"h2","children":[{"text":"Talkers","color":"hsl(0, 0%,
+      78%)"}],"id":1698179822760}]'
+    col: 0
+    height: 2
+    name: ' (3)'
+    rich_content_json: '{"format":"slate"}'
+    row: 9
+    subtitle_text: ""
+    title_text: ""
+    type: text
+    width: 18
+  filters:
+  - allow_multiple_values: false
+    default_value: ""
+    explore: events
+    field: events.time_filter
+    listens_to_filters: []
+    model: cn
+    name: Time Range
+    required: false
+    title: Time Range
+    type: field_filter
+    ui_config:
+      display: popover
+      options: []
+      type: advanced
+  layout: newspaper
+  title: Our Dashboard
+metadata:
+  exported_at: "2023-10-24T16:50:24-07:00"
+  file_fingerprint: "153707028860267975385249711012121579299"
+  looker_version: 23.16.30
+  version: "1"

@@ -1,7 +1,7 @@
 rule msiexec_web_install {
  meta:
     author = "Florian Roth"
-    description = "Detects suspicious msiexec process starts with web addreses as parameter  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    description = "Detects suspicious msiexec process starts with web addresses as parameter  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
     reference = "https://tdm.socprime.com/tdm/info/T5M5JJ1YfyiQ"
     version = "0.01"
     created = "2018/02/09"

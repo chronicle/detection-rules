@@ -16,11 +16,11 @@
 
 rule ttp_logDeletion {
   meta:
-    // Routine log rotation can be a normal occurance and is not in itself
-    // malicious however it can also signal the presense of an attacker
-    // attemping to clean up their activity.
+    // Routine log rotation can be a normal occurrence and is not in itself
+    // malicious however it can also signal the presence of an attacker
+    // attempting to clean up their activity.
     //
-    // This rule triggers on the presense of a log deletion GCP audit event.
+    // This rule triggers on the presence of a log deletion GCP audit event.
     //
     // Known False Positives:
     //    Routine log rotation functions, to address these consider adding

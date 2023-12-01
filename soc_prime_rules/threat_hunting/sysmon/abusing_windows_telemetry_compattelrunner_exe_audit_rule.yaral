@@ -1,7 +1,7 @@
 rule abusing_windows_telemetry_compattelrunnerexeaudit_rule {
  meta:
     author = "Den Iuzvyk"
-    description = "Detects abusing of CompatTelRunner.exe for persistance.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
+    description = "Detects abusing of CompatTelRunner.exe for persistence.  License: https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md."
     reference = "https://tdm.socprime.com/tdm/info/0ZXi5CE8Zkwb"
     version = "0.01"
     created = "2020/04/09"

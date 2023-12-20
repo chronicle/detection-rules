@@ -30,7 +30,7 @@ rule gcp_audit_config_changes {
 
     //capture variables
     $gcp.target.resource.name = $resourceName
-    $gcp.target.cloud.project.name = $projectName
+    $gcp.target.resource_ancestors.name = $projectName
 
     // exclude system account changes
     not ( $gcp.principal.user.email_addresses = /system.gserviceaccount.com/ )

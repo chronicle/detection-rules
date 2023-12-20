@@ -35,7 +35,7 @@ rule gcp_gcs_public_accessible {
 
     //capture variables
     $gcp.target.resource.name = $resourceName
-    $gcp.target.cloud.project.name = $projectName
+    $gcp.target.resource_ancestors.name = $projectName
 
     //exclusions
     //not ($cis.principal.user.email_addresses = /gserviceaccount.com/

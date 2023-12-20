@@ -32,7 +32,7 @@ rule gcp_dns_modification {
 
     //capture variables
     $gcp.target.resource.name = $resourceName
-    $gcp.target.cloud.project.name = $projectName
+    $gcp.target.resource_ancestors.name = $projectName
 
     // exclude system account changes
     not (

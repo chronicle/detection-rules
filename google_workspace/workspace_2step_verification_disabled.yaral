@@ -23,11 +23,11 @@ rule workspace_2step_verification_disabled {
     url = "https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings#ALLOW_STRONG_AUTHENTICATION"
 
   events:
-    $workspace.metadata.vendor_name        = "Google Workspace"
-    $workspace.metadata.product_name       = /admin/ nocase
-    $workspace.metadata.product_event_type = /enforce_strong_authentication/ nocase
-    $workspace.about.labels.key            = "new_value"
-    $workspace.about.labels.value          = "false"
+    $workspace.metadata.vendor_name              = "Google Workspace"
+    $workspace.metadata.product_name             = /admin/ nocase
+    $workspace.metadata.product_event_type       = /enforce_strong_authentication/ nocase
+    $workspace.about.user.attribute.labels.key   = "new_value"
+    $workspace.about.user.attribute.labels.value = "false"
 
   condition:
     $workspace

@@ -30,7 +30,7 @@ rule gcp_vpc_network_route_changes {
 
     //capture variables
     $gcp.target.resource.name = $resourceName
-    $gcp.target.cloud.project.name = $projectName
+    $gcp.target.resource_ancestors.name = $projectName
 
     //exclusions
     //not principal.user.email_addresses = /add_excluded_accounts_here/

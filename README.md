@@ -38,7 +38,7 @@ rules and updates to existing rules.
 
 Please refer to our [contribution guide](CONTRIBUTING.md) for further information.
 
-Our style guide for authoring YARA-L detection rules can be found [here](STYLE_GUIDE.md).
+Our style guide for authoring YARA-L detection rules can be found [here](STYLE_GUIDE.md)
 
 ## Documentation
 

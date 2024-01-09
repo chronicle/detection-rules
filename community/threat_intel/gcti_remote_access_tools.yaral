@@ -21,7 +21,7 @@ rule gcti_remote_access_tools {
     description = "Alert process and file create events that are associated with hashes from the GCTI Remote Access Tool list"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Remote Access Software"
-    mitre_attach_url = "https://attack.mitre.org/techniques/T1219/"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1219/"
     mitre_attack_version = "v13.1"
     type = "alert"
     tags = "rat"

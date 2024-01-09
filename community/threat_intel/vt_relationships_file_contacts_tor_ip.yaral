@@ -21,7 +21,7 @@ rule vt_relationships_file_contacts_tor_ip {
     description = "Alert on known Hash contacting Tor IP with VT Relationships."
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Proxy: Multi-hop Proxy"
-    mitre_attach_url = "https://attack.mitre.org/techniques/T1090/003/"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"
     mitre_attack_version = "v13.1"
     type = "alert"
     tags = "vt, tor"

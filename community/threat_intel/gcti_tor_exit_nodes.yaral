@@ -21,7 +21,7 @@ rule gcti_tor_exit_nodes {
     description = "Alert traffic destined for known Tor exit nodes"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Proxy: Multi-hop Proxy"
-    mitre_attach_url = "https://attack.mitre.org/techniques/T1090/003/"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"
     mitre_attack_version = "v13.1"
     type = "alert"
     tags = "tor"

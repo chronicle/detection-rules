@@ -21,7 +21,7 @@ rule chrome_browser_safe_browsing_user_bypass {
     description = "Detects and alerts on users bypassing Chrome Safe Browsing warnings and accessing potentially dangerous content or downloads"
     mitre_attack_tactic = "Initial Access"
     mitre_attack_technique = "Phishing: Spearphishing Link"
-    mitre_attach_url = "https://attack.mitre.org/techniques/T1566/002/"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1566/002/"
     mitre_attack_version = "v14.1"
     type = "alert"
     tags = "chrome enterprise"

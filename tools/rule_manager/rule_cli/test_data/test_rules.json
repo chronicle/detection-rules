@@ -1,0 +1,65 @@
+[
+    {
+        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_079f0681-523d-487f-ac4e-64a266f7a2d0",
+        "revisionId": "v_1705363627_913199000",
+        "displayName": "okta_suspicious_use_of_a_session_cookie",
+        "text": "/*\n * Copyright 2023 Google LLC\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *     https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nrule okta_suspicious_use_of_a_session_cookie {\n\n  meta:\n    author = \"Google Cloud Security\"\n    description = \"Detects when an adversary attempts to reuse a stolen web session cookie in a different device that has a different OS, IP, Browser or User Agent.\"\n    reference = \"https://sec.okta.com/sessioncookietheft\"\n    mitre_attack_tactic = \"Credential Access\"\n    mitre_attack_technique = \"Steal Web Session Cookie\"\n    mitre_attack_url = \"https://attack.mitre.org/techniques/T1539/\"\n    mitre_attack_version = \"v13.1\"\n    type = \"Alert\"\n    data_source = \"Okta\"\n    severity = \"Medium\"\n    priority = \"Medium\"\n\n  events:\n    $login.metadata.product_name = \"Okta\"\n    $login.metadata.vendor_name = \"Okta\"\n    $login.metadata.event_type = \"USER_UNCATEGORIZED\"\n    $login.metadata.product_event_type = \"policy.evaluate_sign_on\"\n    (\n        $login.security_result.action = \"ALLOW\" or\n        $login.security_result.action = \"ALLOW_WITH_MODIFICATION\" or\n        $login.security_result.action = \"CHALLENGE\"\n    )\n    $login.principal.user.userid = $userid\n    $login.security_result.detection_fields[\"dtHash\"] = $dtHash\n\n  match:\n    $userid, $dtHash over 1h\n\n  outcome:\n    $risk_score = max(35)\n    $mitre_attack_tactic = \"Credential Access\"\n    $mitre_attack_technique = \"Steal Web Session Cookie\"\n    $target_os = array_distinct($login.network.http.parsed_user_agent.os)\n    $dc_target_os = count_distinct($login.network.http.parsed_user_agent.os)\n    $target_browser = array_distinct($login.network.http.parsed_user_agent.browser)\n    $dc_target_browser = count_distinct($login.network.http.parsed_user_agent.browser)\n    $target_user_agent = array_distinct($login.network.http.user_agent)\n    $principal_ip = array_distinct($login.principal.ip)\n    $dc_principal_ip = count_distinct($login.principal.ip)\n    $principal_ip_country = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)\n    $principal_ip_state = array_distinct($login.principal.ip_geo_artifact.location.state)\n    $principal_ip_city = array_distinct($login.principal.location.city)\n    $dc_principal_ip_city = count_distinct($login.principal.location.city)\n    $security_result_summary = array_distinct($login.security_result.summary)\n    $principal_user_managers_email_addresses = array_distinct($login.principal.user.managers.email_addresses)\n    $principal_user_userid = array_distinct($login.principal.user.userid)\n\n  condition:\n    $login and $dc_principal_ip > 1 and ($dc_target_browser > 1 or $dc_target_os > 1)\n}\n",
+        "author": "Google Cloud Security",
+        "severity": {
+            "displayName": "Medium"
+        },
+        "metadata": {
+            "mitre_attack_tactic": "Credential Access",
+            "type": "Alert",
+            "mitre_attack_version": "v13.1",
+            "mitre_attack_url": "https://attack.mitre.org/techniques/T1539/",
+            "priority": "Medium",
+            "mitre_attack_technique": "Steal Web Session Cookie",
+            "description": "Detects when an adversary attempts to reuse a stolen web session cookie in a different device that has a different OS, IP, Browser or User Agent.",
+            "reference": "https://sec.okta.com/sessioncookietheft",
+            "data_source": "Okta"
+        },
+        "createTime": "2024-01-16T00:07:07.913199Z",
+        "revisionCreateTime": "2024-01-16T00:07:07.913199Z",
+        "compilationState": "SUCCEEDED",
+        "type": "MULTI_EVENT",
+        "allowedRunFrequencies": [
+            "HOURLY",
+            "DAILY"
+        ],
+        "etag": "CKuRl60GEJifubMD",
+        "deployment_state": {}
+    },
+    {
+        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_26f96ee8-f87c-4103-b28e-dd7bc3c6118e",
+        "revisionId": "v_1704475682_607535000",
+        "displayName": "okta_new_api_token_created",
+        "text": "/*\n * Copyright 2023 Google LLC\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *     https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nrule okta_new_api_token_created {\n\n  meta:\n    author = \"Google Cloud Security\"\n    description = \"Detects when a new API token is created.\"\n    reference = \"https://developer.okta.com/docs/guides/tokens/\"\n    mitre_attack_tactic = \"Defense Evasion, Persistence, Privilege Escalation, Initial Access\"\n    mitre_attack_technique = \"Valid Accounts\"\n    mitre_attack_url = \"https://attack.mitre.org/techniques/T1078/\"\n    mitre_attack_version = \"v13.1\"\n    type = \"Alert\"\n    data_source = \"Okta\"\n    severity = \"Low\"\n    priority = \"Low\"\n    // test\n\n  events:\n    $token.metadata.product_name = \"Okta\"\n    $token.metadata.vendor_name = \"Okta\"\n    $token.metadata.product_event_type = \"system.api_token.create\"\n    $token.security_result.summary = \"Create API token\"\n    $token.security_result.action = \"ALLOW\"\n    $token.principal.user.userid = $userid\n\n  match:\n    $userid over 1h\n\n  outcome:\n    $risk_score = max(35)\n    $mitre_attack_tactic = \"Defense Evasion, Persistence, Privilege Escalation, Initial Access\"\n    $mitre_attack_technique = \"Valid Accounts\"\n    $target_user_agent = array_distinct($token.network.http.user_agent)\n    $principal_ip = array_distinct($token.principal.ip)\n    $principal_ip_country = array_distinct($token.principal.ip_geo_artifact.location.country_or_region)\n    $principal_ip_state = array_distinct($token.principal.ip_geo_artifact.location.state)\n    $principal_ip_city = array_distinct($token.principal.location.city)\n    $principal_user_email_addresses = array_distinct ($token.principal.user.email_addresses)\n    $security_result_summary = array_distinct($token.security_result.summary)\n\n  condition:\n    $token\n}\n",
+        "author": "Google Cloud Security",
+        "severity": {
+            "displayName": "Low"
+        },
+        "metadata": {
+            "data_source": "Okta",
+            "mitre_attack_version": "v13.1",
+            "mitre_attack_url": "https://attack.mitre.org/techniques/T1078/",
+            "type": "Alert",
+            "priority": "Low",
+            "mitre_attack_technique": "Valid Accounts",
+            "description": "Detects when a new API token is created.",
+            "reference": "https://developer.okta.com/docs/guides/tokens/",
+            "mitre_attack_tactic": "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+        },
+        "createTime": "2023-12-19T21:05:23.849551Z",
+        "revisionCreateTime": "2024-01-05T17:28:02.607535Z",
+        "compilationState": "SUCCEEDED",
+        "type": "SINGLE_EVENT",
+        "allowedRunFrequencies": [
+            "LIVE",
+            "HOURLY",
+            "DAILY"
+        ],
+        "etag": "CKL44KwGEJj/2KEC",
+        "deployment_state": {}
+    }
+]

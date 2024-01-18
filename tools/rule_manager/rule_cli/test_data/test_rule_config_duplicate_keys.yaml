@@ -1,0 +1,24 @@
+rule_1:
+  alerting: true
+  archive_time: null
+  archived: false
+  create_time: '2024-01-04T17:57:20.868959Z'
+  enabled: true
+  id: ru_ec6bbdcb-03e8-4889-abb9-a153922c9e71
+  resource_name: projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_ec6bbdcb-03e8-4889-abb9-a153922c9e71
+  revision_create_time: '2024-01-04T17:57:20.868959Z'
+  revision_id: v_1704391040_868959000
+  run_frequency: LIVE
+  type: SINGLE_EVENT
+rule_1:
+  alerting: true
+  archive_time: null
+  archived: false
+  create_time: '2024-01-04T17:57:20.868959Z'
+  enabled: true
+  id: ru_ff140221-ba68-4e53-8a1c-3413d767207a
+  resource_name: projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_ff140221-ba68-4e53-8a1c-3413d767207a
+  revision_create_time: '2024-01-04T17:57:20.868959Z'
+  revision_id: v_1704391040_868959000
+  run_frequency: LIVE
+  type: SINGLE_EVENT

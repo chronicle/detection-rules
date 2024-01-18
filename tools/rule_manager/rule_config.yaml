@@ -1,0 +1,13 @@
+# Example rule config entry
+okta_new_api_token_created:
+  alerting: false
+  archive_time: '2024-01-05T17:28:06.041427Z'
+  archived: true
+  create_time: '2023-12-19T21:05:23.849551Z'
+  enabled: false
+  id: ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1
+  resource_name: projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1
+  revision_create_time: '2024-01-05T17:28:02.607535Z'
+  revision_id: v_1704475682_607535000
+  run_frequency: LIVE
+  type: SINGLE_EVENT

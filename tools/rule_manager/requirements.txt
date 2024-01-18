@@ -1,0 +1,5 @@
+google-auth
+requests
+python-dotenv
+PyYAML
+ruamel.yaml

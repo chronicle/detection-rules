@@ -22,6 +22,7 @@ import logging
 import os
 import pathlib
 import sys
+import time
 
 from chronicle_api import chronicle_auth
 from chronicle_api.rules.verify_rule import verify_rule
@@ -58,7 +59,7 @@ def pull_latest_rules():
 
   remote_rules = Rules.get_remote_rules(http_session=http_session)
 
-  if not remote_rules.rules:  # pylint: disable="g-explicit-length-test"
+  if len(remote_rules.rules) == 0:  # pylint: disable="g-explicit-length-test"
     return
 
   # Delete existing local rule files before writing a fresh copy of all rules
@@ -117,22 +118,46 @@ def verify_rules():
   """Verify that all detection rules are valid YARA-L 2.0 rules using Chronicle's API."""
   http_session = initialize_http_session()
 
+  # Maintain lists of successful and failed YARA-L 2.0 verification responses.
+  verify_rule_successes = []
+  verify_rule_errors = []
+
   for rule_file in list(RULES_DIR.glob("*.yaral")):
     with open(rule_file, "r", encoding="utf-8") as f:
       rule_text = f.read()
 
     response = verify_rule(http_session=http_session, rule_text=rule_text)
+    time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
     if response.get("success") is True:
-      LOGGER.debug(
-          "Rule verified successfully (%s). Response: %s", rule_file, response
+      LOGGER.info(
+          "Rule verification succeeded for rule (%s). Response: %s",
+          rule_file,
+          response,
       )
+      verify_rule_successes.append(rule_file)
 
     else:
-      raise RuleVerificationError(
-          f"Rule verification error ({rule_file}). Response:"
-          f" {json.dumps(response, indent=4)}"
+      verify_rule_errors.append({"rule": rule_file, "response": response})
+
+  LOGGER.info(
+      "Rule verification succeeded for %s rules", len(verify_rule_successes)
+  )
+
+  if verify_rule_errors:
+    LOGGER.error(
+        "Rule verification failed for %s rules", len(verify_rule_errors)
+    )
+    # Log each rule verification error before raising an exception
+    for error in verify_rule_errors:
+      LOGGER.error(
+          "Rule verification failed for rule (%s). Response: %s",
+          error["rule"],
+          json.dumps(error["response"], indent=4),
       )
+    raise RuleVerificationError(
+        f"Rule verification failed for {len(verify_rule_errors)} rules"
+    )
 
 
 if __name__ == "__main__":

@@ -34,14 +34,15 @@ def list_rules(
 
   Args:
     http_session: Authorized session for HTTP requests.
-    page_size: Maximum number of rules to return. Must be non-negative, and is
-      capped at a server-side limit of 1000. Optional - a server-side default
-      of 100 is used if the size is 0 or a None value.
-    page_token: Page token from a previous ListRules call used for pagination.
-      Optional - the first page is retrieved if the token is the empty string
-      or a None value.
-    view: The scope of fields to populate for the Rule being returned.
-      Optional. Reference:
+    page_size (optional): Maximum number of rules to return.
+      Must be non-negative, and is capped at a server-side limit of 1000.
+      A server-side default of 100 is used if the size is 0 or a None value.
+    page_token (optional): Page token from a previous ListRules call used for
+      pagination.
+      The first page is retrieved if the token is the empty string or a None
+      value.
+    view (optional): The scope of fields to populate for the Rule being
+      returned. Reference:
       https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/RuleView
 
   Returns:

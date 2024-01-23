@@ -22,6 +22,7 @@ import hashlib
 import logging
 import pathlib
 import re
+import time
 from typing import Any, List, Mapping, Optional, Sequence, Tuple
 
 from chronicle_api.rules.create_rule import create_rule
@@ -257,6 +258,7 @@ class Rules:
           page_token=next_page_token,
           view="FULL",
       )
+      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
       if retrieved_rules is not None:
         LOGGER.info("Retrieved %s rules", len(retrieved_rules))
@@ -282,6 +284,7 @@ class Rules:
       rule["deployment_state"] = get_rule_deployment(
           http_session=http_session, resource_name=rule["name"]
       )
+      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
     parsed_rules = Rules.parse_rules(rules=raw_rules)
 
@@ -343,11 +346,11 @@ class Rules:
   ) -> str:
     """Extract the rule name from the YARA-L rule."""
     rule_name_match = re.search(
-        pattern=r"rule ([A-Za-z0-9_]+)[\r\n\s]?{", string=rule_text
+        pattern=r"rule(\s+)([A-Za-z0-9_]+)[\r\n\s]*", string=rule_text
     )
 
     if rule_name_match:
-      rule_name = rule_name_match.group(1)
+      rule_name = rule_name_match.group(2)
     else:
       raise RuleError(
           f"Unable to extract rule name from YARA-L rule in {rule_file_path}"
@@ -412,7 +415,8 @@ class Rules:
           f"{rule.name} - alerting (true/false) option is missing."
       )
 
-    # Check that enabled or alerting are not set to True if archived is True.
+    # Check that enabled or alerting are not set to True if archived is set to
+    # True.
     if rule.archived is True and (
         rule.enabled is True or rule.alerting is True
     ):
@@ -501,6 +505,7 @@ class Rules:
               update_mask=["text"],
               updates={"text": local_rule.text},
           )
+          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           update_summary["new_version_created"].append((rule_id, rule_name))
         LOGGER.debug(
             "Rule %s (%s) - No changes found in rule text", rule_name, rule_id
@@ -521,9 +526,11 @@ class Rules:
           new_rule = create_rule(
               http_session=http_session, rule_text=local_rule.text
           )
+          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           new_rule["deployment_state"] = get_rule_deployment(
               http_session=http_session, resource_name=new_rule["name"]
           )
+          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           remote_rule = Rules.parse_rule(new_rule)
           LOGGER.info(
               "Created new rule %s (%s)", remote_rule.name, remote_rule.id
@@ -549,6 +556,7 @@ class Rules:
               update_mask=["text"],
               updates={"text": local_rule.text},
           )
+          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           remote_rule = Rules.parse_rule(new_rule_version)
           update_summary["new_version_created"].append((rule_id, rule_name))
 
@@ -599,6 +607,7 @@ class Rules:
           update_mask=["archived"],
           updates={"archived": False},
       )
+      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["unarchived"] = True
 
     LOGGER.debug(
@@ -613,6 +622,7 @@ class Rules:
           update_mask=["enabled"],
           updates={"enabled": True},
       )
+      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["enabled"] = True
 
     # Disable the rule if required.
@@ -624,6 +634,7 @@ class Rules:
           update_mask=["enabled"],
           updates={"enabled": False},
       )
+      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["disabled"] = True
 
     LOGGER.debug(
@@ -638,6 +649,7 @@ class Rules:
           update_mask=["alerting"],
           updates={"alerting": True},
       )
+      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["alerting_enabled"] = True
 
     # Disable alerting for the rule if required.
@@ -649,6 +661,7 @@ class Rules:
           update_mask=["alerting"],
           updates={"alerting": False},
       )
+      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["alerting_disabled"] = True
 
     LOGGER.debug("%s - Checking if the rule should be archived", log_msg_prefix)
@@ -661,6 +674,7 @@ class Rules:
           update_mask=["archived"],
           updates={"archived": True},
       )
+      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["archived"] = True
 
     return rule_updates

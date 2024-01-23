@@ -23,9 +23,12 @@ repo.
 
 ## Setup
 
+Use Python 3.10 or above.
+
 ```console
 # Create and activate a Python virtual environment after cloning this directory into a location of your choosing
-$ python3.10 -m virtualenv venv
+$ pip3 install virtualenv
+$ python3 -m virtualenv venv
 $ source venv/bin/activate
 
 # Install the project's dependencies
@@ -58,12 +61,12 @@ refrain from including any sensitive information such as service account keys or
 * Used to configure the [logging level](https://docs.python.org/3/library/logging.html#levels) for this project. The 
   recommendation is to set this to `INFO` or `DEBUG` for more verbose logging.
 
-### `CHRONICLE_BASE_URL`
+#### `CHRONICLE_BASE_URL`
 
 * Set the `CHRONICLE_BASE_URL` variable to your regional service endpoint for the Chronicle API.
 * For example, the base URL for the US regional service endpoint is https://us-chronicle.googleapis.com/v1alpha
 
-### `CHRONICLE_INSTANCE`
+#### `CHRONICLE_INSTANCE`
 
 * Set the `CHRONICLE_INSTANCE` variable as follows: `projects/{google-cloud-project-id}/locations/{chronicle-instance-location}/instances/{chronicle-instance-id}`
   * Replace the `{google-cloud-project-id}` placeholder with your Google Cloud project ID that is linked to your 
@@ -73,13 +76,13 @@ refrain from including any sensitive information such as service account keys or
   * Replace the `chronicle-instance-id` placeholder with the `Customer ID` for your Chronicle instance. You can find 
     this under `Settings` - `SIEM Settings` - `Profile` in Chronicle's UI.
 
-### `AUTHORIZATION_SCOPES`
+#### `AUTHORIZATION_SCOPES`
 
 * Set the `AUTHORIZATION_SCOPES` variable to `AUTHORIZATION_SCOPES={"CHRONICLE_API":["https://www.googleapis.com/auth/cloud-platform"]}`
 * Refer to the [Authentication methods at Google](https://cloud.google.com/docs/authentication/) documentation for 
   information on OAuth 2.0 scopes.
 
-### `CHRONICLE_API_CREDENTIALS`
+#### `CHRONICLE_API_CREDENTIALS`
 
 * For the purposes of authenticating to and managing detection rules via Chronicle's API, you can create a [service account](https://cloud.google.com/iam/docs/service-account-overview)
   in the Google Cloud project that's linked to your Chronicle instance.
@@ -108,8 +111,9 @@ refrain from including any sensitive information such as service account keys or
   value for the `CHRONICLE_API_CREDENTIALS` variable. Enter the variable's value in JSON format, on a single line as 
   shown in above example `.env` file).
 
+### Executing the CLI
+
 ```console
-# Verify that the CLI executes successfully
 (venv) $ python -m rule_cli -h
 16-Jan-24 16:14:00 MST | INFO | <module> | Rule CLI started
 usage: __main__.py [-h] [--pull-latest-rules] [--update-remote-rules] [--verify-rules] {verify-rule} ...
@@ -128,7 +132,7 @@ subcommands:
     verify-rule         Verify that a rule is a valid YARA-L 2.0 rule.
 ```
 
-To run the tests.
+### Running the tests
 
 ```console
 (venv) $ pip install -r requirements_dev.txt
@@ -146,7 +150,7 @@ The pull latest rules command retrieves the latest version of all rules from Chr
 files in the `rules` directory.
 
 The rule state is written to the `rule_config.yaml` file. The rule state contains metadata about the state of each rule
-such as whether it is live enabled/disabled, the rule ID, the rule version ID, etc.
+such as whether it is enabled/disabled/archived, the rule ID, the rule's revision ID, etc.
 
 Example output from pull latest rules command:
 
@@ -161,7 +165,7 @@ Example output from pull latest rules command:
 
 ## Verify rule(s)
 
-The `--verify-rule` and `--verify-rules` commands use Chronicle's API to verify that YARA-L 2.0 rules are valid without
+The `verify-rule` and `--verify-rules` commands use Chronicle's API to verify that YARA-L 2.0 rules are valid without
 creating a new rule or evaluating it over data.
 
 Example output from verify rule command:
@@ -173,8 +177,13 @@ Example output from verify rule command:
 16-Jan-24 16:16:11 MST | INFO | verify_rule_text | Rule verified successfully (rules/dns_query_to_recently_created_domain.yaral). Response: {'success': True}
 
 python -m rule_cli --verify-rules
-16-Jan-24 16:17:08 MST | INFO | <module> | Rule CLI started
-16-Jan-24 16:17:08 MST | INFO | <module> | Attempting to verify all local rules
+19-Jan-24 11:13:06 MST | INFO | <module> | Rule CLI started
+19-Jan-24 11:13:06 MST | INFO | <module> | Attempting to verify all local rules
+19-Jan-24 11:13:07 MST | INFO | verify_rules | Rule verification succeeded for rule (/Users/x/Documents/projects/detection-engineering/rules/google_workspace_multiple_files_sent_as_email_attachment_from_google_drive.yaral). Response: {'success': True}
+...
+19-Jan-24 11:13:10 MST | INFO | verify_rules | Rule verification succeeded for 36 rules
+19-Jan-24 11:17:32 MST | ERROR | verify_rules | Rule verification failed for 2 rules
+19-Jan-24 11:13:10 MST | ERROR | verify_rules | Rule verification failed for rule (/Users/x/Documents/projects/detection-engineering/rules/okta_new_api_token_created.yaral). Response: {...}
 ...
 ```
 

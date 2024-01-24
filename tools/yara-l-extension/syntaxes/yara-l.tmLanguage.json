@@ -1,0 +1,174 @@
+{
+  "name": "YARA-L",
+  "scopeName": "source.yara-l",
+  "patterns": [
+    { "include": "#commments" },
+    { "include": "#inline_comments" },
+    { "include": "#block_comments" },
+    { "include": "#core_structure" },
+    { "include": "#required_sections" },
+    { "include": "#optional_sections" },
+    { "include": "#brackets" },
+    { "include": "#numbers" },
+    { "include": "#string_constants" },
+    { "include": "#regex_constants" },
+    { "include": "#assignment_operators" },
+    { "include": "#comparison_operators" },
+    { "include": "#variables" },
+    { "include": "#key_value_pairs" },
+    { "include": "#function_expression" },
+    { "include": "#reference_list_expression" },
+    { "include": "#logical_operators" },
+    { "include": "#modifiers" },
+    { "include": "#match_selection" },
+    { "include": "#conditional_logic" },
+    { "include": "#mathematical_operations"}
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+            "name": "comment.block.empty.yara-l",
+            "match": "/\\*\\*/",
+            "captures": {
+                "0": {
+                    "name": "punctuation.definition.comment.yara-l"
+                }
+            }
+        },
+        {
+            "include": "#inline_comments"
+        }
+      ]
+    },
+    "inline_comments": {
+      "name": "comment.line.double-slash.yara-l",
+      "match": "\/\/.*"
+    },
+    "block_comments": {
+      "patterns": [
+        {
+          "name": "comment.block.yara-l",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "patterns": [
+            {
+              "include": "#block_comments"
+            }
+          ]
+        }
+      ]
+    },
+    "core_structure": {
+      "match": "(rule|RULE)\\s+([^\\s=\\{]*)",
+      "captures": {
+        "1": {
+          "name": "entity.name.tag.yara-l"
+        },
+        "2": {
+          "name": "entity.name.type.yara-l"
+        }
+      }
+    },
+    "required_sections": {
+      "name": "keyword.control.yara-l",
+      "match": "\\b(meta|META|events|EVENTS|condition|CONDITION)\\b"
+    },
+    "optional_sections": {
+      "name": "keyword.control.yara-l",
+      "match": "\\b(match|MATCH|outcome|OUTCOME|options|OPTIONS)\\b"
+    },
+    "brackets": {
+      "name": "brackets.yara-l",
+      "match": "[\\{\\}\\(\\)\\[\\]]"
+    },
+    "numbers": {
+      "name": "constant.numeric.yara-l",
+      "match": "\\d+\\.?\\d*"
+    },
+    "string_constants": {
+      "name": "string.quoted.double.yara-l",
+      "match": "\"([^\"\\\\]|\\\\.)*\""
+    },
+    "regex_constants": {
+      "match": "(\/.+?\/)(?=[\\s|)])|(`.+?`)(?=[\\s|)])",
+      "captures": {
+        "1": {
+          "name": "string.regexp.yara-l"
+        },
+        "2": {
+          "name": "string.regexp.yara-l"
+        }
+      }
+    },
+    "assignment_operators": {
+      "name": "keyword.operator.assignment.yara-l",
+      "match": "(=)"
+    },
+    "comparison_operators": {
+      "name": "keyword.operator.comparison.yara-l",
+      "match": "(!=|<|<=|>|>=)"
+    },
+    "variables": {
+      "match": "([$#][^\\s,)`=!<>]+)",
+      "captures": {
+        "1": {
+          "name": "variable.name.yara-l"
+        }
+      }
+    },
+    "key_value_pairs": {
+      "match": "^.[^\\(\\$#\"\/]*=",
+      "captures": {
+        "2": {
+          "name": "no-highlight.variable.yara-l"
+        }
+      }
+    },
+    "function_expression": {
+      "match": "([^\\s+@=\"$(]+)\\s*\\(",
+      "captures": {
+        "1": {
+          "name": "support.function.yara-l"
+        }
+      }
+    },
+    "reference_list_expression": {
+      "name": "variable.other.yara-l",
+      "match": "\\B(\\%\\S*)(?<!,)"
+    },
+    "logical_operators": {
+      "name": "constant.language.yara-l",
+      "match": "\\s(and|AND|or|OR|not|NOT|true|TRUE|True|false|FALSE|False)\\s"
+    },
+    "modifiers": {
+      "name": "constant.language.yara-l",
+      "match": "(nocase|NOCASE|any|ANY|all|ALL)"
+    },
+    "match_selection": {
+      "match": "(over|OVER) (\\d*)(s|m|h|d) ?(before|BEFORE|after|AFTER)?",
+      "captures": {
+        "1": {
+          "name": "constant.language.yara-l"
+        },
+        "2": {
+          "name": "constant.numeric.yara-l"
+        },
+        "3": {
+          "name": "constant.language.yara-l"
+        },
+        "4": {
+          "name": "constant.language.yara-l"
+        }
+      }
+    },
+    "conditional_logic": {
+      "name": "constant.language.yara-l",
+      "match": "\\b(if|IF)\\s"
+    },
+    "mathematical_operations": {
+      "name": "keyword.operator.yara-l",
+      "match": "(\\-|\\+|\\*|\\/|%|!)"
+    }
+  }
+}

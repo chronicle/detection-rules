@@ -1,0 +1,35 @@
+{
+  "name": "yara-l",
+  "displayName": "YARA-L",
+  "version": "1.0.0",
+  "publisher": "Google Cloud Security",
+  "description":
+      "Provides syntax highlighting, bracket matching, and folding in YARA-L files.",
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "grammars": [{
+      "language": "yara-l",
+      "path": "./syntaxes/yara-l.tmLanguage.json",
+      "scopeName": "source.yara-l"
+    }],
+    "languages": [{
+      "id": "yara-l",
+      "aliases": ["YARA-L", "yara-l", "YARAL", "yaral", "yl2"],
+      "configuration": "language-configuration.json",
+      "extensions": [".yaral", ".yl2"]
+    }]
+  },
+  "icon": "./images/chronicle.png",
+  "engines": {
+    "vscode": "^1.8.0"
+  },
+  "license": "Apache License, Version 2.0",
+  "keywords": ["Chronicle", "YARA-L", "YARAL", "yl2"],
+  "bugs": {
+    "url": "https://github.com/chronicle/detection-rules/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chronicle/detection-rules/tree/main/tools/yara-l-extension"
+  }
+}

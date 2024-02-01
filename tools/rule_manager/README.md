@@ -5,6 +5,9 @@
 This directory contains example code that can be used to build a Detection-as-Code CI/CD pipeline to manage rules in
 [Chronicle Security Operations](https://cloud.google.com/chronicle-security-operations).
 
+You can learn more about managing detection rules via Chronicle's API in this blog post:
+[Getting Started with Detection-as-Code and Chronicle Security Operations](https://www.googlecloudcommunity.com/gc/Community-Blog/Getting-Started-with-Detection-as-Code-and-Chronicle-Security/ba-p/702154).
+
 <span style="color: red;">**Important**</span>: This code can modify rules in Chronicle. Please exercise caution and 
 avoid running it in production without first understanding the code, customizing it for your specific use cases, and 
 testing it.
@@ -110,6 +113,9 @@ refrain from including any sensitive information such as service account keys or
 * Create a service account key for the service account that has the required permissions assigned and set it as the 
   value for the `CHRONICLE_API_CREDENTIALS` variable. Enter the variable's value in JSON format, on a single line as 
   shown in above example `.env` file).
+* To follow [best practices](https://cloud.google.com/secret-manager/docs/best-practices) for storing and handling
+service account keys, you can customize this code to instead store the key in [Secrets Manager](https://cloud.google.com/secret-manager/docs/overview)
+and retrieve it via the [Secrets Manager API](https://cloud.google.com/secret-manager/docs/reference/libraries#client-libraries-install-python).
 
 ### Executing the CLI
 

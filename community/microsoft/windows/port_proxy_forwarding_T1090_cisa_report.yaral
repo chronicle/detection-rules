@@ -36,7 +36,7 @@ rule port_proxy_forwarding_T1090_cisa_report {
 
         // cisa report referenced cmd /c in their report throughout, can filter this in/out for tuning as needed
         re.regex($process.target.process.command_line, `(|cmd.*/c).*netsh.*interface.*portproxy.*add.*v4tov4`) nocase
-        // For greater precision to align with the report, comment out the above line and uncomment the below line to incporporate exact ports referenced
+        // For greater precision to align with the report, comment out the above line and uncomment the below line to incorporate exact ports referenced
         //re.regex($process.target.process.command_line, `(|cmd.*/c).*netsh.*interface.*portproxy.*add.*v4tov4.*port\=(9999|50100).*port\=(8443|1433)`) nocase
     )
     or
@@ -67,13 +67,13 @@ rule port_proxy_forwarding_T1090_cisa_report {
     $principal_process_command_line = array_distinct($process.principal.process.command_line)
     $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
     $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
-    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
-    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $principal_process_product_specific_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
     $target_process_pid = array_distinct($process.target.process.pid)
     $target_process_command_line = array_distinct($process.target.process.command_line)
     $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
     $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
-    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $target_process_product_specific_process_id = array_distinct($process.target.process.product_specific_process_id)
     $principal_user_userid = array_distinct($process.principal.user.userid)
 
   condition:

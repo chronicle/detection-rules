@@ -39,7 +39,7 @@ rule o365_login_activity_to_uncommon_mscloud_apps {
     /* Additional AppIds that are not in this list but have appeared benign during testing include the following:
     7eadcef8-456d-4611-9480-4fff72b8b9e2 Microsoft Account Controls V2
     8e0e8db5-b713-4e91-98e6-470fed0aa4c2 Microsoft Azure Signup Portal
-    f9818e52-50bd-463e-8932-a1650bd3fad2 MSAL Confguration
+    f9818e52-50bd-463e-8932-a1650bd3fad2 MSAL Configuration
     There are additional lists on GitHub that are compiled that would be added for additional tuning as needed
     */
     $login.metadata.vendor_name = "Microsoft"

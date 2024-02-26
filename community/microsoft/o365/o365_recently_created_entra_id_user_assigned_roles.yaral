@@ -23,7 +23,7 @@ rule o365_recently_created_entra_id_user_assigned_roles {
     mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"
     mitre_attack_version = "v14.1"
-    assumption = "The list msgraph_watchlist_roles is popualted with role names, ie Application Administrator"
+    assumption = "The list msgraph_watchlist_roles is populated with role names, ie Application Administrator"
     type = "alert"
     platform = "azure"
     data_source = "o365"

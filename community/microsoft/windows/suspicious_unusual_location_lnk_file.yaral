@@ -48,8 +48,8 @@ rule suspicious_unusual_location_lnk_file {
     $principal_process_command_line = $file.principal.process.command_line
     $principal_process_file_sha256 = $file.principal.process.file.sha256
     $principal_process_file_full_path = $file.principal.process.file.full_path
-    $principal_process_product_specfic_process_id = $file.principal.process.product_specific_process_id
-    $principal_process_parent_process_product_specfic_process_id = $file.principal.process.parent_process.product_specific_process_id
+    $principal_process_product_specific_process_id = $file.principal.process.product_specific_process_id
+    $principal_process_parent_process_product_specific_process_id = $file.principal.process.parent_process.product_specific_process_id
     $principal_user_userid = $file.principal.user.userid
     $src_user_userid = $file.principal.user.userid
     $target_file_sha256 = $file.target.file.sha256

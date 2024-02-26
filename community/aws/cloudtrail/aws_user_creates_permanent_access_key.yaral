@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-rule aws_user_creates_permenant_access_key {
+rule aws_user_creates_permanent_access_key {
 
   meta:
     author = "Google Cloud Security"

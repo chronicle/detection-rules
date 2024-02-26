@@ -51,10 +51,10 @@ rule dns_query_to_recently_created_domain {
    $target_ip = array_distinct($dns.target.ip)
    $principal_process_pid = array_distinct($dns.principal.process.pid)
    $principal_process_file_full_path = array_distinct($dns.principal.process.file.full_path)
-   $principal_process_product_specfic_process_id = array_distinct($dns.principal.process.product_specific_process_id)
+   $principal_process_product_specific_process_id = array_distinct($dns.principal.process.product_specific_process_id)
    $principal_process_command_line = array_distinct($dns.principal.process.command_line)
    $principal_process_file_sha256 = array_distinct($dns.principal.process.file.sha256)
-   $principal_process_parent_process_product_specfic_process_id = array_distinct($dns.principal.process.parent_process.product_specific_process_id)
+   $principal_process_parent_process_product_specific_process_id = array_distinct($dns.principal.process.parent_process.product_specific_process_id)
    // Commented out principal.user.userid because it is already represented in graph as match variable. If match changes, can uncomment to add to results
    //$principal_user_userid = array_distinct($dns.principal.user.userid)
 

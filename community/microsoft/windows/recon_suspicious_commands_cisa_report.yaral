@@ -21,7 +21,7 @@ rule recon_suspicious_commands_cisa_report {
     description = "Detects suspicious commands as identified in CISA Living of the Land pdf. Alone they may be normal but in concert, they may be worth looking into"
     type = "hunt"
     platform = "Windows"
-    data_source = "microsoft sysmon, microsft windows events"
+    data_source = "microsoft sysmon, microsoft windows events"
     reference = "https://media.defense.gov/2023/May/24/2003229517/-1/-1/0/CSA_Living_off_the_Land.PDF"
     severity = "Low"
     priority = "Low"
@@ -66,13 +66,13 @@ rule recon_suspicious_commands_cisa_report {
     $principal_process_command_line = array_distinct($process.principal.process.command_line)
     $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
     $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
-    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
-    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $principal_process_product_specific_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
     $target_process_pid = array_distinct($process.target.process.pid)
     $target_process_command_line = array_distinct($process.target.process.command_line)
     $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
     $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
-    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $target_process_product_specific_process_id = array_distinct($process.target.process.product_specific_process_id)
     $principal_user_userid = array_distinct($process.principal.user.userid)
 
   condition:

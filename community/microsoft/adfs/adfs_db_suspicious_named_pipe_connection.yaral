@@ -55,8 +55,8 @@ rule adfs_db_suspicious_named_pipe_connection {
     $target_process_command_line = array_distinct($process.target.process.command_line)
     $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
     $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
-    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
-    $target_process_parent_product_specfic_process_id = array_distinct($process.target.process.parent_process.product_specific_process_id)
+    $target_process_product_specific_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $target_process_parent_product_specific_process_id = array_distinct($process.target.process.parent_process.product_specific_process_id)
     $target_resource_name = array_distinct($process.target.resource.name)
 
  condition:

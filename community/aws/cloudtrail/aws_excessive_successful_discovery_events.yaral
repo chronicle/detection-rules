@@ -18,7 +18,7 @@ rule aws_excessive_successful_discovery_events {
 
   meta:
     author = "Google Cloud Security"
-    description = "Detects excessive successful events within a 5 minute timefram from an IAM User."
+    description = "Detects excessive successful events within a 5 minute timeframe from an IAM User."
     mitre_attack_tactic = "Discovery"
     mitre_attack_technique = "Cloud Infrastructure Discovery"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1580/"

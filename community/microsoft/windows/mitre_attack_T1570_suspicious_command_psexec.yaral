@@ -50,13 +50,13 @@ rule mitre_attack_T1570_suspicious_command_psexec {
     $principal_process_command_line = array_distinct($process.principal.process.command_line)
     $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
     $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
-    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
-    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $principal_process_product_specific_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
     $target_process_pid = array_distinct($process.target.process.pid)
     $target_process_command_line = array_distinct($process.target.process.command_line)
     $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
     $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
-    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $target_process_product_specific_process_id = array_distinct($process.target.process.product_specific_process_id)
     $principal_user_userid = array_distinct($process.principal.user.userid)
 
   condition:

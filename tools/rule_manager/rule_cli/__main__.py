@@ -53,11 +53,11 @@ def initialize_http_session() -> (
   )
 
 
-def pull_latest_rules():
+def pull_latest_rules(skip_archived: bool = False):
   """Retrieves the latest version of all rules from Chronicle and updates the local rule files."""
   http_session = initialize_http_session()
 
-  remote_rules = Rules.get_remote_rules(http_session=http_session)
+  remote_rules = Rules.get_remote_rules(http_session=http_session, skip_archived=skip_archived)
 
   if len(remote_rules.rules) == 0:  # pylint: disable="g-explicit-length-test"
     return
@@ -72,11 +72,11 @@ def pull_latest_rules():
   remote_rules.dump_rule_config()
 
 
-def update_remote_rules():
+def update_remote_rules(skip_archived: bool = False):
   """Update rules in Chronicle based on local rule files."""
   http_session = initialize_http_session()
 
-  rule_updates = Rules.update_remote_rules(http_session=http_session)
+  rule_updates = Rules.update_remote_rules(http_session=http_session, skip_archived=skip_archived)
 
   # Log summary of rule updates that occurred.
   LOGGER.info("Logging summary of rule changes...")
@@ -87,7 +87,7 @@ def update_remote_rules():
 
   # Retrieve the latest version of all rules after any changes were made and
   # update the local rule files.
-  pull_latest_rules()
+  pull_latest_rules(skip_archived=skip_archived)
 
 
 def verify_rule_text(rule_file: pathlib.Path):
@@ -165,22 +165,29 @@ if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description="rule_cli")
 
-  parser.add_argument(
-      "--pull-latest-rules",
-      action="store_true",
-      help=(
-          "Retrieves the latest version of all rules from Chronicle and writes"
-          " them to local files."
-      ),
-  )
-
-  parser.add_argument(
-      "--update-remote-rules",
-      action="store_true",
-      help="Update rules in Chronicle based on local rule files.",
-  )
-
   subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
+
+  pull_latest_rules_subparser = subparsers.add_parser(
+      name="pull-latest-rules",
+      help="Retrieve the latest version of all rules from Chronicle and write them to local files."
+  )
+
+  pull_latest_rules_subparser.add_argument(
+      "--skip-archived",
+      action="store_true",
+      help="Skip the processing of rules that are archived in Chronicle."
+  )
+
+  update_remote_rules_subparser = subparsers.add_parser(
+      name="update-remote-rules",
+      help="Update rules in Chronicle based on local rule files and config."
+  )
+
+  update_remote_rules_subparser.add_argument(
+      "--skip-archived",
+      action="store_true",
+      help="Skip the updating of rules that are archived in Chronicle."
+  )
 
   verify_rule_subparser = subparsers.add_parser(
       name="verify-rule",
@@ -212,18 +219,13 @@ if __name__ == "__main__":
   if not RULES_DIR.is_dir():
     RULES_DIR.mkdir()
 
-  if args.pull_latest_rules:
-    LOGGER.info(
-        "Attempting to pull latest version of all Chronicle rules and update"
-        " local files"
-    )
-    pull_latest_rules()
+  if args.subcommand == "pull-latest-rules":
+      LOGGER.info("Attempting to pull latest version of all rules from Chronicle and update local files")
+      pull_latest_rules(skip_archived=args.skip_archived)
 
-  elif args.update_remote_rules:
-    LOGGER.info(
-        "Attempting to update rules in Chronicle based on local rule files"
-    )
-    update_remote_rules()
+  elif args.subcommand == "update-remote-rules":
+      LOGGER.info("Attempting to update rules in Chronicle based on local rule files")
+      update_remote_rules(skip_archived=args.skip_archived)
 
   elif args.subcommand == "verify-rule":
     rule_file_path = args.rule_file_path

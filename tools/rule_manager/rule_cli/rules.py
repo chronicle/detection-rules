@@ -120,12 +120,15 @@ class Rules:
     return parsed_rule
 
   @classmethod
-  def parse_rules(cls, rules: Sequence[Mapping[str, Any]]) -> List[Rule]:
+  def parse_rules(cls, rules: Sequence[Mapping[str, Any]], skip_archived: bool = False) -> List[Rule]:
     """Parse a list of rules into a list of Rule objects."""
     parsed_rules = []
 
     for rule in rules:
-      parsed_rules.append(Rules.parse_rule(rule))
+        if skip_archived is True and rule["deployment_state"].get("archived") is True:
+            LOGGER.debug("Skipping parsing for archived rule %s", rule["displayName"])
+        else:
+            parsed_rules.append(Rules.parse_rule(rule))
 
     return parsed_rules
 
@@ -244,7 +247,7 @@ class Rules:
 
   @classmethod
   def get_remote_rules(
-      cls, http_session: requests.AuthorizedSession
+      cls, http_session: requests.AuthorizedSession, skip_archived: bool = False
   ) -> "Rules":
     """Retrieve the latest version of all rules from Chronicle."""
     raw_rules = []
@@ -286,7 +289,7 @@ class Rules:
       )
       time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
-    parsed_rules = Rules.parse_rules(rules=raw_rules)
+    parsed_rules = Rules.parse_rules(rules=raw_rules, skip_archived=skip_archived)
 
     Rules.check_for_duplicate_rule_names(rules=parsed_rules)
 
@@ -431,6 +434,7 @@ class Rules:
       http_session: requests.AuthorizedSession,
       rules_dir: pathlib.Path = RULES_DIR,
       rule_config_file: pathlib.Path = RULE_CONFIG_FILE,
+      skip_archived: bool = False
   ) -> Mapping[str, Sequence[Tuple[str, str]]] | None:
     """Attempting to update rules in Chronicle based on local rule files."""
     LOGGER.info(
@@ -449,7 +453,7 @@ class Rules:
     LOGGER.info(
         "Attempting to retrieve latest version of all rules from Chronicle"
     )
-    remote_rules = Rules.get_remote_rules(http_session=http_session)
+    remote_rules = Rules.get_remote_rules(http_session=http_session, skip_archived=skip_archived)
 
     # Create a dictionary containing the remote rules using the rule name as the
     # key for each item.

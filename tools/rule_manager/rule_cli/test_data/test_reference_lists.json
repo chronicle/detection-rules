@@ -1,0 +1,22 @@
+[
+    {
+        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_1",
+        "displayName": "test_list_1",
+        "revisionCreateTime": "2024-02-13T22:26:31.415855Z",
+        "description": "Test list 1",
+        "entries": [
+            {}
+        ],
+        "syntaxType": "REFERENCE_LIST_SYNTAX_TYPE_PLAIN_TEXT_STRING"
+    },
+    {
+        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_2",
+        "displayName": "test_list_2",
+        "revisionCreateTime": "2024-02-13T22:30:02.167551Z",
+        "description": "list 2",
+        "entries": [
+            {}
+        ],
+        "syntaxType": "REFERENCE_LIST_SYNTAX_TYPE_CIDR"
+    }
+]

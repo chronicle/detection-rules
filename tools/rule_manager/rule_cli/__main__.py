@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,12 +29,14 @@ from chronicle_api.rules.verify_rule import verify_rule
 import dotenv
 import google.auth.transport.requests
 from rule_cli.common import RuleVerificationError
+from rule_cli.reference_lists import ReferenceLists
 from rule_cli.rules import Rules
 
 LOGGER = logging.getLogger()
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 RULES_DIR = ROOT_DIR / "rules"
+REF_LISTS_DIR = ROOT_DIR / "reference_lists"
 
 dotenv.load_dotenv()
 
@@ -88,6 +90,47 @@ def update_remote_rules():
   # Retrieve the latest version of all rules after any changes were made and
   # update the local rule files.
   pull_latest_rules()
+
+
+def pull_latest_reference_lists():
+  """Retrieves the latest version of all reference lists from Chronicle and updates the local reference list files."""
+  http_session = initialize_http_session()
+
+  remote_ref_lists = ReferenceLists.get_remote_ref_lists(
+      http_session=http_session
+  )
+
+  if len(remote_ref_lists.ref_lists) == 0:  # pylint: disable="g-explicit-length-test"
+    return
+
+  # Delete existing local reference list files before writing a fresh copy of
+  # all reference lists pulled from Chronicle.
+  for local_ref_list_file in list(REF_LISTS_DIR.glob("*.txt")):
+    local_ref_list_file.unlink()
+
+  remote_ref_lists.dump_ref_lists()
+
+  remote_ref_lists.dump_ref_list_config()
+
+
+def update_remote_ref_lists():
+  """Update reference lists in Chronicle based on local reference list files."""
+  http_session = initialize_http_session()
+
+  ref_list_updates = ReferenceLists.update_remote_ref_lists(
+      http_session=http_session
+  )
+
+  # Log summary of reference list updates that occurred.
+  LOGGER.info("Logging summary of reference list changes...")
+  for update_type, ref_list_names in ref_list_updates.items():
+    LOGGER.info("Reference lists %s: %s", update_type, len(ref_list_names))
+    for ref_list_name in ref_list_names:
+      LOGGER.info("%s Reference list %s", update_type, ref_list_name)
+
+  # Retrieve the latest version of all reference lists after any changes were
+  # made and update the local Reference List files.
+  pull_latest_reference_lists()
 
 
 def verify_rule_text(rule_file: pathlib.Path):
@@ -169,7 +212,7 @@ if __name__ == "__main__":
       "--pull-latest-rules",
       action="store_true",
       help=(
-          "Retrieves the latest version of all rules from Chronicle and writes"
+          "Retrieve the latest version of all rules from Chronicle and write"
           " them to local files."
       ),
   )
@@ -177,7 +220,25 @@ if __name__ == "__main__":
   parser.add_argument(
       "--update-remote-rules",
       action="store_true",
-      help="Update rules in Chronicle based on local rule files.",
+      help="Update rules in Chronicle based on local rule files and config.",
+  )
+
+  parser.add_argument(
+      "--pull-latest-reference-lists",
+      action="store_true",
+      help=(
+          "Retrieve the latest version of all reference lists from Chronicle"
+          " and write them to local files."
+      ),
+  )
+
+  parser.add_argument(
+      "--update-remote-reference-lists",
+      action="store_true",
+      help=(
+          "Update reference lists in Chronicle based on local reference list"
+          " files and config."
+      ),
   )
 
   subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
@@ -208,14 +269,16 @@ if __name__ == "__main__":
 
   args = parser.parse_args()
 
-  # Create the rules directory if it doesn't exist.
+  # Create content directories if they don't exist.
   if not RULES_DIR.is_dir():
     RULES_DIR.mkdir()
+  if not REF_LISTS_DIR.is_dir():
+    REF_LISTS_DIR.mkdir()
 
   if args.pull_latest_rules:
     LOGGER.info(
-        "Attempting to pull latest version of all Chronicle rules and update"
-        " local files"
+        "Attempting to pull latest version of all rules from Chronicle and"
+        " update local files"
     )
     pull_latest_rules()
 
@@ -224,6 +287,20 @@ if __name__ == "__main__":
         "Attempting to update rules in Chronicle based on local rule files"
     )
     update_remote_rules()
+
+  if args.pull_latest_reference_lists:
+    LOGGER.info(
+        "Attempting to pull latest version of all reference lists from"
+        " Chronicle and update local files"
+    )
+    pull_latest_reference_lists()
+
+  if args.update_remote_reference_lists:
+    LOGGER.info(
+        "Attempting to update reference lists in Chronicle based on local"
+        " reference list files"
+    )
+    update_remote_ref_lists()
 
   elif args.subcommand == "verify-rule":
     rule_file_path = args.rule_file_path

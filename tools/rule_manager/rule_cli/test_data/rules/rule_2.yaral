@@ -1,0 +1,59 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule rule_2 {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects the execution of whoami, which is often used by attackers after exploitation to establish what credentials they are logged in under"
+    type = "hunt"
+    data_source = "microsoft sysmon, microsoft windows events"
+    mitre_attack_tactic = "Discovery"
+    mitre_attack_technique = "System Owner/User Discovery"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1033/"
+    mitre_attack_version = "v13.1"
+    platform = "Windows"
+    severity = "Info"
+    priority = "Info"
+
+  events:
+    $process.metadata.event_type = "PROCESS_LAUNCH"
+    $process.target.process.command_line = "whoami"
+
+  outcome:
+    $risk_score = 10
+    $mitre_attack_tactic = "Discovery"
+    $mitre_attack_technique = "System Owner/User Discovery"
+    $mitre_attack_technique_id = "T1033"
+    // added to populate alert graph with additional context
+    $principal_hostname = $process.principal.hostname
+    $principal_process_pid = $process.principal.process.pid
+    $principal_process_command_line = $process.principal.process.command_line
+    $principal_process_file_sha256 = $process.principal.process.file.sha256
+    $principal_process_file_full_path = $process.principal.process.file.full_path
+    $principal_process_product_specific_process_id = $process.principal.process.product_specific_process_id
+    $principal_process_parent_process_product_specific_process_id = $process.principal.process.parent_process
+    .product_specific_process_id
+    $target_process_pid = $process.target.process.pid
+    $target_process_command_line = $process.target.process.command_line
+    $target_process_file_sha256 = $process.target.process.file.sha256
+    $target_process_file_full_path = $process.target.process.file.full_path
+    $target_process_product_specific_process_id = $process.target.process.product_specific_process_id
+    $principal_user_userid = $process.principal.user.userid
+
+  condition:
+    $process
+}

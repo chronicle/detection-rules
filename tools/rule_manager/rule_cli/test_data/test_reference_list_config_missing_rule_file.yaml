@@ -1,0 +1,7 @@
+test_list_3:
+  description: Test list 3
+  resource_name: projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_3
+  revision_create_time: '2024-02-13T22:26:31.415855Z'
+  rule_associations_count: null
+  rules: null
+  syntax_type: REFERENCE_LIST_SYNTAX_TYPE_CIDR

@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,3 +33,7 @@ class DuplicateRuleIdError(Exception):
 
 class DuplicateRuleNameError(Exception):
   """Raised when a duplicate rule name is found."""
+
+
+class ReferenceListConfigError(Exception):
+  """Raised when an issue with the reference list config file is found."""

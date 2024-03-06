@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,12 +21,15 @@ import json
 import pathlib
 from typing import Any, Mapping, Sequence
 
+import pydantic
 import pytest
 import ruamel.yaml.constructor
 from rule_cli.common import DuplicateRuleIdError
 from rule_cli.common import DuplicateRuleNameError
 from rule_cli.common import RuleConfigError
 from rule_cli.common import RuleError
+from rule_cli.rules import Rule
+from rule_cli.rules import RuleConfigEntry
 from rule_cli.rules import Rules
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
@@ -52,25 +55,94 @@ def raw_test_rules_fixture() -> Sequence[Mapping[str, Any]]:
     return json.load(f)
 
 
-def test_load_local_rules():
-  """Test that all local rules can be loaded."""
+def test_load_rules():
+  """Tests for rules.Rules.load_rules."""
+  # Test that all local rules can be loaded
   rule_files_count = len(list(RULES_DIR.glob("*.yaral")))
   rules = Rules.load_rules()
   assert rule_files_count == len(rules.rules)
 
+  # Ensure an exception occurs if a rule config entry is found that doesn't
+  # have a corresponding .yaral file in the
+  # rules directory
+  with pytest.raises(
+      RuleConfigError,
+      match=(
+          r"Rule file not found in .*\/rules with same name as rule config"
+          r" entry "
+      ),
+  ):
+    Rules.load_rule_config(
+        rule_config_file=TEST_DATA_DIR
+        / "test_rule_config_missing_rule_file.yaml",
+        rules_dir=TEST_RULES_DIR,
+    )
 
-def test_parse_invalid_rule(raw_test_rules: Sequence[Mapping[str, Any]]):
-  """Test that exceptions occur when attempting to parse an invalid rule."""
+
+def test_parse_rules(raw_test_rules: Sequence[Mapping[str, Any]]):
+  """Tests for rules.Rules.parse_rules."""
   raw_rules = copy.deepcopy(raw_test_rules)
 
+  # Ensure an exception occurs when attempting to parse a rule that's missing a
+  # required value
   del raw_rules[0]["name"]
 
   with pytest.raises(expected_exception=KeyError, match=r"name"):
     Rules.parse_rules(raw_rules)
 
+  raw_rules = copy.deepcopy(raw_test_rules)
 
-def test_rule_settings(parsed_test_rules: Rules):
-  """Test that an exception occurs when a rule has invalid setting combinations."""
+  # Ensure an exception occurs when attempting to extract the rule ID from the
+  # resource name value
+  raw_rules[0][
+      "name"
+  ] = "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/invalid_rule_name"
+  with pytest.raises(
+      expected_exception=AttributeError,
+      match=r"'NoneType' object has no attribute 'group'",
+  ):
+    Rules.parse_rules(raw_rules)
+
+
+def test_rule():
+  """Tests for rules.Rule."""
+  # Ensure an exception occurs when attempting to create a Rule object that's
+  # missing a required value
+  with pytest.raises(
+      expected_exception=pydantic.ValidationError,
+      match=r"Field required \[type=missing",
+  ):
+    Rule(name="test")
+
+  # Ensure an exception occurs when attempting to create a Rule object with an
+  # invalid value
+  with pytest.raises(
+      expected_exception=pydantic.ValidationError,
+      match=(
+          r"validation error for Rule\nenabled\n  Input should be a valid"
+          r" boolean"
+      ),
+  ):
+    Rule(
+        name="rule_name",
+        id=None,
+        resource_name=None,
+        create_time=None,
+        revision_id=None,
+        revision_create_time=None,
+        # enabled should be True/False, not None
+        enabled=None,
+        alerting=True,
+        archived=False,
+        archive_time=None,
+        run_frequency=None,
+        type=None,
+        text="rule_text",
+    )
+
+
+def test_check_rule_settings(parsed_test_rules: Rules):
+  """Tests for rules.Rules.check_rule_settings."""
   rule = copy.deepcopy(parsed_test_rules.rules[0])
 
   # Ensure an exception occurs when archived is True and enabled is True.
@@ -101,29 +173,9 @@ def test_rule_settings(parsed_test_rules: Rules):
   ):
     Rules.check_rule_settings(rule)
 
-  # Ensure an exception occurs when enabled option is None.
-  rule = copy.deepcopy(parsed_test_rules.rules[0])
-  rule.enabled = None
-
-  with pytest.raises(
-      expected_exception=RuleConfigError,
-      match=r" - enabled \(true\/false\) option is missing\.",
-  ):
-    Rules.check_rule_settings(rule)
-
-  # Ensure exception occurs when alerting_enabled flag is None.
-  rule = copy.deepcopy(parsed_test_rules.rules[0])
-  rule.alerting = None
-
-  with pytest.raises(
-      expected_exception=RuleConfigError,
-      match=r" - alerting \(true\/false\) option is missing.",
-  ):
-    Rules.check_rule_settings(rule)
-
 
 def test_compare_rule_text():
-  """Test that the expected result is returned when the rule text of two rules is compared."""
+  """Tests for rules.Rules.compare_rule_text."""
   result = Rules.compare_rule_text(rule_text_1="rule1", rule_text_2="rule1")
   assert result is False
 
@@ -132,7 +184,7 @@ def test_compare_rule_text():
 
 
 def test_check_for_duplicate_rule_names(parsed_test_rules):
-  """Test that an exception occurs when duplicate rule names are found in a list of rules."""
+  """Tests for rules.Rules.check_for_duplicate_rule_names."""
   rules = copy.deepcopy(parsed_test_rules.rules)
   rules[0].name = rules[1].name
 
@@ -144,7 +196,7 @@ def test_check_for_duplicate_rule_names(parsed_test_rules):
 
 
 def test_check_for_duplicate_rule_ids(parsed_test_rules):
-  """Test that an exception occurs when duplicate rule IDs are found in a list of rules."""
+  """Tests for rules.Rules.check_for_duplicate_rule_ids."""
   rules = copy.deepcopy(parsed_test_rules.rules)
   rules[0].id = rules[1].id
 
@@ -154,7 +206,7 @@ def test_check_for_duplicate_rule_ids(parsed_test_rules):
 
 
 def test_extract_rule_name(parsed_test_rules: Rules):
-  """Test that an exception occurs when the rule name can't be extracted from a YARA-L rule."""
+  """Tests for rules.Rules.extract_rule_name."""
   rule = copy.deepcopy(parsed_test_rules.rules[0])
   rule_file_path = pathlib.Path(TEST_RULES_DIR / f"{rule.name}.yaral")
 
@@ -176,16 +228,19 @@ def test_extract_rule_name(parsed_test_rules: Rules):
     Rules.extract_rule_name(rule_file_path=rule_file_path, rule_text=rule.text)
 
 
-def test_load_rule_config():
-  """Test that an exception occurs when the rule config file is malformed."""
-  # Ensure an exception occurs when a rule config file contains duplicate keys
-  # (rule names).
+def test_check_rule_config():
+  """Tests for rules.Rules.check_rule_config."""
+  # Ensure an exception occurs when a rule config file contains duplicate
+  # keys (rule names).
   with pytest.raises(ruamel.yaml.constructor.DuplicateKeyError):
     Rules.load_rule_config(
-        rule_config_file=TEST_DATA_DIR / "test_rule_config_duplicate_keys.yaml"
+        rule_config_file=TEST_DATA_DIR / "test_rule_config_duplicate_keys.yaml",
+        rules_dir=TEST_RULES_DIR,
     )
 
-  rule_config = Rules.load_rule_config(rule_config_file=TEST_RULE_CONFIG_FILE)
+  rule_config = Rules.load_rule_config(
+      rule_config_file=TEST_RULE_CONFIG_FILE, rules_dir=TEST_RULES_DIR
+  )
 
   rule_config["rule_1"]["invalid_key"] = "invalid"
 
@@ -205,3 +260,40 @@ def test_load_rule_config():
       match=r"Required key \(alerting\) not found for rule - ",
   ):
     Rules.check_rule_config(config=rule_config)
+
+
+def test_rule_config_entry():
+  """Tests for rules.RuleConfigEntry."""
+  # Ensure an exception occurs when attempting to create a RuleConfigEntry
+  # object that's missing a required value
+  with pytest.raises(
+      expected_exception=pydantic.ValidationError,
+      match=r"Field required \[type=missing",
+  ):
+    RuleConfigEntry(
+        name="rule_name",
+    )
+
+  # Ensure an exception occurs when attempting to create a RuleConfigEntry
+  # object with an invalid value
+  with pytest.raises(
+      expected_exception=pydantic.ValidationError,
+      match=(
+          r"validation error for RuleConfigEntry\nalerting\n  Input should be a"
+          r" valid boolean"
+      ),
+  ):
+    RuleConfigEntry(
+        name="rule_name",
+        id=None,
+        resource_name=None,
+        create_time=None,
+        revision_id=None,
+        revision_create_time=None,
+        enabled=True,
+        alerting="invalid_value",
+        archived=False,
+        archive_time=None,
+        run_frequency=None,
+        type=None,
+    )

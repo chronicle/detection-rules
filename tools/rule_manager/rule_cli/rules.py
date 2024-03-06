@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 # pylint: disable="g-bool-id-comparison","g-explicit-length-test"
 
 import collections
-import dataclasses
 import hashlib
+import json
 import logging
 import pathlib
 import re
 import time
-from typing import Any, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, List, Mapping, Sequence, Tuple
 
 from chronicle_api.rules.create_rule import create_rule
 from chronicle_api.rules.get_rule_deployment import get_rule_deployment
@@ -31,6 +31,7 @@ from chronicle_api.rules.list_rules import list_rules
 from chronicle_api.rules.update_rule import update_rule
 from chronicle_api.rules.update_rule_deployment import update_rule_deployment
 from google.auth.transport import requests
+import pydantic
 import ruamel.yaml
 from rule_cli.common import DuplicateRuleIdError
 from rule_cli.common import DuplicateRuleNameError
@@ -49,23 +50,39 @@ RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
 ruamel_yaml = ruamel.yaml.YAML(typ="safe")
 
 
-@dataclasses.dataclass
-class Rule:
-  """Class for a YARA-L rule."""
+class Rule(pydantic.BaseModel):
+  """Data class for a YARA-L rule."""
 
   name: str
-  id: Optional[str]
-  resource_name: Optional[str]
-  create_time: Optional[str]
-  revision_id: Optional[str]
-  revision_create_time: Optional[str]
+  id: str | None
+  resource_name: str | None
+  create_time: str | None
+  revision_id: str | None
+  revision_create_time: str | None
   enabled: bool
   alerting: bool
-  archived: Optional[bool]
-  archive_time: Optional[str]
-  run_frequency: Optional[str]
-  type: Optional[str]
+  archived: bool | None
+  archive_time: str | None
+  run_frequency: str | None
+  type: str | None
   text: str
+
+
+class RuleConfigEntry(pydantic.BaseModel):
+  """Class for a rule config file entry."""
+
+  name: str
+  id: str | None
+  resource_name: str | None
+  create_time: str | None
+  revision_id: str | None
+  revision_create_time: str | None
+  enabled: bool
+  alerting: bool
+  archived: bool | None
+  archive_time: str | None
+  run_frequency: str | None
+  type: str | None
 
 
 class Rules:
@@ -101,21 +118,30 @@ class Rules:
     )
     rule_id = rule_id_match.group(1)
 
-    parsed_rule = Rule(
-        name=rule["displayName"],
-        id=rule_id,
-        resource_name=rule["name"],
-        create_time=rule["createTime"],
-        revision_id=rule["revisionId"],
-        revision_create_time=rule["revisionCreateTime"],
-        enabled=rule["deployment_state"]["enabled"],
-        alerting=rule["deployment_state"]["alerting"],
-        archived=rule["deployment_state"]["archived"],
-        archive_time=rule["deployment_state"].get("archiveTime"),
-        run_frequency=rule["deployment_state"].get("runFrequency"),
-        type=rule["type"],
-        text=rule["text"],
-    )
+    try:
+      parsed_rule = Rule(
+          name=rule["displayName"],
+          id=rule_id,
+          resource_name=rule["name"],
+          create_time=rule["createTime"],
+          revision_id=rule["revisionId"],
+          revision_create_time=rule["revisionCreateTime"],
+          enabled=rule["deployment_state"]["enabled"],
+          alerting=rule["deployment_state"]["alerting"],
+          archived=rule["deployment_state"]["archived"],
+          archive_time=rule["deployment_state"].get("archiveTime"),
+          run_frequency=rule["deployment_state"].get("runFrequency"),
+          type=rule["type"],
+          text=rule["text"],
+      )
+    except pydantic.ValidationError as e:
+      LOGGER.error(
+          """ValidationError occurred for rule %s"
+                %s""",
+          rule,
+          json.dumps(e.errors(), indent=4),
+      )
+      raise
 
     return parsed_rule
 
@@ -136,7 +162,9 @@ class Rules:
       rule_config_file: pathlib.Path = RULE_CONFIG_FILE,
   ) -> "Rules":
     """Load rule files and config from disk."""
-    rule_config = Rules.load_rule_config(rule_config_file)
+    rule_config = Rules.load_rule_config(
+        rule_config_file=rule_config_file, rules_dir=rules_dir
+    )
 
     rule_files = list(rules_dir.glob("*.yaral"))
     non_rule_files = [
@@ -199,16 +227,59 @@ class Rules:
 
   @classmethod
   def load_rule_config(
-      cls, rule_config_file: pathlib.Path = RULE_CONFIG_FILE
+      cls,
+      rule_config_file: pathlib.Path = RULE_CONFIG_FILE,
+      rules_dir: pathlib.Path = RULES_DIR,
   ) -> Mapping[str, Any]:
     """Load rule config from file."""
+    rule_config_parsed = {}
+
     LOGGER.info("Loading rule config file from %s", rule_config_file)
     with open(rule_config_file, "r", encoding="utf-8") as f:
       rule_config = ruamel_yaml.load(f)
 
     Rules.check_rule_config(rule_config)
+    rule_files = list(rules_dir.glob("*.yaral"))
+    rule_file_names = [rule_file_path.stem for rule_file_path in rule_files]
 
-    return rule_config
+    for rule_name, rule_config_entry in rule_config.items():
+      # Raise an exception if a .yaral rule file is not found with the same name
+      # as the rule config entry
+      if rule_name not in rule_file_names:
+        raise RuleConfigError(
+            f"Rule file not found in {rules_dir} with same name as rule config"
+            f" entry {rule_name}"
+        )
+
+      try:
+        rule_config_entry_parsed = RuleConfigEntry(
+            name=rule_name,
+            id=rule_config_entry.get("id"),
+            resource_name=rule_config_entry.get("resource_name"),
+            create_time=rule_config_entry.get("create_time"),
+            revision_id=rule_config_entry.get("revision_id"),
+            revision_create_time=rule_config_entry.get("revision_create_time"),
+            enabled=rule_config_entry.get("enabled"),
+            alerting=rule_config_entry.get("alerting"),
+            archived=rule_config_entry.get("archived"),
+            archive_time=rule_config_entry.get("archive_time"),
+            run_frequency=rule_config_entry.get("run_frequency"),
+            type=rule_config_entry.get("type"),
+        )
+      except pydantic.ValidationError as e:
+        LOGGER.error(
+            """ValidationError occurred for rule config entry %s"
+                    %s""",
+            rule_name,
+            json.dumps(e.errors(), indent=4),
+        )
+        raise
+
+      rule_config_parsed[rule_config_entry_parsed.name] = (
+          rule_config_entry_parsed.model_dump(exclude={"name"})
+      )
+
+    return rule_config_parsed
 
   def dump_rules(self, rules_dir: pathlib.Path = RULES_DIR):
     """Dump a list of rules to local files."""
@@ -223,18 +294,37 @@ class Rules:
         rule_file.write(rule.text)
 
   def dump_rule_config(self):
-    """Dump the config/state for a collection of rules."""
+    """Dump the configuration and metadata for a collection of rules."""
     rule_config = {}
 
     for rule in self.rules:
-      rule_name = rule.name
-      rule_dict = dataclasses.asdict(rule)
-      # rule text not needed in rule config file.
-      del rule_dict["text"]
-      # rule name not required in config entry. The key for the config entry is
-      # set to the rule name.
-      del rule_dict["name"]
-      rule_config[rule_name] = rule_dict
+      try:
+        rule_config_entry = RuleConfigEntry(
+            name=rule.name,
+            id=rule.id,
+            resource_name=rule.resource_name,
+            create_time=rule.create_time,
+            revision_id=rule.revision_id,
+            revision_create_time=rule.revision_create_time,
+            enabled=rule.enabled,
+            alerting=rule.alerting,
+            archived=rule.archived,
+            archive_time=rule.archive_time,
+            run_frequency=rule.run_frequency,
+            type=rule.type,
+        )
+      except pydantic.ValidationError as e:
+        LOGGER.error(
+            """ValidationError occurred for rule config entry %s"
+                    %s""",
+            rule,
+            json.dumps(e.errors(), indent=4),
+        )
+        raise
+
+      rule_config[rule_config_entry.name] = rule_config_entry.model_dump(
+          exclude={"name"}
+      )
 
     rule_config_file_path = ROOT_DIR / "rule_config.yaml"
 
@@ -294,7 +384,7 @@ class Rules:
 
   @classmethod
   def compare_rule_text(cls, rule_text_1: str, rule_text_2: str) -> bool:
-    """Compare the rulet ext value of two rules."""
+    """Compare the rule text value of two rules."""
     # Compute MD5 hash for each rule's ruleText value.
     rule_1_hash = hashlib.md5(rule_text_1.encode(encoding="utf-8")).hexdigest()
     rule_2_hash = hashlib.md5(rule_text_2.encode(encoding="utf-8")).hexdigest()
@@ -405,16 +495,6 @@ class Rules:
   @classmethod
   def check_rule_settings(cls, rule: Rule):
     """Check a rule for invalid setting combinations."""
-    # Check that the enabled and alerting options are set.
-    if rule.enabled is None:
-      raise RuleConfigError(
-          f"{rule.name} - enabled (true/false) option is missing."
-      )
-    if rule.alerting is None:
-      raise RuleConfigError(
-          f"{rule.name} - alerting (true/false) option is missing."
-      )
-
     # Check that enabled or alerting are not set to True if archived is set to
     # True.
     if rule.archived is True and (
@@ -432,7 +512,7 @@ class Rules:
       rules_dir: pathlib.Path = RULES_DIR,
       rule_config_file: pathlib.Path = RULE_CONFIG_FILE,
   ) -> Mapping[str, Sequence[Tuple[str, str]]] | None:
-    """Attempting to update rules in Chronicle based on local rule files."""
+    """Update rules in Chronicle based on local rule files."""
     LOGGER.info(
         "Attempting to update rules in Chronicle based on local rule files"
     )
@@ -536,7 +616,7 @@ class Rules:
               "Created new rule %s (%s)", remote_rule.name, remote_rule.id
           )
           rule_id = remote_rule.id
-          local_rule.rule_id = rule_id
+          local_rule.id = rule_id
           local_rule.resource_name = remote_rule.resource_name
           update_summary["created"].append((rule_id, rule_name))
 
@@ -544,9 +624,10 @@ class Rules:
         # but there's a rule id for the local rule, the local rule has been
         # renamed. Create a new version of the existing rule in Chronicle.
         else:
-          rule_id = local_rule.rule_id
+          rule_id = local_rule.id
           LOGGER.info(
-              "Rule %s (%s) - Creating new rule version for existing rule",
+              "Rule %s (%s) has been renamed - Creating new rule version for"
+              " existing rule",
               rule_name,
               rule_id,
           )
@@ -555,6 +636,10 @@ class Rules:
               resource_name=local_rule.resource_name,
               update_mask=["text"],
               updates={"text": local_rule.text},
+          )
+          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
+          new_rule_version["deployment_state"] = get_rule_deployment(
+              http_session=http_session, resource_name=new_rule_version["name"]
           )
           time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           remote_rule = Rules.parse_rule(new_rule_version)

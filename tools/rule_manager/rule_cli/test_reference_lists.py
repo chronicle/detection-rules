@@ -21,7 +21,7 @@ from typing import Any, Mapping, Sequence
 import pydantic
 import pytest
 import ruamel.yaml.constructor
-from rule_cli.common import ReferenceListConfigError
+from rule_cli.common.custom_exceptions import ReferenceListConfigError
 from rule_cli.reference_lists import ReferenceList
 from rule_cli.reference_lists import ReferenceListConfigEntry
 from rule_cli.reference_lists import ReferenceLists

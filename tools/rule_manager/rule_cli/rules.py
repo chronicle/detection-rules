@@ -33,10 +33,10 @@ from chronicle_api.rules.update_rule_deployment import update_rule_deployment
 from google.auth.transport import requests
 import pydantic
 import ruamel.yaml
-from rule_cli.common import DuplicateRuleIdError
-from rule_cli.common import DuplicateRuleNameError
-from rule_cli.common import RuleConfigError
-from rule_cli.common import RuleError
+from rule_cli.common.custom_exceptions import DuplicateRuleIdError
+from rule_cli.common.custom_exceptions import DuplicateRuleNameError
+from rule_cli.common.custom_exceptions import RuleConfigError
+from rule_cli.common.custom_exceptions import RuleError
 import yaml
 
 LOGGER = logging.getLogger()

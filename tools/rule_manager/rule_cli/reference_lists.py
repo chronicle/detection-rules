@@ -29,7 +29,7 @@ from chronicle_api.reference_lists.update_reference_list import update_reference
 from google.auth.transport import requests
 import pydantic
 import ruamel.yaml
-from rule_cli.common import ReferenceListConfigError
+from rule_cli.common.custom_exceptions import ReferenceListConfigError
 import yaml
 
 LOGGER = logging.getLogger()

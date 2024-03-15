@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Classes and functions used across multiple modules."""
+"""Custom exceptions used across multiple modules."""
 
 
 class RuleError(Exception):

@@ -17,6 +17,7 @@
 # pylint: disable="invalid-name","g-bool-id-comparison"
 
 import argparse
+import datetime
 import json
 import logging
 import os
@@ -25,10 +26,12 @@ import sys
 import time
 
 from chronicle_api import chronicle_auth
+from chronicle_api.rules.stream_test_rule import test_rule
 from chronicle_api.rules.verify_rule import verify_rule
 import dotenv
 import google.auth.transport.requests
-from rule_cli.common import RuleVerificationError
+from rule_cli.common import datetime_converter
+from rule_cli.common.custom_exceptions import RuleVerificationError
 from rule_cli.reference_lists import ReferenceLists
 from rule_cli.rules import Rules
 
@@ -203,6 +206,66 @@ def verify_rules():
     )
 
 
+def stream_test_rule(
+    rule_file: pathlib.Path,
+    start_time: datetime.datetime | None = None,
+    end_time: datetime.datetime | None = None,
+    max_detections: int | None = None,
+    scope: str | None = None,
+):
+  """Test a rule in Chronicle without persisting results."""
+  if not rule_file.is_file():
+    raise FileNotFoundError(rule_file)
+
+  # Initialize an authorized HTTP session
+  http_session = chronicle_auth.initialize_http_session(
+      chronicle_api_credentials=json.loads(
+          os.environ["CHRONICLE_API_CREDENTIALS"]
+      ),
+      scopes=json.loads(os.environ["AUTHORIZATION_SCOPES"]).get(
+          "DETECTION_ENGINE_API"
+      ),
+  )
+
+  with open(rule_file, "r", encoding="utf-8") as f:
+    rule_text = f.read()
+
+  detections = test_rule(
+      http_session=http_session,
+      rule_text=rule_text,
+      start_time=start_time,
+      end_time=end_time,
+      max_detections=max_detections,
+      scope=scope,
+  )
+
+  LOGGER.info(
+      "Retrieved %s detections for rule: %s", len(detections), rule_file
+  )
+
+  # Remove or comment out the following lines to prevent detections from being
+  # logged
+  if len(detections) > 0:  # pylint: disable="g-explicit-length-test"
+    LOGGER.debug("Logging retrieved detections for rule: %s", rule_text)
+    for detection in detections:
+      LOGGER.debug(detection)
+
+  # This code can be customized to process the detections that were retrieved
+  # for the rule that was tested
+  # For example, the code below can be used to write the detections to a json
+  # file
+  # if len(detections) > 0:
+  #   current_time = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S")
+  #   detections_results_file_path = (
+  #       ROOT_DIR / f"rule_test_results_{rule_file.stem}_{current_time}.json"
+  #   )
+  #   with open(detections_results_file_path, "w", encoding="utf-8") as f:
+  #     json.dump(detections, f, indent=4)
+  #   LOGGER.debug(
+  #       "Detections for rule written to %s", detections_results_file_path
+  #   )
+
+
 if __name__ == "__main__":
   LOGGER.info("Rule CLI started")
 
@@ -262,6 +325,67 @@ if __name__ == "__main__":
       help="Verify that all local rules are valid YARA-L 2.0 rules.",
   )
 
+  test_rule_subparser = subparsers.add_parser(
+      name="test-rule",
+      help=(
+          "Runs a YARA-L rule over the given time range without persisting"
+          " results in Chronicle. Results (detections) are logged to the"
+          " console."
+      ),
+  )
+
+  test_rule_subparser.add_argument(
+      "-f",
+      "--rule-file-path",
+      type=pathlib.Path,
+      help="File path for rule to test.",
+      required=True,
+  )
+
+  test_rule_subparser.add_argument(
+      "--start-time",
+      type=datetime_converter.iso8601_datetime_utc,
+      required=False,
+      help=(
+          "The start time (in UTC format 'yyyy-mm-ddThh:mm:ssZ') of the time"
+          " range of events to test the rule text over. If unspecified, will"
+          " default to 12 hours before end_time."
+      ),
+  )
+
+  test_rule_subparser.add_argument(
+      "--end-time",
+      type=datetime_converter.iso8601_datetime_utc,
+      required=False,
+      help=(
+          "The end time (in UTC format 'yyyy-mm-ddThh:mm:ssZ') of the time"
+          " range of events to test the rule text over. If unspecified, will"
+          " either default to 12 hours after start_time, or the last 12 hours"
+          " of events if start_time is also unspecified."
+      ),
+  )
+
+  test_rule_subparser.add_argument(
+      "-md",
+      "--max-detections",
+      type=int,
+      required=False,
+      help=(
+          "Maximum number of detections to stream back. Default is 1,000."
+          " Maximum is 10,000."
+      ),
+  )
+
+  test_rule_subparser.add_argument(
+      "--scope",
+      type=str,
+      required=False,
+      help=(
+          "The data access scope to use to run the rule. Required if data"
+          " access control is enabled."
+      ),
+  )
+
   # Print CLI help if no arguments are provided.
   if len(sys.argv) == 1:
     parser.print_help()
@@ -310,3 +434,21 @@ if __name__ == "__main__":
   elif args.verify_rules:
     LOGGER.info("Attempting to verify all local rules")
     verify_rules()
+
+  elif args.subcommand == "test-rule":
+    rule_file_path = args.rule_file_path
+    LOGGER.info(
+        "Attempting to test rule %s with event start time of %s and event end"
+        " time of %s and scope %s",
+        rule_file_path,
+        args.start_time,
+        args.end_time,
+        args.scope,
+    )
+    stream_test_rule(
+        rule_file=rule_file_path,
+        start_time=args.start_time,
+        end_time=args.end_time,
+        max_detections=args.max_detections,
+        scope=args.scope,
+    )

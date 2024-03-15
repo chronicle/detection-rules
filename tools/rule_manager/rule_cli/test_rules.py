@@ -24,10 +24,10 @@ from typing import Any, Mapping, Sequence
 import pydantic
 import pytest
 import ruamel.yaml.constructor
-from rule_cli.common import DuplicateRuleIdError
-from rule_cli.common import DuplicateRuleNameError
-from rule_cli.common import RuleConfigError
-from rule_cli.common import RuleError
+from rule_cli.common.custom_exceptions import DuplicateRuleIdError
+from rule_cli.common.custom_exceptions import DuplicateRuleNameError
+from rule_cli.common.custom_exceptions import RuleConfigError
+from rule_cli.common.custom_exceptions import RuleError
 from rule_cli.rules import Rule
 from rule_cli.rules import RuleConfigEntry
 from rule_cli.rules import Rules

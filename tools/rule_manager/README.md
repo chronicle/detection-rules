@@ -20,6 +20,7 @@ used in a CI/CD pipeline (in GitHub, GitLab, CircleCI, etc) to do the following:
 their current state/configuration
 * Update detection rules in Chronicle based on local rule files, e.g., create new rules, create a new rule version, or
 enable/disable/archive rules
+* Test a YARA-L rule by running it over a given time range without persisting results in Chronicle
 * Retrieve the latest version of all reference lists from Chronicle and write them to local files along with their 
   current state/configuration
 * Create or update reference lists in Chronicle based on local files
@@ -130,9 +131,9 @@ and retrieve it via the [Secrets Manager API](https://cloud.google.com/secret-ma
 ### Executing the CLI
 
 ```console
-(venv) $ python -m rule_cli -h
-21-Feb-24 15:30:46 MST | INFO | <module> | Rule CLI started
-usage: __main__.py [-h] [--pull-latest-rules] [--update-remote-rules] [--pull-latest-reference-lists] [--update-remote-reference-lists] [--verify-rules] {verify-rule} ...
+python -m rule_cli -h
+02-Apr-24 10:47:39 MDT | INFO | <module> | Rule CLI started
+usage: __main__.py [-h] [--pull-latest-rules] [--update-remote-rules] [--pull-latest-reference-lists] [--update-remote-reference-lists] [--verify-rules] {verify-rule,test-rule} ...
 
 rule_cli
 
@@ -148,8 +149,9 @@ options:
   --verify-rules        Verify that all local rules are valid YARA-L 2.0 rules.
 
 subcommands:
-  {verify-rule}
+  {verify-rule,test-rule}
     verify-rule         Verify that a rule is a valid YARA-L 2.0 rule.
+    test-rule           Runs a YARA-L rule over the given time range without persisting results in Chronicle. Results (detections) are logged to the console.
 ```
 
 ### Running the tests
@@ -256,6 +258,27 @@ Example output from update remote rules command.
 16-Jan-24 16:23:11 MST | INFO | get_remote_rules | Retrieved a total of 37 rules
 16-Jan-24 16:23:13 MST | INFO | dump_rules | Writing 37 rule files to /Users/x/Documents/projects/detection-engineering/rules
 16-Jan-24 16:23:13 MST | INFO | dump_rule_config | Writing rule config to /Users/x/Documents/projects/detection-engineering/rule_config.yaml
+```
+
+### Testing a rule
+
+The `test-rule` command uses Chronicle's REST API to run a YARA-L rule over a given time range without persisting 
+results in Chronicle.
+
+Results (detections) are logged to the console. This code can be customized to write the results to a file for 
+analysis or add logic to process any detections that are returned.
+
+Example output from `test-rule` command:
+
+```console
+python -m rule_cli test-rule -f "/Users/x/Documents/projects/detection-engineering/rules/okta_new_api_token_created.yaral" --start-time 2024-03-12T05:30:00Z --end-time 2024-03-12T07:30:00Z
+02-Apr-24 10:57:50 MDT | INFO | <module> | Rule CLI started
+02-Apr-24 10:57:50 MDT | INFO | <module> | Attempting to test rule /Users/x/Documents/projects/detection-engineering/rules/okta_new_api_token_created.yaral with event start time of 2024-03-12 05:30:00+00:00 and event end time of 2024-03-12 07:30:00+00:00 and scope None
+02-Apr-24 10:57:57 MDT | INFO | stream_test_rule | Initiated connection to test rule stream
+02-Apr-24 10:57:57 MDT | DEBUG | stream_test_rule | Retrieved detection
+02-Apr-24 10:57:57 MDT | INFO | test_rule | Retrieved 1 detections and 0 rule execution errors
+02-Apr-24 10:57:57 MDT | INFO | stream_test_rule | Retrieved 1 detections for rule: /Users/x/Documents/projects/detection-engineering/rules/okta_new_api_token_created.yaral
+02-Apr-24 10:57:57 MDT | DEBUG | stream_test_rule | Logging retrieved detections for rule: ...
 ```
 
 ## Managing reference lists in Chronicle

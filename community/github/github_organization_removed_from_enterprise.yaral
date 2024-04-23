@@ -37,10 +37,10 @@ rule github_organization_removed_from_enterprise {
     $github.metadata.product_event_type = "business.remove_organization"
     $github.principal.user.userid = $user_id
     $github.target.user.company_name = $github_enterprise_name
-    $github.target.administrative_domain = $github_repo_name
+    $github.target.administrative_domain = $github_org_name
 
   match:
-    $user_id, $github_enterprise_name, $github_repo_name over 30m
+    $user_id, $github_enterprise_name, $github_org_name over 30m
 
 outcome:
     $risk_score = max(65)

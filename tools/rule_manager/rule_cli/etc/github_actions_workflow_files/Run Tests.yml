@@ -1,0 +1,45 @@
+# Run unit tests and verify YARA-L rules using Google SecOps' API.
+
+name: Run Tests
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches-ignore:
+      - main
+
+  # workflow_dispatch allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  run-unit-tests:
+    runs-on: ubuntu-latest
+    
+    env:
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      CHRONICLE_API_BASE_URL: ${{ vars.CHRONICLE_API_BASE_URL }}
+      CHRONICLE_INSTANCE: ${{ vars.CHRONICLE_INSTANCE }}
+      AUTHORIZATION_SCOPES: ${{ vars.AUTHORIZATION_SCOPES }}
+      CHRONICLE_API_CREDENTIALS: ${{ secrets.CHRONICLE_API_CREDENTIALS }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"  # Caching pip dependencies
+
+      - name: Install Python project dependencies
+        run: pip install -r requirements_dev.txt
+
+      - name: Check Python code formatting with black
+        run: python -m black chronicle_api rule_cli --line-length 120 --check
+
+      - name: Run tests using pytest
+        run: pytest -v
+
+      - name: Verify YARA-L rules
+        # Verify that all rules are valid YARA-L 2.0 rules via Google SecOps' API
+        run: python -m rule_cli --verify-rules

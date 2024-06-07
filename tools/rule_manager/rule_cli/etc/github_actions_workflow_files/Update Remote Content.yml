@@ -1,0 +1,77 @@
+# Update rules and reference lists in Google SecOps based on local rule files.
+
+name: Update Remote Content
+
+on:
+  push:
+    branches:
+      - "main"
+
+  # workflow_dispatch allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-remote-content:
+    runs-on: ubuntu-latest
+    
+    env:
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      CHRONICLE_API_BASE_URL: ${{ vars.CHRONICLE_API_BASE_URL }}
+      CHRONICLE_INSTANCE: ${{ vars.CHRONICLE_INSTANCE }}
+      AUTHORIZATION_SCOPES: ${{ vars.AUTHORIZATION_SCOPES }}
+      CHRONICLE_API_CREDENTIALS: ${{ secrets.CHRONICLE_API_CREDENTIALS }}
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"  # Caching pip dependencies
+
+      - name: Install Python project dependencies
+        run: pip install -r requirements_dev.txt
+
+      - name: Check Python code formatting with black
+        run: python -m black chronicle_api rule_cli --line-length 120 --check
+
+      - name: Run tests using pytest
+        run: pytest -v
+
+      - name: Update reference lists in Google SecOps based on files in main branch
+        run: python -m rule_cli --update-remote-reference-lists
+
+      - name: Update rules in Google SecOps based on files in main branch
+        run: python -m rule_cli --update-remote-rules
+
+      # After any changes are made to rules and reference lists in Google SecOps, the latest rules and reference lists are retrieved to update the main branch with the latest data (revision_id, revision_create_time, etc).
+
+      - name: Add files to git staging area
+        run: git add rules rule_config.yaml reference_lists reference_list_config.yaml
+
+      - name: Run git status command
+        run: git status  # For debugging
+
+      - name: Set the username and email to be associated with git commits
+        run: |
+          git config --global user.email ${{ secrets.GH_USER_EMAIL }}
+          git config --global user.name ${{ secrets.GH_USER_NAME }}
+
+      - name: Commit pending changes
+        run: |
+          # Check if there are uncommitted changes
+          if [[ -n $(git status --porcelain) ]]; then
+            git add .
+            git commit -m "latest content pulled from google secops api"
+            git push origin main
+          else
+            echo "No changes to commit"
+          fi 
+
+      - name: Show last git commit message
+        run: git log -1  # For debugging

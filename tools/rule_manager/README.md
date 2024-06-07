@@ -166,7 +166,7 @@ subcommands:
 Example CI/CD configuration files are provided to assist with managing content in Google SecOps via its REST API. You can customize these files to fit your specific requirements.
 
 * [GitLab CI/CD pipeline configuration file](https://github.com/chronicle/detection-rules/blob/main/tools/rule_manager/.gitlab-ci.yml)
-* [GitHub Actions workflow files](https://github.com/chronicle/detection-rules/blob/main/tools/rule_manager/etc/github_actions_workflow_files)
+* [GitHub Actions workflow files](https://github.com/chronicle/detection-rules/tree/main/tools/rule_manager/rule_cli/etc/github_actions_workflow_files)
 
 # Usage
 

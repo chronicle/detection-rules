@@ -119,6 +119,8 @@ refrain from including any sensitive information such as service account keys or
     chronicle.referenceLists.list
     chronicle.referenceLists.create
     chronicle.referenceLists.update
+    # Permissions required to test rules
+    chronicle.legacies.legacyTestRuleStreaming
     ```
 
 * Create a service account key for the service account that has the required permissions assigned and set it as the 

@@ -19,6 +19,8 @@ rule aws_guardduty_crypto_currency_activity_detected {
   meta:
     author = "Google Cloud Security"
     description = "Amazon GuardDuty detects CryptoCurrency activity in Amazon EC2, AWS Lambda or Amazon EKS Runtimes."
+    rule_id = "mr_be21d1ff-4d2b-4d0b-a928-0fa5d534cba5"
+    rule_name = "AWS GuardDuty Cryptocurrency Activity Detected"
     mitre_attack_tactic = "Impact"
     mitre_attack_technique = "Resource Hijacking"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1496/"

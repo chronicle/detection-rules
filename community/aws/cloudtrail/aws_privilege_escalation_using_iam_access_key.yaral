@@ -19,6 +19,8 @@ rule aws_privilege_escalation_using_iam_access_key {
   meta:
     author = "Google Cloud Security"
     description = "Detect when a user creates a new access key for another user and escalates privileges using this newly created access key from the same IP."
+    rule_id = "mr_a28c56ea-b5e6-4e23-8cb8-f306587b832b"
+    rule_name = "AWS Privilege Escalation Using IAM Access Key"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Cloud Account"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1136/003/"

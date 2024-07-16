@@ -19,6 +19,8 @@ rule win_repeatedAuthFailure_thenSuccess_T1110_001 {
   meta:
     author = "Google Cloud Security"
     description = "Detect Multiple Failed Login Attempts followed by Successful Login"
+    rule_id = "mr_16893c0e-2563-44ed-84c9-57ab326eb1c2"
+    rule_name = "MITRE ATT&CK T1110.001 Windows Repeated Authentication Failures Before Successful One"
     type = "alert"
     data_source = "microsoft windows events"
     platform = "Windows"

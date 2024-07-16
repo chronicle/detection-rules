@@ -19,6 +19,8 @@ rule o365_login_activity_to_azure_ad_powershell_app {
   meta:
     author = "Google Cloud Security"
     description = "Logins to Azure AD PowerShell app can have legitimate purposes, but are also abused to gain access to user information. Programmatic access to Entra ID (Azure AD) should generally be through apps, so reviewing these activities is needed."
+    rule_id = "mr_0cc56eaf-4176-444d-874d-9780bbb29d4f"
+    rule_name = "O365 Login Activity To Azure AD PowerShell App"
     mitre_attack_tactic = "Initial Access"
     mitre_attack_technique = "Valid Accounts: Cloud Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"

@@ -19,6 +19,8 @@ rule google_workspace_suspicious_login_and_google_drive_file_share {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when a Google Workspace user shares a file on Google Drive after a suspicious login event occurred."
+    rule_id = "mr_0ddcbd08-e918-4f7c-918b-3190c8b54ea4"
+    rule_name = "Google Workspace Suspicious Login and Google Drive File Share"
     mitre_attack_tactic = "Exfiltration"
     mitre_attack_technique = "Exfiltration Over Web Service"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1567/"

@@ -19,6 +19,8 @@ rule okta_threatinsight_login_failure_with_high_unknown_users {
   meta:
     author = "Google Cloud Security"
     description = "Okta's ThreatInsight can identify multiple login failures with high unknown users count from the same IP across one or more Okta orgs."
+    rule_id = "mr_41bafd12-7b1d-4b73-adf6-621c0431b538"
+    rule_name = "Okta ThreatInsight Login Failure With High Unknown Users"
     reference = "https://help.okta.com/en-us/Content/Topics/Security/threat-insight/configure-threatinsight-system-log.htm"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Brute Force: Credential Stuffing"

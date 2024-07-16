@@ -19,6 +19,8 @@ rule aws_guardduty_tor_network_activity_detected {
   meta:
     author = "Google Cloud Security"
     description = "Amazon GuardDuty detects Tor Network activity in an AWS account."
+    rule_id = "mr_abbc8f85-d4a3-4579-b444-19e6944f49d1"
+    rule_name = "AWS GuardDuty Tor Network Activity Detected"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Proxy: Multi-hop Proxy"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"

@@ -19,6 +19,8 @@ rule low_prevalence_hash_on_process_launch_low_prevalence_domain_accessed {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a low prevalence hash is seen during a process launch event, and a low prevalence domain is accessed within 10m."
+    rule_id = "mr_0624f9fb-8c73-4b8c-8651-b88ed736c862"
+    rule_name = "Low Prevalence Hash On Process Launch Low Prevalence Domain Accessed"
     type = "alert"
     tags = "prevalence"
     data_source = "zscalar, microsoft sysmon"

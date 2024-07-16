@@ -19,6 +19,8 @@ rule o365_persistent_login_activity_to_azure_ADPowerShell_app {
   meta:
     author = "Google Cloud Security"
     description = "Continual logins to Azure AD PowerShell app are not a security best practice, if this is observed, additional investigation is needed"
+    rule_id = "mr_4e61ae7f-d9fc-4c2a-b086-69d9d50dc5cc"
+    rule_name = "O365 Persistent Login Activity To Azure AD PowerShell App"
     mitre_attack_tactic = "Lateral Movement"
     mitre_attack_technique = "Remote Services: Cloud Services"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1021/007/"

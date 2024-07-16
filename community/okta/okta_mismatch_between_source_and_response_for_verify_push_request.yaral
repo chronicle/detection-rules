@@ -19,6 +19,8 @@ rule okta_mismatch_between_source_and_response_for_verify_push_request {
   meta:
     author = "Google Cloud Security"
     description = "Okta Mismatch Between Source and Response for Verify Push Request"
+    rule_id = "mr_552008c0-c691-40b2-b7ce-5181570ba5c3"
+    rule_name = "Okta Mismatch Between Source And Response For Verify Push Request"
     reference = "https://sec.okta.com/pushfatigueworkflows"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Multi-Factor Authentication Request Generation"

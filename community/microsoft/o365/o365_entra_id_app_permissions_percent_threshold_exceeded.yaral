@@ -19,6 +19,8 @@ rule o365_entra_id_app_permissions_percent_threshold_exceeded {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an excessive number of permissions are assigned to an Entra ID application within a time window, potentially indicating a greedy permission grab, as a percentage from old permissions to new permissions"
+    rule_id = "mr_6dcdb335-0054-46ae-a742-ecf6ac4e442b"
+    rule_name = "O365 Entra ID App Permissions Percent Threshold Exceeded"
     assumption = "This rule does not compare the specific permissions of the old and new permissions. Removing 8 permissions and replacing with 8 different permissions would not cause this rule to trigger"
     reference = "https://learn.microsoft.com/en-us/graph/permissions-reference"
     type = "alert"

@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when multiple KMS crypto key versions are disabled or destroyed from GCP Cloud KMS."
+    rule_id = "mr_1457dcf4-b20b-4ec0-a295-d04074889991"
+    rule_name = "GCP Multiple KMS Keys Disabled Or Destroyed"
     mitre_attack_tactic = "Impact"
     mitre_attack_technique = "Data Destruction"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1485/"

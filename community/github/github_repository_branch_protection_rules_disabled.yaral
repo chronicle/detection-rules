@@ -19,6 +19,8 @@ rule github_repository_branch_protection_rules_disabled {
   meta:
     author = "Google Cloud Security"
     description = "Detects when branch protection rules are disabled for a GitHub repository."
+    rule_id = "mr_6cf2c5d1-3e94-428f-b29c-84d09c209424"
+    rule_name = "GitHub Repository Branch Protection Rules Disabled"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "Medium"

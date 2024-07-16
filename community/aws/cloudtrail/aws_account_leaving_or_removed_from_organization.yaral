@@ -19,6 +19,8 @@ rule aws_account_leaving_or_removed_from_organization {
   meta:
     author = "Google Cloud Security"
     description = "Detect an AWS account attempting to leave or being removed from an AWS organization."
+    rule_id = "mr_eb9b7a74-0ad2-43e1-bf93-376844fe62b6"
+    rule_name = "AWS Account Leaving Or Removed From The Organization"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"

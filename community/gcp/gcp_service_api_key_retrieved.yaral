@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detects a successful attempt to retrieve the service API Keys."
+    rule_id = "mr_ee63778e-20ac-482c-84ef-abf5ceacd36e"
+    rule_name = "GCP Service API Key Retrieved"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Credentials from Password Stores"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1555/"

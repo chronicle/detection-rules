@@ -19,6 +19,8 @@ rule github_invitation_sent_to_non_company_email_domain {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an invitation to join a GitHub enterprise or organization is sent to a non-company email address. This rule can be customized to alert you when a GitHub invitation is sent to an unexpected domain i.e. not one of your company's domains used for email."
+    rule_id = "mr_c191df42-006f-485a-b037-f0cbf737bdd4"
+    rule_name = "GitHub Invitation Sent To Non Company Email Domain"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "High"

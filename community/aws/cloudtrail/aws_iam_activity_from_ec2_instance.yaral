@@ -19,6 +19,8 @@ rule aws_iam_activity_from_ec2_instance {
   meta:
     author = "Google Cloud Security"
     description = "Detect AWS IAM activities made by AWS EC2 instances to retain access or escalate privileges."
+    rule_id = "mr_60c7bb2f-2f02-4ac5-bbe0-ba8be871f3fb"
+    rule_name = "AWS IAM Activity From EC2 Instance"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Account Manipulation"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1098/"

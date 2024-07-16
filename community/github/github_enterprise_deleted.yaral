@@ -19,6 +19,8 @@ rule github_enterprise_deleted {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a GitHub enterprise is deleted."
+    rule_id = "mr_6443a51b-c381-4504-9b45-9d8b5e9531d7"
+    rule_name = "GitHub Enterprise Deleted"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "High"

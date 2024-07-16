@@ -19,6 +19,8 @@ rule whois_recently_created_domain_access {
   meta:
     author = "Google Cloud Security"
     description = "Detects access attempts to a newly created domain via WHOIS enrichment."
+    rule_id = "mr_209a5ab1-a0ea-473c-bfae-7beb67673e99"
+    rule_name = "WHOIS Recently Created Domain Access"
     type = "alert"
     tags = "whois"
     data_source = "zscalar"

@@ -19,6 +19,8 @@ rule suspicious_unusual_location_lnk_file {
   meta:
     author = "Google Cloud Security"
     description = "Detects creation and movement of .lnk files to specific folders"
+    rule_id = "mr_efb341aa-57c5-47b6-bde5-b409b4395c8f"
+    rule_name = "Suspicious Unusual Location LNK File"
     type = "alert"
     data_source = "microsoft sysmon"
     platform = "Windows"

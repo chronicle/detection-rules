@@ -19,6 +19,8 @@ rule hash_prevalence {
   meta:
     author = "Google Cloud Security"
     description = "Correlate process events with hashes that have a low rolling max over the past 10 days"
+    rule_id = "mr_abaa155b-f4ce-4fb2-b525-3eed59bca6d1"
+    rule_name = "Hash Prevalence"
     type = "alert"
     tags = "prevalence"
     data_source = "crowdstrike, sentinelone, microsoft sysmon, microsoft defender atp"

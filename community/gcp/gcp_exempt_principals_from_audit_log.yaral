@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when GCP Cloud Audit logs are exempted for principals in all services at project or organization level. Audit logging helps organizations maintain security and minimize risk."
+    rule_id = "mr_6ebf472c-bf50-468c-a0b1-e0f53dd91a61"
+    rule_name = "GCP Exempt Principals From Audit Log"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses: Disable Cloud Logs"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/008/"

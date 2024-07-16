@@ -19,6 +19,8 @@ rule github_enterprise_or_organization_recovery_codes_activity {
   meta:
     author = "Google Cloud Security"
     description = "Detects when the Single Sign-On (SSO) recovery codes are accessed for a GitHub enterprise or organization. An adversary may attempt to access or steal SSO recovery codes in order to maintain access to their target's GitHub environment."
+    rule_id = "mr_2bb0bc58-b799-4b8f-96c3-f1cfd7cea201"
+    rule_name = "GitHub Enterprise Or Organization Recovery Codes Activity"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "Medium"

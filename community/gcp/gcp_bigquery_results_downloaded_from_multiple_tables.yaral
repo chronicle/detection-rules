@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect a user downloads GCP BigQuery results from multiple tables which might indicate data exfiltration activity."
+    rule_id = "mr_dc6b1f68-734d-4b4b-91c2-1675f2422c11"
+    rule_name = "GCP BigQuery Results Downloaded From Multiple Tables"
     mitre_attack_tactic = "Exfiltration"
     mitre_attack_technique = "Exfiltration Over Web Service"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1567/"

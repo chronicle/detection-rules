@@ -19,6 +19,8 @@ rule google_workspace_encryption_key_files_accessed_by_anonymous_user {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when an encryption key file is accessed by an anonymous user in Google Drive. An adversary may attempt to access encryption keys before moving laterally and compromising sensitive data."
+    rule_id = "mr_5d7defeb-13d4-48f3-b6b0-d2cdab30ab57"
+    rule_name = "Google Workspace Encryption Key File Accessed By An Anonymous User"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Unsecured Credentials: Private Keys"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1552/004/"

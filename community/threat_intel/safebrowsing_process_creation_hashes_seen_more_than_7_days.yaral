@@ -19,6 +19,8 @@ rule safebrowsing_process_creation_hashes_seen_more_than_7_days {
   meta:
     author = "Google Cloud Security"
     description = "Identify process and file creation using safe browsing hashes where the first and last seen are more than 7 days apart"
+    rule_id = "mr_9970945d-45cf-44ed-887a-ff876d5a072b"
+    rule_name = "Safebrowsing Process Creation Hashes Seen More Than 7 Days"
     type = "alert"
     tags = "safe browsing, first last seen"
     data_source = "microsoft sysmon, crowdstrike"

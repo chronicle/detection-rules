@@ -19,6 +19,8 @@ rule vt_relationships_file_contacts_tor_ip {
   meta:
     author = "Google Cloud Security"
     description = "Alert on known Hash contacting Tor IP with VT Relationships."
+    rule_id = "mr_a6f8b114-8fdb-4f39-8820-8961dcbb1079"
+    rule_name = "VT Relationships File Contacts Tor IP"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Proxy: Multi-hop Proxy"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"

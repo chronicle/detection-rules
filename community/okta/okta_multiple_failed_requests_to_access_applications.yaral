@@ -19,6 +19,8 @@ rule okta_multiple_failed_requests_to_access_applications {
   meta:
     author = "Google Cloud Security"
     description = "Detects multiple failed requests to access applications"
+    rule_id = "mr_171cce33-0367-4c46-918d-c9fe813b4418"
+    rule_name = "Okta Multiple Failed Requests To Access Applications"
     reference = "https://sec.okta.com/sessioncookietheft"
     mitre_attack_tactic = "Defense Evasion, Lateral Movement"
     mitre_attack_technique = "Use Alternate Authentication Material: Web Session Cookie"

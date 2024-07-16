@@ -19,6 +19,8 @@ rule win_short_term_account_use {
   meta:
     author = "Google Cloud Security"
     description = "Detects the creation, login, and deletion of a user account over a predefined timeframe"
+    rule_id = "mr_ac28ce76-8197-4354-af0d-d77c5771d9df"
+    rule_name = "Windows Short Term Account Use"
     type = "alert"
     platform = "windows"
     data_source = "microsoft windows events"

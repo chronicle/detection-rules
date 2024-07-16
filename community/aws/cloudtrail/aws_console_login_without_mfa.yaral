@@ -19,6 +19,8 @@ rule aws_console_login_without_mfa {
     meta:
       author = "Google Cloud Security"
       description = "Detect when a user logs into AWS console without MFA."
+      rule_id = "mr_b03d1e57-7ed0-49e7-b125-6c18b364ae8c"
+      rule_name = "AWS Console Login Without MFA"
       mitre_attack_tactic = "Initial Access"
       mitre_attack_technique = "Valid Accounts: Cloud Accounts"
       mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"

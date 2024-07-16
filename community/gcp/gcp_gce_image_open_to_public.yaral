@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when GCP Compute Image is opened to public by adding allAuthenticatedUsers to the access policy."
+    rule_id = "mr_4a1525be-9e17-41d6-ba67-a11058ee4d3c"
+    rule_name = "GCP GCE Image Open To Public"
     mitre_attack_tactic = "Exfiltration"
     mitre_attack_technique = "Transfer Data to Cloud Account"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1537/"

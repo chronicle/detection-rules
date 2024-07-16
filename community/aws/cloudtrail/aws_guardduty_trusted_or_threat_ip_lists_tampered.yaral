@@ -19,6 +19,8 @@ rule aws_guardduty_trusted_or_threat_ip_lists_tampered {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a GuardDuty Detector's trusted or threat intel IP lists are deleted or disabled."
+    rule_id = "mr_bdf03398-6341-4f2a-a8ce-9056c82fda2e"
+    rule_name = "AWS GuardDuty Trusted Or Threat IP Lists Tampered"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"

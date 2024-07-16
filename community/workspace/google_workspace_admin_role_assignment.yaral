@@ -19,6 +19,8 @@ rule google_workspace_admin_role_assignment {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when an administrator role is assigned to a user account in Google Workspace. Security teams can monitor for the malicious or accidental assignment of administrator privileges to prevent unauthorized access to data."
+    rule_id = "mr_0c547820-1095-42a1-94d8-a00d5ef2df76"
+    rule_name = "Google Workspace Admin Role Assignment"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"

@@ -19,6 +19,8 @@ rule okta_user_account_lockout {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a user's account is locked out or a user account has reached the lockout limit."
+    rule_id = "mr_b7d1d908-77db-4217-a170-44e0423c7fbe"
+    rule_name = "Okta User Account Lockout"
     reference = "https://www.okta.com/resources/whitepaper/how-adaptive-mfa-helps-mitigate-brute-force-attacks/"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts"

@@ -19,6 +19,8 @@ rule geoip_user_login_from_multiple_states_or_countries {
   meta:
     author = "Google Cloud Security"
     description = "Detect multiple user logins from multiple states or countries using Chronicle GeoIP enrichment."
+    rule_id = "mr_3fa832e4-1ac0-42cd-9f0a-357d6b8fb12f"
+    rule_name = "GeoIP User Login From Multiple States Or Countries"
     type = "alert"
     data_source = "microsoft ad, azure ad, okta, aws cloudtrail, google scc"
     tags = "geoip enrichment"

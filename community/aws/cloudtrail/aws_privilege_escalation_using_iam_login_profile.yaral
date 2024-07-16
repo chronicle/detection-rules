@@ -19,6 +19,8 @@ rule aws_privilege_escalation_using_iam_login_profile {
   meta:
     author = "Google Cloud Security"
     description = "Detect when a user creates or updates a login profile for another user and escalates privileges using this new user from the same IP."
+    rule_id = "mr_b0d13079-dbe7-4c19-a8e9-23f98655a29b"
+    rule_name = "AWS Privilege Escalation Using IAM Login Profile"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Cloud Account"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1136/003/"

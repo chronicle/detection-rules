@@ -19,6 +19,8 @@ rule aws_guardduty_command_and_control_activity_detected {
   meta:
     author = "Google Cloud Security"
     description = "Amazon GuardDuty detects Command and control activity in Amazon EC2, AWS Lambda or Amazon EKS Runtimes."
+    rule_id = "mr_dc0c33c7-35e3-44e2-b149-99212f3e54c6"
+    rule_name = "AWS GuardDuty Command And Control Activity Detected"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Application Layer Protocol"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1071/"

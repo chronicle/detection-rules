@@ -19,6 +19,8 @@ rule rw_utilities_associated_with_ntdsdit_T1003_003 {
   meta:
     author = "Google Cloud Security"
     description = "Detects process launches from processes related to ntds against key servers"
+    rule_id = "mr_03db3339-09ba-4c9c-b3d6-1b81998a1de4"
+    rule_name = "MITRE ATT&CK T1003.003 RW Utilities Associated With Ntds.dit"
     type = "alert"
     tags = "list"
     assumption = "Assumes lists for key servers and ntds suspicious processes have been created"

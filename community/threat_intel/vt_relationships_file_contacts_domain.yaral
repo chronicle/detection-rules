@@ -19,6 +19,8 @@ rule vt_relationships_file_contacts_domain {
   meta:
     author = "Google Cloud Security"
     description = "Alert on known Hash querying a known hostname with VT Relationships"
+    rule_id = "mr_42ee37ba-cb36-49f2-b784-05ca0bd55b9f"
+    rule_name = "VT Relationships File Contacts Domain"
     type = "alert"
     tags = "vt"
     data_source = "microsoft sysmon, crowdstrike"

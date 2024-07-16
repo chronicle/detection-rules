@@ -19,6 +19,8 @@ rule aws_guardduty_brute_force_activity_detected {
   meta:
     author = "Google Cloud Security"
     description = "Amazon GuardDuty detects a brute force activity in an Amazon EC2 or Amazon RDS instance."
+    rule_id = "mr_33197748-cb9d-451f-8135-4b61cc5e4ca5"
+    rule_name = "AWS GuardDuty Bruteforce Activity Detected"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Brute Force"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1110/"

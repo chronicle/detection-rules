@@ -19,6 +19,8 @@ rule github_oauth_application_access_restrictions_disabled {
   meta:
     author = "Google Cloud Security"
     description = "Detects when third-party application access restrictions are disabled for a GitHub organization."
+    rule_id = "mr_9faa8dae-8e9f-4c10-9d11-e45eaebe1070"
+    rule_name = "GitHub OAuth Application Access Restrictions Disabled"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "Low"

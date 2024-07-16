@@ -19,6 +19,8 @@ rule adfs_db_suspicious_named_pipe_connection {
   meta:
     author = "Google Cloud Security"
     description = "Connection to ADFS via named pipes that are not using specific Windows ADFS processes may be indicative of user attempting to access ADFS for suspicious purposes"
+    rule_id = "mr_a25913a1-65be-4cb5-b0de-6858dd04ac99"
+    rule_name = "ADFS DB Suspicious Named Pipe Connection"
     reference = "https://github.com/Azure/Azure-Sentinel/blob/master/Solutions/Windows%20Security%20Events/Analytic%20Rules/ADFSDBNamedPipeConnection.yaml"
     type = "alert"
     platform = "Windows"

@@ -19,6 +19,8 @@ rule google_workspace_application_added {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when a Marketplace app is added in a Google Workspace organization. Installing certain apps may increase the organization's risk of data exfiltration/leakage and increase its attack surface."
+    rule_id = "mr_bb4f5ff0-76b8-4b08-8b1b-fcb81e5a10cc"
+    rule_name = "Google Workspace Application Added"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = ""
     mitre_attack_url = ""

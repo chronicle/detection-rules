@@ -19,6 +19,8 @@ rule okta_threatinsight_targeted_brute_force_attack {
   meta:
     author = "Google Cloud Security"
     description = "Okta ThreatInsight detects access requests from known malicious IPs targeting a specific org."
+    rule_id = "mr_ce576f12-ee6d-4282-9f7b-f955af183eb7"
+    rule_name = "Okta ThreatInsight Targeted Bruteforce Attack"
     reference = "https://help.okta.com/en-us/Content/Topics/Security/threat-insight/configure-threatinsight-system-log.htm"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Brute Force"

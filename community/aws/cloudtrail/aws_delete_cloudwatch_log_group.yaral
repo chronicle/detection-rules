@@ -19,6 +19,8 @@ rule aws_delete_cloudwatch_log_group {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a CloudWatch log group is deleted."
+    rule_id = "mr_e1e4e137-341a-4302-af26-3bfe599bcc98"
+    rule_name = "AWS Delete CloudWatch Log Group"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses: Disable Cloud Logs"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/008/"

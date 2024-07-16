@@ -19,6 +19,8 @@ rule aws_lateral_movement_using_iam_session_token {
   meta:
     author = "Google Cloud Security"
     description = "Detect when an IAM session token is created and used from a different IP."
+    rule_id = "mr_ac0df875-fe5b-49af-bf2a-3da341177754"
+    rule_name = "AWS Lateral Movement Using IAM Session Token"
     mitre_attack_tactic = "Lateral Movement"
     mitre_attack_technique = "Use Alternate Authentication Material"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1550/"

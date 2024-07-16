@@ -19,6 +19,8 @@ rule o365_add_user_to_admin_role {
   meta:
     author = "Google Cloud Security"
     description = "Adding users to administrative roles is not malicious, but due to the sensitivity of certain roles, validation should occur when this occurs"
+    rule_id = "mr_ee28c257-d2c7-490c-addf-aef35d07f29d"
+    rule_name = "O365 Add User To Admin Role"
     assumption = "The list msgraph_watchlist_roles is populated with role names, example: Application Administrator"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"

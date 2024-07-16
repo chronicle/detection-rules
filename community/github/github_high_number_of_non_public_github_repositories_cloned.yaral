@@ -19,6 +19,8 @@ rule github_high_number_of_non_public_github_repositories_cloned {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a user clones a high number of non-public GitHub repositories. An adversary may attempt to steal the contents of several GitHub repositories after compromising a user account."
+    rule_id = "mr_9063e681-ac7b-4fad-8bcf-08ed1ae367da"
+    rule_name = "GitHub High Number Of Non Public GitHub Repositories Cloned"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "High"

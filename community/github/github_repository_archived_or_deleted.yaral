@@ -19,6 +19,8 @@ rule github_repository_archived_or_deleted {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a GitHub repository is archived or deleted."
+    rule_id = "mr_8c515a63-1e2e-4f9e-9150-93302b813315"
+    rule_name = "GitHub Repository Archived Or Deleted"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "Low"

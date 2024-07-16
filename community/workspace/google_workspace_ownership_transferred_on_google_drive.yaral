@@ -19,6 +19,8 @@ rule google_workspace_ownership_transferred_on_google_drive {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when a Google Workspace user transfers the ownership of a file."
+    rule_id = "mr_05cddcc9-abf6-4c4c-9518-e2218a1f5c84"
+    rule_name = "Google Workspace Ownership Transferred On Google Drive"
     mitre_attack_tactic = "Collection"
     mitre_attack_technique = "Data Staged: Remote Data Staging"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1074/002/"

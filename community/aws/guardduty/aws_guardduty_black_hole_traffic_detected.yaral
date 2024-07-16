@@ -19,6 +19,8 @@ rule aws_guardduty_black_hole_traffic_detected {
   meta:
     author = "Google Cloud Security"
     description = "Amazon GuardDuty detects an Amazon EC2 instance or a container attempting to communicate with a black hole IP address."
+    rule_id = "mr_8ac55f38-9c11-4f51-89cd-c40e9b6238b3"
+    rule_name = "AWS GuardDuty Black Hole Traffic Detected"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Application Layer Protocol"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1071/"

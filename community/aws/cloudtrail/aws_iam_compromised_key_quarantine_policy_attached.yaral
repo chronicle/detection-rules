@@ -19,6 +19,8 @@ rule aws_iam_compromised_key_quarantine_policy_attached {
   meta:
     author = "Google Cloud Security"
     description = "Detect when the AWS managed policy AWSCompromisedKeyQuarantine has been attached to a user, role, or group. It is applied by the AWS team in the event that the credentials of an IAM user has been compromised or publicly exposed."
+    rule_id = "mr_3ac90268-e8bd-41b7-8fc1-e10ee165df8e"
+    rule_name = "AWS IAM Compromised Key Quarantine Policy Attached"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Unsecured Credentials"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1552/"

@@ -19,6 +19,8 @@ rule aws_guardduty_penetration_testing_activity_detected {
   meta:
     author = "Google Cloud Security"
     description = "Amazon GuardDuty detects penetration testing activity from known offensive security distros such as KaliLinux, ParrotLinux or PentooLinux."
+    rule_id = "mr_7dac6e7c-9d35-4093-9b85-4b0175e8bee7"
+    rule_name = "AWS GuardDuty Penetration Testing Activity Detected"
     mitre_attack_tactic = "Resource Development"
     mitre_attack_technique = "Obtain Capabilities"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1588/"

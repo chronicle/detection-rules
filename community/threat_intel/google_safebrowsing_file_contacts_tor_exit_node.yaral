@@ -19,6 +19,8 @@ rule google_safebrowsing_file_contacts_tor_exit_node {
   meta:
     author = "Google Cloud Security"
     description = "A malicious file contacting a known Tor Exit Node."
+    rule_id = "mr_f6733319-50b3-477e-bad6-96bb4c14c632"
+    rule_name = "Google Safebrowsing File Contacts Tor Exit Node"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Proxy: Multi-hop Proxy"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"

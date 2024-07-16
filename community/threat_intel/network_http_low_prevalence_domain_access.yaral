@@ -19,6 +19,8 @@ rule network_http_low_prevalence_domain_access {
   meta:
     author = "Google Cloud Security"
     description = "Detects network web access to a low prevalence domain"
+    rule_id = "mr_c376478e-1c93-4d27-8bea-a56c3c0052f5"
+    rule_name = "Network HTTP Low Prevalence Domain Access"
     type = "alert"
     tags = "prevalence"
     data_source = "zscalar"

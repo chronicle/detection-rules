@@ -19,6 +19,8 @@ rule o365_entra_id_app_modify_permission_change_on_watchlist {
   meta:
     author = "Google Cloud Security"
     description = "Alerts when a permission on the watchlist is applied to an Entra ID application."
+    rule_id = "mr_678cafb8-ea1f-42ac-a396-238bc35e4d21"
+    rule_name = "O365 Entra ID App Modify Permission Change On Watchlist"
     reference = "https://learn.microsoft.com/en-us/graph/permissions-reference"
     assumption = "The list msgraph_watchlist_permissions is populated as needed with guid permissions Example: 024d486e-b451-40bb-833d-3e66d98c5c73 //Mail.Read.Write"
     type = "alert"

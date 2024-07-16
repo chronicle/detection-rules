@@ -19,6 +19,8 @@ rule mitre_attack_T1570_suspicious_command_psexec {
   meta:
     author = "Google Cloud Security"
     description = "Command-line execution of the PsExec tool on Windows"
+    rule_id = "mr_b1c34e7b-79c2-4d44-a105-d8166f6fd2c5"
+    rule_name = "MITRE ATT&CK T1570 Suspicious Command PSExec"
     mitre_attack_tactic = "Lateral Movement"
     mitre_attack_technique = "Lateral Tool Transfer"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1570/"

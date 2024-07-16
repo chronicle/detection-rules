@@ -19,6 +19,8 @@ rule aws_api_call_outside_of_organization {
   meta:
     author = "Google Cloud Security"
     description = "Detects API Calls from AWS accounts that are not part of the organization."
+    rule_id = "mr_205120b7-6654-410a-ab6d-e40484e2fafb"
+    rule_name = "AWS API Call Outside Of Organization"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts: Cloud Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"

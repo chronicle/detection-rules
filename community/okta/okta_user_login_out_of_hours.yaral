@@ -19,6 +19,8 @@ rule okta_user_login_out_of_hours {
   meta:
     author = "Google Cloud Security"
     description = "Detects out of hours successful authentication."
+    rule_id = "mr_36840037-a41c-47d0-b0eb-4096f28855e1"
+    rule_name = "Okta User Login Out Of Hours"
     reference = "https://support.okta.com/help/s/article/User-Signin-and-Recovery-Events-in-the-Okta-System-Log"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts"

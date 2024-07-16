@@ -19,6 +19,8 @@ rule aws_unusual_number_of_failed_authentications_from_the_same_ip {
   meta:
     author = "Google Cloud Security"
     description = "Detects unusual number of failed authentications from the same IP for valid users."
+    rule_id = "mr_cf1787a4-0145-4093-ad35-2de17f1980ce"
+    rule_name = "AWS Unusual Number Of Failed Authentication Attempts From The Same IP"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Brute Force: Credential Stuffing"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1110/004/"

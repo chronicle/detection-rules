@@ -19,6 +19,8 @@ rule google_workspace_marketplace_allowlist_configuration {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when the Google Workspace Marketplace allowlist is configured to allow users to install and run any apps from the Marketplace. Allowing users to install and run any apps may increase the organization's risk of data exfiltration/leakage and increase its attack surface."
+    rule_id = "mr_3dd74ce1-27cb-4c57-b4cf-4cfb29293ab5"
+    rule_name = "Google Workspace Marketplace Allowlist Configuration"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses: Disable or Modify Tools"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/001/"

@@ -19,6 +19,8 @@ rule github_personal_access_token_created_from_tor_ip_address {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a GitHub Personal Access Token is created from a known Tor exit node IP address. An adversary may create a Personal Access Token before carrying out follow up actions such as cloning GitHub repositories to steal data."
+    rule_id = "mr_39b42a3c-6b7a-4fa7-a6ca-df084ca92da4"
+    rule_name = "GitHub Personal Access Token Created from Tor IP Address"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "High"

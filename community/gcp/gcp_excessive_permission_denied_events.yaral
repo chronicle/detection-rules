@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detects excessive PermissionDenied events within an hour timeframe from a user"
+    rule_id = "mr_2edbd86a-703a-41a3-b2b2-596dd9dbed8d"
+    rule_name = "GCP Excessive Permission Denied Events"
     mitre_attack_tactic = "Discovery"
     mitre_attack_technique = "Cloud Infrastructure Discovery"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1580/"

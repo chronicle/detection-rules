@@ -19,6 +19,8 @@ rule aws_new_mfa_method_registered_for_user {
   meta:
     author = "Google Cloud Security"
     description = "Detects the registration of a new Multi Factor authentication method for an AWS user."
+    rule_id = "mr_bee2a210-111a-478a-a1a2-caeb9077eca2"
+    rule_name = "AWS New MFA Method Registered For User"
     mitre_attack_tactic = "Credential Access, Defense Evasion, Persistence"
     mitre_attack_technique = "Modify Authentication Process: Multi-Factor Authentication"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1556/006/"

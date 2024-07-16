@@ -19,6 +19,8 @@ rule aws_successful_console_authentication_from_multiple_ips {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an AWS user successfully authenticating from more than one unique IP address within 5 minutes."
+    rule_id = "mr_4a221c43-1059-4247-a7a6-69d8ce4dca2c"
+    rule_name = "AWS Successful Console Authentication From Multiple IPs"
     mitre_attack_tactic = "Resource Development"
     mitre_attack_technique = "Compromise Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1586/"

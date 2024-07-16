@@ -19,6 +19,8 @@ rule mitre_attack_T1053_005_windows_creation_of_scheduled_task {
   meta:
     author = "Google Cloud Security"
     description = "Creation of scheduled task using command line"
+    rule_id = "mr_14beda0b-8ef1-4805-a227-df9d8bbc6804"
+    rule_name = "MITRE ATT&CK T1053.005 Windows Creation Of Scheduled Task"
     mitre_attack_tactic = "Execution, Persistence, Privilege Escalation"
     mitre_attack_technique = "Scheduled Task/Job: Scheduled Task"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1053/005/"

@@ -19,6 +19,8 @@ rule aws_kms_key_disabled_or_scheduled_for_deletion {
   meta:
     author = "Google Cloud Security"
     description = "Detect when a KMS (Key Management Service) key is disabled or scheduled for deletion."
+    rule_id = "mr_b1947fef-7b98-4c10-8303-d6c9c032d84e"
+    rule_name = "AWS KMS Key Disabled Or Scheduled For Deletion"
     mitre_attack_tactic = "Impact"
     mitre_attack_technique = "Data Destruction"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1485/"

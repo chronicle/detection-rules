@@ -19,6 +19,8 @@ rule vt_relationships_file_downloaded_from_ip {
   meta:
     author = "Google Cloud Security"
     description = "Alert on downloading a known file hash from a known IP with VT Relationships."
+    rule_id = "mr_1a62ba21-6f3d-40c7-9278-b1e2d639a10b"
+    rule_name = "VT Relationships File Downloaded From IP"
     type = "alert"
     tags = "vt"
     data_source = "zscalar, crowdstrike"

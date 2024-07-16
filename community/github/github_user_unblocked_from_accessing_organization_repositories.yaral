@@ -19,6 +19,8 @@ rule github_user_unblocked_from_accessing_organization_repositories {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a user is unblocked from accessing repositories within a GitHub organization."
+    rule_id = "mr_3a6905e8-e5e1-40af-b911-52bc4918d2ba"
+    rule_name = "GitHub User Unblocked From Accessing Organization Repositories"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "Low"

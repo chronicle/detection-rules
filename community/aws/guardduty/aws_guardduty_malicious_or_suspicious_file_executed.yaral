@@ -19,6 +19,8 @@ rule aws_guardduty_malicious_or_suspicious_file_executed {
   meta:
     author = "Google Cloud Security"
     description = "Amazon GuardDuty detects a malicious or suspicious file on an Amazon EC2 instance or a container workload."
+    rule_id = "mr_a5d8f51c-d0de-4169-99e2-d3eaa02b266c"
+    rule_name = "AWS GuardDuty Malicious Or Suspicious File Executed"
     mitre_attack_tactic = "Execution"
     mitre_attack_technique = "User Execution: Malicious File"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1204/002/"

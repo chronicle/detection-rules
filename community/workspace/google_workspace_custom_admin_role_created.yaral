@@ -19,6 +19,8 @@ rule google_workspace_custom_admin_role_created {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when a custom administrator role is created in Google Workspace. Security teams can monitor for malicious or accidental configuration of administrator privileges to prevent unauthorized access to data."
+    rule_id = "mr_a15f64fc-3eaf-49f0-9f74-c533a63cb531"
+    rule_name = "Google Workspace Custom Admin Role Created"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"

@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when free Google Email addressess are added to IAM Policy such as gmail.com, googlemail.com or googlegroups.com."
+    rule_id = "mr_eec293b2-75d6-48f1-871d-182d67345a9c"
+    rule_name = "GCP Free Gmail Domains Added To IAM Policy"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Create Account: Cloud Account"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1136/003/"

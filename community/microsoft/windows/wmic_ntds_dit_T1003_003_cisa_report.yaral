@@ -19,6 +19,8 @@ rule wmic_ntds_dit_T1003_003_cisa_report {
   meta:
     author = "Google Cloud Security"
     description = "Detects extraction of ntds.dit file using vssadmin.exe or ntdsutil.exe with wmic as identified in CISA Living of the Land pdf"
+    rule_id = "mr_b1719d37-6689-485d-b80c-b509fdaa1af8"
+    rule_name = "MITRE ATT&CK T1003.003 WMIC Ntds.dit CISA Report"
     type = "alert"
     platform = "Windows"
     data_source = "microsoft sysmon, windows event logs"

@@ -19,6 +19,8 @@ rule mitre_attack_T1140_encoded_powershell_command {
   meta:
     author = "Google Cloud Security"
     description = "Detects encoded powershell commands"
+    rule_id = "mr_c01d7d92-db49-4044-a2c5-5a16c74a141d"
+    rule_name = "MITRE ATT&CK T1140 Encoded Powershell Command"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Deobfuscate/Decode Files or Information"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1140/"

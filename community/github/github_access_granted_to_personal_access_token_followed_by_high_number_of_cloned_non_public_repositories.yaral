@@ -19,6 +19,8 @@ rule github_access_granted_to_personal_access_token_followed_by_high_number_of_c
   meta:
     author = "Google Cloud Security"
     description = "Detects when a user grants access to a GitHub Personal Access Token prior to cloning several GitHub non-public GitHub repositories. An adversary may grant access to a Personal Access Token before attempting to steal the contents of several GitHub repositories using a an automated script or offensive tool."
+    rule_id = "mr_11aaa6f7-7fcc-42cb-af2e-42ed39226c43"
+    rule_name = "GitHub Access Granted To Personal Access Token Followed By High Number Of Cloned Non Public Repositories"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "High"

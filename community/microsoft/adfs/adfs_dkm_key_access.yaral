@@ -19,6 +19,8 @@ rule adfs_dkm_key_access {
   meta:
     author = "Google Cloud Security"
     description = "Detects access to the AD contact object to read the AD FS DKM (distributed key manager) master key value"
+    rule_id = "mr_2517eaa0-0915-4a9e-8ca2-abce955eb635"
+    rule_name = "ADFS DKM Key Access"
     reference = "https://github.com/OTRF/BHEU22-ADFS/blob/main/Slide-Deck.pdf"
     type = "alert"
     mitre_attack_tactic = "Credential Access"

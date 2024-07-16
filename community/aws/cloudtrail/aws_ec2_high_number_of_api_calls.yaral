@@ -19,6 +19,8 @@ rule aws_ec2_high_number_of_api_calls {
   meta:
     author = "Google Cloud Security"
     description = "Detect when an EC2 instance makes high number of API calls."
+    rule_id = "mr_d19289e1-4385-4757-bf54-0f61e7a789a4"
+    rule_name = "AWS EC2 High Number Of API Calls"
     mitre_attack_tactic = "Discovery"
     mitre_attack_technique = "Cloud Infrastructure Discovery"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1580/"

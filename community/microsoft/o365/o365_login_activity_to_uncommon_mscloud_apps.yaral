@@ -19,6 +19,8 @@ rule o365_login_activity_to_uncommon_mscloud_apps {
   meta:
     author = "Google Cloud Security"
     description = "This rule detects O365 login activity to apps other than a defined list of first party MS Cloud Apps. Note that Azure Active Directory PowerShell and custom Azure apps are not in this list by default"
+    rule_id = "mr_eca0cd3d-7d65-47f6-9df2-1a16664819ae"
+    rule_name = "O365 Login Activity To Uncommon Microsoft Cloud Apps"
     assumption = "The list first_party_ms_cloud_apps is populated as needed"
     mitre_attack_tactic = "Initial Access"
     mitre_attack_technique = "Valid Accounts: Cloud Accounts"

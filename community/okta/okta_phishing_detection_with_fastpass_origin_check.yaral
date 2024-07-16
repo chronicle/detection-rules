@@ -19,6 +19,8 @@ rule okta_phishing_detection_with_fastpass_origin_check {
   meta:
     author = "Google Cloud Security"
     description = "Okta provides a platform detection for when a user enrolled in FastPass fails to authenticate via a real-time AiTM phishing proxy."
+    rule_id = "mr_07d1a26d-1132-4228-bd49-c8dd899c7792"
+    rule_name = "Okta Phishing Detection With Fastpass Origin Check"
     reference = "https://sec.okta.com/fastpassphishingdetection"
     mitre_attack_tactic = "Initial Access"
     mitre_attack_technique = "Phishing"

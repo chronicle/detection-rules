@@ -19,6 +19,8 @@ rule gcti_tor_exit_nodes {
   meta:
     author = "Google Cloud Security"
     description = "Alert traffic destined for known Tor exit nodes"
+    rule_id = "mr_1d31f0e4-8cd9-4fc2-ae87-e91a435fe34f"
+    rule_name = "GCTI Tor Exit Nodes"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Proxy: Multi-hop Proxy"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"

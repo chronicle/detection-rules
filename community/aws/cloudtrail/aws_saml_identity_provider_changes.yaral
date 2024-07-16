@@ -19,6 +19,8 @@ rule aws_saml_identity_provider_changes {
   meta:
     author = "Google Cloud Security"
     description = "Detects create, update or delete events of a SAML provider in AWS."
+    rule_id = "mr_2f36760a-241d-4ace-9142-db0ccf1992b7"
+    rule_name = "AWS SAML Identity Provider Changes"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/"

@@ -19,6 +19,8 @@ rule recon_successful_logon_enumeration_powershell_T1033_cisa_report {
   meta:
     author = "Google Cloud Security"
     description = "Detects the use of powershell to enumerate successful logins on a specific host"
+    rule_id = "mr_db589a2e-0a06-46b5-8479-f8e120ec0405"
+    rule_name = "MITRE ATT&CK T1033 Recon Successful Logon Enumeration Powershell CISA Report"
     type = "hunt"
     platform = "Windows"
     data_source = "microsoft sysmon"

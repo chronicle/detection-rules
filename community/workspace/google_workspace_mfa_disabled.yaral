@@ -19,6 +19,8 @@ rule google_workspace_mfa_disabled {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when multi-factor authentication (MFA) is disabled for a Google Workspace organization. Security teams can monitor for changes to MFA configuration that may weaken the organization's security posture."
+    rule_id = "mr_63139204-0d18-4410-b4c4-839bc9ccd456"
+    rule_name = "Google Workspace MFA Disabled"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Modify Authentication Process"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1556/"

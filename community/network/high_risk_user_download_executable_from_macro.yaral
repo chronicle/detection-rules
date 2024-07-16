@@ -19,6 +19,8 @@ rule high_risk_user_download_executable_from_macro {
   meta:
     author = "Google Cloud Security"
     description = "Executable downloaded by Microsoft Excel by user with GCP entity relationship"
+    rule_id = "mr_352c77a7-67b6-4dfb-95e5-75fef8fa4a6c"
+    rule_name = "High Risk User Download Executable From Macro"
     type = "alert"
     data_source = "zscaler nss, crowdstrike"
     tags = "user entity, resource entity"

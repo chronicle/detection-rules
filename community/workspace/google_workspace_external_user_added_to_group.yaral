@@ -19,6 +19,8 @@ rule google_workspace_external_user_added_to_group {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when an external user account is added to a group in Google Workspace. Security teams can monitor for unexpected user accounts being added to Google Workspace groups to prevent unauthorized access to data."
+    rule_id = "mr_c64af222-e029-4add-ac9c-b9285c5eb135"
+    rule_name = "Google Workspace External User Added To Group"
     mitre_attack_tactic = "Initial Access"
     mitre_attack_technique = "Valid Accounts: Cloud Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"

@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when GCP Security Command Center services are disabled."
+    rule_id = "mr_0d065dd8-4489-434a-bb6e-066537318484"
+    rule_name = "GCP Security Command Center Service Disabled"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"

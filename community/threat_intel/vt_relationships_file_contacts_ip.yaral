@@ -19,6 +19,8 @@ rule vt_relationships_file_contacts_ip {
   meta:
     author = "Google Cloud Security"
     description = "Alert on known Hash contacting known IP with VT Relationships"
+    rule_id = "mr_d6011593-c864-40b2-b300-4275ed163f5d"
+    rule_name = "VT Relationships File Contacts IP"
     type = "alert"
     tags = "vt"
     data_source = "microsoft defender atp"

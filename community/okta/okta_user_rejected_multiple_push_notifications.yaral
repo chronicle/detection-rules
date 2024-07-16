@@ -19,6 +19,8 @@ rule okta_user_rejected_multiple_push_notifications {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an Okta user rejects more than 2 Push notifications in a 10 minute window."
+    rule_id = "mr_4d8ac05a-0d73-4d81-a5a1-470d2bd7d725"
+    rule_name = "Okta User Rejected Multiple Push Notifications"
     reference = "https://sec.okta.com/pushfatigueworkflows"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Brute Force"

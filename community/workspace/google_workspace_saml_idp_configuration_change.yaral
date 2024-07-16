@@ -19,6 +19,8 @@ rule google_workspace_saml_idp_configuration_change {
   meta:
     author = "Google Cloud Security"
     description = "Identifies SAML provider configuration changes in Google Workspace. Security teams can monitor for changes to SAML provider configuration that may weaken the organization's security posture."
+    rule_id = "mr_1a321683-9c52-4928-a654-e0677df97c09"
+    rule_name = "Google Workspace SAML IDP Configuration Change"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/"

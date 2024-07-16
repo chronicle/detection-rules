@@ -19,6 +19,8 @@ rule impacket_wmiexec_cisa_report {
   meta:
     author = "Google Cloud Security"
     description = "Detects the artifacts generally associated with the use of wmiexec.py"
+    rule_id = "mr_ca682bc6-411b-46e5-88ef-1668032b14d1"
+    rule_name = "Impacket WMIExec CISA Report"
     type = "alert"
     data_source = "microsoft sysmon, microsoft windows events"
     mitre_attack_tactic = "Execution"

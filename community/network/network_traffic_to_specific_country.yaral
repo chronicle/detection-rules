@@ -19,6 +19,8 @@ rule network_traffic_to_specific_country {
   meta:
     author = "Google Cloud Security"
     description = "Identify network traffic based on target country"
+    rule_id = "mr_f1ab5184-771f-48dc-82e6-11a72632fcd5"
+    rule_name = "Network Traffic To Specific Country"
     type = "alert"
     tags = "geoip enrichment"
     data_source = "microsoft windows events"

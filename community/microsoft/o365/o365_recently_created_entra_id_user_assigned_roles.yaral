@@ -19,6 +19,8 @@ rule o365_recently_created_entra_id_user_assigned_roles {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a user is created in Entra ID and assigned roles within a defined time window."
+    rule_id = "mr_c0406a96-4ed1-4dd2-9629-aa5a2c881222"
+    rule_name = "O365 Recently Created Entra ID User Assigned Roles"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"

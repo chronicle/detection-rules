@@ -19,6 +19,8 @@ rule github_enterprise_audit_log_stream_modified {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a GitHub audit log stream is modified (e.g. paused, enabled, or disabled). An adversary may attempt to interrupt audit logging to erase their tracks."
+    rule_id = "mr_6a64250e-df54-4037-80f7-1486775c6f37"
+    rule_name = "GitHub Enterprise Audit Log Stream Modified"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "High"

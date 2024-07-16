@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when GCP Cloud Audit logs are removed from all services at project or organization level. Audit logging helps organizations maintain security and minimize risk."
+    rule_id = "mr_6ffed437-4666-433f-8ba8-b6043daef4c5"
+    rule_name = "GCP Cloud Audit Logging Removed From All Services"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses: Disable Cloud Logs"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/008/"

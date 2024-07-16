@@ -19,6 +19,8 @@ rule process_launch_vt_enrichment {
   meta:
     author = "Google Cloud Security"
     description = "Identify process creations that are tagged exploit in VT"
+    rule_id = "mr_cf022210-8063-4aa0-9ad3-b2a2f7a7f725"
+    rule_name = "Process Launch VT Enrichment"
     type = "alert"
     tags = "vt enrichment"
     data_source = "crowdstrike"

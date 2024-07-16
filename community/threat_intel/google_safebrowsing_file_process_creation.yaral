@@ -19,6 +19,8 @@ rule google_safebrowsing_file_process_creation {
   meta:
     author = "Google Cloud Security"
     description = "Detection of process/file events that match Safe Browsing hashes, which are files deemed to be malicious"
+    rule_id = "mr_6aa149a9-cae3-4414-b50f-75cf53ac5e11"
+    rule_name = "Google Safebrowsing File Process Creation"
     type = "alert"
     tags = "safe browsing"
     data_source = "microsoft sysmon"

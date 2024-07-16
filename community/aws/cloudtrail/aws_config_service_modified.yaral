@@ -19,6 +19,8 @@ rule aws_config_service_modified {
   meta:
     author = "Google Cloud Security"
     description = "Detects when AWS Config Service is updated, stopped or deleted."
+    rule_id = "mr_9a5af6d7-5119-46db-ad24-72d7e873a56b"
+    rule_name = "AWS Config Service Modified"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses: Disable Cloud Logs"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/008/"

@@ -19,6 +19,8 @@ rule ioc_sha256_hash {
   meta:
     author = "Google Cloud Security"
     description = "Detect file/process events that match watchlisted hashes in MISP"
+    rule_id = "mr_82df7e96-1bc3-489d-9e17-ff86e8f6e89b"
+    rule_name = "IOC SHA256 Hash"
     type = "alert"
     tags = "threat indicators"
     assumption = "Assumes MISP data has been ingested into entity graph; this rule can be modified to utilize other TI indicators"

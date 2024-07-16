@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect process launch events that correlate to Safe Browsing hash data and have low prevalence"
+    rule_id = "mr_4b77947d-b7a5-4308-b54c-a87b2b1cb80f"
+    rule_name = "Google Safebrowsing With Prevalence"
     type = "alert"
     tags = "safe browsing, prevalence"
     data_source = "microsoft sysmon"

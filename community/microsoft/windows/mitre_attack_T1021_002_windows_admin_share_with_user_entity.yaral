@@ -19,6 +19,8 @@ rule mitre_attack_T1021_002_windows_admin_share_with_user_entity {
   meta:
     author = "Google Cloud Security"
     description = "Net use commands for SMB/Windows admin shares focused on specific user entity characteristics"
+    rule_id = "mr_18cff6cc-0d2d-4b83-9424-c854c84c4241"
+    rule_name = "MITRE ATT&CK T1021.002 Windows Admin Share With User Entity"
     mitre_attack_tactic = "Lateral Movement"
     mitre_attack_technique = "Remote Services: SMB/Windows Admin Shares"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1021/002/"

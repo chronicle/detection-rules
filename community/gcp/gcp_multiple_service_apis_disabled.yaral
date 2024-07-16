@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when multiple GCP Service APIs are disabled in a short period of time."
+    rule_id = "mr_5a4ce357-e4da-4a4b-8cc2-ed5515f1043d"
+    rule_name = "GCP Multiple Service APIs Disabled"
     mitre_attack_tactic = "Impact"
     mitre_attack_technique = "Service Stop"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1489/"

@@ -19,6 +19,8 @@ rule recon_environment_enumeration_network_cisa_report {
   meta:
     author = "Google Cloud Security"
     description = "Detects network enumeration commands as identified in CISA Living of the Land pdf. Alone they may be normal but in concert, they may be worth looking into"
+    rule_id = "mr_9ca49a46-fb60-4ada-b722-5714d5cb7f53"
+    rule_name = "Recon Environment Enumeration Network CISA Report"
     type = "hunt"
     platform = "Windows"
     data_source = "microsoft sysmon, windows event logs"

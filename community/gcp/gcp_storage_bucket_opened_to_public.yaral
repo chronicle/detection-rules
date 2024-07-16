@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when Google Cloud Storage buckets are opened to public by adding allUsers or allAuthenticatedUsers to the access policy."
+    rule_id = "mr_b776abb0-9e7b-444d-ae0f-8a88b5654ded"
+    rule_name = "GCP Storage Bucket Opened To Public"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"

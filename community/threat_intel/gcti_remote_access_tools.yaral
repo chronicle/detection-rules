@@ -19,6 +19,8 @@ rule gcti_remote_access_tools {
   meta:
     author = "Google Cloud Security"
     description = "Alert process and file create events that are associated with hashes from the GCTI Remote Access Tool list"
+    rule_id = "mr_d838d64d-4a6f-4999-a895-0b5771d02aa6"
+    rule_name = "GCTI Remote Access Tools"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Remote Access Software"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1219/"

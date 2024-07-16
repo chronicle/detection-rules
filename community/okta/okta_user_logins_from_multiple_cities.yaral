@@ -19,6 +19,8 @@ rule okta_user_logins_from_multiple_cities {
   meta:
     author = "Google Cloud Security"
     description = "Detects user logins for same user from different cities within 24 hours."
+    rule_id = "mr_b607de8a-7988-4f4f-8ecf-e8754de6bbae"
+    rule_name = "Okta User Logins From Multiple Cities"
     reference = "https://help.okta.com/en-us/Content/Topics/Security/behavior-detection/logs-behavior-detection.htm"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts"

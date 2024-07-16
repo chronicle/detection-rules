@@ -19,6 +19,8 @@ rule github_two_factor_authentication_requirement_disabled {
   meta:
     author = "Google Cloud Security"
     description = "Detects when two-factor authentication requirements are disabled for a GitHub enterprise or organization."
+    rule_id = "mr_43f096a4-42dc-4da7-a6aa-c81379f529c6"
+    rule_name = "GitHub Two-Factor Authentication Requirement Disabled"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "High"

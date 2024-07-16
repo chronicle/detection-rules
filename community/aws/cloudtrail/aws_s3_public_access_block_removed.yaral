@@ -18,6 +18,8 @@ rule aws_s3_public_access_block_removed {
   meta:
     author = "Google Cloud Security"
     description = "Detect when the S3 Public Access Block configuration has been removed from a bucket or an account."
+    rule_id = "mr_07638aec-6719-467b-9fee-8de4993087fa"
+    rule_name = "AWS S3 Public Access Block Removed"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"

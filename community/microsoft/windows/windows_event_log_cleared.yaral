@@ -19,6 +19,8 @@ rule windows_event_log_cleared {
   meta:
     author = "Google Cloud Security"
     description = "Detects the clearing of event logs within the Windows Event Viewer. "
+    rule_id = "mr_067f3ee9-9bc6-400d-9ba5-bebe7253482f"
+    rule_name = "Windows Event Log Cleared"
     type = "alert"
     data_source = "microsoft sysmon, microsoft windows events"
     platform = "Windows"

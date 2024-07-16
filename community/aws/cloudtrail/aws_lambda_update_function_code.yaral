@@ -19,6 +19,8 @@ rule aws_lambda_update_function_code {
   meta:
     author = "Google Cloud Security"
     description = "Detects an IAM user attempting to update/modify AWS lambda code."
+    rule_id = "mr_046e8bc7-2d48-4118-ae38-eb095a4333e3"
+    rule_name = "AWS Lambda Update Function Code"
     mitre_attack_tactic = "Execution"
     mitre_attack_technique = "Serverless Execution"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1648/"

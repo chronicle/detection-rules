@@ -19,6 +19,8 @@ rule okta_new_api_token_created {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a new API token is created."
+    rule_id = "mr_beca4f13-9526-4095-ab77-f0fc0610200c"
+    rule_name = "Okta New API Token Created"
     reference = "https://developer.okta.com/docs/guides/tokens/"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts"

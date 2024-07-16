@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when GCP Workload identity pools are disabled or deleted. Disabling or deleting a pool will prevent any connected identities from accessing all GCP resources."
+    rule_id = "mr_265fbe68-80c6-48b0-a211-dca6bcef0fd2"
+    rule_name = "GCP Workload Identity Pool Disabled Or Deleted"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts: Cloud Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"

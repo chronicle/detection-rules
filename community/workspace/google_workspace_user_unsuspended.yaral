@@ -19,6 +19,8 @@ rule google_workspace_user_unsuspended {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when a user account is unsuspended in Google Workspace."
+    rule_id = "mr_6bf3e4c9-b380-4562-9aa8-6416a9126ee1"
+    rule_name = "Google Workspace User Unsuspended"
     mitre_attack_tactic = "Initial Access"
     mitre_attack_technique = "Valid Accounts: Cloud Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"

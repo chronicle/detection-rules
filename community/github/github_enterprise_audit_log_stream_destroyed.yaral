@@ -19,6 +19,8 @@ rule github_enterprise_audit_log_stream_destroyed {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a GitHub audit log stream is destroyed. An adversary may attempt to destroy audit logs to erase their tracks."
+    rule_id = "mr_f86cc19d-4cbb-4ba5-97ef-1d648d53d06a"
+    rule_name = "GitHub Enterprise Audit Log Stream Destroyed"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "High"

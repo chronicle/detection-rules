@@ -19,6 +19,8 @@ rule aws_guardduty_publishing_destination_deleted {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a GuardDuty Detector's publishing destination has been deleted which will prevent the exporting of findings."
+    rule_id = "mr_630cd3d0-d22f-4e8a-9065-425bdbe1ab32"
+    rule_name = "AWS GuardDuty Publishing Destination Deleted"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"

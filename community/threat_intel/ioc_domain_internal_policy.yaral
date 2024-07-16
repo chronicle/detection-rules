@@ -19,6 +19,8 @@ rule ioc_domain_internal_policy {
   meta:
     author = "Google Cloud Security"
     description = "Detect DNS events that communicate with gaming sites in MISP. These violate policy."
+    rule_id = "mr_853bfafe-3049-43b5-a077-6a5f4a24ea3c"
+    rule_name = "IOC Domain Internal Policy"
     type = "alert"
     tags = "threat indicators"
     assumption = "Assumes MISP data has been ingested into entity graph; this rule can be modified to utilize other TI indicators"

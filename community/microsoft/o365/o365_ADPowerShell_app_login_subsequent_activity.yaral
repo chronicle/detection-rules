@@ -19,6 +19,8 @@ rule o365_ADPowerShell_app_login_subsequent_activity {
   meta:
     author = "Google Cloud Security"
     description = "Once a user authenticates to the Azure AD PowerShell application, if they take multiple admin actions indicative of establishing their own persistence with an Entra ID application within a portion of the access token time, alert for additional investigation"
+    rule_id = "mr_2d781f34-05f3-43aa-b5ec-257c03787a66"
+    rule_name = "O365 AD PowerShell App Login Subsequent Activity"
     assumption = "This does not take into account attempts that were blocked, just any logging of attempts for any of these actions"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Account Manipulation: Additional Cloud Credentials"

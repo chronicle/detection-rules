@@ -19,6 +19,8 @@ rule whois_expired_domain_executable_downloaded {
   meta:
     author = "Google Cloud Security"
     description = "Detect web traffic to a recently expired domain followed by an exe file creation event"
+    rule_id = "mr_ce0a1979-ec95-40d4-8107-748ee6d1e93f"
+    rule_name = "WHOIS Expired Domain Executable Downloaded"
     type = "alert"
     tags = "whois"
     data_source = "zscalar, microsoft sysmon"

@@ -19,6 +19,8 @@ rule google_workspace_file_shared_from_google_drive_to_free_email_domain {
     meta:
       author = "Google Cloud Security"
       description = "Identifies when a user shares a file on Google Drive with a free email domain, which may indicate data exfiltration."
+      rule_id = "mr_054c422b-2a42-4dde-b937-e80d063f65e7"
+      rule_name = "Google Workspace File Shared From Google Drive To Free Email Domain"
       mitre_attack_tactic = "Exfiltration"
       mitre_attack_technique = "Exfiltration Over Web Service"
       mitre_attack_url = "https://attack.mitre.org/techniques/T1567/"

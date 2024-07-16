@@ -19,6 +19,8 @@ rule aws_multi_factor_authentication_disabled {
   meta:
     author = "Google Cloud Security"
     description = "Detects attempts to disable multi-factor authentication for an AWS IAM user."
+    rule_id = "mr_0d6bd993-c80b-4367-a921-5a542ab826b3"
+    rule_name = "AWS MultiFactor Authentication Disabled"
     mitre_attack_tactic = "Credential Access, Defense Evasion, Persistence"
     mitre_attack_technique = "Modify Authentication Process: Multi-Factor Authentication"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1556/006/"

@@ -19,6 +19,8 @@ rule logins_from_terminated_employees {
   meta:
     author = "Google Cloud Security"
     description = "Allowed Logins from Terminated Employees"
+    rule_id = "mr_69178541-285b-45cb-b723-e2b5d88f22d3"
+    rule_name = "Logins From Terminated Employees"
     assumptions = "This rule requires a context data source such as AzureAD AD Context or Workday to demonstrate the correlation of context logs with event logs"
     type = "alert"
     tags = "user enrichment"

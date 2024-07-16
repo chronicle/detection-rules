@@ -19,6 +19,8 @@ rule aws_guardduty_disabled {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a GuardDuty Detector is disabled or suspended."
+    rule_id = "mr_22495d55-4177-425f-9a4e-8d836b01e976"
+    rule_name = "AWS GuardDuty Disabled"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"

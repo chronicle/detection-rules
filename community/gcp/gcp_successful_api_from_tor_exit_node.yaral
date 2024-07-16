@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detects successful API executions from a Tor exit node."
+    rule_id = "mr_5912e2be-4366-4f34-a770-0ac8358f2cb9"
+    rule_name = "GCP Successful API Call From Tor Exit Node"
     mitre_attack_tactic = "Execution"
     mitre_attack_technique = "User Execution"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1204/"

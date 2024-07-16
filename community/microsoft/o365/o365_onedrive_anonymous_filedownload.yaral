@@ -19,6 +19,8 @@ rule o365_onedrive_anonymous_filedownload {
   meta:
     author = "Google Cloud Security"
     description = "Anonymous links can be used to export files from OneDrive. While this isn't always a sign of malicious activity, some organizations do not support the use of anonymous links because of the risk of data leakage. This rule detects when anonymous links are used to download files from OneDrive."
+    rule_id = "mr_f713e2b0-31b1-4165-8764-59a5e2c5eabb"
+    rule_name = "O365 OneDrive Anonymous File Downloaded"
     mitre_attack_tactic = "Exfiltration"
     mitre_attack_technique = "Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1048/002/"

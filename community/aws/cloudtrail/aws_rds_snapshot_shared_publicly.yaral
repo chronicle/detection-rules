@@ -19,6 +19,8 @@ rule aws_rds_snapshot_shared_publicly {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an Amazon RDS Snapshot is shared publicly."
+    rule_id = "mr_d87cf718-8a9c-4f1d-bcf0-20f4f5f59d02"
+    rule_name = "AWS RDS Snapshot Shared Publicly"
     mitre_attack_tactic = "Exfiltration"
     mitre_attack_technique = "Transfer Data to Cloud Account"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1537/"

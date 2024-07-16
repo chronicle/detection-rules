@@ -19,6 +19,8 @@ rule suspicious_asn_watchlist {
   meta:
     author = "Google Cloud Security"
     description = "Identify any network connections to a list of ASNs"
+    rule_id = "mr_4b4311e2-8505-4758-8435-dbd951d2ee0d"
+    rule_name = "Suspicious ASN Watchlist"
     type = "alert"
     tags = "geoip enrichment, list"
     assumption = "List named suspicious_asn needs to be created and populated"

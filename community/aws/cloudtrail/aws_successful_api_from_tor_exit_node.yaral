@@ -19,6 +19,8 @@ rule aws_successful_api_from_tor_exit_node {
   meta:
     author = "Google Cloud Security"
     description = "Detects successful API executions from a Tor exit node."
+    rule_id = "mr_17232c2a-188e-4d6e-85b6-836cdc779655"
+    rule_name = "AWS Successful API From Tor Exit Node"
     mitre_attack_tactic = "Execution"
     mitre_attack_technique = "User Execution"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1204/"

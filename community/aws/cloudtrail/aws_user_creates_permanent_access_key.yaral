@@ -19,6 +19,8 @@ rule aws_user_creates_permanent_access_key {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an AWS IAM user creates an AWS Access Key for programmatic calls."
+    rule_id = "mr_ebe72ce0-1e54-4251-afca-ed3fc403cd1f"
+    rule_name = "AWS User Creates Permanent Access Key"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts: Cloud Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"

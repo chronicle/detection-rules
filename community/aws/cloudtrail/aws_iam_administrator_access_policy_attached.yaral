@@ -19,6 +19,8 @@ rule aws_iam_administrator_access_policy_attached {
   meta:
     author = "Google Cloud Security"
     description = "Detects when AWS IAM AdministratorAccess policy is attached to a user, group or role which can be used for privilege escalation."
+    rule_id = "mr_52c6643b-f6ce-4299-9fb6-05554901800c"
+    rule_name = "AWS IAM Administrator Access Policy Attached"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts: Cloud Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"

@@ -19,6 +19,8 @@ rule gcp_multiple_hmac_keys_deleted {
   meta:
     author = "Google Cloud Security"
     description = "Detect when multiple HMAC authentication keys are deleted from GCP Storage settings."
+    rule_id = "mr_75b441f1-edde-4a33-bc12-06a92ccb9ba8"
+    rule_name = "GCP Multiple HMAC Keys Deleted"
     mitre_attack_tactic = "Impact"
     mitre_attack_technique = "Account Access Removal"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1531/"

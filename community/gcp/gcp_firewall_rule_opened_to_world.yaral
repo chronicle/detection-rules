@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when a GCP Firewall rule is opened to the world (0.0.0.0/0) on all protocols."
+    rule_id = "mr_340c7a66-56ea-498a-bf00-270e9e61fed0"
+    rule_name = "GCP Firewall Rule Opened To The World"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"

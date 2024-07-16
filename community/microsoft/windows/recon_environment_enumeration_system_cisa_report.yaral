@@ -19,6 +19,8 @@ rule recon_environment_enumeration_system_cisa_report {
   meta:
     author = "Google Cloud Security"
     description = "Detects system enumeration events as identified in CISA Living of the Land pdf. Alone they may be normal but in concert, they may be worth looking into"
+    rule_id = "mr_086dede6-33ba-42df-b001-5595ceb0d589"
+    rule_name = "Recon Environment Enumeration System CISA Report"
     type = "hunt"
     platform = "Windows"
     data_source = "microsoft sysmon, windows event logs"

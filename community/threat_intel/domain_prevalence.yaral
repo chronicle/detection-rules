@@ -19,6 +19,8 @@ rule domain_prevalence {
   meta:
     author = "Google Cloud Security"
     description = "Detects DNS events querying domains that have a low rolling max prevalence."
+    rule_id = "mr_cf5dd851-d7e9-42b8-baf9-f4527ab61bf3"
+    rule_name = "Domain Prevalence"
     type = "alert"
     tags = "prevalence"
     data_source = "extrahop, tanium, microsoft sysmon, gcp dns, crowdstrike"

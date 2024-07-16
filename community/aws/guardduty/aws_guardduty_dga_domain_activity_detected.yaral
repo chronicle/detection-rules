@@ -19,6 +19,8 @@ rule aws_guardduty_dga_domain_activity_detected {
   meta:
     author = "Google Cloud Security"
     description = "Amazon GuardDuty detects an Amazon EC2 instance or a container querying algorithmically generated domains (DGA)."
+    rule_id = "mr_52851fd2-be35-4eda-82b3-541edc5c2196"
+    rule_name = "AWS GuardDuty DGA Domain Activity Detected"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Dynamic Resolution: Domain Generation Algorithms"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1568/002/"

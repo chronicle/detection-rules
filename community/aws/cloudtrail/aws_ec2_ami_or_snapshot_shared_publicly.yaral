@@ -19,6 +19,8 @@ rule aws_ec2_ami_or_snapshot_shared_publicly {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an Amazon EC2 AMI or Snapshot is shared publicly."
+    rule_id = "mr_843a37db-dcd5-40b2-8b55-a00397fd5c0d"
+    rule_name = "AWS EC2 AMI Or Snapshot Shared Publicly"
     mitre_attack_tactic = "Exfiltration"
     mitre_attack_technique = "Transfer Data to Cloud Account"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1537/"

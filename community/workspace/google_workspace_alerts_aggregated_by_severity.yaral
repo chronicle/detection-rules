@@ -19,6 +19,8 @@ rule google_workspace_alerts_aggregated_by_severity {
   meta:
     author = "Google Cloud Security"
     description = "Generates alerts based on Google Workspace alerts center and aggregates them based on severity."
+    rule_id = "mr_311cc4ab-627b-43a1-a744-8d7aa5e44fbf"
+    rule_name = "Google Workspace Alerts Aggregated By Severity"
     type = "Alert"
     data_source = "Workspace Alerts"
 

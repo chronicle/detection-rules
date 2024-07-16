@@ -19,6 +19,8 @@ rule recon_suspicious_commands_cisa_report {
   meta:
     author = "Google Cloud Security"
     description = "Detects suspicious commands as identified in CISA Living of the Land pdf. Alone they may be normal but in concert, they may be worth looking into"
+    rule_id = "mr_66edb4f7-a7e2-4ce6-a247-d09319b7eeea"
+    rule_name = "Recon Suspicious Commands CISA Report"
     type = "hunt"
     platform = "Windows"
     data_source = "microsoft sysmon, microsoft windows events"

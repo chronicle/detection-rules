@@ -19,6 +19,8 @@ rule dns_query_to_recently_created_domain {
   meta:
     author = "Google Cloud Security"
     description = "DNS query to a recently created domain"
+    rule_id = "mr_a5cff3f1-8092-48a0-b4a3-f3f856299474"
+    rule_name = "DNS Query To Recently Created Domain"
     type = "alert"
     tags = "whois"
     data_source = "microsoft sysmon"

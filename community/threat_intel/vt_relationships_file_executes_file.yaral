@@ -19,6 +19,8 @@ rule vt_relationships_file_executes_file {
   meta:
     author = "Google Cloud Security"
     description = "Alert on known File Hash executing known File Hash with VT Relationships."
+    rule_id = "mr_9250a0b5-b671-4c63-bb78-d7fda0ac2cf4"
+    rule_name = "VT Relationships File Executes File"
     type = "alert"
     tags = "vt"
     data_source = "microsoft sysmon"

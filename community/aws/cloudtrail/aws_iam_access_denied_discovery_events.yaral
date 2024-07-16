@@ -19,6 +19,8 @@ rule aws_iam_access_denied_discovery_events {
   meta:
     author = "Google Cloud Security"
     description = "Detects excessive AccessDenied events within an hour timeframe from an IAM User"
+    rule_id = "mr_a175b0d9-4488-46cc-880a-2408cb301f41"
+    rule_name = "AWS IAM Access Denied Discovery Events"
     mitre_attack_tactic = "Discovery"
     mitre_attack_technique = "Cloud Infrastructure Discovery"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1580/"

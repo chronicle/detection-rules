@@ -19,6 +19,8 @@ rule gcti_benign_binaries_contacts_tor_exit_node {
   meta:
     author = "Google Cloud Security"
     description = "Alert on Benign Binary contacting a TOR IP"
+    rule_id = "mr_8bb13cf7-d66b-41f2-9bbc-0a1884a77f70"
+    rule_name = "GCTI Benign Binaries Contacts Tor Exit Node"
     mitre_attack_tactic = "Command and Control"
     mitre_attack_technique = "Proxy: Multi-hop Proxy"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"

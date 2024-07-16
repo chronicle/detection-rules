@@ -19,6 +19,8 @@ rule aws_guardduty_denial_of_service_activity_detected {
   meta:
     author = "Google Cloud Security"
     description = "Amazon GuardDuty detects a Denial of Service (DoS) activity in an Amazon EC2 instance."
+    rule_id = "mr_63e3f20f-95f5-4caa-b471-ec53d5de2d28"
+    rule_name = "AWS GuardDuty Denial Of Service Activity Detected"
     mitre_attack_tactic = "Impact"
     mitre_attack_technique = "Network Denial of Service"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1498/"

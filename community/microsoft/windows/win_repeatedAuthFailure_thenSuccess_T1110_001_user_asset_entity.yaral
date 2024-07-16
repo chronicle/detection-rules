@@ -19,6 +19,8 @@ rule win_repeatedAuthFailure_thenSuccess_T1110_001_user_asset_entity {
   meta:
     author = "Google Cloud Security"
     description = "Detect Multiple Failed Login Attempts followed by Successful Login"
+    rule_id = "mr_2a9dc1d2-d4b8-4b80-a494-3369c681da60"
+    rule_name = "MITRE ATT&CK T1110.001 Windows Repeated Authentication Failures Before Successful One With User Entity"
     type = "alert"
     tags = "user entity, asset entity"
     assumption = "Assumes ingestion of Windows users and assets to entity graph to entity graph"

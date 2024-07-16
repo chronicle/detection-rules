@@ -19,6 +19,8 @@ rule github_personal_access_token_auto_approve_policy_modified {
   meta:
     author = "Google Cloud Security"
     description = "Detects when changes are made to a GitHub organization's fine-grained Personal Access Token approval policy."
+    rule_id = "mr_516c8368-2e3c-4585-afa1-c5df49b214ad"
+    rule_name = "GitHub Personal Access Token Auto Approve Policy Modified"
     assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
     type = "alert"
     severity = "Medium"

@@ -19,6 +19,8 @@ rule aws_successful_login_after_multiple_failed_attempts {
   meta:
     author = "Google Cloud Security"
     description = "Detects successful login after multiple failed attempts"
+    rule_id = "mr_8ba028b6-98e3-4983-92e9-c0fe50419a20"
+    rule_name = "AWS Successful Login After Multiple Failed Attempts"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1078/"

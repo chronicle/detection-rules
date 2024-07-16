@@ -19,6 +19,8 @@ rule okta_suspicious_use_of_a_session_cookie {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an adversary attempts to reuse a stolen web session cookie in a different device that has a different OS, IP, Browser or User Agent."
+    rule_id = "mr_913cbc7a-86c9-46a4-b822-023b4aa17106"
+    rule_name = "Okta Suspicious Use Of A Session Cookie"
     reference = "https://sec.okta.com/sessioncookietheft"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Steal Web Session Cookie"

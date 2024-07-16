@@ -19,6 +19,8 @@ rule google_workspace_user_ou_changed {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when a Google Workspace user account is moved between Organizational Units."
+    rule_id = "mr_e265b499-9a83-4e7d-acf8-ae7674e1c743"
+    rule_name = "Google Workspace User Ou Changed"
     mitre_attack_tactic = "Persistence"
     mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"

@@ -19,6 +19,8 @@ rule aws_enable_disable_region {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an AWS region is enabled or disabled."
+    rule_id = "mr_905d6ae2-4acc-4969-a85d-707c78db687f"
+    rule_name = "AWS Enable Or Disable Region"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Unused/Unsupported Cloud Regions"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1535/"

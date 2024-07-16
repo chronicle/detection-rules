@@ -19,6 +19,8 @@ rule okta_successful_high_risk_user_logins {
   meta:
     author = "Google Cloud Security"
     description = "Detects successfully authenticated user logins based on Okta's Behavior Detection pattern analysis."
+    rule_id = "mr_ef123f09-f2ae-4d29-bb69-896d708f6a27"
+    rule_name = "Okta Successful High Risk User Logins"
     reference = "https://help.okta.com/en-us/Content/Topics/Security/behavior-detection/logs-behavior-detection.htm"
     mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
     mitre_attack_technique = "Valid Accounts"

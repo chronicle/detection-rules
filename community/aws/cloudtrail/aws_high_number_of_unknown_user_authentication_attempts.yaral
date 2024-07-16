@@ -19,6 +19,8 @@ rule aws_high_number_of_unknown_user_authentication_attempts {
   meta:
     author = "Google Cloud Security"
     description = "Detects when a high number of failed authentication attempts happen for unknown users."
+    rule_id = "mr_3ddfee11-c959-4283-8fb4-1f57bdaaf2b1"
+    rule_name = "AWS High Number Of Unknown User Authentication Attempts"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Brute Force: Credential Stuffing"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1110/004/"

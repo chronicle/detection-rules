@@ -19,6 +19,8 @@ rule okta_user_failed_number_challenge_during_push_notification {
   meta:
     author = "Google Cloud Security"
     description = "Detects when an Okta user failed a number challenge during push notification."
+    rule_id = "mr_c5542a92-03d7-463a-bab8-ad10a6cd42f0"
+    rule_name = "Okta User Failed Number Challenge During Push Notification"
     reference = "https://support.okta.com/help/s/article/Number-Challenge-for-Okta-Verify"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Multi-Factor Authentication Request Generation"

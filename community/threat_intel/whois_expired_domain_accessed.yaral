@@ -19,6 +19,8 @@ rule whois_expired_domain_accessed {
   meta:
     author = "Google Cloud Security"
     description = "Example usage of WHOIS data, detecting an executable file download from a domain that's recently expired"
+    rule_id = "mr_7b487c4f-cbf9-4b11-8b25-632ada3f90a3"
+    rule_name = "WHOIS Expired Domain Accessed"
     type = "alert"
     tags = "whois"
     data_source = "zscalar"

@@ -19,6 +19,8 @@ rule aws_ses_service_modification {
   meta:
     author = "Google Cloud Security"
     description = "Detect when the Amazon Simple Email Service (SES) has been modified where an attacker can modify Amazon SES service to propagate phishing emails campaigns."
+    rule_id = "mr_223bad6a-9c6a-4038-9990-18d3545598aa"
+    rule_name = "AWS SES Service Modification"
     mitre_attack_tactic = "Impact"
     mitre_attack_technique = "Resource Hijacking"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1496/"

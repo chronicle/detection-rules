@@ -19,6 +19,8 @@ rule google_workspace_suspicious_login_and_google_drive_file_download {
   meta:
     author = "Google Cloud Security"
     description = "Identifies when a Google Workspace user downloads a file from Google Drive after a suspicious login event occurred."
+    rule_id = "mr_3c55c930-d9be-4d34-a90e-baf92c22ae40"
+    rule_name = "Google Workspace Suspicious Login and Google Drive File Download"
     mitre_attack_tactic = "Exfiltration"
     mitre_attack_technique = "Exfiltration Over Web Service"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1567/"

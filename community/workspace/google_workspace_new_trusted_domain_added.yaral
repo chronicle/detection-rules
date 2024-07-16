@@ -19,6 +19,8 @@ rule google_workspace_new_trusted_domain_added {
     meta:
       author = "Google Cloud Security"
       description = "Identifies when a domain is added to the list of trusted domains in Google Workspace. An adversary may attempt to manipulate sharing settings for trusted domains to gain unauthorized access to sensitive files and folders within an organization."
+      rule_id = "mr_319d97c3-6f63-4a6c-9fab-e70cc3f03aaf"
+      rule_name = "Google Workspace New Trusted Domain Added"
       mitre_attack_tactic = "Defense Evasion"
       mitre_attack_technique = "Impair Defenses: Disable or Modify Cloud Firewall"
       mitre_attack_url = "https://attack.mitre.org/techniques/T1562/007/"

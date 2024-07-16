@@ -19,6 +19,8 @@ rule okta_threatinsight_suspected_brute_force_attack {
   meta:
     author = "Google Cloud Security"
     description = "Okta ThreatInsight detects multiple login failures from the same IP across one or more Okta orgs."
+    rule_id = "mr_9537e888-7af7-491f-a5e2-3623e1798aba"
+    rule_name = "Okta ThreatInsight Suspected Bruteforce Attack"
     reference = "https://help.okta.com/en-us/Content/Topics/Security/threat-insight/configure-threatinsight-system-log.htm"
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Brute Force: Password Guessing"

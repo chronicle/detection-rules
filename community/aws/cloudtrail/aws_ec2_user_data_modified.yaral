@@ -19,6 +19,8 @@ rule aws_ec2_user_data_modified {
   meta:
     author = "Google Cloud Security"
     description = "Detect modifications to user data script on an EC2 instance."
+    rule_id = "mr_3167a29e-abbb-4d72-9f33-93df151d0224"
+    rule_name = "AWS EC2 User Data Modified"
     mitre_attack_tactic = "Privilege Escalation"
     mitre_attack_technique = "Boot or Logon Initialization Scripts"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1037/"

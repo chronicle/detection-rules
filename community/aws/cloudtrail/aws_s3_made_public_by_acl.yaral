@@ -18,6 +18,8 @@ rule aws_s3_made_public_by_acl {
   meta:
     author = "Google Cloud Security"
     description = "Detect when an AWS S3 bucket is made public using ACL."
+    rule_id = "mr_f0255a99-d90c-4640-a56e-0145f2672c2c"
+    rule_name = "AWS S3 Bucket Made Public By ACL"
     mitre_attack_tactic = "Defense Evasion"
     mitre_attack_technique = "Impair Defenses"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"

@@ -19,6 +19,8 @@
   meta:
     author = "Google Cloud Security"
     description = "Detect when GCP IAM Organization Policy is updated or deleted."
+    rule_id = "mr_327c1753-1cd5-424a-8a9f-1648278e2831"
+    rule_name = "GCP IAM Organization Policy Updated Or Deleted"
     mitre_attack_tactic = "Persistence, Privilege Escalation"
     mitre_attack_technique = "Account Manipulation"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1098/"

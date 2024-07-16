@@ -19,6 +19,8 @@ rule whoami_execution {
   meta:
     author = "Google Cloud Security"
     description = "Detects the execution of whoami, which is often used by attackers after exploitation to establish what credentials they are logged in under"
+    rule_id = "mr_4372a068-1411-449f-b572-dc2b9358b5f4"
+    rule_name = "Whoami Execution"
     type = "hunt"
     data_source = "microsoft sysmon, microsoft windows events"
     mitre_attack_tactic = "Discovery"

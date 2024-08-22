@@ -20,7 +20,7 @@ https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.location
 
 import copy
 import os
-from typing import Mapping, Any, List
+from typing import Mapping, Any
 
 from google.auth.transport import requests
 
@@ -29,7 +29,6 @@ def update_reference_list(
     http_session: requests.AuthorizedSession,
     resource_name: str,
     updates: Mapping[str, Any],
-    update_mask: List[str] | None = None,
 ) -> Mapping[str, Any]:
   """Updates an existing reference list.
 
@@ -40,10 +39,6 @@ def update_reference_list(
       updates: A dictionary containing the updates to make to the reference
         list. example: A value of {"entries": ["entry1", "entry2"]} will update
         the entries in the reference list accordingly.
-      update_mask (optional): The list of fields to update for the reference
-        list. If no update_mask is provided, all non-empty fields will be
-        updated. example: An update_mask of ["entries"] will update the entries
-        for a reference list.
 
   Returns:
       New version of the reference list.
@@ -53,13 +48,6 @@ def update_reference_list(
       (response.status_code >= 400).
   """
   url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{resource_name}"
-
-  # If no update_mask is provided, all non-empty fields will be updated
-  if update_mask is None:
-    params = {}
-  else:
-    params = {"updateMask": update_mask}
-
   if updates.get("entries") is not None:
     if len(updates.get("entries")) == 0:  # pylint: disable="g-explicit-length-test"
       # If 'entries' is an empty list, the reference list is empty [{}]
@@ -71,7 +59,8 @@ def update_reference_list(
       for entry in updates["entries"]:
         reference_list_entries.append({"value": entry.strip()})
       updates["entries"] = copy.deepcopy(reference_list_entries)
-
+  updates["scope_info"] = None  # assumes Data RBAC is disabled
+  params = {"updateMask": ",".join(updates.keys)}
   response = http_session.request(
       method="PATCH", url=url, params=params, json=updates
   )

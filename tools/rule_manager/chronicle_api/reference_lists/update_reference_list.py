@@ -20,6 +20,7 @@ https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.location
 
 import copy
 import os
+import time
 from typing import Mapping, Any, List
 
 from google.auth.transport import requests
@@ -30,6 +31,7 @@ def update_reference_list(
     resource_name: str,
     updates: Mapping[str, Any],
     update_mask: List[str] | None = None,
+    max_retries: int = 3,
 ) -> Mapping[str, Any]:
   """Updates an existing reference list.
 
@@ -44,6 +46,9 @@ def update_reference_list(
         list. If no update_mask is provided, all non-empty fields will be
         updated. example: An update_mask of ["entries"] will update the entries
         for a reference list.
+      max_retries (optional): Maximum number of times to retry HTTP request if
+        certain response codes are returned. For example: HTTP response status
+        code 429 (Too Many Requests)
 
   Returns:
       New version of the reference list.
@@ -53,6 +58,7 @@ def update_reference_list(
       (response.status_code >= 400).
   """
   url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{resource_name}"
+  response = None
 
   # If no update_mask is provided, all non-empty fields will be updated
   if update_mask is None:
@@ -61,7 +67,7 @@ def update_reference_list(
     params = {"updateMask": update_mask}
 
   if updates.get("entries") is not None:
-    if len(updates.get("entries")) == 0:  # pylint: disable="g-explicit-length-test"
+    if len(updates.get("entries")) == 0:  # pylint: disable=g-explicit-length-test
       # If 'entries' is an empty list, the reference list is empty [{}]
       updates["entries"] = [{}]
     else:
@@ -72,12 +78,20 @@ def update_reference_list(
         reference_list_entries.append({"value": entry.strip()})
       updates["entries"] = copy.deepcopy(reference_list_entries)
 
-  response = http_session.request(
-      method="PATCH", url=url, params=params, json=updates
-  )
+  for _ in range(max_retries + 1):
+    response = http_session.request(
+        method="PATCH", url=url, params=params, json=updates
+    )
 
-  if response.status_code >= 400:
-    print(response.text)
+    if response.status_code >= 400:
+      print(response.text)
+
+    if response.status_code == 429:
+      print("API rate limit exceeded. Sleeping for 60s before retrying")
+      time.sleep(60)
+    else:
+      break
+
   response.raise_for_status()
 
   return response.json()

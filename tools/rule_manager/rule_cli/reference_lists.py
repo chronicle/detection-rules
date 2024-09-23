@@ -20,7 +20,6 @@ import hashlib
 import json
 import logging
 import pathlib
-import time
 from typing import Any, List, Literal, Mapping, Sequence, Tuple
 
 from chronicle_api.reference_lists.create_reference_list import create_reference_list
@@ -343,7 +342,6 @@ class ReferenceLists:
           page_token=next_page_token,
           view="REFERENCE_LIST_VIEW_FULL",
       )
-      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
       if retrieved_ref_lists is not None:
         LOGGER.info("Retrieved %s reference lists", len(retrieved_ref_lists))
@@ -452,7 +450,6 @@ class ReferenceLists:
             syntax_type=local_ref_list.syntax_type,
         )
         update_summary["created"].append(ref_list_name)
-        time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
       if ref_list_name in remote_ref_lists_dict.keys():
         # Reference list exists in Chronicle with same name as local reference
@@ -522,6 +519,5 @@ class ReferenceLists:
               },
           )
           update_summary["updated"].append(ref_list_name)
-          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
     return update_summary

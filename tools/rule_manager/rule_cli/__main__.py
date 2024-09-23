@@ -23,7 +23,6 @@ import logging
 import os
 import pathlib
 import sys
-import time
 
 from chronicle_api import chronicle_auth
 from chronicle_api.rules.stream_test_rule import test_rule
@@ -173,7 +172,6 @@ def verify_rules():
       rule_text = f.read()
 
     response = verify_rule(http_session=http_session, rule_text=rule_text)
-    time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
     if response.get("success") is True:
       LOGGER.info(

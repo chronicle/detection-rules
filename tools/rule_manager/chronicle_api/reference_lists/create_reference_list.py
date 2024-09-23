@@ -19,6 +19,7 @@ https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.location
 """
 
 import os
+import time
 from typing import Mapping, Any, Sequence
 
 from google.auth.transport import requests
@@ -30,6 +31,7 @@ def create_reference_list(
     description: str,
     entries: Sequence[str | None],
     syntax_type: str | None = None,
+    max_retries: int = 3,
 ) -> Mapping[str, Any]:
   """Creates a new reference list.
 
@@ -41,6 +43,9 @@ def create_reference_list(
       syntax_type: The syntax type indicating how list entries should be
         validated. Reference:
         https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.referenceLists#ReferenceListSyntaxType
+      max_retries (optional): Maximum number of times to retry HTTP request if
+        certain response codes are returned. For example: HTTP response status
+        code 429 (Too Many Requests)
 
   Returns:
       New reference list.
@@ -51,6 +56,7 @@ def create_reference_list(
   """
   url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{os.environ['CHRONICLE_INSTANCE']}/referenceLists"
   params = {"referenceListId": name}
+  response = None
 
   if len(entries) == 0:  # pylint: disable="g-explicit-length-test"
     # If 'entries' is an empty list, the reference list is empty [{}]
@@ -68,12 +74,20 @@ def create_reference_list(
       "syntax_type": syntax_type,
   }
 
-  response = http_session.request(
-      method="POST", url=url, json=body, params=params
-  )
+  for _ in range(max_retries + 1):
+    response = http_session.request(
+        method="POST", url=url, json=body, params=params
+    )
 
-  if response.status_code >= 400:
-    print(response.text)
+    if response.status_code >= 400:
+      print(response.text)
+
+    if response.status_code == 429:
+      print("API rate limit exceeded. Sleeping for 60s before retrying")
+      time.sleep(60)
+    else:
+      break
+
   response.raise_for_status()
 
   return response.json()

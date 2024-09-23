@@ -19,7 +19,8 @@ https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.location
 """
 
 import os
-from typing import Any, Mapping
+import time
+from typing import Mapping, Any
 
 from google.auth.transport import requests
 
@@ -28,6 +29,7 @@ def get_reference_list(
     http_session: requests.AuthorizedSession,
     resource_name: str,
     view: str | None = "REFERENCE_LIST_VIEW_FULL",
+    max_retries: int = 3,
 ) -> Mapping[str, Any]:
   """Retrieves a reference list.
 
@@ -38,6 +40,9 @@ def get_reference_list(
       view (optional): The scope of fields to populate for the ReferenceList
         being returned. Reference:
         https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/ReferenceListView
+      max_retries (optional): Maximum number of times to retry HTTP request if
+        certain response codes are returned. For example: HTTP response status
+        code 429 (Too Many Requests)
 
   Returns:
       Content and metadata about the requested reference list.
@@ -48,11 +53,20 @@ def get_reference_list(
   """
   url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{resource_name}"
   params = {"view": view}
+  response = None
 
-  response = http_session.request(method="GET", url=url, params=params)
+  for _ in range(max_retries + 1):
+    response = http_session.request(method="GET", url=url, params=params)
 
-  if response.status_code >= 400:
-    print(response.text)
-    response.raise_for_status()
+    if response.status_code >= 400:
+      print(response.text)
+
+    if response.status_code == 429:
+      print("API rate limit exceeded. Sleeping for 60s before retrying")
+      time.sleep(60)
+    else:
+      break
+
+  response.raise_for_status()
 
   return response.json()

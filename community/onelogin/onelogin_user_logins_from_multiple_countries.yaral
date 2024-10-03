@@ -1,0 +1,66 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule onelogin_user_logins_from_multiple_countries {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects user logins for the same user from different cities within 24 hours."
+    rule_id = "mr_92eb87fb-0310-460f-9640-8bc0bb87a8a3"
+    rule_name = "OneLogin User Logins From Multiple Countries"
+    mitre_attack_tactic = "Initial Access"
+    mitre_attack_technique = "Valid Accounts: Cloud Accounts"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"
+    mitre_attack_version = "v15.1"
+    type = "Alert"
+    data_source = "OneLogin"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.metadata.product_name = "ONELOGIN_SSO"
+    $login.metadata.vendor_name = "ONELOGIN"
+    $login.metadata.product_event_type = "5" //user logged into onelogin
+    $login.principal.user.userid = $userid
+
+  match:
+    $userid over 24h
+
+  outcome:
+      $risk_score = max(
+        35 +
+        // Unauthorized target geographies
+        if($login.principal.ip_geo_artifact.location.country_or_region = "Cuba", 20) +
+        if($login.principal.ip_geo_artifact.location.country_or_region = "Iran", 20) +
+        if($login.principal.ip_geo_artifact.location.country_or_region = "North Korea", 20) +
+        if($login.principal.ip_geo_artifact.location.country_or_region = "Russia", 20) +
+        if($login.principal.ip_geo_artifact.location.country_or_region = "Syria", 20)
+    )
+    $mitre_attack_tactic = "Initial Access"
+    $mitre_attack_technique = "Valid Accounts: Cloud Accounts"
+    $network_user_agent = array_distinct($login.network.http.user_agent)
+    $principal_ip = array_distinct($login.principal.ip)
+    $principal_ip_country = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($login.principal.ip_geo_artifact.location.state)
+    $dc_principal_ip_country = count_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $principal_user_userid = array_distinct($login.principal.user.userid)
+    $principal_user_user_display_name = array_distinct($login.principal.user.user_display_name)
+    $target_user_userid = array_distinct($login.target.user.userid)
+
+  condition:
+    $login and $dc_principal_ip_country > 1
+}

@@ -1,0 +1,65 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule onelogin_multiple_users_login_failures_from_the_same_ip {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects multiple users login failures from a single IP."
+    rule_id = "mr_8e302561-6fc5-430d-ae0c-bd285a0aec21"
+    rule_name = "OneLogin Multiple Users Login Failures From The Same IP"
+    mitre_attack_tactic = "Initial Access"
+    mitre_attack_technique = "Valid Accounts: Cloud Accounts"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"
+    mitre_attack_version = "v15.1"
+    type = "Alert"
+    data_source = "OneLogin"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.metadata.product_name = "ONELOGIN_SSO"
+    $login.metadata.vendor_name = "ONELOGIN"
+    $login.security_result.action = "BLOCK"
+    $login.metadata.product_event_type = "6" //user failed authentication
+    $login.principal.ip = $ip
+
+  match:
+    $ip over 1h
+
+  outcome:
+    $risk_score = max(35 +
+      // Unauthorized target geographies
+      if($login.target.ip_geo_artifact.location.country_or_region = "Cuba", 20) +
+      if($login.target.ip_geo_artifact.location.country_or_region = "Iran", 20) +
+      if($login.target.ip_geo_artifact.location.country_or_region = "North Korea", 20) +
+      if($login.target.ip_geo_artifact.location.country_or_region = "Russia", 20) +
+      if($login.target.ip_geo_artifact.location.country_or_region = "Syria", 20)
+    )
+    $mitre_attack_tactic = "Initial Access"
+    $mitre_attack_technique = "Valid Accounts: Cloud Accounts"
+    $principal_ip = array_distinct($login.principal.ip)
+    $principal_ip_country = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($login.principal.ip_geo_artifact.location.state)
+    $principal_user_userid = array_distinct($login.principal.user.userid)
+    $principal_user_user_display_name = array_distinct($login.principal.user.user_display_name)
+    $dc_principal_user_userid = count_distinct($login.principal.user.userid)
+    $metadata_description = array_distinct($login.metadata.description)
+
+  condition:
+    $login and $dc_principal_user_userid > 3
+}

@@ -1,0 +1,59 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule onelogin_multiple_users_assumed {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when a user assumes multiple user accounts."
+    rule_id = "mr_20b98df8-72a3-4163-8654-b66e4192d744"
+    rule_name = "OneLogin Multiple Users Assumed"
+    reference = "https://onelogin.service-now.com/kb_view_customer.do?sysparm_article=KB0010594"
+    mitre_attack_tactic = "Lateral Movement"
+    mitre_attack_technique = "Use Alternate Authentication Material"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1550/"
+    mitre_attack_version = "v15.1"
+    type = "Alert"
+    data_source = "OneLogin"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+     $assume.metadata.event_type = "USER_RESOURCE_ACCESS"
+     $assume.metadata.product_name = "ONELOGIN_SSO"
+     $assume.metadata.vendor_name = "ONELOGIN"
+     $assume.metadata.product_event_type = "3" //a user assumed another user
+     $assume.principal.user.userid = $actor_user
+
+  match:
+    $actor_user over 1h
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Lateral Movement"
+    $mitre_attack_technique = "Use Alternate Authentication Material"
+    $assume_reason = array_distinct($assume.metadata.description)
+    $principal_user_userid = array_distinct($assume.principal.user.userid)
+    $principal_user_user_display_name = array_distinct($assume.principal.user.user_display_name)
+    $principal_ip = array_distinct($assume.principal.ip)
+    $principal_ip_country = array_distinct($assume.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($assume.principal.ip_geo_artifact.location.state)
+    $target_user_userid = array_distinct($assume.target.user.userid)
+    $dc_target_user_userid = count_distinct($assume.target.user.userid)
+
+  condition:
+    $assume and $dc_target_user_userid > 3
+}

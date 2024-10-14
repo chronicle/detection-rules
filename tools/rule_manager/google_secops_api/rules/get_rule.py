@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Verify that a rule is a valid YARA-L 2.0 rule without creating a new rule or evaluating it over data.
+"""Retrieve a rule.
 
 API reference:
-https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText
+https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/get
 """
 
 import os
@@ -25,33 +25,33 @@ from typing import Any, Mapping
 from google.auth.transport import requests
 
 
-def verify_rule(
+def get_rule(
     http_session: requests.AuthorizedSession,
-    rule_text: str,
+    resource_name: str,
     max_retries: int = 3,
 ) -> Mapping[str, Any]:
-  """Verifies that a rule is a valid YARA-L 2.0 rule without creating a new rule or evaluating it over data.
+  """Retrieves a rule.
 
   Args:
     http_session: Authorized session for HTTP requests.
-    rule_text: The content of the YARA-L 2.0 rule.
+    resource_name: The resource name of the rule to retrieve. Format:
+      projects/{project}/locations/{location}/instances/{instance}/rules/{rule_id}
     max_retries (optional): Maximum number of times to retry HTTP request if
       certain response codes are returned. For example: HTTP response status
       code 429 (Too Many Requests)
 
   Returns:
-    Response message with results of whether rule was verified successfully.
+    Content and metadata about the requested rule.
 
   Raises:
     requests.exceptions.HTTPError: HTTP request resulted in an error
     (response.status_code >= 400).
   """
-  url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{os.environ['CHRONICLE_INSTANCE']}:verifyRuleText"
-  body = {"rule_text": rule_text}
+  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{resource_name}"
   response = None
 
   for _ in range(max_retries + 1):
-    response = http_session.request(method="POST", url=url, json=body)
+    response = http_session.request(method="GET", url=url)
 
     if response.status_code >= 400:
       print(response.text)

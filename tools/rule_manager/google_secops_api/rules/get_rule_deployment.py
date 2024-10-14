@@ -34,22 +34,21 @@ def get_rule_deployment(
 
   Args:
     http_session: Authorized session for HTTP requests.
-    resource_name: The resource name of the rule deployment to retrieve.
-      Format - projects/{project}/locations/{location}/instances/{instance}/rules/{rule_id}/deployment  # pylint: disable="line-too-long"
+    resource_name: The resource name of the rule deployment to retrieve. Format:
+      projects/{project}/locations/{location}/instances/{instance}/rules/{rule_id}/deployment
     max_retries (optional): Maximum number of times to retry HTTP request if
       certain response codes are returned. For example: HTTP response status
       code 429 (Too Many Requests)
 
   Returns:
-    The rule's deployment state.
-      Reference:
-      https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/RuleDeployment
+    The rule's deployment state. Reference:
+    https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/RuleDeployment
 
   Raises:
     requests.exceptions.HTTPError: HTTP request resulted in an error
     (response.status_code >= 400).
   """
-  url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{resource_name}/deployment"
+  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{resource_name}/deployment"
   response = None
 
   for _ in range(max_retries + 1):

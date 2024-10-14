@@ -18,8 +18,8 @@ import json
 import unittest
 from unittest import mock
 
-from chronicle_api.rules import stream_test_rule
 from google.auth.transport import requests
+from google_secops_api.rules import stream_test_rule
 
 
 class StreamTestRuleTest(unittest.TestCase):

@@ -12,21 +12,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Rule Command Line Interface package."""
-
-import logging
-import os
-
-import dotenv
-
-dotenv.load_dotenv()
-
-logging.basicConfig(
-    level=os.getenv(key="LOGGING_LEVEL", default="INFO"),
-    format="%(asctime)s | %(levelname)s | %(funcName)s | %(message)s",
-    datefmt="%d-%b-%y %H:%M:%S %Z",
-    handlers=[logging.StreamHandler()],
-    encoding="utf-8",
-)
-
-LOGGER = logging.getLogger()

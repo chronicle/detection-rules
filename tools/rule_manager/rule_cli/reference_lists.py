@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Manage reference lists in Chronicle."""
+"""Manage reference lists in Google SecOps."""
 
 # pylint: disable="g-bool-id-comparison","g-explicit-length-test"
 
@@ -22,10 +22,10 @@ import logging
 import pathlib
 from typing import Any, List, Literal, Mapping, Sequence, Tuple
 
-from chronicle_api.reference_lists.create_reference_list import create_reference_list
-from chronicle_api.reference_lists.list_reference_lists import list_reference_lists
-from chronicle_api.reference_lists.update_reference_list import update_reference_list
 from google.auth.transport import requests
+from google_secops_api.reference_lists.create_reference_list import create_reference_list
+from google_secops_api.reference_lists.list_reference_lists import list_reference_lists
+from google_secops_api.reference_lists.update_reference_list import update_reference_list
 import pydantic
 import ruamel.yaml
 from rule_cli.common.custom_exceptions import ReferenceListConfigError
@@ -144,8 +144,7 @@ class ReferenceLists:
     ref_list_names = []
 
     # Raise an exception if a reference list config entry is found that doesn't
-    # have a corresponding txt file in
-    # the reference lists dir
+    # have a corresponding txt file in the reference lists dir
     for ref_list_file_path in ref_list_files:
       ref_list_names.append(ref_list_file_path.stem)
     for key in ref_list_config:
@@ -157,8 +156,7 @@ class ReferenceLists:
 
     ref_lists = []
     # Raise an exception if the txt file for the reference list does not have a
-    # corresponding entry in the
-    # reference list config file
+    # corresponding entry in the reference list config file
     for ref_list_file_path in ref_list_files:
       ref_list_name = ref_list_file_path.stem
       if ref_list_config.get(ref_list_name) is None:
@@ -279,8 +277,8 @@ class ReferenceLists:
         ref_lists_dir,
     )
     for ref_list in self.ref_lists:
-      # Use the reference list display name (unique value in Chronicle) for the
-      # file name.
+      # Use the reference list display name (unique value in Google SecOps) for
+      # the file name.
       ref_list_file_path = f"{ref_lists_dir}/{ref_list.name}.txt"
 
       # Dump the reference list to a file.
@@ -330,11 +328,11 @@ class ReferenceLists:
   def get_remote_ref_lists(
       cls, http_session: requests.AuthorizedSession
   ) -> "ReferenceLists":
-    """Retrieve the latest version of all reference lists from Chronicle."""
+    """Retrieve the latest version of all reference lists from Google SecOps."""
     raw_ref_lists = []
     next_page_token = None
 
-    LOGGER.info("Attempting to retrieve all reference lists from Chronicle")
+    LOGGER.info("Attempting to retrieve all reference lists from Google SecOps")
     while True:
       retrieved_ref_lists, next_page_token = list_reference_lists(
           http_session=http_session,
@@ -392,9 +390,10 @@ class ReferenceLists:
       ref_lists_dir: pathlib.Path = REF_LISTS_DIR,
       ref_lists_config_file: pathlib.Path = REF_LIST_CONFIG_FILE,
   ) -> Mapping[str, Sequence[Tuple[str, str]]] | None:
-    """Update reference lists in Chronicle based on local files."""
+    """Update reference lists in Google SecOps based on local files."""
     LOGGER.info(
-        "Attempting to update reference lists in Chronicle based on local files"
+        "Attempting to update reference lists in Google SecOps based on local"
+        " files"
     )
 
     LOGGER.info("Loading local reference lists from %s", ref_lists_dir)
@@ -408,7 +407,7 @@ class ReferenceLists:
 
     LOGGER.info(
         "Attempting to retrieve latest version of all reference lists from"
-        " Chronicle"
+        " Google SecOps"
     )
     remote_ref_lists = ReferenceLists.get_remote_ref_lists(
         http_session=http_session
@@ -452,8 +451,8 @@ class ReferenceLists:
         update_summary["created"].append(ref_list_name)
 
       if ref_list_name in remote_ref_lists_dict.keys():
-        # Reference list exists in Chronicle with same name as local reference
-        # list.
+        # Reference list exists in Google SecOps with same name as local
+        # reference list.
         remote_ref_list = remote_ref_lists_dict[ref_list_name]
 
         # Check if the reference list's description should be updated

@@ -20,7 +20,7 @@ https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.location
 
 import os
 import time
-from typing import Mapping, Any, Sequence
+from typing import Any, Mapping, Sequence
 
 from google.auth.transport import requests
 
@@ -36,25 +36,25 @@ def create_reference_list(
   """Creates a new reference list.
 
   Args:
-      http_session: Authorized session for HTTP requests.
-      name: The name for the new reference list.
-      description: A user-provided description of the reference list.
-      entries: A list of entries for the reference list.
-      syntax_type: The syntax type indicating how list entries should be
-        validated. Reference:
-        https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.referenceLists#ReferenceListSyntaxType
-      max_retries (optional): Maximum number of times to retry HTTP request if
-        certain response codes are returned. For example: HTTP response status
-        code 429 (Too Many Requests)
+    http_session: Authorized session for HTTP requests.
+    name: The name for the new reference list.
+    description: A user-provided description of the reference list.
+    entries: A list of entries for the reference list.
+    syntax_type: The syntax type indicating how list entries should be
+      validated. Reference:
+      https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.referenceLists#ReferenceListSyntaxType
+    max_retries (optional): Maximum number of times to retry HTTP request if
+      certain response codes are returned. For example: HTTP response status
+      code 429 (Too Many Requests)
 
   Returns:
-      New reference list.
+    New reference list.
 
   Raises:
       requests.exceptions.HTTPError: HTTP request resulted in an error
       (response.status_code >= 400).
   """
-  url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{os.environ['CHRONICLE_INSTANCE']}/referenceLists"
+  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{os.environ['GOOGLE_SECOPS_INSTANCE']}/referenceLists"
   params = {"referenceListId": name}
   response = None
 

@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Unit tests for the "get_rule" module."""
+"""Unit tests for the "list_rules" module."""
 
 import unittest
 from unittest import mock
 
-from chronicle_api.rules.get_rule import get_rule
 from google.auth.transport import requests
+from google_secops_api.rules.list_rules import list_rules
 
 
-class GetRuleTest(unittest.TestCase):
-  """Unit tests for the "get_rule" module."""
+class ListRulesTest(unittest.TestCase):
+  """Unit tests for the "list_rules" module."""
 
   @mock.patch.object(
       target=requests, attribute="AuthorizedSession", autospec=True
@@ -43,10 +43,7 @@ class GetRuleTest(unittest.TestCase):
     )
 
     with self.assertRaises(requests.requests.exceptions.HTTPError):
-      get_rule(
-          http_session=mock_session,
-          resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_079f0681-523d-487f-ac4e-64a266f7a2d0",
-      )
+      list_rules(http_session=mock_session)
 
   @mock.patch.object(
       target=requests, attribute="AuthorizedSession", autospec=True
@@ -67,10 +64,13 @@ class GetRuleTest(unittest.TestCase):
         "text": "rule content",
         "displayName": "okta_suspicious_use_of_a_session_cookie",
     }
-    mock_response.json.return_value = expected_rule
+    expected_page_token = "page token here"
+    mock_response.json.return_value = {
+        "rules": [expected_rule],
+        "nextPageToken": expected_page_token,
+    }
 
-    response = get_rule(
-        http_session=mock_session,
-        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_079f0681-523d-487f-ac4e-64a266f7a2d0",
-    )
-    self.assertEqual(response, expected_rule)
+    rules, next_page_token = list_rules(http_session=mock_session)
+    self.assertEqual(len(rules), 1)
+    self.assertEqual(rules[0], expected_rule)
+    self.assertEqual(next_page_token, expected_page_token)

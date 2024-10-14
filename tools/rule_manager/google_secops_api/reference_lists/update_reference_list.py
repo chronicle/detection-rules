@@ -21,7 +21,7 @@ https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.location
 import copy
 import os
 import time
-from typing import Mapping, Any, List
+from typing import Any, List, Mapping
 
 from google.auth.transport import requests
 
@@ -36,28 +36,28 @@ def update_reference_list(
   """Updates an existing reference list.
 
   Args:
-      http_session: Authorized session for HTTP requests.
-      resource_name: The resource name of the reference list to retrieve. format:
-        projects/{project}/locations/{location}/instances/{instance}/referenceLists/{reference_list_name}
+    http_session: Authorized session for HTTP requests.
+    resource_name: The resource name of the reference list to retrieve. Format:
+      projects/{project}/locations/{location}/instances/{instance}/referenceLists/{reference_list_name}
       updates: A dictionary containing the updates to make to the reference
-        list. example: A value of {"entries": ["entry1", "entry2"]} will update
-        the entries in the reference list accordingly.
-      update_mask (optional): The list of fields to update for the reference
-        list. If no update_mask is provided, all non-empty fields will be
-        updated. example: An update_mask of ["entries"] will update the entries
-        for a reference list.
-      max_retries (optional): Maximum number of times to retry HTTP request if
-        certain response codes are returned. For example: HTTP response status
-        code 429 (Too Many Requests)
+      list. Example: A value of {"entries": ["entry1", "entry2"]} will update 
+      the entries in the reference list accordingly.
+    update_mask (optional): The list of fields to update for the reference
+      list. If no update_mask is provided, all non-empty fields will be
+      updated. Example: An update_mask of ["entries"] will update the entries
+      for a reference list.
+    max_retries (optional): Maximum number of times to retry HTTP request if
+      certain response codes are returned. For example: HTTP response status
+      code 429 (Too Many Requests)
 
   Returns:
-      New version of the reference list.
+    New version of the reference list.
 
   Raises:
-      requests.exceptions.HTTPError: HTTP request resulted in an error
-      (response.status_code >= 400).
+    requests.exceptions.HTTPError: HTTP request resulted in an error
+    (response.status_code >= 400).
   """
-  url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{resource_name}"
+  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{resource_name}"
   response = None
 
   # If no update_mask is provided, all non-empty fields will be updated

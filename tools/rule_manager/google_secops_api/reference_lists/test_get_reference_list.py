@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Unit tests for the "verify_rule" module."""
+"""Unit tests for the "get_reference_list" module."""
 
 import unittest
 from unittest import mock
 
-from chronicle_api.rules.verify_rule import verify_rule
 from google.auth.transport import requests
+from google_secops_api.reference_lists.get_reference_list import get_reference_list
 
 
-class VerifyRuleTest(unittest.TestCase):
-  """Unit tests for the "verify_rule" module."""
+class GetReferenceListTest(unittest.TestCase):
+  """Unit tests for the "get_reference_list" module."""
 
   @mock.patch.object(
       target=requests, attribute="AuthorizedSession", autospec=True
@@ -35,7 +35,7 @@ class VerifyRuleTest(unittest.TestCase):
       mock_response: unittest.mock.MagicMock,
       mock_session: unittest.mock.MagicMock,
   ):
-    """Test that HTTP response 200 (OK) occurs."""
+    """Test that an HTTP error occurs."""
     mock_session.request.return_value = mock_response
     type(mock_response).status_code = mock.PropertyMock(return_value=400)
     mock_response.raise_for_status.side_effect = (
@@ -43,9 +43,9 @@ class VerifyRuleTest(unittest.TestCase):
     )
 
     with self.assertRaises(requests.requests.exceptions.HTTPError):
-      verify_rule(
+      get_reference_list(
           http_session=mock_session,
-          rule_text="new rule content",
+          resource_name="projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/referenceLists/list_1",
       )
 
   @mock.patch.object(
@@ -54,12 +54,27 @@ class VerifyRuleTest(unittest.TestCase):
   @mock.patch.object(
       target=requests.requests, attribute="Response", autospec=True
   )
-  def test_http_ok(self, mock_response, mock_session):
+  def test_http_ok(
+      self,
+      mock_response: unittest.mock.MagicMock,
+      mock_session: unittest.mock.MagicMock,
+  ):
     """Test that HTTP response 200 (OK) occurs."""
     mock_session.request.return_value = mock_response
     type(mock_response).status_code = mock.PropertyMock(return_value=200)
+    expected_ref_list = {
+        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_1",
+        "displayName": "test_list_1",
+        "revisionCreateTime": "2024-02-13T22:26:31.415855Z",
+        "description": "Test list 1",
+        "entries": [{}],
+        "syntaxType": "REFERENCE_LIST_SYNTAX_TYPE_PLAIN_TEXT_STRING",
+    }
 
-    verify_rule(
+    mock_response.json.return_value = expected_ref_list
+
+    response = get_reference_list(
         http_session=mock_session,
-        rule_text="new rule content",
+        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_1",
     )
+    self.assertEqual(response, expected_ref_list)

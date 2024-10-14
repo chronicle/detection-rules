@@ -12,57 +12,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Update an existing rule.
+"""Retrieve a list of rules.
 
 API reference:
-https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/patch
+https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/list
 """
 
 import os
 import time
-from typing import Any, Mapping, List
+from typing import Any, List, Mapping, Tuple
 
 from google.auth.transport import requests
 
 
-def update_rule(
+def list_rules(
     http_session: requests.AuthorizedSession,
-    resource_name: str,
-    update_mask: List[str],
-    updates: Mapping[str, Any],
+    page_size: int | None = None,
+    page_token: str | None = None,
+    view: str | None = "FULL",
     max_retries: int = 3,
-) -> Mapping[str, Any]:
-  """Updates an existing rule.
+) -> Tuple[List[Mapping[str, Any]], str]:
+  """Retrieve a list of rules.
 
   Args:
     http_session: Authorized session for HTTP requests.
-    resource_name: The resource name of the rule to update. Format -
-      projects/{project}/locations/{location}/instances/{instance}/rules/{rule_id}
-    update_mask: The list of fields to update for the rule. For example, an
-      update_mask of ["text"] will update the text field for a rule i.e. create
-      a new version for the rule.
-    updates: A dictionary containing the updates to make to the rule. For
-      example, a value of {"text": "New YARA-L 2.0 rule"} will update the text
-      field for the rule i.e. create a new version for the rule.
+    page_size (optional): Maximum number of rules to return. Must be
+      non-negative, and is capped at a server-side limit of 1000. A
+      server-side default of 100 is used if the size is 0 or a None value.
+    page_token (optional): Page token from a previous ListRules call used for
+      pagination. The first page is retrieved if the token is the empty string
+      or a None value.
+    view (optional): The scope of fields to populate for the Rule being
+      returned. Reference:
+      https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/RuleView
     max_retries (optional): Maximum number of times to retry HTTP request if
       certain response codes are returned. For example: HTTP response status
       code 429 (Too Many Requests)
 
   Returns:
-    New version of the rule.
+    List of rules and a page token for the next page of rules, if there are
+    any.
 
   Raises:
     requests.exceptions.HTTPError: HTTP request resulted in an error
     (response.status_code >= 400).
   """
-  url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{resource_name}"
-  params = {"updateMask": update_mask}
+  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{os.environ['GOOGLE_SECOPS_INSTANCE']}/rules"
+  params = {"page_size": page_size, "page_token": page_token, "view": view}
   response = None
 
   for _ in range(max_retries + 1):
-    response = http_session.request(
-        method="PATCH", url=url, params=params, json=updates
-    )
+    response = http_session.request(method="GET", url=url, params=params)
 
     if response.status_code >= 400:
       print(response.text)
@@ -75,4 +75,6 @@ def update_rule(
 
   response.raise_for_status()
 
-  return response.json()
+  response_json = response.json()
+
+  return response_json.get("rules"), response_json.get("nextPageToken")

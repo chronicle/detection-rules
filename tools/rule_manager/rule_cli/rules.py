@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Manage rules in Chronicle."""
+"""Manage rules in Google SecOps."""
 
 # pylint: disable="g-bool-id-comparison","g-explicit-length-test"
 
@@ -24,12 +24,12 @@ import pathlib
 import re
 from typing import Any, List, Mapping, Sequence, Tuple
 
-from chronicle_api.rules.create_rule import create_rule
-from chronicle_api.rules.get_rule_deployment import get_rule_deployment
-from chronicle_api.rules.list_rules import list_rules
-from chronicle_api.rules.update_rule import update_rule
-from chronicle_api.rules.update_rule_deployment import update_rule_deployment
 from google.auth.transport import requests
+from google_secops_api.rules.create_rule import create_rule
+from google_secops_api.rules.get_rule_deployment import get_rule_deployment
+from google_secops_api.rules.list_rules import list_rules
+from google_secops_api.rules.update_rule import update_rule
+from google_secops_api.rules.update_rule_deployment import update_rule_deployment
 import pydantic
 import ruamel.yaml
 from rule_cli.common.custom_exceptions import DuplicateRuleIdError
@@ -94,7 +94,7 @@ class Rules:
   def parse_rule(cls, rule: Mapping[str, Any]) -> Rule:
     """Parse a rule into a Rule object."""
     # Set enabled, alerting, and archived options based on the rule's current
-    # state in Chronicle.
+    # state in Google SecOps.
     if rule["deployment_state"].get("enabled") is True:
       pass
     else:
@@ -335,11 +335,11 @@ class Rules:
   def get_remote_rules(
       cls, http_session: requests.AuthorizedSession
   ) -> "Rules":
-    """Retrieve the latest version of all rules from Chronicle."""
+    """Retrieve the latest version of all rules from Google SecOps."""
     raw_rules = []
     next_page_token = None
 
-    LOGGER.info("Attempting to retrieve all rules from Chronicle")
+    LOGGER.info("Attempting to retrieve all rules from Google SecOps")
     while True:
       retrieved_rules, next_page_token = list_rules(
           http_session=http_session,
@@ -509,9 +509,9 @@ class Rules:
       rules_dir: pathlib.Path = RULES_DIR,
       rule_config_file: pathlib.Path = RULE_CONFIG_FILE,
   ) -> Mapping[str, Sequence[Tuple[str, str]]] | None:
-    """Update rules in Chronicle based on local rule files."""
+    """Update rules in Google SecOps based on local rule files."""
     LOGGER.info(
-        "Attempting to update rules in Chronicle based on local rule files"
+        "Attempting to update rules in Google SecOps based on local rule files"
     )
 
     LOGGER.info("Loading local files from %s", rules_dir)
@@ -524,7 +524,7 @@ class Rules:
       return
 
     LOGGER.info(
-        "Attempting to retrieve latest version of all rules from Chronicle"
+        "Attempting to retrieve latest version of all rules from Google SecOps"
     )
     remote_rules = Rules.get_remote_rules(http_session=http_session)
 
@@ -553,7 +553,7 @@ class Rules:
       rule_name = local_rule.name
 
       if rule_name in remote_rules_dict.keys():
-        # Rule exists in Chronicle with same rule name as local rule.
+        # Rule exists in Google SecOps with same rule name as local rule.
         rule_id = local_rule.id
         remote_rule = remote_rules_dict[rule_name]
 
@@ -588,7 +588,7 @@ class Rules:
         )
 
       else:
-        # Rule does not exist in Chronicle with same rule name as local rule
+        # Rule does not exist in Google SecOps with same rule name as local rule
         LOGGER.info("Local rule name %s not found in remote rules", rule_name)
 
         # A new rule will be created if a remote rule doesn't exist with the
@@ -616,7 +616,7 @@ class Rules:
 
         # If a remote rule doesn't exist with the same name as the local rule,
         # but there's a rule id for the local rule, the local rule has been
-        # renamed. Create a new version of the existing rule in Chronicle.
+        # renamed. Create a new version of the existing rule in Google SecOps
         else:
           rule_id = local_rule.id
           LOGGER.info(

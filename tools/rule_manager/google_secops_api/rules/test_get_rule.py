@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Unit tests for the "get_reference_list" module."""
+"""Unit tests for the "get_rule" module."""
 
 import unittest
 from unittest import mock
 
-from chronicle_api.reference_lists.get_reference_list import get_reference_list
 from google.auth.transport import requests
+from google_secops_api.rules.get_rule import get_rule
 
 
-class GetReferenceListTest(unittest.TestCase):
-  """Unit tests for the "get_reference_list" module."""
+class GetRuleTest(unittest.TestCase):
+  """Unit tests for the "get_rule" module."""
 
   @mock.patch.object(
       target=requests, attribute="AuthorizedSession", autospec=True
@@ -43,9 +43,9 @@ class GetReferenceListTest(unittest.TestCase):
     )
 
     with self.assertRaises(requests.requests.exceptions.HTTPError):
-      get_reference_list(
+      get_rule(
           http_session=mock_session,
-          resource_name="projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/referenceLists/list_1",
+          resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_079f0681-523d-487f-ac4e-64a266f7a2d0",
       )
 
   @mock.patch.object(
@@ -62,19 +62,15 @@ class GetReferenceListTest(unittest.TestCase):
     """Test that HTTP response 200 (OK) occurs."""
     mock_session.request.return_value = mock_response
     type(mock_response).status_code = mock.PropertyMock(return_value=200)
-    expected_ref_list = {
-        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_1",
-        "displayName": "test_list_1",
-        "revisionCreateTime": "2024-02-13T22:26:31.415855Z",
-        "description": "Test list 1",
-        "entries": [{}],
-        "syntaxType": "REFERENCE_LIST_SYNTAX_TYPE_PLAIN_TEXT_STRING",
+    expected_rule = {
+        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_079f0681-523d-487f-ac4e-64a266f7a2d0",
+        "text": "rule content",
+        "displayName": "okta_suspicious_use_of_a_session_cookie",
     }
+    mock_response.json.return_value = expected_rule
 
-    mock_response.json.return_value = expected_ref_list
-
-    response = get_reference_list(
+    response = get_rule(
         http_session=mock_session,
-        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_1",
+        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_079f0681-523d-487f-ac4e-64a266f7a2d0",
     )
-    self.assertEqual(response, expected_ref_list)
+    self.assertEqual(response, expected_rule)

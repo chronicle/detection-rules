@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Unit tests for the "get_rule_deployment" module."""
+"""Unit tests for the "update_rule_deployment" module."""
 
 import unittest
 from unittest import mock
 
-from chronicle_api.rules.get_rule_deployment import get_rule_deployment
 from google.auth.transport import requests
+from google_secops_api.rules.update_rule_deployment import update_rule_deployment
 
 
-class GetRuleDeploymentTest(unittest.TestCase):
-  """Unit tests for the "get_rule_deployment" module."""
+class UpdateRuleDeploymentTest(unittest.TestCase):
+  """Unit tests for the "update_rule_deployment" module."""
 
   @mock.patch.object(
       target=requests, attribute="AuthorizedSession", autospec=True
@@ -43,9 +43,11 @@ class GetRuleDeploymentTest(unittest.TestCase):
     )
 
     with self.assertRaises(requests.requests.exceptions.HTTPError):
-      get_rule_deployment(
+      update_rule_deployment(
           http_session=mock_session,
           resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1",
+          update_mask=["enabled"],
+          updates={"enabled": True},
       )
 
   @mock.patch.object(
@@ -71,8 +73,10 @@ class GetRuleDeploymentTest(unittest.TestCase):
     }
     mock_response.json.return_value = expected_response
 
-    response = get_rule_deployment(
+    response = update_rule_deployment(
         http_session=mock_session,
         resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1",
+        update_mask=["enabled", "alerting"],
+        updates={"enabled": True, "alerting": True},
     )
     self.assertEqual(response, expected_response)

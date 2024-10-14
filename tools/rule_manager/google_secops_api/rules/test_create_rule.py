@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Unit tests for the "create_reference_list" module."""
+"""Unit tests for the "create_rule" module."""
 
 import unittest
 from unittest import mock
 
-from chronicle_api.reference_lists.create_reference_list import create_reference_list
 from google.auth.transport import requests
+from google_secops_api.rules.create_rule import create_rule
 
 
-class CreateReferenceListTest(unittest.TestCase):
-  """Unit tests for the "create_reference_list" module."""
+class CreateRuleTest(unittest.TestCase):
+  """Unit tests for the "create_rule" module."""
 
   @mock.patch.object(
       target=requests, attribute="AuthorizedSession", autospec=True
@@ -43,11 +43,9 @@ class CreateReferenceListTest(unittest.TestCase):
     )
 
     with self.assertRaises(requests.requests.exceptions.HTTPError):
-      create_reference_list(
+      create_rule(
           http_session=mock_session,
-          name="test_list_1",
-          description="test_list_1",
-          entries=["hello", "bonjour"],
+          rule_text="new rule content",
       )
 
   @mock.patch.object(
@@ -64,20 +62,15 @@ class CreateReferenceListTest(unittest.TestCase):
     """Test that HTTP response 200 (OK) occurs."""
     mock_session.request.return_value = mock_response
     type(mock_response).status_code = mock.PropertyMock(return_value=200)
-    expected_ref_list = {
-        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_1",
-        "displayName": "test_list_1",
-        "revisionCreateTime": "2024-02-13T22:26:31.415855Z",
-        "description": "Test list 1",
-        "entries": [{"value": "hello"}, {"value": "bonjour"}],
-        "syntaxType": "REFERENCE_LIST_SYNTAX_TYPE_PLAIN_TEXT_STRING",
+    expected_rule = {
+        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_079f0681-523d-487f-ac4e-64a266f7a2d0",
+        "displayName": "okta_suspicious_use_of_a_session_cookie",
+        "text": "rule content",
     }
-    mock_response.json.return_value = expected_ref_list
+    mock_response.json.return_value = expected_rule
 
-    actual_ref_list = create_reference_list(
+    actual_rule = create_rule(
         http_session=mock_session,
-        name="test_list_1",
-        description="test_list_1",
-        entries=["hello", "bonjour"],
+        rule_text="new rule content",
     )
-    self.assertEqual(actual_ref_list, expected_ref_list)
+    self.assertEqual(actual_rule, expected_rule)

@@ -12,59 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Update the deployment state for a rule.
+"""Create a new rule.
 
 API reference:
-https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/updateDeployment
+https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create
 """
 
 import os
 import time
-from typing import Any, List, Mapping
+from typing import Any, Mapping
 
 from google.auth.transport import requests
 
 
-def update_rule_deployment(
+def create_rule(
     http_session: requests.AuthorizedSession,
-    resource_name: str,
-    update_mask: List[str],
-    updates: Mapping[str, Any],
+    rule_text: str,
     max_retries: int = 3,
 ) -> Mapping[str, Any]:
-  """Update the deployment state for a rule.
+  """Creates a new rule.
 
   Args:
     http_session: Authorized session for HTTP requests.
-    resource_name: The resource name of the rule deployment to update. Format
-      "projects/{project}/locations/{location}/instances/{instance}/rules/{rule_id}/deployment"
-    update_mask: The list of fields to update in the rule's deployment state.
-      For example, an update_mask of ["archived","enabled"] will update the
-      rule's archived and deployment state.
-    updates: A dictionary containing the updates to the rule's deployment
-      state. For example, a value of {"archived": False, "enabled": True} will
-      unarchive and enable the rule.
+    rule_text: The content of the YARA-L 2.0 rule.
     max_retries (optional): Maximum number of times to retry HTTP request if
       certain response codes are returned. For example: HTTP response status
       code 429 (Too Many Requests)
 
   Returns:
-    The rule's deployment state.
-      Reference:
-      https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/RuleDeployment
+    New rule.
 
   Raises:
     requests.exceptions.HTTPError: HTTP request resulted in an error
     (response.status_code >= 400).
   """
-  url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{resource_name}/deployment"
-  params = {"updateMask": update_mask}
+  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{os.environ['GOOGLE_SECOPS_INSTANCE']}/rules"
+  body = {"text": rule_text}
   response = None
 
   for _ in range(max_retries + 1):
-    response = http_session.request(
-        method="PATCH", url=url, params=params, json=updates
-    )
+    response = http_session.request(method="POST", url=url, json=body)
 
     if response.status_code >= 400:
       print(response.text)

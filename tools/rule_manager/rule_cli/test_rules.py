@@ -63,8 +63,7 @@ def test_load_rules():
   assert rule_files_count == len(rules.rules)
 
   # Ensure an exception occurs if a rule config entry is found that doesn't
-  # have a corresponding .yaral file in the
-  # rules directory
+  # have a corresponding .yaral file in the rules directory
   with pytest.raises(
       RuleConfigError,
       match=(

@@ -57,10 +57,10 @@ def parse_stream(
   stream closes.
 
   Args:
-      response: The response object returned from post().
+    response: The response object returned from post().
 
   Yields:
-      Dictionary representations of each result that was sent over the stream.
+    Dictionary representations of each result that was sent over the stream.
   """
   try:
     if response.encoding is None:
@@ -85,12 +85,12 @@ def parse_stream(
       yield json.loads(json_string)
 
   except Exception as e:  # pylint: disable=broad-except
-    # Chronicle's servers will generally send a {"error": ...} dict over the
-    # stream to indicate retryable failures (e.g. due to periodic internal
+    # Google SecOps's servers will generally send a {"error": ...} dict over
+    # the stream to indicate retryable failures (e.g. due to periodic internal
     # server maintenance), which will not cause this except block to fire.
     #
-    # In rarer cases, the streaming connection may silently fail; the connection
-    # will close without an error dict, which manifests as a
+    # In rarer cases, the streaming connection may silently fail; the
+    # connection will close without an error dict, which manifests as a
     # requests.requests.exceptions.ChunkedEncodingError; see
     # https://github.com/urllib3/urllib3/issues/1516 for details from the
     # `requests` and `urllib3` community.
@@ -197,7 +197,7 @@ def stream_test_rule(
       execution errors successfully streamed
       back, disconnection reason).
   """
-  url = f"{os.environ['CHRONICLE_API_BASE_URL']}/{os.environ['CHRONICLE_INSTANCE']}/legacy:legacyTestRuleStreaming"
+  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{os.environ['GOOGLE_SECOPS_INSTANCE']}/legacy:legacyTestRuleStreaming"
 
   detections = []
   rule_execution_errors = []
@@ -220,9 +220,9 @@ def stream_test_rule(
     #   # Some delay before server sends next result...
     #   {rule execution error 1},
     #   # Some delay before server sends next result(s)...
-    # # We expect the ']' to arrive if all results are streamed before a
-    # server-side timeout; otherwise, a connection failure error may be
-    # streamed back if/when the connection breaks.
+    #   # We expect the ']' to arrive if all results are streamed before a
+    #   # server-side timeout; otherwise, a connection failure error may be
+    #   # streamed back if/when the connection breaks.
     LOGGER.info("Initiated connection to test rule stream")
     if response.status_code >= 400:
       disconnection_reason = (
@@ -237,8 +237,8 @@ def stream_test_rule(
           detections.append(detection)
         elif "error" in result:
           # We distinguish rule execution errors from other errors sent back
-          # over the stream by checking to
-          # see if the error has the RULES_EXECUTION_ERROR category.
+          # over the stream by checking to see if the error has the
+          # RULES_EXECUTION_ERROR category.
           error = result["error"]
           if error.get("category") == "RULES_EXECUTION_ERROR":
             LOGGER.error("A rule execution error occurred")
@@ -261,6 +261,8 @@ def test_rule(
 ) -> Sequence[Mapping[str, Any]]:
   """Calls legacy.legacyTestRuleStreaming API method once to test rule.
 
+  https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.legacy/legacyTestRuleStreaming
+
   Args:
     http_session: Authorized session for HTTP requests.
     rule_text: The content of the YARA-L 2.0 rule to test as a UTF-8 string.
@@ -277,7 +279,7 @@ def test_rule(
       Time range between start_time and end_time must not exceed two weeks. A
       timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and
       up to nine fractional digits.
-      Examples- "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+      Examples - "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
       Time range between start_time and end_time must not exceed two
       weeks.
     max_detections (optional): Maximum number of detections to return. The

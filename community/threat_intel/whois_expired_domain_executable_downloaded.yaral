@@ -41,6 +41,8 @@ rule whois_expired_domain_executable_downloaded {
     $whois.graph.metadata.vendor_name = "WHOIS"
     $whois.graph.metadata.product_name = "WHOISXMLAPI Simple Whois"
     $whois.graph.metadata.source_type = "GLOBAL_CONTEXT"
+    // Filter out domains without expiration time
+    $whois.graph.entity.domain.expiration_time.seconds > 0
     // Domain expired before the event
     $whois.graph.entity.domain.expiration_time.seconds < $access.metadata.event_timestamp.seconds
 

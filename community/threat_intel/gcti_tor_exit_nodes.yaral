@@ -33,6 +33,7 @@ rule gcti_tor_exit_nodes {
 
   events:
     $network.metadata.event_type = "NETWORK_CONNECTION"
+    $network.security_result.action = "ALLOW"
     $network.target.ip = $ip
 
     // Tor IP listing provided by GCTI Feed

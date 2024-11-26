@@ -39,7 +39,7 @@ rule google_workspace_malicious_file_downloaded {
 
     ($ws.target.resource.attribute.labels["visibility"] = "people_with_link" or
     $ws.target.resource.attribute.labels["visibility"] = "public_on_the_web")
-    $ws.target.resource.name = /.*dll|.*exe|.*scr|.*jar|.*pif|.*app|.*dmg|.*pkg|.*elf|.*so|.*bin|.*deb|.*rpm|.*sh|.*hta|.*lnk/
+    $ws.target.resource.name = /.*\.dll|.*\.exe|.*\.scr|.*\.jar|.*\.pif|.*\.app|.*\.dmg|.*\.pkg|.*\.elf|.*\.so|.*\.bin|.*\.deb|.*\.rpm|.*\.sh|.*\.hta|.*\.lnk/
 
   outcome:
     $risk_score = max(35)

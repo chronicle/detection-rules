@@ -48,7 +48,7 @@ rule aws_kms_key_disabled_or_scheduled_for_deletion {
     $principal_ip_country = array_distinct($cloudtrail.principal.ip_geo_artifact.location.country_or_region)
     $principal_ip_state = array_distinct($cloudtrail.principal.ip_geo_artifact.location.state)
     $principal_user_display_name = $cloudtrail.principal.user.user_display_name
-    $recipient_aws_account_id = $cloudtrail.target.resource.attribute.labels["Recipient Account Id"]
+    $recipient_aws_account_id = $cloudtrail.additional.fields["recipientAccountId"]
     $aws_region = $cloudtrail.principal.location.name
     $target_resource_name = $cloudtrail.target.resource.name
     $target_resource_product_object_id = $cloudtrail.target.resource.product_object_id

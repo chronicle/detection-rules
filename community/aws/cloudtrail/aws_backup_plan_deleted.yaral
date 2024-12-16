@@ -50,7 +50,7 @@ rule aws_backup_plan_deleted {
     $principal_ip_country = array_distinct($cloudtrail.principal.ip_geo_artifact.location.country_or_region)
     $principal_ip_state = array_distinct($cloudtrail.principal.ip_geo_artifact.location.state)
     $principal_user_display_name = array_distinct($cloudtrail.principal.user.user_display_name)
-    $recipient_aws_account_id = array_distinct($cloudtrail.target.resource.attribute.labels["Recipient Account Id"])
+    $recipient_aws_account_id = array_distinct($cloudtrail.additional.fields["recipientAccountId"])
     $aws_region = array_distinct($cloudtrail.principal.location.name)
 
   condition:

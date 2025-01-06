@@ -54,7 +54,7 @@ rule aws_high_number_of_unknown_user_authentication_attempts {
     $principal_ip_country = array_distinct($fail.principal.ip_geo_artifact.location.country_or_region)
     $principal_ip_state = array_distinct($fail.principal.ip_geo_artifact.location.state)
     $target_user_display_name = array_distinct($fail.target.user.user_display_name)
-    $recipient_aws_account_id = array_distinct($fail.target.resource.attribute.labels["Recipient Account Id"])
+    $recipient_aws_account_id = array_distinct($fail.additional.fields["recipientAccountId"])
     $target_resource_name = array_distinct($fail.target.resource.name)
     $target_resource_product_object_id = array_distinct($fail.target.resource.product_object_id)
     $security_result_description = array_distinct($fail.security_result.description)

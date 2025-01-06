@@ -39,7 +39,7 @@ rule aws_console_login_without_mfa {
       $login.metadata.product_event_type = "ConsoleLogin"
       $login.security_result.action= "ALLOW"
       $login.extensions.auth.auth_details = "MFAUsed: No"
-      $login.target.resource.attribute.labels["Recipient Account Id"] = $account_id
+      $login.additional.fields["recipientAccountId"] = $account_id
 
     match:
       $account_id over 1h

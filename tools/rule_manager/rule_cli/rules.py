@@ -27,6 +27,7 @@ from typing import Any, List, Mapping, Sequence, Tuple
 from google.auth.transport import requests
 from google_secops_api.rules.create_rule import create_rule
 from google_secops_api.rules.get_rule_deployment import get_rule_deployment
+from google_secops_api.rules.list_rule_deployments import list_rule_deployments
 from google_secops_api.rules.list_rules import list_rules
 from google_secops_api.rules.update_rule import update_rule
 from google_secops_api.rules.update_rule_deployment import update_rule_deployment
@@ -110,12 +111,9 @@ class Rules:
     else:
       rule["deployment_state"]["archived"] = False
 
-    # Extract the rule ID from the resource_name value
-    rule_id_match = re.search(
-        pattern=r"\/(ru_[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$)",
-        string=rule["name"],
+    rule_id = Rules.extract_rule_id_from_resource_name(
+        rule_resource_name=rule["name"]
     )
-    rule_id = rule_id_match.group(1)
 
     try:
       parsed_rule = Rule(
@@ -360,18 +358,52 @@ class Rules:
         # Break if there are no more pages of rules to retrieve
         break
 
-    raw_rules_count = len(raw_rules)
+    LOGGER.info("Retrieved a total of %s rules", len(raw_rules))
 
-    LOGGER.info("Retrieved a total of %s rules", raw_rules_count)
+    rule_deployments = []
+    next_page_token = None
 
     LOGGER.info(
-        "Attempting to retrieve rule deployment state for %s rules",
-        raw_rules_count,
+        "Attempting to retrieve deployment state for all rules in Google SecOps"
     )
-    for rule in raw_rules:
-      rule["deployment_state"] = get_rule_deployment(
-          http_session=http_session, resource_name=rule["name"]
+    while True:
+      retrieved_rule_deployments, next_page_token = list_rule_deployments(
+          http_session=http_session, page_size=None, page_token=next_page_token
       )
+
+      if retrieved_rule_deployments is not None:
+        LOGGER.info(
+            "Retrieved deployment state for %s rules",
+            len(retrieved_rule_deployments),
+        )
+        rule_deployments.extend(retrieved_rule_deployments)
+
+      if next_page_token:
+        LOGGER.info(
+            "Attempting to retrieve rule deployment states with page token %s",
+            next_page_token,
+        )
+      else:
+        # Break if there are no more pages of rule deployments to retrieve
+        break
+
+    LOGGER.info(
+        "Retrieved deployment state for a total of %s rules",
+        len(rule_deployments),
+    )
+
+    # Store the rule deployment objects in a dict using the rule_id as the key
+    rule_deployments_dict = {}
+    for rule_deployment in rule_deployments:
+      rule_id = Rules.extract_rule_id_from_resource_name(
+          rule_deployment["name"]
+      )
+      rule_deployments_dict[rule_id] = rule_deployment
+
+    # Add the deployment state to each raw rule ready for parsing
+    for raw_rule in raw_rules:
+      rule_id = Rules.extract_rule_id_from_resource_name(raw_rule["name"])
+      raw_rule["deployment_state"] = rule_deployments_dict[rule_id]
 
     parsed_rules = Rules.parse_rules(rules=raw_rules)
 
@@ -453,6 +485,28 @@ class Rules:
       )
 
     return rule_name
+
+  @classmethod
+  def extract_rule_id_from_resource_name(cls, rule_resource_name: str) -> str:
+    """Extract the rule ID from a Google Cloud resource name.
+
+    Args:
+      rule_resource_name: The Google Cloud resource name for the rule. Example:
+        projects/1234567890123/locations/us/instances/abcdef12-1234-1234-abc9-abcde1234566/rules/ru_e05bebd5-1234-410a-1234-4d7d0ee8b55f
+
+    Returns:
+      The unique ID for the rule. Example:
+      projects/1234567890123/locations/us/instances/abcdef12-1234-1234-abc9-abcde1234566/rules/ru_e05bebd5-1234-410a-1234-4d7d0ee8b55f
+    """
+    # Extract the rule ID from the resource_name value
+    rule_id_match = re.search(
+        pattern=r"\/(ru_[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})",
+        string=rule_resource_name,
+    )
+
+    rule_id = rule_id_match.group(1)
+
+    return rule_id
 
   @classmethod
   def check_rule_config(cls, config: Mapping[str, Any]):

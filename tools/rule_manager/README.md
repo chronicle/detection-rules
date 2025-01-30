@@ -10,7 +10,7 @@ If you're new to the concept of managing detection content with CI/CD tools, we 
 
 The example code interacts with Google SecOps' [API](https://cloud.google.com/chronicle/docs/reference/rest) and can be used in a CI/CD pipeline (in GitHub, GitLab, CircleCI, etc) to do the following:
 
-* Verify that a rule is a valid YARA-L 2.0 rule without creating a new rule or evaluating it over data
+* Verify that a rule is a valid YARA-L rule without creating a new rule or evaluating it over data
 * Retrieve the latest version of all detection rules from Google SecOps and write them to local `.yaral` files along with their current state/configuration
 * Update detection rules in Google SecOps based on local rule files, e.g., create new rules, create a new rule version, or enable/disable/archive rules
 * Retrieve the latest version of all reference lists from Google SecOps and write them to local files along with their current state/configuration
@@ -176,7 +176,7 @@ Example output from pull latest rules command:
 
 ### Verify rule(s)
 
-The `verify-rule` and `--verify-rules` commands use Google SecOps's API to verify that YARA-L 2.0 rules are valid without creating a new rule or evaluating it over data.
+The `verify-rule` and `--verify-rules` commands use Google SecOps's API to verify that rules are valid without creating a new rule or evaluating it over data.
 
 Example output from verify rule command:
 

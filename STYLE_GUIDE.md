@@ -1,7 +1,7 @@
 # Style Guide for YARA-L Detection Rules
 
 Detection Rules for Chronicle Security Operations are written in the
-[YARA-L 2.0](https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-overview) language.
+[YARA-L](https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-overview) language.
 
 This style guide establishes baseline standards of quality, completeness, readability, and extensibility for
 community-published rules. This guide also sets an example for what high quality rules look like and what components
@@ -43,7 +43,7 @@ The following license must be included at the beginning of each rule file.
 
 Ensure that there are no tabs or trailing whitespaces in your rule.
 
-## YARA-L 2.0 rule sections
+## YARA-L rule sections
 
 ### `meta` section
 

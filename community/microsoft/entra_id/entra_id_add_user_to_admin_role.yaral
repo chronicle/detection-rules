@@ -1,0 +1,67 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ rule entra_id_add_user_to_admin_role {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Adding users to administrative roles is needed but due to sensitivity of these roles, validation should occur when this occurs"
+    rule_id = "mr_069a282b-a605-4572-921e-f466b93d0cf3"
+    rule_name = "Entra ID Add User To Admin Role"
+    mitre_attack_tactic = "Persistence"
+    mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"
+    assumption = "The list entra_id_watchlist_roles is populated with GUIDs, ie 62e90394-69f5-4237-9190-012177145e10"
+    reference = "https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference"
+    type = "alert"
+    platform = "azure"
+    data_source = "azure ad"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $app.metadata.event_type = "USER_CHANGE_PERMISSIONS"
+    $app.metadata.product_event_type = "Add member to role"
+    $app.metadata.product_name = "Azure AD Directory Audit"
+    $app.metadata.vendor_name = "Microsoft"
+    $app.security_result.action = "ALLOW"
+    //To use with a single named role, like Exchange Administrator, use the following
+    //$app.target.user.title = "Exchange Administrator"
+    //To use with single role in GUID form (Preferred), use the following
+    $app.target.resource.attribute.labels["Role.TemplateId"] = "62e90394-69f5-4237-9190-012177145e10"
+    //To use a list of GUIDs (Preferred), create a reference list and use the syntax below
+    //$app.target.resource.attribute.labels["Role.TemplateId"] in %entra_id_watchlist_roles_guid
+    $app.principal.user.userid = $userid
+
+  match:
+    $userid over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($app.metadata.id)
+    $assigned_role = array_distinct($app.target.user.title)
+    $assigned_role_guid = array_distinct($app.target.resource.attribute.labels["Role.TemplateId"])
+    $principal_county_region = array_distinct($app.principal.ip_geo_artifact.location.country_or_region)
+    $user_agent = array_distinct($app.network.http.user_agent)
+    $network_session = array_distinct($app.network.session_id)
+    $principal_ip = array_distinct($app.principal.ip)
+    $userid_making_modification = array_distinct($app.principal.user.userid)
+    $principal_user_email_addresses = array_distinct($app.principal.user.email_addresses)
+    $modified_userid = array_distinct($app.target.user.userid)
+
+  condition:
+    $app
+}

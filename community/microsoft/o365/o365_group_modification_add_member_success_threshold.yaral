@@ -1,0 +1,57 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule o365_group_modification_add_member_success_threshold {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when a group GUID in Office 365 has more users added to it by the same user than a defined thresold."
+    rule_id = "mr_47e13870-800b-4886-b8b8-8e6b68b203b9"
+    rule_name = "Office 365 group modification add member success has exceeded a defined threshold"
+    type = "alert"
+    platform = "azure"
+    data_source = "o365"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $group.metadata.event_type = "GROUP_MODIFICATION"
+    $group.metadata.product_event_type = "Add member to group."
+    $group.metadata.product_name = "Office 365"
+    $group.metadata.vendor_name = "Microsoft"
+    $group.security_result.action = "ALLOW"
+    $group.principal.user.userid = $user
+    $group.target.group.product_object_id = $guid
+
+  match:
+    $guid, $user over 5m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($group.metadata.id)
+    $user_agent = array_distinct($group.network.http.user_agent)
+    $security_summary = array_distinct($group.security_result.summary)
+    $target_application = array_distinct($group.target.application)
+    $principal_user_userid = array_distinct($group.principal.user.userid)
+    $group_name = array_distinct($group.target.group.group_display_name)
+    $group_guid = array_distinct($group.target.group.product_object_id)
+    $user_added = array_distinct($group.target.user.userid)
+    $user_count = count_distinct($group.target.user.userid)
+
+  condition:
+    //Modify the user_count value to suit your needs
+    $group and $user_count > 4
+}

@@ -1,0 +1,100 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule suspicious_entra_id_sign_in_external_call {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects authentication to O365 followed by a non-interactive sign-ins that aligns to suspicious activity."
+    rule_id = "mr_2245edf0-3a75-4bf6-901b-c47ffda1703e"
+    rule_name = "Hunt for suspicious sign-in to Entra ID Using Extrnal Call Method"
+    assumption = "Microsoft Office is the application the stolen token is associated with, however this can be modified in GraphRunner. This detection could create FPs if not focusing on the default application, however filtering on suspicious IP addresses or user agents may help make this useful as a hunting rule."
+    reference = "https://github.com/dafthack/GraphRunner/blob/main/GraphRunner.ps1"
+    type = "hunt"
+    platform = "azure"
+    data_source = "o365, azure activity"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $init_login.metadata.event_type = "USER_LOGIN"
+    $init_login.metadata.product_event_type = "UserLoggedIn"
+    $init_login.metadata.product_name = "Office 365"
+    $init_login.metadata.vendor_name = "Microsoft"
+    $init_login.security_result.action = "ALLOW"
+    $init_login.network.session_id != ""
+    strings.to_lower($init_login.target.user.userid) = $user
+    $init_login.principal.ip = $ip
+    //Can add specific IPs of interest here or filter admin consoles out
+    //$init_login.principal.ip != "10.10.10.10"
+
+    $init_login.network.session_id != $sub_login.network.session_id
+    $init_login.target.application != $sub_login.target.application
+    $init_login.network.http.user_agent != $sub_login.network.http.user_agent
+    $init_login.metadata.event_timestamp.seconds < $sub_login.metadata.event_timestamp.seconds
+
+    $sub_login.metadata.event_type = "USER_LOGIN"
+    $sub_login.metadata.product_event_type = "Sign-in activity"
+    $sub_login.metadata.product_name = "Azure Activity"
+    $sub_login.metadata.vendor_name = "Microsoft"
+    $sub_login.security_result.action = "ALLOW"
+    $sub_login.security_result.category_details = "NonInteractiveUserSignInLogs"
+    //Microsoft Office GUID is the default application used with Get-GraphTokens function. This can be customized but is a good place to start
+    //$sub_login.target.application = "Microsoft Office"
+    //UA listing displayed here as strings separated by or statement
+    //Each line is commented with device or browser or combination as specified in GraphRunner
+    //Could also convert to regex to refine if desired or used with a list
+    (
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36" nocase or // Mac/Chrome | Chrome
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0) Gecko/20100101 Firefox/70.0" nocase or // Mac/Firefox
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/604.1 Edg/91.0.100.0" nocase or // Mac/Edge
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15" nocase or // Mac/Safari | Mac | Safari
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko" nocase or // Windows/IE | IE
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36" nocase or // Windows/Chrome
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0" nocase or // Windows/Firefox | Firefox
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19042" nocase or // Windows/Edge | Windows
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30" nocase or // AndroidMobile/Android | AndroidMobile | Android
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Mobile Safari/537.36" nocase or // AndroidMobile/Chrome
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Android 4.4; Mobile; rv:70.0) Gecko/70.0 Firefox/70.0" nocase or // AndroidMobile/Firefox
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Linux; Android 8.1.0; Pixel Build/OPM4.171019.021.D1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.109 Mobile Safari/537.36 EdgA/42.0.0.2057" nocase or // AndroidMobile/Edge
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/91.0.4472.114 Mobile/15E148 Safari/604.1" nocase or // iPhone/Chrome
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (iPhone; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4" nocase or // iPhone/Firefox
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 EdgiOS/44.5.0.10 Mobile/15E148 Safari/604.1" nocase or // iPhone/Edge
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1" nocase or // iPhone/Safari | iPhone
+        $sub_login.network.http.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" nocase // Edge
+    )
+    strings.to_lower($sub_login.principal.user.email_addresses[0]) = $user
+    $sub_login.principal.ip = $ip
+
+  match:
+    $user, $ip over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($init_login.metadata.id)
+    $init_user_agent = array_distinct($init_login.network.http.user_agent)
+    $sub_user_agent = array_distinct($sub_login.network.http.user_agent)
+    $security_summary = array_distinct($init_login.security_result.summary)
+    $init_target_application = array_distinct($init_login.target.application)
+    $sub_target_application = array_distinct($sub_login.target.application)
+    //$principal_user_userid = array_distinct($group.principal.user.userid)
+    $principal_user =array_distinct($user)
+    $principal_ip = array_distinct($init_login.principal.ip)
+    $session_id = array_distinct($init_login.network.session_id)
+
+  condition:
+    $init_login and $sub_login
+}

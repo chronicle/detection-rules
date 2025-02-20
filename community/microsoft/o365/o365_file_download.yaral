@@ -1,0 +1,84 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ rule o365_file_download {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects file downloads using O365 or Graph Activity logs, not including anonymous file links"
+    rule_id = "mr_0dfb4338-4b4c-4af1-82da-fd5221d611a0"
+    rule_name = "Hunt for Non-Anonymous Office 365 file downloads"
+    assumption = "Because file downloads occur all the time, additional criteria to narrow this rule is expected. Areas to filter include user agent, specific users, IPs, applications and folders or items in the directory structure."
+    mitre_attack_tactic = "Exfiltration"
+    mitre_attack_technique = "Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1048/002/"
+    type = "hunt"
+    platform = "azure"
+    data_source = "o365, ms graph activity logs"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    (
+        $file.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT" and
+        $file.metadata.product_event_type = "FileDownloaded" and
+        $file.metadata.product_name = "Office 365" and
+        $file.metadata.vendor_name = "Microsoft" and
+        //This could be modified to specify downloading only thorugh specific applications
+        //$file.target.application = "OneDrive" and
+        //Add folder or docs of interest to monitor for downloads like this - focus in example is pdf in R&D folder - could also use a list
+        //re.regex($file.src.url, `^https://.*sharepoint.com/sites/.*/R&D/.*\.pdf$`) nocase and
+        NOT (
+            $file.principal.user.userid = /^urn:spo:anon#/ or
+            $file.principal.user.userid = "anonymous"
+        )
+    )
+    or
+    (
+        $file.metadata.event_type = "NETWORK_HTTP" and
+        $file.metadata.product_event_type = "Microsoft Graph Activity" and
+        $file.network.http.method = "GET" and
+        $file.network.http.response_code = 302 //and
+        //Could modify this to focus on a specific UA string or a UA strings not commonly used in environment
+        //$file.network.http.user_agent = /PowerShell/ nocase
+        //Could tighten to specify drives or items using an example like this
+        //re.regex($file.target.url, `^https://graph.microsoft.com/.*/drives/.*/content$`) nocase
+    )
+    $file.principal.ip = $ip
+
+  match:
+    $ip over 5m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($file.metadata.id)
+    $referral_url = array_distinct($file.network.http.referral_url)
+    $user_agent = array_distinct($file.network.http.user_agent)
+    $principal_application = array_distinct($file.principal.application)
+    $principal_ip = array_distinct($file.principal.ip)
+    $target_application = array_distinct($file.target.application)
+    //$principal_user_email_address = array_distinct(principal.user.email_addresses)
+    $principal_user_userid = array_distinct($file.principal.user.userid)
+    $src_file_full_path = array_distinct($file.src.file.full_path)
+    $src_url = array_distinct($file.src.url)
+    $session = array_distinct($file.network.session_id)
+    $location = array_distinct($file.principal.location.name)
+    $target_resource_guid = array_distinct($file.target.resource.product_object_id)
+    $target_url = array_distinct($file.target.url)
+
+  condition:
+    $file
+}

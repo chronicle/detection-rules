@@ -1,0 +1,77 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule ms_graph_graphrunner_graphrecon_enumeration {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identify the use of the GraphRunner recon command Invoke-GraphRecon with the permission enum flag set, providing allowed actions and conditional access data for the current user."
+    rule_id = "mr_2bb3fd42-5569-4bab-9788-855425971b7f"
+    rule_name = "Enumeration observed in the Microsoft Graph API using GraphRunner GraphRecon command"
+    reference = "https://github.com/dafthack/GraphRunner/blob/main/GraphRunner.ps1"
+    type = "Alert"
+    data_source = "MS Graph Activity Logs"
+    platform = "Azure"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $api_est.metadata.event_type = "NETWORK_HTTP"
+    $api_est.metadata.product_event_type = "Microsoft Graph Activity"
+    $api_est.target.url = "https://graph.microsoft.com/beta/roleManagement/directory/estimateAccess" nocase
+    //Can be tuned for specific User Agent strings being used - by default GraphRunner does not forge the UA for this action
+    //$api_est.network.http.user_agent = /PowerShell/ nocase
+    $api_est.network.http.method = "POST"
+    $api_est.network.http.response_code = 200
+    $api_est.principal.ip = $ip
+    $api_est.network.session_id = $session
+
+    $api_me.metadata.event_type = "NETWORK_HTTP"
+    $api_me.metadata.product_event_type = "Microsoft Graph Activity"
+    $api_me.target.url = "https://graph.microsoft.com/v1.0/me" nocase
+    //Can be tuned for specific User Agent strings being used - by default GraphRunner does not forge the UA for this action
+    //$api_me.network.http.user_agent = /PowerShell/ nocase
+    $api_me.network.http.method = "GET"
+    $api_me.network.http.response_code = 200
+    $api_me.principal.ip = $ip
+    $api_me.network.session_id = $session
+
+    $api_auth.metadata.event_type = "NETWORK_HTTP"
+    $api_auth.metadata.product_event_type = "Microsoft Graph Activity"
+    $api_auth.target.url = "https://graph.microsoft.com/beta/policies/authorizationPolicy" nocase
+    //Can be tuned for specific User Agent strings being used - by default GraphRunner does not forge the UA for this action
+    //$api_auth.network.http.user_agent = /PowerShell/ nocase
+    $api_auth.network.http.method = "GET"
+    $api_auth.network.http.response_code = 200
+    $api_auth.principal.ip = $ip
+    $api_auth.network.session_id = $session
+
+  match:
+    $ip, $session over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($api_est.metadata.id) + count_distinct($api_auth.metadata.id) + count_distinct($api_me.metadata.id)
+    $requesting_user_guid = array_distinct($api_est.principal.user.userid)
+    $requesting_ip = array_distinct($api_est.principal.ip)
+    $user_agent = array_distinct($api_est.network.http.user_agent)
+    $location = array_distinct($api_est.principal.location.name)
+    $target_application_id_guid = array_distinct($api_est.target.resource.product_object_id)
+    $session_id = array_distinct($api_est.network.session_id)
+
+  condition:
+    $api_est and $api_auth and $api_me
+}

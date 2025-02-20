@@ -1,0 +1,62 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule o365_logging_disabled {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect when the Unified Audit Log is disabled"
+    rule_id = "mr_17a49d19-2ea1-4d7d-9e4d-bbc7ffb07099"
+    rule_name = "Office 365 logging is disabled"
+    assumption = "If logging is expected, there is no reason for this to be switched off. If it is disabled a gap in logging will occur."
+    mitre_attack_tactic = "Defense Evasion"
+    mitre_attack_technique = "Impair Defenses: Disable or Modify Cloud Logs"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1562/008/"
+    type = "alert"
+    platform = "azure"
+    data_source = "o365"
+    severity = "Critical"
+    priority = "Critical"
+
+  events:
+    $log.metadata.event_type = "SETTING_CREATION"
+    $log.metadata.product_event_type = "Set-AdminAuditLogConfig"
+    $log.metadata.product_name = "Office 365"
+    $log.metadata.vendor_name = "Microsoft"
+    $log.security_result.detection_fields["UnifiedAuditLogIngestionEnabled"] = "False"
+    $log.principal.user.userid = $user
+
+  match:
+    $user over 5m
+
+  outcome:
+    $risk_score = 85
+    $event_count = count_distinct($log.metadata.id)
+    $referral_url = array_distinct($log.network.http.referral_url)
+    $user_agent = array_distinct($log.network.http.user_agent)
+    $principal_application = array_distinct($log.principal.application)
+    $principal_ip = array_distinct($log.principal.ip)
+    $target_application = array_distinct($log.target.application)
+    //$principal_user_email_address = array_distinct(principal.user.email_addresses)
+    //$principal_user_userid = array_distinct($log.principal.user.userid)
+    $session = array_distinct($log.network.session_id)
+    $location = array_distinct(strings.coalesce($log.principal.location.state,$log.principal.location.country_or_region))
+    $target_resource_resource_type = array_distinct($log.target.resource.resource_type)
+    $target_url = array_distinct($log.target.url)
+
+  condition:
+    $log
+}

@@ -1,0 +1,59 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule ms_graph_search_query {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "This detects when the search/query endpoint is called which can be used for enumeration of items like SharePoint site URLs. GraphRunner contains a function called Get-SharePointSiteURLs but other tools may as well."
+    rule_id = "mr_19ac0f85-970c-4eca-9832-72aaed1ee311"
+    rule_name = "Hunt for search/query endpoint API requests in the Microsoft Graph"
+    reference = "https://github.com/dafthack/GraphRunner/blob/main/GraphRunner.ps1"
+    assumption = "Applications that perform this action will need to be filtered and thresholding in the condition could be added for additional tuning as needed"
+    type = "hunt"
+    data_source = "MS Graph Activity Logs"
+    platform = "Azure"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $api.metadata.event_type = "NETWORK_HTTP"
+    $api.metadata.product_event_type = "Microsoft Graph Activity"
+    $api.target.url = "https://graph.microsoft.com/v1.0/search/query" nocase
+    //Can be tuned for specific User Agent strings being used - by default GraphRunner does not forge the UA for this action
+    //$api.network.http.user_agent = /PowerShell/ nocase
+    $api.network.http.method = "POST"
+    $api.network.http.response_code = 200
+    $api.principal.ip = $ip
+    $api.network.session_id = $session
+
+  match:
+    $ip, $session over 5m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($api.metadata.id)
+    $requesting_user_guid = array_distinct($api.principal.user.userid)
+    $requesting_ip = array_distinct($api.principal.ip)
+    $user_agent = array_distinct($api.network.http.user_agent)
+    $location = array_distinct($api.principal.location.name)
+    $target_application_id_guid = array_distinct($api.target.resource.product_object_id)
+    $session_id = array_distinct($api.network.session_id)
+    $target_url = array_distinct($api.target.url)
+
+  condition:
+    $api
+}

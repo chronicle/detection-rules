@@ -1,0 +1,54 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule entra_id_application_deletion {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Delete Entra ID application. This is a soft delete, can still be recovered."
+    rule_id = "mr_597d57bf-1bae-4179-a068-7985c2d28340"
+    rule_name = "Entra ID Application Deletion"
+    type = "alert"
+    platform = "azure"
+    data_source = "azure ad audit"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $app.metadata.event_type = "SETTING_DELETION"
+    $app.metadata.product_event_type = "Delete application"
+    $app.metadata.product_name = "Azure AD Directory Audit"
+    $app.metadata.vendor_name = "Microsoft"
+    $app.security_result.action = "ALLOW"
+    $app.principal.user.userid = $user
+
+  match:
+    $user over 5m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($app.metadata.id)
+    $principal_ip = array_distinct($app.principal.ip)
+    $principal_email = array_distinct($app.principal.user.email_addresses)
+    $principal_county_region = array_distinct($app.principal.ip_geo_artifact.location.country_or_region)
+    $user_agent = array_distinct($app.network.http.user_agent)
+    $network_session = array_distinct($app.network.session_id)
+    $target_application = array_distinct($app.target.resource.name)
+    $target_application_id = array_distinct($app.target.resource.product_object_id)
+
+  condition:
+    $app
+}

@@ -1,0 +1,73 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule ms_graph_enumerate_applications {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identify the use GraphRunner's Invoke-DumpApps function to collect applications and external apps as well as users that consented to permissions in their apps."
+    rule_id = "mr_3715d986-b1a9-4bb2-b625-acc54cd5322d"
+    rule_name = "Entra ID application enumeration observed in the Microsoft Graph API"
+    assumption = "While additional API endpoints are called in the function, this rule is stripped down to the applications and servicePrincipals endpoint recursively requesting the appRole assigned to."
+    reference = "https://github.com/dafthack/GraphRunner/blob/main/GraphRunner.ps1"
+    type = "Alert"
+    data_source = "MS Graph Activity Logs"
+    platform = "Azure"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $app_api.metadata.event_type = "NETWORK_HTTP"
+    $app_api.metadata.product_event_type = "Microsoft Graph Activity"
+    $app_api.target.url = "https://graph.microsoft.com/v1.0/applications" nocase
+    $app_api.network.http.method = "GET"
+    $app_api.network.http.response_code = 200
+    //Can be tuned for specific User Agent strings being used - by default GraphRunner does not forge the UA for this action
+    //$app_api.network.http.user_agent = /PowerShell/ nocase
+    $app_api.principal.ip = $ip
+    $app_api.network.session_id = $session
+
+    $app_api.metadata.event_timestamp.seconds < $role_api.metadata.event_timestamp.seconds
+
+    $role_api.metadata.event_type = "NETWORK_HTTP"
+    $role_api.metadata.product_event_type = "Microsoft Graph Activity"
+    re.regex($role_api.target.url, `^https:\/\/graph.microsoft.com\/v1.0\/servicePrincipals\(appId='.*'\)/appRoleAssignedTo$`) nocase
+    $role_api.network.http.method = "GET"
+    $role_api.network.http.response_code = 200
+    //Can be tuned for specific User Agent strings being used - by default GraphRunner does not forge the UA for this action
+    //$role_api.network.http.user_agent = /PowerShell/ nocase
+    $role_api.principal.ip = $ip
+    $role_api.network.session_id = $session
+    re.capture($role_api.target.url, `^https:\/\/graph.microsoft.com\/v1.0\/servicePrincipals\(appId='(.*)'\)/appRoleAssignedTo$`) = $app_guid
+
+  match:
+    $ip, $session over 5m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($app_api.metadata.id) + count_distinct($role_api.metadata.id)
+    $requesting_user_guid = array_distinct($app_api.principal.user.userid)
+    $requesting_ip = array_distinct($app_api.principal.ip)
+    $user_agent = array_distinct($app_api.network.http.user_agent)
+    $location = array_distinct($app_api.principal.location.name)
+    $target_application_id_guid = array_distinct($app_api.target.resource.product_object_id)
+    $session_id = array_distinct($app_api.network.session_id)
+    $application_count = count_distinct($app_guid)
+    $application_list = array_distinct($app_guid) //limited to 25 applications
+
+  condition:
+    $app_api and $role_api
+}

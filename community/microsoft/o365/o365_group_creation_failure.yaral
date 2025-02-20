@@ -1,0 +1,53 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule o365_group_creation_failure {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when a group is attempted to be created but fails in Office 365. This could be due to insufficient permissions or other errors"
+    rule_id = "mr_964c36cd-cf07-446d-bc85-68a937d4441a"
+    rule_name = "Hunt for Office 365 group creation failures"
+    type = "hunt"
+    platform = "azure"
+    data_source = "o365"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $group.metadata.event_type = "GROUP_CREATION"
+    $group.metadata.product_event_type = "Add group."
+    $group.metadata.product_name = "Office 365"
+    $group.metadata.vendor_name = "Microsoft"
+    $group.security_result.action = "BLOCK"
+    $group.principal.user.userid = $user
+
+  match:
+    $user over 5m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($group.metadata.id)
+    $security_summary = array_distinct($group.security_result.summary)
+    $user_agent = array_distinct($group.network.http.user_agent)
+    $target_application = array_distinct($group.target.application)
+    //$principal_user_userid = array_distinct($group.principal.user.userid)
+    $proposed_group_name = array_distinct($group.target.group.group_display_name)
+    $reason = array_distinct($group.target.labels["MethodExecutionResult."])
+
+  condition:
+    $group
+}

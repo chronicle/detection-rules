@@ -1,0 +1,28 @@
+name: Deprecate Rule
+description: Deprecate a rule in this project
+title: "[Deprecate Rule] Name of rule"
+labels: ["rule: deprecate"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for your interest in contributing to this project. Please familiarize yourself with the [contribution guide](https://github.com/chronicle/detection-rules/blob/main/CONTRIBUTING.md) and rule [style guide](https://github.com/chronicle/detection-rules/blob/main/STYLE_GUIDE.md) if you haven't done so already.
+
+  - type: input
+    id: rule_url
+    attributes:
+      label: Rule URL
+      description: Enter the URL for the rule's location in the `main` branch of this repo.
+      placeholder: https://github.com/chronicle/detection-rules/tree/main/rules
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe your proposed changes.
+      placeholder: I recommend that this rule be deprecated for the following reason(s)...
+    validations:
+      required: true

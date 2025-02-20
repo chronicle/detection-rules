@@ -1,0 +1,75 @@
+name: New Rule
+description: Contribute a new rule to this project
+title: "[New Rule] Name of rule"
+labels: ["rule: new"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for your interest in contributing to this project. Please familiarize yourself with the [contribution guide](https://github.com/chronicle/detection-rules/blob/main/CONTRIBUTING.md) and rule [style guide](https://github.com/chronicle/detection-rules/blob/main/STYLE_GUIDE.md) if you haven't done so already.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the behavior that the rule is designed to detect.
+      placeholder: This rule detects...
+    validations:
+      required: true
+
+  - type: input
+    id: log_types
+    attributes:
+      label: Log Types
+      description: Specify the [log types](https://cloud.google.com/chronicle/docs/ingestion/parser-list/supported-default-parsers) that this rule is compatible with (e.g. WINEVTLOG, WINDOWS_SYSMON, MICROSOFT_DEFENDER_ENDPOINT)
+      placeholder: |
+        WINEVTLOG, WINDOWS_SYSMON, MICROSOFT_DEFENDER_ENDPOINT
+    validations:
+      required: true
+
+  - type: textarea
+    id: rule
+    attributes:
+      label: YARA-L Rule
+      description: Enter the initial version of your rule in valid [YARA-L syntax](https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-syntax). Please ensure that your rule aligns with the [style guide](https://github.com/chronicle/detection-rules/blob/main/STYLE_GUIDE.md) for this project.
+      placeholder: |
+        rule my_new_rule {
+
+          meta:
+            ...
+
+          events:
+            ...
+
+          outcome:
+            ...
+
+          condition:
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: List any references related to your rule. References may include links to relevant vendor documentation or threat research/intelligence.
+      placeholder: |
+        * Reference URL 1
+        * Reference URL 2
+        * Reference URL 3
+    validations:
+      required: false
+
+  - type: textarea
+    id: test_data
+    attributes:
+      label: Test Data
+      description: Raw log events (sanitized of any confidential data or PII) that can be used to trigger the rule.
+      placeholder: |
+        ```
+        Insert raw log events here (one event per line) and sanitized of any confidential data or PII
+        ```
+    validations:
+      required: true

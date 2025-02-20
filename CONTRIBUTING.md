@@ -18,11 +18,35 @@ to see your current agreements on file or to sign a new one.
 You generally only need to submit a CLA once, so if you've already submitted one
 (even if it was for a different project), you probably don't need to do it again.
 
-## Code Reviews
+## How to Contribute
 
 All submissions, including submissions by project maintainers, require review.
-We use GitHub pull requests for this purpose. Consult [GitHub Help](https://help.github.com/articles/about-pull-requests/)
-for more information on using pull requests.
+
+Please follow the process below to contribute to this project after signing the
+[Contributor License Agreement](https://cla.developers.google.com/) mentioned
+above.
+
+1.  Familiarize yourself with this contribution guide and our rule
+    [style guide](STYLE_GUIDE.md). This will increase the likelihood that your
+    contributions will be accepted.
+2.  Open a new issue under the [Issues](https://github.com/chronicle/detection-rules/issues)
+    page of this repo, choose from one of our issue templates, and fill in all
+    of the required fields.
+3.  Create a [pull request](https://help.github.com/articles/about-pull-requests/)
+    using our pull request template and stage your proposed changes.
+      * Link your pull request to your related issue using GitHub supported
+        [keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue)
+4.  Ensure that the tests associated with your pull request complete
+    successfully.
+5.  When your pull request is ready for review, add the `ready for review`
+    label to it
+6.  Someone from the Google Cloud Security team will review your pull request.
+      * Please collaborate with your reviewer to incorporate feedback &
+        suggestions into your proposed changes. For example, if a rule's logic
+        needs to be refined or the rule needs to be updated to conform to our
+        style guide.
+7.  If your proposed changes are approved, your pull request will be merged into
+    the `main` branch of this repo.
 
 We try and acknowledge all issues and pull requests within a few working days.
 

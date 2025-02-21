@@ -1,0 +1,51 @@
+/*
+* High or Critical severity alerts get proper attention from security analysts, 
+* but Low severity alerts often receive less immediate focus, while they can serve
+* as precursors to more damaging activities. For instance, a Low severity alert might
+* involve anomalous but non-critical user behavior, such as an unexpected API call.
+* When followed within 24 hours by one or more Medium severity alerts for that specific
+* username or a service account, the combination could signal a potential multi-stage attack
+* requiring more immediate attention. It could be followed by contextual factors like
+* resource criticality. This means a Low severity finding could escalate if further
+* analysis reveals its role in a broader attack chain. By utilizing a Multi-Event
+* rule, we can increase the risk score of correlated anomalous events to High
+* for faster investigations and reduced MTTD.
+*/
+
+rule User_Event_Severity_Escalation {
+
+  meta:
+    author = "Mo Mohajerani"
+    description = "Detects when a user experiences a Low severity event followed by Medium or High severity within 48 hours."
+    severity = "High"
+    rule_name = "Escalated Security Alerts For Specific Account"
+    type = "Alert"
+    data_source = "GCP - Security Command Center"
+
+  events:
+    // Low severity alert triggered
+    $low_event.security_result[0].severity = "LOW"
+    $low_event.principal.user.userid = $user_id
+
+    // 
+    $med_event.security_result[0].severity = "MEDIUM" 
+    $med_event.principal.user.userid = $user_id
+    $low_event.metadata.event_timestamp.seconds <= $med_event.metadata.event_timestamp.seconds
+
+  match:
+    $user_id over 24h
+
+  outcome:
+    $risk_score = 80
+    $security_category = array_distinct($med_event.security_result.category)
+    $security_category_details = array_distinct($med_event.security_result.category_details)
+    $security_summary = array_distinct($med_event.security_result.summary)
+    $affected_account = array_distinct($med_event.principal.user.userid)
+    $principal_ip_country = array_distinct($med_event.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($med_event.principal.ip_geo_artifact.location.state)
+    $principal_user_id = array_distinct($med_event.principal.user.userid)
+    
+  condition:
+    $low_event and $med_event 
+    
+}

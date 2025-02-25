@@ -18,7 +18,7 @@ rule chrome_browser_safe_browsing_user_bypass {
 
   meta:
     author = "Google Cloud Security"
-    description = "Detects and alerts on users bypassing Chrome Safe Browsing warnings and accessing potentially dangerous content or downloads."
+    description = "Detects and alerts on users bypassing Chrome Safe Browsing warnings and accessing potentially dangerous content or downloads"
     rule_id = "mr_73e2a3d4-13ba-47ef-b250-a2bdcd98dc48"
     rule_name = "Chrome Browser Safe Browsing User Bypass"
     mitre_attack_tactic = "Initial Access"

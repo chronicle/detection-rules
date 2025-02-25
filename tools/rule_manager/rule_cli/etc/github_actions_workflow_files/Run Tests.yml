@@ -1,0 +1,59 @@
+# Run unit tests and verify YARA-L rules using Google SecOps' API.
+
+name: Run Tests
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches-ignore:
+      - main
+
+  # workflow_dispatch allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # 'id-token: write' is required to allow GitHub's OIDC provider to create a JSON Web Token for every run
+  id-token: write
+
+jobs:
+  run-unit-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      GOOGLE_SECOPS_API_BASE_URL: ${{ vars.GOOGLE_SECOPS_API_BASE_URL }}
+      GOOGLE_SECOPS_INSTANCE: ${{ vars.GOOGLE_SECOPS_INSTANCE }}
+      AUTHORIZATION_SCOPES: ${{ vars.AUTHORIZATION_SCOPES }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ vars.GOOGLE_CLOUD_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GOOGLE_CLOUD_WORKLOAD_IDENTITY_PROVIDER}}
+          access_token_lifetime: 180s
+          export_environment_variables: true
+          create_credentials_file: true
+          cleanup_credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"  # Caching pip dependencies
+
+      - name: Install Python project dependencies
+        run: pip install -r requirements_dev.txt
+
+      - name: Check Python code formatting with black
+        run: python -m black google_secops_api rule_cli --line-length 120 --check
+
+      - name: Run tests using pytest
+        run: pytest -v
+
+      - name: Verify YARA-L rules
+        # Verify that all rules are valid YARA-L 2.0 rules via Google SecOps' API
+        run: python -m rule_cli --verify-rules

@@ -1,0 +1,58 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule entra_id_conditional_access_policy_modification {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when an Entra ID conditional access policy has been modified"
+    rule_id = "mr_0c3f7309-a3e3-4c80-9b33-12ade9f499f8"
+    rule_name = "Entra ID conditional access policy modification"
+    mitre_attack_tactic = "Privilege Escalation"
+    mitre_attack_technique = "Domain or Tenant Policy Modification"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1484/"
+    type = "alert"
+    platform = "azure"
+    data_source = "o365"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $cloud.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT"
+    $cloud.metadata.product_event_type = "Update policy."
+    $cloud.metadata.product_name = "Office 365"
+    $cloud.metadata.vendor_name = "Microsoft"
+    $cloud.target.application = "AzureActiveDirectory"
+    $cloud.target.resource.attribute.labels.key = "extendedAuditEventCategory"
+    $cloud.target.resource.attribute.labels.value = "Policy"
+    $cloud.principal.user.userid = $user
+
+  match:
+    $user over 5m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($cloud.metadata.id)
+    $user_agent = array_distinct($cloud.network.http.user_agent)
+    $policy_name = array_distinct($cloud.security_result.detection_fields["target_1"])
+    $security_summary = array_distinct($cloud.security_result.summary)
+    $target_application = array_distinct($cloud.target.application)
+    //$principal_user_userid = array_distinct($group.principal.user.userid)
+
+  condition:
+    $cloud
+}
+

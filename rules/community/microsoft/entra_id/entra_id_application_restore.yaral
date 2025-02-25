@@ -1,0 +1,54 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule entra_id_application_restore {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Entra ID application was restored. This implies a soft delete was performed at some point but less than 30 days ago."
+    rule_id = "mr_ed0a04f9-4ceb-499e-9e6f-01e4507b8da5"
+    rule_name = "Entra ID Application Restore"
+    type = "alert"
+    platform = "azure"
+    data_source = "azure ad audit"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $app.metadata.event_type = "SERVICE_CREATION"
+    $app.metadata.product_event_type = "Restore application"
+    $app.metadata.product_name = "Azure AD Directory Audit"
+    $app.metadata.vendor_name = "Microsoft"
+    $app.security_result.action = "ALLOW"
+    $app.principal.user.userid = $user
+
+  match:
+    $user over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($app.metadata.id)
+    $principal_ip = array_distinct($app.principal.ip)
+    $principal_email = array_distinct($app.principal.user.email_addresses)
+    $principal_county_region = array_distinct($app.principal.ip_geo_artifact.location.country_or_region)
+    $user_agent = array_distinct($app.network.http.user_agent)
+    $network_session = array_distinct($app.network.session_id)
+    $target_application = array_distinct($app.target.resource.name)
+    $target_application_id = array_distinct($app.target.resource.product_object_id)
+
+  condition:
+    $app
+}

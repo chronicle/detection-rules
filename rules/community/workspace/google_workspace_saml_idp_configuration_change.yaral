@@ -1,0 +1,60 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_saml_idp_configuration_change {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identifies SAML provider configuration changes in Google Workspace. Security teams can monitor for changes to SAML provider configuration that may weaken the organization's security posture."
+    rule_id = "mr_1a321683-9c52-4928-a654-e0677df97c09"
+    rule_name = "Google Workspace SAML IDP Configuration Change"
+    mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    mitre_attack_technique = "Valid Accounts"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1078/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Workspace Activity"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $ws.metadata.vendor_name = "Google Workspace"
+    $ws.metadata.product_name = "admin"
+    $ws.security_result.category_details = "SAML2_SERVICE_PROVIDER_CONFIG_SETTINGS"
+    $ws.metadata.product_event_type = /SAML2_SERVICE_PROVIDER_CONFIG/
+    $ws.principal.user.userid = $userid
+
+  match:
+    $userid over 1h
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    $mitre_attack_technique = "Valid Accounts"
+    $mitre_attack_technique_id = "T1078"
+    $event_count = count_distinct($ws.metadata.id)
+    $principal_ip = array_distinct($ws.principal.ip)
+    $principal_country = array_distinct($ws.principal.ip_geo_artifact.location.country_or_region)
+    $principal_state = array_distinct($ws.principal.ip_geo_artifact.location.state)
+    $principal_user_emails = array_distinct($ws.principal.user.email_addresses)
+    $principal_user_id = array_distinct($ws.principal.user.userid)
+    $saml_entity_id = array_distinct($ws.about.labels["saml2_service_provider_entity_id"])
+    $saml_name = array_distinct($ws.about.labels["saml2_service_provider_name"])
+    $product_event_type = array_distinct($ws.metadata.product_event_type)
+
+  condition:
+    $ws
+}

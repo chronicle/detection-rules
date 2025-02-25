@@ -1,0 +1,74 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule onelogin_otp_brute_force_attack {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects a successful login after multiple failed OTP intents"
+    rule_id = "mr_cc37e0cf-c8c5-4e46-be0e-b2b992775500"
+    rule_name = "OneLogin OTP Bruteforce Attack"
+    reference = "https://www.onelogin.com/blog/brute-force-attacks"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Brute Force"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/"
+    mitre_attack_version = "v15.1"
+    type = "Alert"
+    data_source = "OneLogin"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $failed_otp.metadata.event_type = "USER_RESOURCE_ACCESS"
+    $failed_otp.metadata.product_name = "ONELOGIN_SSO"
+    $failed_otp.metadata.vendor_name = "ONELOGIN"
+    $failed_otp.metadata.product_event_type = "1002" //failed otp challenge
+    $failed_otp.principal.user.userid = $userid
+
+    $success_otp.metadata.event_type = "USER_LOGIN"
+    $success_otp.metadata.product_name = "ONELOGIN_SSO"
+    $success_otp.metadata.vendor_name = "ONELOGIN"
+    $success_otp.metadata.product_event_type = "1400" //User verified otp device
+    $success_otp.principal.user.userid = $userid
+
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.metadata.product_name = "ONELOGIN_SSO"
+    $login.metadata.vendor_name = "ONELOGIN"
+    $login.metadata.product_event_type = "5" //User logged into onelogin
+    $login.principal.user.userid = $userid
+
+    $failed_otp.metadata.event_timestamp.seconds <= $success_otp.metadata.event_timestamp.seconds
+    $success_otp.metadata.event_timestamp.seconds <= $login.metadata.event_timestamp.seconds
+
+  match:
+    $userid over 15m
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Brute Force"
+    $target_user_agent = array_distinct($login.network.http.user_agent)
+    $principal_ip = array_distinct($login.principal.ip)
+    $principal_ip_country = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($login.principal.ip_geo_artifact.location.state)
+    $principal_user_user_display_name = array_distinct($login.principal.user.user_display_name)
+    $target_user_userid = array_distinct($login.target.user.userid)
+    $otp_device_name = array_distinct($success_otp.additional.fields["otp_device_name"])
+    $otp_device_id = array_distinct($success_otp.principal.asset_id)
+
+  condition:
+    #failed_otp >= 4 and $success_otp and $login
+}

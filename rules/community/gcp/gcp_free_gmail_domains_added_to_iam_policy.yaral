@@ -1,0 +1,62 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ rule gcp_free_gmail_domains_added_to_iam_policy {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect when free Google Email addressess are added to IAM Policy such as gmail.com, googlemail.com or googlegroups.com."
+    rule_id = "mr_eec293b2-75d6-48f1-871d-182d67345a9c"
+    rule_name = "GCP Free Gmail Domains Added To IAM Policy"
+    mitre_attack_tactic = "Persistence"
+    mitre_attack_technique = "Create Account: Cloud Account"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1136/003/"
+    mitre_attack_version = "v14.1"
+    type = "Alert"
+    data_source = "GCP Cloud Audit"
+    platform = "GCP"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $gcp.metadata.event_type = "USER_RESOURCE_UPDATE_PERMISSIONS"
+    $gcp.metadata.log_type = "GCP_CLOUDAUDIT"
+    $gcp.metadata.product_event_type = "SetIamPolicy"
+    $gcp.metadata.product_name = "Google Cloud Platform"
+    $gcp.metadata.vendor_name = "Google Cloud Platform"
+    $gcp.security_result.action = "ALLOW"
+    $gcp.target.resource.attribute.labels["ser_binding_deltas_action"] = "ADD"
+    $gcp.target.resource.attribute.labels["ser_binding_deltas_member"] = /.*@gmail\.com|.*@googlemail\.com|.*@googlegroups\.com/ nocase
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Persistence"
+    $mitre_attack_technique = "Create Account: Cloud Account"
+    $mitre_attack_technique_id = "T1136.003"
+    $event_count = count_distinct($gcp.metadata.id)
+    $network_http_user_agent = array_distinct($gcp.network.http.user_agent)
+    $principal_ip = array_distinct($gcp.principal.ip)
+    $principal_ip_country = array_distinct($gcp.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($gcp.principal.ip_geo_artifact.location.state)
+    $principal_user_id = $gcp.principal.user.userid
+    $principal_user_display_name = $gcp.principal.user.user_display_name
+    $target_resource_name = $gcp.target.resource.name
+    $event_name = $gcp.metadata.product_event_type
+    $target_email_addresses = array_distinct($gcp.target.user.email_addresses)
+
+  condition:
+    $gcp
+}

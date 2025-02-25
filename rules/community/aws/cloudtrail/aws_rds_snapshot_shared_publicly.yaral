@@ -1,0 +1,67 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule aws_rds_snapshot_shared_publicly {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when an Amazon RDS Snapshot is shared publicly."
+    rule_id = "mr_d87cf718-8a9c-4f1d-bcf0-20f4f5f59d02"
+    rule_name = "AWS RDS Snapshot Shared Publicly"
+    mitre_attack_tactic = "Exfiltration"
+    mitre_attack_technique = "Transfer Data to Cloud Account"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1537/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "AWS CloudTrail"
+    platform = "AWS"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $cloudtrail.metadata.vendor_name = "AMAZON"
+    $cloudtrail.metadata.product_name = "AWS CloudTrail"
+    (
+        $cloudtrail.metadata.product_event_type = "ModifyDBSnapshotAttribute" or
+        $cloudtrail.metadata.product_event_type = "ModifyDBClusterSnapshotAttribute"
+    )
+    $cloudtrail.target.resource.attribute.labels["Request Parameters Values To Add"] = "all"
+    $cloudtrail.target.resource.attribute.labels["Request Parameters Attribute Name"] = "restore"
+    $cloudtrail.security_result.action = "ALLOW"
+    $cloudtrail.principal.user.userid = $user_id
+
+  match:
+    $user_id over 1h
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Exfiltration"
+    $mitre_attack_technique = "Transfer Data to Cloud Account"
+    $mitre_attack_technique_id = "T1537"
+    $event_count = count_distinct($cloudtrail.metadata.id)
+    $network_http_user_agent = array_distinct($cloudtrail.network.http.user_agent)
+    $principal_ip = array_distinct($cloudtrail.principal.ip)
+    $principal_ip_country = array_distinct($cloudtrail.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($cloudtrail.principal.ip_geo_artifact.location.state)
+    $principal_user_display_name = array_distinct($cloudtrail.principal.user.user_display_name)
+    $recipient_aws_account_id = array_distinct($cloudtrail.additional.fields["recipientAccountId"])
+    $aws_region = array_distinct($cloudtrail.principal.location.name)
+    $target_resource_name = array_distinct($cloudtrail.target.resource.name)
+    $target_resource_product_object_id = array_distinct($cloudtrail.target.resource.product_object_id)
+
+  condition:
+    $cloudtrail
+}

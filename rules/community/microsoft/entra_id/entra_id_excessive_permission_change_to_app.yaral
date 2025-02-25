@@ -1,0 +1,65 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ rule entra_id_excessive_permission_change_to_app {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Adding permissions to an application is expected, however if excessive permissions are changed at one time over a defined threshold, it may be worth validating."
+    rule_id = "mr_7e13e4fc-6a6d-45c6-af92-69f98b4c9805"
+    rule_name = "Entra ID Excessive Permission Changes to Application"
+    reference = "https://learn.microsoft.com/en-us/graph/permissions-reference"
+    type = "alert"
+    platform = "azure"
+    data_source = "azure ad"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $app.metadata.event_type = "SERVICE_MODIFICATION"
+    $app.metadata.product_event_type = "Update application"
+    $app.metadata.product_name = "Azure AD Directory Audit"
+    $app.metadata.vendor_name = "Microsoft"
+    $app.security_result.action = "ALLOW"
+    (
+        (
+            //used to tune application updates that are not permission related or where permissions before and after are the same
+            $app.target.resource.attribute.labels["RequiredResourceAccess"] != "" and
+            $app.src.resource.attribute.labels["RequiredResourceAccess"] != ""
+        ) or
+        $app.src.resource.attribute.labels["RequiredResourceAccess"] != $app.target.resource.attribute.labels["RequiredResourceAccess"]
+    )
+    $app.principal.user.userid = $userid
+
+  match:
+    $userid over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($app.metadata.id)
+    $previous_permissions = array_distinct($app.src.resource.attribute.labels["RequiredResourceAccess"])
+    $previous_permissions_count = max(strings.count_substrings($app.src.resource.attribute.labels["RequiredResourceAccess"], "EntitlementId:"))
+    $current_permissions = array_distinct($app.target.resource.attribute.labels["RequiredResourceAccess"])
+    $current_permissions_count = max(strings.count_substrings($app.target.resource.attribute.labels["RequiredResourceAccess"], "EntitlementId:"))
+    $permission_delta = math.abs($current_permissions_count - $previous_permissions_count)
+    $principal_county_region = array_distinct($app.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip = array_distinct($app.principal.ip)
+    $target_application = array_distinct($app.target.resource.name)
+
+  condition:
+    //adjust the permission delta to your desired threshold
+    $app and $permission_delta > 5
+}

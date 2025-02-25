@@ -1,0 +1,66 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule adfs_db_suspicious_named_pipe_connection {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Connection to ADFS via named pipes that are not using specific Windows ADFS processes may be indicative of user attempting to access ADFS for suspicious purposes"
+    rule_id = "mr_a25913a1-65be-4cb5-b0de-6858dd04ac99"
+    rule_name = "ADFS DB Suspicious Named Pipe Connection"
+    reference = "https://github.com/Azure/Azure-Sentinel/blob/master/Solutions/Windows%20Security%20Events/Analytic%20Rules/ADFSDBNamedPipeConnection.yaml"
+    type = "alert"
+    platform = "Windows"
+    data_source = "sysmon"
+    severity = "Medium"
+    priority = "Medium"
+
+ events:
+   $process.metadata.event_type = "PROCESS_UNCATEGORIZED"
+   $process.metadata.product_event_type = "18"
+   $process.metadata.product_name = "Microsoft-Windows-Sysmon"
+   not re.regex($process.target.process.file.full_path, `Microsoft.Identity.Health.Adfs.PshSurrogate.exe|Microsoft.IdentityServer.ServiceHost.exe|AzureADConnect.exe|Microsoft.Tri.Sensor.exe|wsmprovhost.exe|mmc.exe|sqlservr.exe|sqlwriter.exe`) nocase
+   $process.target.resource.name = "\\MICROSOFT##WID\\tsql\\query" nocase
+   /*
+   If you have a listing of ADFS servers, you can use a reference list or enumerate them in the field below.
+   Alternatively, if ADFS servers are grouped in an asset attribute, that attribute could be used instead.
+   */
+   $process.principal.hostname = /adfs/ nocase
+   $process.principal.hostname = $hostname
+
+ match:
+   $hostname over 5m
+
+ outcome:
+    $risk_score = 65
+    $event_count = count_distinct($process.metadata.id)
+    $security_summary = array_distinct($process.security_result.summary)
+    $target_process_parent_process_command_line = array_distinct($process.target.process.parent_process.command_line)
+    //added to populate alert graph with additional context
+    //Commented out because it is the same as the match variable, if match variable changes, uncomment to use
+    //$principal_hostname = array_distinct($process.principal.hostname)
+    $principal_user_userid = array_distinct($process.principal.user.userid)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $target_process_parent_product_specific_process_id = array_distinct($process.target.process.parent_process.product_specific_process_id)
+    $target_resource_name = array_distinct($process.target.resource.name)
+
+ condition:
+   $process
+}

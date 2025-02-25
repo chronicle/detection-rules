@@ -1,0 +1,99 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule okta_mismatch_between_source_and_response_for_verify_push_request {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Okta Mismatch Between Source and Response for Verify Push Request"
+    rule_id = "mr_552008c0-c691-40b2-b7ce-5181570ba5c3"
+    rule_name = "Okta Mismatch Between Source And Response For Verify Push Request"
+    reference = "https://sec.okta.com/pushfatigueworkflows"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Multi-Factor Authentication Request Generation"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1621"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $push.metadata.product_name = "Okta"
+    $push.metadata.vendor_name = "Okta"
+    $push.metadata.event_type = "USER_UNCATEGORIZED"
+    $push.metadata.product_event_type = "system.push.send_factor_verify_push"
+    $push.security_result.description = /New Device=POSITIVE/
+    $push.security_result.description = /New IP=POSITIVE/
+    $push.security_result.action = "ALLOW"
+    $push.network.parent_session_id = $parent_session_id
+
+    $auth.metadata.product_name = "Okta"
+    $auth.metadata.vendor_name = "Okta"
+    $auth.metadata.event_type = "USER_LOGIN"
+    $auth.metadata.product_event_type = "user.authentication.auth_via_mfa"
+    $auth.security_result.detection_fields["factor"] = "OKTA_VERIFY_PUSH"
+    $auth.security_result.action = "ALLOW"
+    $auth.network.parent_session_id = $parent_session_id
+
+    $push.metadata.event_timestamp.seconds <= $auth.metadata.event_timestamp.seconds
+
+  match:
+    $parent_session_id over 5m
+
+  outcome:
+    $risk_score = max(
+        // Baseline
+        35 +
+        // If the IP Address is marked as suspicious IP address by Okta ThreatInsight
+        if($push.security_result.detection_fields["threatSuspected"] = "true", 30) +
+        // Based on Okta Behavior Detection pattern analysis
+        if($push.security_result.description = /New Geo-Location=POSITIVE/, 10) +
+        if($push.security_result.description = /New Device=POSITIVE/, 20) +
+        if($push.security_result.description = /New IP=POSITIVE/, 5) +
+        if($push.security_result.description = /New City=POSITIVE/, 5) +
+        if($push.security_result.description = /New State=POSITIVE/, 10) +
+        if($push.security_result.description = /New Country=POSITIVE/, 10) +
+        if($push.security_result.description = /Velocity=POSITIVE/, 10) +
+        // Unauthorized target geographies
+        if($push.target.ip_geo_artifact.location.country_or_region = "Cuba", 20) +
+        if($push.target.ip_geo_artifact.location.country_or_region = "Iran", 20) +
+        if($push.target.ip_geo_artifact.location.country_or_region = "North Korea", 20) +
+        if($push.target.ip_geo_artifact.location.country_or_region = "Russia", 20) +
+        if($push.target.ip_geo_artifact.location.country_or_region = "Syria", 20)
+    )
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Multi-Factor Authentication Request Generation"
+    $push_principal_ip_country = array_distinct($push.principal.ip_geo_artifact.location.country_or_region)
+    $push_principal_ip_state = array_distinct($push.principal.ip_geo_artifact.location.state)
+    $push_principal_ip_city = array_distinct($push.principal.location.city)
+    $push_principal_user_email_addresses = array_distinct ($push.principal.user.email_addresses)
+    $push_security_result_summary = array_distinct($push.security_result.summary)
+    $push_target_user_email_addresses = array_distinct($push.target.user.email_addresses)
+    $push_target_user_userid = array_distinct($push.target.user.userid)
+    $auth_target_user_agent = array_distinct($auth.network.http.user_agent)
+    $auth_principal_ip = array_distinct($auth.principal.ip)
+    $auth_principal_ip_country = array_distinct($auth.principal.ip_geo_artifact.location.country_or_region)
+    $auth_principal_ip_state = array_distinct($auth.principal.ip_geo_artifact.location.state)
+    $auth_principal_ip_city = array_distinct($auth.principal.location.city)
+    $auth_principal_user_email_addresses = array_distinct ($auth.principal.user.email_addresses)
+    $auth_security_result_summary = array_distinct($auth.security_result.summary)
+    $auth_target_user_email_addresses = array_distinct($auth.target.user.email_addresses)
+    $auth_target_user_userid = array_distinct($auth.target.user.userid)
+
+  condition:
+    $push and $auth
+}

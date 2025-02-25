@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Manage rules in Chronicle."""
+"""Manage rules in Google SecOps."""
 
 # pylint: disable="g-bool-id-comparison","g-explicit-length-test"
 
@@ -22,15 +22,15 @@ import json
 import logging
 import pathlib
 import re
-import time
 from typing import Any, List, Mapping, Sequence, Tuple
 
-from chronicle_api.rules.create_rule import create_rule
-from chronicle_api.rules.get_rule_deployment import get_rule_deployment
-from chronicle_api.rules.list_rules import list_rules
-from chronicle_api.rules.update_rule import update_rule
-from chronicle_api.rules.update_rule_deployment import update_rule_deployment
 from google.auth.transport import requests
+from google_secops_api.rules.create_rule import create_rule
+from google_secops_api.rules.get_rule_deployment import get_rule_deployment
+from google_secops_api.rules.list_rule_deployments import list_rule_deployments
+from google_secops_api.rules.list_rules import list_rules
+from google_secops_api.rules.update_rule import update_rule
+from google_secops_api.rules.update_rule_deployment import update_rule_deployment
 import pydantic
 import ruamel.yaml
 from rule_cli.common.custom_exceptions import DuplicateRuleIdError
@@ -95,7 +95,7 @@ class Rules:
   def parse_rule(cls, rule: Mapping[str, Any]) -> Rule:
     """Parse a rule into a Rule object."""
     # Set enabled, alerting, and archived options based on the rule's current
-    # state in Chronicle.
+    # state in Google SecOps.
     if rule["deployment_state"].get("enabled") is True:
       pass
     else:
@@ -111,12 +111,9 @@ class Rules:
     else:
       rule["deployment_state"]["archived"] = False
 
-    # Extract the rule ID from the resource_name value
-    rule_id_match = re.search(
-        pattern=r"\/(ru_[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$)",
-        string=rule["name"],
+    rule_id = Rules.extract_rule_id_from_resource_name(
+        rule_resource_name=rule["name"]
     )
-    rule_id = rule_id_match.group(1)
 
     try:
       parsed_rule = Rule(
@@ -336,11 +333,11 @@ class Rules:
   def get_remote_rules(
       cls, http_session: requests.AuthorizedSession
   ) -> "Rules":
-    """Retrieve the latest version of all rules from Chronicle."""
+    """Retrieve the latest version of all rules from Google SecOps."""
     raw_rules = []
     next_page_token = None
 
-    LOGGER.info("Attempting to retrieve all rules from Chronicle")
+    LOGGER.info("Attempting to retrieve all rules from Google SecOps")
     while True:
       retrieved_rules, next_page_token = list_rules(
           http_session=http_session,
@@ -348,7 +345,6 @@ class Rules:
           page_token=next_page_token,
           view="FULL",
       )
-      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
       if retrieved_rules is not None:
         LOGGER.info("Retrieved %s rules", len(retrieved_rules))
@@ -362,19 +358,52 @@ class Rules:
         # Break if there are no more pages of rules to retrieve
         break
 
-    raw_rules_count = len(raw_rules)
+    LOGGER.info("Retrieved a total of %s rules", len(raw_rules))
 
-    LOGGER.info("Retrieved a total of %s rules", raw_rules_count)
+    rule_deployments = []
+    next_page_token = None
 
     LOGGER.info(
-        "Attempting to retrieve rule deployment state for %s rules",
-        raw_rules_count,
+        "Attempting to retrieve deployment state for all rules in Google SecOps"
     )
-    for rule in raw_rules:
-      rule["deployment_state"] = get_rule_deployment(
-          http_session=http_session, resource_name=rule["name"]
+    while True:
+      retrieved_rule_deployments, next_page_token = list_rule_deployments(
+          http_session=http_session, page_size=None, page_token=next_page_token
       )
-      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
+
+      if retrieved_rule_deployments is not None:
+        LOGGER.info(
+            "Retrieved deployment state for %s rules",
+            len(retrieved_rule_deployments),
+        )
+        rule_deployments.extend(retrieved_rule_deployments)
+
+      if next_page_token:
+        LOGGER.info(
+            "Attempting to retrieve rule deployment states with page token %s",
+            next_page_token,
+        )
+      else:
+        # Break if there are no more pages of rule deployments to retrieve
+        break
+
+    LOGGER.info(
+        "Retrieved deployment state for a total of %s rules",
+        len(rule_deployments),
+    )
+
+    # Store the rule deployment objects in a dict using the rule_id as the key
+    rule_deployments_dict = {}
+    for rule_deployment in rule_deployments:
+      rule_id = Rules.extract_rule_id_from_resource_name(
+          rule_deployment["name"]
+      )
+      rule_deployments_dict[rule_id] = rule_deployment
+
+    # Add the deployment state to each raw rule ready for parsing
+    for raw_rule in raw_rules:
+      rule_id = Rules.extract_rule_id_from_resource_name(raw_rule["name"])
+      raw_rule["deployment_state"] = rule_deployments_dict[rule_id]
 
     parsed_rules = Rules.parse_rules(rules=raw_rules)
 
@@ -458,6 +487,28 @@ class Rules:
     return rule_name
 
   @classmethod
+  def extract_rule_id_from_resource_name(cls, rule_resource_name: str) -> str:
+    """Extract the rule ID from a Google Cloud resource name.
+
+    Args:
+      rule_resource_name: The Google Cloud resource name for the rule. Example:
+        projects/1234567890123/locations/us/instances/abcdef12-1234-1234-abc9-abcde1234566/rules/ru_e05bebd5-1234-410a-1234-4d7d0ee8b55f
+
+    Returns:
+      The unique ID for the rule. Example:
+      projects/1234567890123/locations/us/instances/abcdef12-1234-1234-abc9-abcde1234566/rules/ru_e05bebd5-1234-410a-1234-4d7d0ee8b55f
+    """
+    # Extract the rule ID from the resource_name value
+    rule_id_match = re.search(
+        pattern=r"\/(ru_[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})",
+        string=rule_resource_name,
+    )
+
+    rule_id = rule_id_match.group(1)
+
+    return rule_id
+
+  @classmethod
   def check_rule_config(cls, config: Mapping[str, Any]):
     """Check rule config file for invalid keys."""
     required_keys = ["alerting", "enabled"]
@@ -512,9 +563,9 @@ class Rules:
       rules_dir: pathlib.Path = RULES_DIR,
       rule_config_file: pathlib.Path = RULE_CONFIG_FILE,
   ) -> Mapping[str, Sequence[Tuple[str, str]]] | None:
-    """Update rules in Chronicle based on local rule files."""
+    """Update rules in Google SecOps based on local rule files."""
     LOGGER.info(
-        "Attempting to update rules in Chronicle based on local rule files"
+        "Attempting to update rules in Google SecOps based on local rule files"
     )
 
     LOGGER.info("Loading local files from %s", rules_dir)
@@ -527,7 +578,7 @@ class Rules:
       return
 
     LOGGER.info(
-        "Attempting to retrieve latest version of all rules from Chronicle"
+        "Attempting to retrieve latest version of all rules from Google SecOps"
     )
     remote_rules = Rules.get_remote_rules(http_session=http_session)
 
@@ -556,7 +607,7 @@ class Rules:
       rule_name = local_rule.name
 
       if rule_name in remote_rules_dict.keys():
-        # Rule exists in Chronicle with same rule name as local rule.
+        # Rule exists in Google SecOps with same rule name as local rule.
         rule_id = local_rule.id
         remote_rule = remote_rules_dict[rule_name]
 
@@ -585,14 +636,13 @@ class Rules:
               update_mask=["text"],
               updates={"text": local_rule.text},
           )
-          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           update_summary["new_version_created"].append((rule_id, rule_name))
         LOGGER.debug(
             "Rule %s (%s) - No changes found in rule text", rule_name, rule_id
         )
 
       else:
-        # Rule does not exist in Chronicle with same rule name as local rule
+        # Rule does not exist in Google SecOps with same rule name as local rule
         LOGGER.info("Local rule name %s not found in remote rules", rule_name)
 
         # A new rule will be created if a remote rule doesn't exist with the
@@ -606,11 +656,9 @@ class Rules:
           new_rule = create_rule(
               http_session=http_session, rule_text=local_rule.text
           )
-          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           new_rule["deployment_state"] = get_rule_deployment(
               http_session=http_session, resource_name=new_rule["name"]
           )
-          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           remote_rule = Rules.parse_rule(new_rule)
           LOGGER.info(
               "Created new rule %s (%s)", remote_rule.name, remote_rule.id
@@ -622,7 +670,7 @@ class Rules:
 
         # If a remote rule doesn't exist with the same name as the local rule,
         # but there's a rule id for the local rule, the local rule has been
-        # renamed. Create a new version of the existing rule in Chronicle.
+        # renamed. Create a new version of the existing rule in Google SecOps
         else:
           rule_id = local_rule.id
           LOGGER.info(
@@ -637,11 +685,9 @@ class Rules:
               update_mask=["text"],
               updates={"text": local_rule.text},
           )
-          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           new_rule_version["deployment_state"] = get_rule_deployment(
               http_session=http_session, resource_name=new_rule_version["name"]
           )
-          time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
           remote_rule = Rules.parse_rule(new_rule_version)
           update_summary["new_version_created"].append((rule_id, rule_name))
 
@@ -692,7 +738,6 @@ class Rules:
           update_mask=["archived"],
           updates={"archived": False},
       )
-      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["unarchived"] = True
 
     LOGGER.debug(
@@ -707,7 +752,6 @@ class Rules:
           update_mask=["enabled"],
           updates={"enabled": True},
       )
-      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["enabled"] = True
 
     # Disable the rule if required.
@@ -719,7 +763,6 @@ class Rules:
           update_mask=["enabled"],
           updates={"enabled": False},
       )
-      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["disabled"] = True
 
     LOGGER.debug(
@@ -734,7 +777,6 @@ class Rules:
           update_mask=["alerting"],
           updates={"alerting": True},
       )
-      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["alerting_enabled"] = True
 
     # Disable alerting for the rule if required.
@@ -746,7 +788,6 @@ class Rules:
           update_mask=["alerting"],
           updates={"alerting": False},
       )
-      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["alerting_disabled"] = True
 
     LOGGER.debug("%s - Checking if the rule should be archived", log_msg_prefix)
@@ -759,7 +800,6 @@ class Rules:
           update_mask=["archived"],
           updates={"archived": True},
       )
-      time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
       rule_updates["archived"] = True
 
     return rule_updates

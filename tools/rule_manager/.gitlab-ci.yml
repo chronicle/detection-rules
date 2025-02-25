@@ -37,10 +37,10 @@ run-tests:
     # Run tests
     - pytest -v
 
-    # Verify that all rules are valid YARA-L 2.0 rules via Chronicle's API
+    # Verify that all rules are valid YARA-L 2.0 rules via Google SecOps's API
     - python -m rule_cli --verify-rules
 
-# Pull the latest version of all rules from Chronicle and commit them to the repo.
+# Pull the latest version of all rules from Google SecOps and commit them to the repo.
 pull-latest-rules:
   stage: scheduled
   rules:
@@ -65,8 +65,8 @@ pull-latest-rules:
     - git config --global user.email "${GIT_USER_EMAIL:-$GITLAB_USER_EMAIL}"
     - git config --global user.name "${GIT_USER_NAME:-$GITLAB_USER_NAME}"
 
-    # Pull the latest version of all rules from Chronicle
-    - echo "Attempting to pull the latest version of all rules from Chronicle"
+    # Pull the latest version of all rules from Google SecOps
+    - echo "Attempting to pull the latest version of all rules from Google SecOps"
     - python -m rule_cli --pull-latest-rules
 
     # Add files to git staging area
@@ -80,13 +80,13 @@ pull-latest-rules:
     - CHANGES=$(git status --porcelain | wc -l)
 
     # Commit and push changes if there are any. Skip the CI pipeline (ci.skip).
-    - echo "There are $CHANGES changes to commit" && [ "$CHANGES" -gt "0" ] && git commit -m "latest rules pulled from chronicle api" && git push origin "${CI_DEFAULT_BRANCH}" -o ci.skip
+    - echo "There are $CHANGES changes to commit" && [ "$CHANGES" -gt "0" ] && git commit -m "latest rules pulled from google secops api" && git push origin "${CI_DEFAULT_BRANCH}" -o ci.skip
 
     - echo "Current time is $(date)"
     # Show last commit message.
     - git log -1
 
-# Update rules in Chronicle based on local rule files.
+# Update rules in Google SecOps based on local rule files.
 update-remote-rules:
   stage: deploy
   rules:
@@ -109,11 +109,11 @@ update-remote-rules:
     - git config --global user.email "${GIT_USER_EMAIL:-$GITLAB_USER_EMAIL}"
     - git config --global user.name "${GIT_USER_NAME:-$GITLAB_USER_NAME}"
 
-    # Update rules in Chronicle based on rule files in main branch.
-    - echo "Attempting to update rules in Chronicle based on local rule files."
+    # Update rules in Google SecOps based on rule files in main branch.
+    - echo "Attempting to update rules in Google SecOps based on local rule files."
     - python -m rule_cli --update-remote-rules
 
-    # After any changes are made to rules in Chronicle, the latest rules are retrieved to update the main branch with the latest rule data (revision_id, revision_create_time, etc).
+    # After any changes are made to rules in Google SecOps, the latest rules are retrieved to update the main branch with the latest rule data (revision_id, revision_create_time, etc).
 
     # Add files to git staging area
     - git add rules rule_config.yaml
@@ -126,7 +126,7 @@ update-remote-rules:
     - CHANGES=$(git status --porcelain | wc -l)
 
     # Commit and push changes if there are any. Skip the CI pipeline (ci.skip).
-    - echo "There are $CHANGES changes to commit" && [ "$CHANGES" -gt "0" ] && git commit -m "latest rules pulled from chronicle api" && git push origin "${CI_DEFAULT_BRANCH}" -o ci.skip
+    - echo "There are $CHANGES changes to commit" && [ "$CHANGES" -gt "0" ] && git commit -m "latest rules pulled from google secops api" && git push origin "${CI_DEFAULT_BRANCH}" -o ci.skip
 
     - echo "Current time is $(date)"
     # Show last commit message.

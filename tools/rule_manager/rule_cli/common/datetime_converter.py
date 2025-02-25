@@ -19,7 +19,7 @@ import re
 
 
 def iso8601_datetime_utc(utc_date_time: str) -> datetime.datetime:
-  """Converts ISO 8601 string ("yyyy-mm-ddThh:mm:ssZ") to a datetime object.
+  """Converts an ISO 8601 string ("yyyy-mm-ddThh:mm:ssZ") to a datetime object.
 
   More details: https://en.wikipedia.org/wiki/ISO_8601
 

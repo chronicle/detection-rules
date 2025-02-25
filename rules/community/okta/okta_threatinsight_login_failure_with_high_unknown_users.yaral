@@ -1,0 +1,70 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule okta_threatinsight_login_failure_with_high_unknown_users {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Okta's ThreatInsight can identify multiple login failures with high unknown users count from the same IP across one or more Okta orgs."
+    rule_id = "mr_41bafd12-7b1d-4b73-adf6-621c0431b538"
+    rule_name = "Okta ThreatInsight Login Failure With High Unknown Users"
+    reference = "https://help.okta.com/en-us/Content/Topics/Security/threat-insight/configure-threatinsight-system-log.htm"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Brute Force: Credential Stuffing"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/004/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $login.metadata.product_name = "Okta"
+    $login.metadata.vendor_name = "Okta"
+    $login.metadata.event_type = "USER_UNCATEGORIZED"
+    $login.metadata.product_event_type = "security.threat.detected"
+    $login.security_result.category_details = /Login failures with high unknown users count/
+    $login.principal.user.userid = $userid
+    $login.principal.ip = $ip
+
+  match:
+    $userid, $ip over 1h
+
+  outcome:
+    $risk_score = max(
+        // Baseline
+        35 +
+        // If the IP Address is marked as suspicious IP address by Okta ThreatInsight
+        if($login.security_result.detection_fields["threatSuspected"] = "true", 30) +
+        // Unauthorized target geographies
+        if($login.principal.ip_geo_artifact.location.country_or_region = "Cuba", 20) +
+        if($login.principal.ip_geo_artifact.location.country_or_region = "Iran", 20) +
+        if($login.principal.ip_geo_artifact.location.country_or_region = "North Korea", 20) +
+        if($login.principal.ip_geo_artifact.location.country_or_region = "Russia", 20) +
+        if($login.principal.ip_geo_artifact.location.country_or_region = "Syria", 20)
+    )
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Brute Force: Credential Stuffing"
+    $target_user_agent = array_distinct($login.network.http.user_agent)
+    $principal_ip = array_distinct($login.principal.ip)
+    $principal_ip_country = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($login.principal.ip_geo_artifact.location.state)
+    $principal_ip_city = array_distinct($login.principal.location.city)
+    $security_result_summary = array_distinct($login.security_result.summary)
+
+  condition:
+    $login
+}

@@ -1,0 +1,62 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule aws_guardduty_brute_force_activity_detected {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Amazon GuardDuty detects a brute force activity in an Amazon EC2 or Amazon RDS instance."
+    rule_id = "mr_33197748-cb9d-451f-8135-4b61cc5e4ca5"
+    rule_name = "AWS GuardDuty Bruteforce Activity Detected"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Brute Force"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "AWS GuardDuty"
+    platform = "AWS"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $guardduty.metadata.vendor_name = "AMAZON"
+    $guardduty.metadata.product_name = "AWS GuardDuty"
+    $guardduty.metadata.product_event_type = /BruteForce/
+    //Filter out sample findings
+    $guardduty.security_result.about.labels["Sample"] != "true"
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Brute Force"
+    $mitre_attack_technique_id = "T1110"
+    $event_count = count_distinct($guardduty.metadata.id)
+    $principal_ip = array_distinct($guardduty.principal.ip)
+    $principal_ip_country = array_distinct($guardduty.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($guardduty.principal.ip_geo_artifact.location.state)
+    $principal_user_display_name = $guardduty.principal.user.user_display_name
+    $aws_region = $guardduty.target.location.name
+    $target_resource_name = $guardduty.target.resource.name
+    $target_resource_product_object_id = $guardduty.target.resource.product_object_id
+    $security_result_summary = array_distinct($guardduty.security_result.summary)
+    $security_result_description = array_distinct($guardduty.security_result.description)
+    $security_result_severity = array_distinct($guardduty.security_result.severity)
+    $security_result_severity_details = array_distinct($guardduty.security_result.severity_details)
+    $metadata_product_event_type = array_distinct($guardduty.metadata.product_event_type)
+
+  condition:
+    $guardduty
+}

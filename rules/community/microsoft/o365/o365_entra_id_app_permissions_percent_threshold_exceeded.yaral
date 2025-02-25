@@ -1,0 +1,68 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule o365_entra_id_app_permissions_percent_threshold_exceeded {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when an excessive number of permissions are assigned to an Entra ID application within a time window, potentially indicating a greedy permission grab, as a percentage from old permissions to new permissions"
+    rule_id = "mr_6dcdb335-0054-46ae-a742-ecf6ac4e442b"
+    rule_name = "O365 Entra ID App Permissions Percent Threshold Exceeded"
+    assumption = "This rule does not compare the specific permissions of the old and new permissions. Removing 8 permissions and replacing with 8 different permissions would not cause this rule to trigger"
+    reference = "https://learn.microsoft.com/en-us/graph/permissions-reference"
+    type = "alert"
+    platform = "azure"
+    data_source = "o365"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $app.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT"
+    $app.metadata.product_name = "Office 365"
+    $app.metadata.product_event_type = "Update application."
+    $app.metadata.vendor_name = "Microsoft"
+    $app.security_result.action = "ALLOW"
+    (
+      $app.target.resource.attribute.labels.key = /OldValue_EntitlementId-/ or
+      $app.target.resource.attribute.labels.key = /NewValue_EntitlementId-/
+    )
+    $app.security_result.detection_fields["target_1"] = $app_name
+
+  match:
+    $app_name over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($app.metadata.id)
+    $security_summary = array_distinct($app.security_result.summary)
+    $user_agent = array_distinct($app.network.http.user_agent)
+    $old_permissions = array_distinct(if($app.target.resource.attribute.labels.key = /OldValue_EntitlementId-/, $app.target.resource.attribute.labels.value, ""))
+    $new_permissions = array_distinct(if($app.target.resource.attribute.labels.key = /NewValue_EntitlementId-/, $app.target.resource.attribute.labels.value, ""))
+    /*
+    Apps created via the portal come with a permission of user.read, however apps created via the Graph API do not. The first time permissions are added to an app created via the API,
+    the distinct count for new permissions will be off by one. Subsequent events will reflect the correct counts of old and new permissions.
+    */
+    $old_permissions_count = count_distinct(if($app.target.resource.attribute.labels.key = /OldValue_EntitlementId-/, $app.target.resource.attribute.labels.value, "")) - 1
+    $new_permissions_count = count_distinct(if($app.target.resource.attribute.labels.key = /NewValue_EntitlementId-/, $app.target.resource.attribute.labels.value, "")) - 1
+    //calculate the difference between the old and new permissions within the match window
+    $old_permission_zero_handler = if($old_permissions_count = 0, 1, $old_permissions_count)
+    $permission_change_percentage = (($new_permissions_count - $old_permission_zero_handler) / $old_permission_zero_handler) * 100
+    //added to populate alert graph with additional context
+    $principal_user_userid = array_distinct($app.principal.user.userid)
+
+  condition:
+    $app and $permission_change_percentage > 70
+}

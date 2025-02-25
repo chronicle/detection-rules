@@ -1,0 +1,64 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule suspicious_unusual_location_lnk_file {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects creation and movement of .lnk files to specific folders"
+    rule_id = "mr_efb341aa-57c5-47b6-bde5-b409b4395c8f"
+    rule_name = "Suspicious Unusual Location LNK File"
+    type = "alert"
+    data_source = "microsoft sysmon"
+    platform = "Windows"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    (
+      $file.metadata.event_type = "FILE_CREATION" or
+      $file.metadata.event_type = "FILE_MODIFICATION" or
+      $file.metadata.event_type = "FILE_COPY" or
+      $file.metadata.event_type = "FILE_MOVE"
+    )
+    //and is optional, implied when broken out by line
+    and
+    $file.target.file.full_path = /\.lnk$/ nocase and
+    //Looking in the desktop, documents and start menu folders, can be modified to look in different folders
+    $file.target.file.full_path = /\\(Desktop|Documents|Start Menu)\\.*/ nocase
+
+  outcome:
+    $risk_score = 35
+    //added to populate alert graph with additional context
+    $principal_hostname = $file.principal.hostname
+    $target_hostname = $file.target.hostname
+    $src_hostname = $file.src.hostname
+    $principal_process_pid = $file.principal.process.pid
+    $principal_process_command_line = $file.principal.process.command_line
+    $principal_process_file_sha256 = $file.principal.process.file.sha256
+    $principal_process_file_full_path = $file.principal.process.file.full_path
+    $principal_process_product_specific_process_id = $file.principal.process.product_specific_process_id
+    $principal_process_parent_process_product_specific_process_id = $file.principal.process.parent_process.product_specific_process_id
+    $principal_user_userid = $file.principal.user.userid
+    $src_user_userid = $file.principal.user.userid
+    $target_file_sha256 = $file.target.file.sha256
+    $target_file_full_path = $file.target.file.full_path
+    $src_file_sha256 = $file.src.file.sha256
+    $src_file_full_path = $file.src.file.full_path
+
+  condition:
+    $file
+}

@@ -1,0 +1,40 @@
+name: Update Rule
+description: Update an existing rule in this project
+title: "[Update Rule] Name of rule"
+labels: ["rule: update"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for your interest in contributing to this project. Please familiarize yourself with the [contribution guide](https://github.com/chronicle/detection-rules/blob/main/CONTRIBUTING.md) and rule [style guide](https://github.com/chronicle/detection-rules/blob/main/STYLE_GUIDE.md) if you haven't done so already.
+
+  - type: input
+    id: rule_url
+    attributes:
+      label: Rule URL
+      description: Enter the URL for the rule's location in the `main` branch of this repo.
+      placeholder: https://github.com/chronicle/detection-rules/tree/main/rules
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe your proposed changes.
+      placeholder: These changes...
+    validations:
+      required: true
+
+  - type: textarea
+    id: test_data
+    attributes:
+      label: Test Data
+      description: Raw log events (sanitized of any confidential data or PII) that can be used to trigger the rule.
+      placeholder: |
+        ```
+        Insert raw log events here (one event per line) and sanitized of any confidential data or PII
+        ```
+    validations:
+      required: true

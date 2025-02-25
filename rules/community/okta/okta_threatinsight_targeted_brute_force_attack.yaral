@@ -1,0 +1,55 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule okta_threatinsight_targeted_brute_force_attack {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Okta ThreatInsight detects access requests from known malicious IPs targeting a specific org."
+    rule_id = "mr_ce576f12-ee6d-4282-9f7b-f955af183eb7"
+    rule_name = "Okta ThreatInsight Targeted Bruteforce Attack"
+    reference = "https://help.okta.com/en-us/Content/Topics/Security/threat-insight/configure-threatinsight-system-log.htm"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Brute Force"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $bruteforce.metadata.product_name = "Okta"
+    $bruteforce.metadata.vendor_name = "Okta"
+    $bruteforce.metadata.event_type = "USER_UNCATEGORIZED"
+    $bruteforce.metadata.product_event_type = "security.attack.start"
+    $bruteforce.principal.user.userid = $userid
+
+  match:
+    $userid over 1h
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Brute Force"
+    $principal_user_userid = array_distinct($bruteforce.principal.user.userid)
+    $principal_user_email_addresses = array_distinct($bruteforce.principal.user.email_addresses)
+    $security_result_summary = array_distinct($bruteforce.security_result.summary)
+    $security_result_severity = array_distinct($bruteforce.security_result.severity)
+
+  condition:
+    $bruteforce
+}

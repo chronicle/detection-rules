@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Rule Command Line Interface - Example code for managing rules via Chronicle's API."""
+"""Rule Command Line Interface - Example code for managing rules via the Google SecOps API."""
 
 # pylint: disable="invalid-name","g-bool-id-comparison"
 
@@ -23,13 +23,12 @@ import logging
 import os
 import pathlib
 import sys
-import time
 
-from chronicle_api import chronicle_auth
-from chronicle_api.rules.stream_test_rule import test_rule
-from chronicle_api.rules.verify_rule import verify_rule
 import dotenv
 import google.auth.transport.requests
+from google_secops_api import auth
+from google_secops_api.rules.stream_test_rule import test_rule
+from google_secops_api.rules.verify_rule import verify_rule
 from rule_cli.common import datetime_converter
 from rule_cli.common.custom_exceptions import RuleVerificationError
 from rule_cli.reference_lists import ReferenceLists
@@ -47,19 +46,16 @@ dotenv.load_dotenv()
 def initialize_http_session() -> (
     google.auth.transport.requests.AuthorizedSession
 ):
-  """Initialize an authorized HTTP session with Chronicle."""
-  return chronicle_auth.initialize_http_session(
-      chronicle_api_credentials=json.loads(
-          os.environ["CHRONICLE_API_CREDENTIALS"]
-      ),
+  """Initialize an authorized HTTP session with the Google SecOps API."""
+  return auth.initialize_http_session(
       scopes=json.loads(os.environ["AUTHORIZATION_SCOPES"]).get(
-          "CHRONICLE_API"
-      ),
+          "GOOGLE_SECOPS_API"
+      )
   )
 
 
 def pull_latest_rules():
-  """Retrieves the latest version of all rules from Chronicle and updates the local rule files."""
+  """Retrieves the latest version of all rules from Google SecOps and updates the local rule files."""
   http_session = initialize_http_session()
 
   remote_rules = Rules.get_remote_rules(http_session=http_session)
@@ -68,7 +64,7 @@ def pull_latest_rules():
     return
 
   # Delete existing local rule files before writing a fresh copy of all rules
-  # pulled from Chronicle.
+  # pulled from Google SecOps
   for local_rule_file in list(RULES_DIR.glob("*.yaral")):
     local_rule_file.unlink()
 
@@ -78,7 +74,7 @@ def pull_latest_rules():
 
 
 def update_remote_rules():
-  """Update rules in Chronicle based on local rule files."""
+  """Update rules in Google SecOps based on local rule files."""
   http_session = initialize_http_session()
 
   rule_updates = Rules.update_remote_rules(http_session=http_session)
@@ -96,7 +92,7 @@ def update_remote_rules():
 
 
 def pull_latest_reference_lists():
-  """Retrieves the latest version of all reference lists from Chronicle and updates the local reference list files."""
+  """Retrieves the latest version of all reference lists from Google SecOps and updates the local reference list files."""
   http_session = initialize_http_session()
 
   remote_ref_lists = ReferenceLists.get_remote_ref_lists(
@@ -107,7 +103,7 @@ def pull_latest_reference_lists():
     return
 
   # Delete existing local reference list files before writing a fresh copy of
-  # all reference lists pulled from Chronicle.
+  # all reference lists pulled from Google SecOps
   for local_ref_list_file in list(REF_LISTS_DIR.glob("*.txt")):
     local_ref_list_file.unlink()
 
@@ -117,7 +113,7 @@ def pull_latest_reference_lists():
 
 
 def update_remote_ref_lists():
-  """Update reference lists in Chronicle based on local reference list files."""
+  """Update reference lists in Google SecOps based on local reference list files."""
   http_session = initialize_http_session()
 
   ref_list_updates = ReferenceLists.update_remote_ref_lists(
@@ -161,7 +157,7 @@ def verify_rule_text(rule_file: pathlib.Path):
 
 
 def verify_rules():
-  """Verify that all detection rules are valid YARA-L 2.0 rules using Chronicle's API."""
+  """Verify that all detection rules are valid YARA-L 2.0 rules using Google SecOps's API."""
   http_session = initialize_http_session()
 
   # Maintain lists of successful and failed YARA-L 2.0 verification responses.
@@ -173,7 +169,6 @@ def verify_rules():
       rule_text = f.read()
 
     response = verify_rule(http_session=http_session, rule_text=rule_text)
-    time.sleep(0.6)  # Sleep to avoid exceeding API rate limit
 
     if response.get("success") is True:
       LOGGER.info(
@@ -213,17 +208,14 @@ def stream_test_rule(
     max_detections: int | None = None,
     scope: str | None = None,
 ):
-  """Test a rule in Chronicle without persisting results."""
+  """Test a rule in Google SecOps without persisting results."""
   if not rule_file.is_file():
     raise FileNotFoundError(rule_file)
 
   # Initialize an authorized HTTP session
-  http_session = chronicle_auth.initialize_http_session(
-      chronicle_api_credentials=json.loads(
-          os.environ["CHRONICLE_API_CREDENTIALS"]
-      ),
+  http_session = auth.initialize_http_session(
       scopes=json.loads(os.environ["AUTHORIZATION_SCOPES"]).get(
-          "DETECTION_ENGINE_API"
+          "GOOGLE_SECOPS_API"
       ),
   )
 
@@ -275,23 +267,25 @@ if __name__ == "__main__":
       "--pull-latest-rules",
       action="store_true",
       help=(
-          "Retrieve the latest version of all rules from Chronicle and write"
-          " them to local files."
+          "Retrieve the latest version of all rules from Google SecOps and"
+          " write them to local files."
       ),
   )
 
   parser.add_argument(
       "--update-remote-rules",
       action="store_true",
-      help="Update rules in Chronicle based on local rule files and config.",
+      help=(
+          "Update rules in Google SecOps based on local rule files and config."
+      ),
   )
 
   parser.add_argument(
       "--pull-latest-reference-lists",
       action="store_true",
       help=(
-          "Retrieve the latest version of all reference lists from Chronicle"
-          " and write them to local files."
+          "Retrieve the latest version of all reference lists from Google"
+          " SecOps and write them to local files."
       ),
   )
 
@@ -299,8 +293,8 @@ if __name__ == "__main__":
       "--update-remote-reference-lists",
       action="store_true",
       help=(
-          "Update reference lists in Chronicle based on local reference list"
-          " files and config."
+          "Update reference lists in Google SecOps based on local reference"
+          " list files and config."
       ),
   )
 
@@ -329,7 +323,7 @@ if __name__ == "__main__":
       name="test-rule",
       help=(
           "Runs a YARA-L rule over the given time range without persisting"
-          " results in Chronicle. Results (detections) are logged to the"
+          " results in Google SecOps. Results (detections) are logged to the"
           " console."
       ),
   )
@@ -401,27 +395,27 @@ if __name__ == "__main__":
 
   if args.pull_latest_rules:
     LOGGER.info(
-        "Attempting to pull latest version of all rules from Chronicle and"
+        "Attempting to pull latest version of all rules from Google SecOps and"
         " update local files"
     )
     pull_latest_rules()
 
   elif args.update_remote_rules:
     LOGGER.info(
-        "Attempting to update rules in Chronicle based on local rule files"
+        "Attempting to update rules in Google SecOps based on local rule files"
     )
     update_remote_rules()
 
   if args.pull_latest_reference_lists:
     LOGGER.info(
-        "Attempting to pull latest version of all reference lists from"
-        " Chronicle and update local files"
+        "Attempting to pull latest version of all reference lists from Google"
+        " SecOps and update local files"
     )
     pull_latest_reference_lists()
 
   if args.update_remote_reference_lists:
     LOGGER.info(
-        "Attempting to update reference lists in Chronicle based on local"
+        "Attempting to update reference lists in Google SecOps based on local"
         " reference list files"
     )
     update_remote_ref_lists()

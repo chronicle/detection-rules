@@ -1,0 +1,65 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule rw_mimikatz_T1003 {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects the process mimikatz being issued from the command line."
+    rule_id = "mr_fa96ead4-7f1f-4dbb-bacb-a526f985c12f"
+    rule_name = "MITRE ATT&CK T1003 RW Mimikatz"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "OS Credential Dumping"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1003/"
+    mitre_attack_version = "v13.1"
+    type = "alert"
+    platform = "Windows"
+    data_source = "microsoft sysmon, microsoft windows events"
+    severity = "Critical"
+    priority = "High"
+
+  events:
+    $process.metadata.event_type = "PROCESS_LAUNCH"
+    $process.metadata.event_type = $event_type
+    $process.target.process.command_line = /mimikatz/ nocase
+
+  match:
+    $event_type over 5m
+
+  outcome:
+    $risk_score = max(95)
+    $mitre_attack_tactic = array_distinct("Credential Access")
+    $mitre_attack_technique = array_distinct("OS Credential Dumping")
+    $mitre_attack_technique_id = array_distinct("T1003")
+    $event_count = count_distinct($process.metadata.id)
+    // added to populate alert graph with additional context
+    $principal_hostname = array_distinct($process.principal.hostname)
+    $principal_process_pid = array_distinct($process.principal.process.pid)
+    $principal_process_command_line = array_distinct($process.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($process.principal.user.userid)
+
+  condition:
+    $process
+}

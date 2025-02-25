@@ -1,0 +1,56 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule entra_id_login_activity_to_azure_ad_powershell_app {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Logins to Azure AD PowerShell app can have legitimate purposes, but are also abused to gain access to user information. Programatic access to Azure AD should generally be through other apps"
+    rule_id = "mr_5bce885a-7f65-41e1-ae94-9befc892d704"
+    rule_name = "Entra ID Login Activity to Azure AD PowerShell Application"
+    type = "hunt"
+    platform = "azure"
+    data_source = "azure ad"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.metadata.product_name = "Azure AD"
+    $login.metadata.vendor_name = "Microsoft"
+    $login.target.application = "Azure Active Directory PowerShell"
+    $login.security_result.action = "ALLOW"
+    $login.target.user.userid = $userid
+
+  match:
+    $userid over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($login.metadata.id)
+    $target_application = array_distinct($login.target.application)
+    $security_description = array_distinct($login.security_result.description)
+    $security_summary = array_distinct($login.security_result.summary)
+    $country_region_login_attempt = array_distinct(strings.concat($login.principal.location.city," ",$login.principal.location.state," ",$login.principal.location.country_or_region))
+    $user_agent = array_distinct($login.network.http.user_agent)
+    $principal_ip = array_distinct($login.principal.ip)
+
+  condition:
+    $login
+}
+
+
+

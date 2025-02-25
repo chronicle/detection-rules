@@ -1,0 +1,68 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule okta_threatinsight_suspected_brute_force_attack {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Okta ThreatInsight detects multiple login failures from the same IP across one or more Okta orgs."
+    rule_id = "mr_9537e888-7af7-491f-a5e2-3623e1798aba"
+    rule_name = "Okta ThreatInsight Suspected Bruteforce Attack"
+    reference = "https://help.okta.com/en-us/Content/Topics/Security/threat-insight/configure-threatinsight-system-log.htm"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Brute Force: Password Guessing"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/001/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $bruteforce.metadata.product_name = "Okta"
+    $bruteforce.metadata.vendor_name = "Okta"
+    $bruteforce.metadata.event_type = "USER_UNCATEGORIZED"
+    $bruteforce.metadata.product_event_type = "security.threat.detected"
+    $bruteforce.security_result.category_details = "Login Failures"
+    $bruteforce.principal.user.userid = $userid
+
+  match:
+    $userid over 1h
+
+  outcome:
+    $risk_score = max(
+        35 +
+        // If the IP Address is marked as suspicious IP address by Okta ThreatInsight
+        if($bruteforce.security_result.detection_fields["threatSuspected"] = "true", 30) +
+        // Unauthorized target geographies
+        if($bruteforce.principal.ip_geo_artifact.location.country_or_region = "Cuba", 20) +
+        if($bruteforce.principal.ip_geo_artifact.location.country_or_region = "Iran", 20) +
+        if($bruteforce.principal.ip_geo_artifact.location.country_or_region = "North Korea", 20) +
+        if($bruteforce.principal.ip_geo_artifact.location.country_or_region = "Russia", 20) +
+        if($bruteforce.principal.ip_geo_artifact.location.country_or_region = "Syria", 20)
+    )
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Brute Force: Password Guessing"
+    $target_user_agent = array_distinct($bruteforce.network.http.user_agent)
+    $principal_ip = array_distinct($bruteforce.principal.ip)
+    $principal_ip_country = array_distinct($bruteforce.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($bruteforce.principal.ip_geo_artifact.location.state)
+    $principal_ip_city = array_distinct($bruteforce.principal.location.city)
+    $security_result_summary = array_distinct($bruteforce.security_result.summary)
+
+  condition:
+    $bruteforce
+}

@@ -1,0 +1,74 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ rule ms_graph_user_and_group_enumeration {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identify the enumeration of both the users and members of groups in the Entra ID tenant. While these are two separate functions in GraphRunner, they are often run in support of one another."
+    rule_id = "mr_1c65d59f-9b9c-4023-b98c-7d6cff503b1b"
+    rule_name = "Enumeration of users and group membership observed in the Microsoft Graph API"
+    assumption = "The user endpoint is frequently called and not ideal to be detected on, however enumeration of users within a security group often occurs with the users being enumerated. This can have applicability beyond graphrunner but additonal tuning may be needed."
+    reference = "https://github.com/dafthack/GraphRunner/blob/main/GraphRunner.ps1"
+    type = "Alert"
+    data_source = "MS Graph Activity Logs"
+    platform = "Azure"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $group_api.metadata.event_type = "NETWORK_HTTP"
+    $group_api.metadata.product_event_type = "Microsoft Graph Activity"
+    re.regex($group_api.target.url, `https://graph\.microsoft\.com/v1\.0/groups/.*/members`) nocase
+    //Can be tuned for specific User Agent strings being used - by default GraphRunner does not forge the UA for this action
+    //$group_api.network.http.user_agent = /PowerShell/ nocase
+    $group_api.network.http.method = "GET"
+    $group_api.network.http.response_code = 200
+    $group_api.principal.ip = $ip
+    $group_api.network.session_id = $session
+    re.capture($group_api.target.url, `https://graph\.microsoft\.com/v1\.0/groups/(.*)/members`) = $group_guid
+
+    //Used to force the users to be requested before the groups which occurs in GraphRunner, but from a recon perspective, this doesn't have to happen in this order
+    $user_api.metadata.event_timestamp.seconds < $group_api.metadata.event_timestamp.seconds
+
+    $user_api.metadata.event_type = "NETWORK_HTTP"
+    $user_api.metadata.product_event_type = "Microsoft Graph Activity"
+    $user_api.target.url = "https://graph.microsoft.com/v1.0/users" nocase
+    $user_api.network.http.method = "GET"
+    $user_api.network.http.response_code = 200
+    //Can be tuned for specific User Agent strings being used - by default GraphRunner does not forge the UA for this action
+    //$user_api.network.http.user_agent = /PowerShell/ nocase
+    $user_api.principal.ip = $ip
+    $user_api.network.session_id = $session
+
+  match:
+    $ip, $session over 15m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($group_api.metadata.id) + count_distinct($user_api.metadata.id)
+    $requesting_user_guid = array_distinct($group_api.principal.user.userid)
+    $requesting_ip = array_distinct($group_api.principal.ip)
+    $user_agent = array_distinct($group_api.network.http.user_agent)
+    $location = array_distinct($group_api.principal.location.name)
+    $target_application_id_guid = array_distinct($group_api.target.resource.product_object_id)
+    $session_id = array_distinct($group_api.network.session_id)
+    $group_count = count_distinct($group_guid)
+    $group_list = array_distinct($group_guid) //limited to 25 groups
+
+  condition:
+    $group_api and $user_api
+}

@@ -1,0 +1,73 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule o365_login_activity_to_uncommon_mscloud_apps {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "This rule detects O365 login activity to apps other than a defined list of first party MS Cloud Apps. Note that Azure Active Directory PowerShell and custom Azure apps are not in this list by default"
+    rule_id = "mr_eca0cd3d-7d65-47f6-9df2-1a16664819ae"
+    rule_name = "O365 Login Activity To Uncommon Microsoft Cloud Apps"
+    assumption = "The list first_party_ms_cloud_apps is populated as needed"
+    mitre_attack_tactic = "Initial Access"
+    mitre_attack_technique = "Valid Accounts: Cloud Accounts"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"
+    mitre_attack_version = "v14.1"
+    reference = "https://learn.microsoft.com/en-us/troubleshoot/azure/active-directory/verify-first-party-apps-sign-in"
+    type = "alert"
+    platform = "azure"
+    data_source = "o365"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.metadata.product_event_type = "UserLoggedIn"
+    $login.metadata.product_name = "Office 365"
+    NOT $login.target.resource.product_object_id in %first_party_ms_cloud_apps
+    /* Additional AppIds that are not in this list but have appeared benign during testing include the following:
+    7eadcef8-456d-4611-9480-4fff72b8b9e2 Microsoft Account Controls V2
+    8e0e8db5-b713-4e91-98e6-470fed0aa4c2 Microsoft Azure Signup Portal
+    f9818e52-50bd-463e-8932-a1650bd3fad2 MSAL Configuration
+    There are additional lists on GitHub that are compiled that would be added for additional tuning as needed
+    */
+    $login.metadata.vendor_name = "Microsoft"
+    $login.security_result.action = "ALLOW"
+    $login.target.user.userid = $userid
+
+    //If you are using ADFS, you may want to consider something like this to filter out Synchronization Login Traffic - Your userid will be different
+    $login.target.user.userid != /Sync_/ nocase
+
+  match:
+    $userid over 5m
+
+  outcome:
+    $risk_score = 65
+    $mitre_attack_tactic = "Initial Access"
+    $mitre_attack_technique = "Valid Accounts: Cloud Accounts"
+    $mitre_attack_technique_id = "T1078.004"
+    $event_count = count_distinct($login.metadata.id)
+    $target_application = array_distinct($login.target.resource.product_object_id)
+    $security_summary = array_distinct($login.security_result.summary)
+    $user_agent = array_distinct($login.network.http.user_agent)
+    $country_region_login_attempt = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    //added to populate alert graph with additional context
+    $principal_ip = array_distinct($login.principal.ip)
+    //$target_user_userid = array_distinct($login.target.user.userid)
+
+  condition:
+    $login
+}

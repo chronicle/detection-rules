@@ -1,0 +1,55 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule onelogin_user_authentication_factor_removed {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when a user removes an authentication factor or otp device."
+    rule_id = "mr_1b251f11-1699-4707-9027-a279dea7d47e"
+    rule_name = "OneLogin User Authentication Factor Removed"
+    reference = "https://onelogin.service-now.com/kb_view_customer.do?sysparm_article=KB0010426"
+    mitre_attack_tactic = "Defense Evasion"
+    mitre_attack_technique = "Modify Authentication Process: Multi-Factor Authentication"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1556/006/"
+    mitre_attack_version = "v15.1"
+    type = "Alert"
+    data_source = "OneLogin"
+    severity = "High"
+    priority = "High"
+
+  events:
+     $user.metadata.event_type = "USER_RESOURCE_ACCESS"
+     $user.metadata.product_name = "ONELOGIN_SSO"
+     $user.metadata.vendor_name = "ONELOGIN"
+     $user.metadata.product_event_type = "24" //otp_device deregistered for user
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Defense Evasion"
+    $mitre_attack_technique = "Modify Authentication Process: Multi-Factor Authentication"
+    $principal_user_userid = array_distinct($user.principal.user.userid)
+    $principal_user_user_display_name = array_distinct($user.principal.user.user_display_name)
+    $principal_user_email_addresses = array_distinct($user.principal.user.email_addresses)
+    $principal_ip = array_distinct($user.principal.ip)
+    $principal_ip_country = array_distinct($user.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($user.principal.ip_geo_artifact.location.state)
+    $target_user_userid = array_distinct($user.target.user.userid)
+    $otp_device_name = array_distinct($user.additional.fields["otp_device_name"])
+
+  condition:
+    $user
+}

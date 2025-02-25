@@ -1,0 +1,64 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule o365_entra_id_app_modify_permission_change_on_watchlist {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Alerts when a permission on the watchlist is applied to an Entra ID application."
+    rule_id = "mr_678cafb8-ea1f-42ac-a396-238bc35e4d21"
+    rule_name = "O365 Entra ID App Modify Permission Change On Watchlist"
+    reference = "https://learn.microsoft.com/en-us/graph/permissions-reference"
+    assumption = "The list msgraph_watchlist_permissions is populated as needed with guid permissions Example: 024d486e-b451-40bb-833d-3e66d98c5c73 //Mail.Read.Write"
+    type = "alert"
+    platform = "azure"
+    data_source = "o365"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $app.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT"
+    $app.metadata.product_name = "Office 365"
+    $app.metadata.product_event_type = "Update application."
+    $app.metadata.vendor_name = "Microsoft"
+    $app.security_result.action = "ALLOW"
+    (
+        $app.target.resource.attribute.labels.key = /NewValue_EntitlementId-/ or
+        $app.target.resource.attribute.labels.key = /OldValue_EntitlementId-/
+    )
+    $app.security_result.detection_fields["target_1"] = $app_name
+
+  match:
+    $app_name over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($app.metadata.id)
+    $security_summary = array_distinct($app.security_result.summary)
+    $user_agent = array_distinct($app.network.http.user_agent)
+    //The reference list msgraph_watchlist_permissions matches on the GUID. List contents example row:  6aedf524-7e1c-45a7-bd76-ded8cab8d0fc //SecurityEvents.ReadWrite.All
+    $watchlist_permissions_after_modification = array_distinct(if($app.target.resource.attribute.labels.key = /NewValue_EntitlementId/ and $app.target.resource.attribute.labels.value IN %msgraph_watchlist_permissions, $app.target.resource.attribute.labels.value,""))
+    $watchlist_permissions_before_modification = array_distinct(if($app.target.resource.attribute.labels.key = /OldValue_EntitlementId/ and $app.target.resource.attribute.labels.value IN %msgraph_watchlist_permissions, $app.target.resource.attribute.labels.value,""))
+    $permissions_after_modification = array_distinct(if($app.target.resource.attribute.labels.key = /NewValue_EntitlementId/ and $app.target.resource.attribute.labels.value !="", $app.target.resource.attribute.labels.value,""))
+    $permissions_before_modification = array_distinct(if($app.target.resource.attribute.labels.key = /OldValue_EntitlementId/ and $app.target.resource.attribute.labels.value !="", $app.target.resource.attribute.labels.value,""))
+    $total_permissions_after_modification = count_distinct(if($app.target.resource.attribute.labels.key = /NewValue_EntitlementId/ and $app.target.resource.attribute.labels.value !="", $app.target.resource.attribute.labels.value, "")) - 1
+    $total_permissions_before_modification = count_distinct(if($app.target.resource.attribute.labels.key = /OldValue_EntitlementId/ and $app.target.resource.attribute.labels.value !="", $app.target.resource.attribute.labels.value, "")) - 1
+    //added to populate alert graph with additional context
+    $principal_user_userid = array_distinct($app.principal.user.userid)
+
+  condition:
+    $app
+}

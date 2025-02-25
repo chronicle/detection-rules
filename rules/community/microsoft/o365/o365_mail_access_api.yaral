@@ -1,0 +1,60 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ rule o365_mail_access_api {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect mail items accessed via API through an unapproved Entra ID application."
+    rule_id = "mr_c8d8368c-db01-4903-a81f-bab51fc1a732"
+    rule_name = "Office 365 mail accessed via unexpected application"
+    type = "alert"
+    platform = "azure"
+    data_source = "o365"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $email.metadata.event_type = "EMAIL_UNCATEGORIZED"
+    $email.metadata.product_event_type = "MailItemsAccessed"
+    $email.metadata.product_name = "Office 365"
+    $email.metadata.vendor_name = "Microsoft"
+    $email.security_result.action = "ALLOW"
+    $email.network.http.user_agent = /Client=REST;/ nocase
+    //Reference list could be used; add Entra ID applications that users would normally access mail through to this list so they are not detected
+    NOT (
+    $email.target.labels["ClientAppId"] = "a3883eba-fbe9-48bd-9ed3-dca3e0e84250" or //Exchange Online
+    $email.target.labels["ClientAppId"] = "13937bba-652e-4c46-b222-3003f4d1ff97" or //Substrate Context Service
+    $email.target.labels["ClientAppId"] = "d3590ed6-52b3-4102-aeff-aad2292ab01c" //Microsoft Office
+    )
+    //$email.target.labels["ClientAppId"] != ""
+    $email.principal.user.userid = $user
+
+  match:
+    $user over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($email.metadata.id)
+    $user_agent = array_distinct($email.network.http.user_agent)
+    $target_application = array_distinct($email.target.application)
+    $principal_user_userid = array_distinct($email.principal.user.userid)
+    $application_guid = array_distinct($email.target.labels["ClientAppId"])
+    $mail_folder = array_distinct($email.about.resource.name)
+
+  condition:
+    $email
+}

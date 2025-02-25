@@ -1,0 +1,60 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule ms_graph_application_endpoint_requests {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identify the use of the application API call to collect a listing of applications in Entra ID. This can be chatty due to other commands calling this single API."
+    rule_id = "mr_0936c89c-4579-4e7c-a081-3129dd93a726"
+    rule_name = "Hunt for application API calls in the Microsoft Graph"
+    assumption = "Focus on PowerShell as part of the User agent or adding IP addresses or applications who call this endpoint should be added to focus this detection."
+    type = "Hunt"
+    data_source = "MS Graph Activity Logs"
+    platform = "Azure"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $api.metadata.event_type = "NETWORK_HTTP"
+    $api.metadata.product_event_type = "Microsoft Graph Activity"
+    $api.target.url = "https://graph.microsoft.com/v1.0/applications" nocase
+    //Can be tuned for specific User Agent strings being used
+    //$api.network.http.user_agent = /PowerShell/ nocase
+    //May want to filter out IP addresses of admin consoles
+    //$api.principal.ip != "10.10.10.10"
+    $api.network.http.method = "GET"
+    $api.network.http.response_code = 200
+    $api.principal.ip = $ip
+    $api.network.session_id = $session
+
+  match:
+    $ip, $session over 5m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($api.metadata.id)
+    $requesting_user_guid = array_distinct($api.principal.user.userid)
+    $requesting_ip = array_distinct($api.principal.ip)
+    $user_agent = array_distinct($api.network.http.user_agent)
+    $location = array_distinct($api.principal.location.name)
+    $target_application_id_guid = array_distinct($api.target.resource.product_object_id)
+    $session_id = array_distinct($api.network.session_id)
+    $target_url = array_distinct($api.target.url)
+
+  condition:
+    $api
+}

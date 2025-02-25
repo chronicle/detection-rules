@@ -1,0 +1,80 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule okta_mfa_brute_force_attack {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects a successful login after multiple failed MFA pushes"
+    rule_id = "mr_61d8d679-bf4d-4441-bbbb-65f82a37e3c5"
+    rule_name = "Okta MFA Bruteforce Attack"
+    reference = "https://sec.okta.com/pushfatigueworkflows"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Brute Force"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/"
+    mitre_attack_version = "v13.1"
+    type = "Hunt"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $push.metadata.product_name = "Okta"
+    $push.metadata.vendor_name = "Okta"
+    $push.metadata.event_type = "USER_UNCATEGORIZED"
+    $push.metadata.product_event_type = "system.push.send_factor_verify_push"
+    $push.network.parent_session_id = $parent_session_id
+
+    $auth.metadata.event_type = "USER_LOGIN"
+    $auth.metadata.product_event_type = "user.authentication.auth_via_mfa"
+    $auth.metadata.product_name = "Okta"
+    $auth.metadata.vendor_name = "Okta"
+    $auth.security_result.action = "ALLOW"
+    $auth.network.parent_session_id = $parent_session_id
+
+    $push.metadata.event_timestamp.seconds <= $auth.metadata.event_timestamp.seconds
+
+  match:
+    $parent_session_id over 15m
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Brute Force"
+    $push_target_user_agent = array_distinct($push.network.http.user_agent)
+    $push_principal_ip = array_distinct($push.principal.ip)
+    $push_principal_ip_country = array_distinct($push.principal.ip_geo_artifact.location.country_or_region)
+    $push_principal_ip_state = array_distinct($push.principal.ip_geo_artifact.location.state)
+    //$push_principal_ip_city = array_distinct($push.principal.location.city)
+    $push_principal_user_email_addresses = array_distinct ($push.principal.user.email_addresses)
+    $push_security_result_summary = array_distinct($push.security_result.summary)
+    $push_target_user_email_addresses = array_distinct($push.target.user.email_addresses)
+    $push_target_user_userid = array_distinct($push.target.user.userid)
+    $push_security_result_risk_reason = array_distinct($push.security_result.detection_fields["Risk Reasons"])
+    $dc_push_network_session_id = count_distinct($push.network.parent_session_id)
+    $auth_target_user_agent = array_distinct($auth.network.http.user_agent)
+    $auth_principal_ip = array_distinct($auth.principal.ip)
+    $auth_principal_ip_country = array_distinct($auth.principal.ip_geo_artifact.location.country_or_region)
+    //$auth_principal_ip_state = array_distinct($auth.principal.ip_geo_artifact.location.state)
+    //$auth_principal_ip_city = array_distinct($auth.principal.location.city)
+    $auth_principal_user_email_addresses = array_distinct ($auth.principal.user.email_addresses)
+    $auth_security_result_summary = array_distinct($auth.security_result.summary)
+    $auth_target_user_email_addresses = array_distinct($auth.target.user.email_addresses)
+    $auth_target_user_userid = array_distinct($auth.target.user.userid)
+
+  condition:
+    #push > 4 and $auth
+}

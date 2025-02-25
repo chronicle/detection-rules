@@ -1,0 +1,60 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule ms_graph_failed_file_downloads_multiple_attempts {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "This detects when a 401 Unauthorized status is received on multiple attempts of the same file when attempting to download from OneDrive and may indicate a permissions issue for the user."
+    rule_id = "mr_1117b547-0f30-444e-b10e-c9cfdf00f1f5"
+    rule_name = "Multiple failed file downloads from OneDrive observed in the Microsoft Graph API"
+    type = "alert"
+    data_source = "MS Graph Activity Logs"
+    platform = "Azure"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $api.metadata.event_type = "NETWORK_HTTP"
+    $api.metadata.product_event_type = "Microsoft Graph Activity"
+    re.regex($api.target.url, `^https://graph\.microsoft\.com/v1\.0/drives/.*/content$`) nocase
+    //Can be tuned for specific User Agent strings being used - by default GraphRunner does not forge the UA for this action
+    //$api.network.http.user_agent = /PowerShell/ nocase
+    $api.network.http.method = "GET"
+    $api.network.http.response_code = 401
+    $api.principal.ip = $ip
+    $api.network.session_id = $session
+    $api.target.url = $url
+
+  match:
+    $ip, $session, $url over 15m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($api.metadata.id)
+    $doc_count = count_distinct($api.target.url)
+    $requesting_user_guid = array_distinct($api.principal.user.userid)
+    $requesting_ip = array_distinct($api.principal.ip)
+    $user_agent = array_distinct($api.network.http.user_agent)
+    $location = array_distinct($api.principal.location.name)
+    $target_application_id_guid = array_distinct($api.target.resource.product_object_id)
+    $session_id = array_distinct($api.network.session_id)
+    $target_url = array_distinct($api.target.url)
+
+  condition:
+    //Tune to the desired threshold
+    #api > 2
+}

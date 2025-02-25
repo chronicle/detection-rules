@@ -1,0 +1,71 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule okta_suspicious_use_of_a_session_cookie {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when an adversary attempts to reuse a stolen web session cookie in a different device that has a different OS, IP, Browser or User Agent."
+    rule_id = "mr_913cbc7a-86c9-46a4-b822-023b4aa17106"
+    rule_name = "Okta Suspicious Use Of A Session Cookie"
+    reference = "https://sec.okta.com/sessioncookietheft"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Steal Web Session Cookie"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1539/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $login.metadata.product_name = "Okta"
+    $login.metadata.vendor_name = "Okta"
+    $login.metadata.event_type = "USER_UNCATEGORIZED"
+    $login.metadata.product_event_type = "policy.evaluate_sign_on"
+    (
+        $login.security_result.action = "ALLOW" or
+        $login.security_result.action = "ALLOW_WITH_MODIFICATION" or
+        $login.security_result.action = "CHALLENGE"
+    )
+    $login.principal.user.userid = $userid
+    $login.security_result.detection_fields["dtHash"] = $dtHash
+
+  match:
+    $userid, $dtHash over 1h
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Steal Web Session Cookie"
+    $target_os = array_distinct($login.network.http.parsed_user_agent.os)
+    $dc_target_os = count_distinct($login.network.http.parsed_user_agent.os)
+    $target_browser = array_distinct($login.network.http.parsed_user_agent.browser)
+    $dc_target_browser = count_distinct($login.network.http.parsed_user_agent.browser)
+    $target_user_agent = array_distinct($login.network.http.user_agent)
+    $principal_ip = array_distinct($login.principal.ip)
+    $dc_principal_ip = count_distinct($login.principal.ip)
+    $principal_ip_country = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($login.principal.ip_geo_artifact.location.state)
+    $principal_ip_city = array_distinct($login.principal.location.city)
+    $dc_principal_ip_city = count_distinct($login.principal.location.city)
+    $security_result_summary = array_distinct($login.security_result.summary)
+    $principal_user_managers_email_addresses = array_distinct($login.principal.user.managers.email_addresses)
+    $principal_user_userid = array_distinct($login.principal.user.userid)
+
+  condition:
+    $login and $dc_principal_ip > 1 and ($dc_target_browser > 1 or $dc_target_os > 1)
+}

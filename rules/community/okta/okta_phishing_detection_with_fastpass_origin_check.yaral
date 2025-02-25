@@ -1,0 +1,63 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule okta_phishing_detection_with_fastpass_origin_check {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Okta provides a platform detection for when a user enrolled in FastPass fails to authenticate via a real-time AiTM phishing proxy."
+    rule_id = "mr_07d1a26d-1132-4228-bd49-c8dd899c7792"
+    rule_name = "Okta Phishing Detection With Fastpass Origin Check"
+    reference = "https://sec.okta.com/fastpassphishingdetection"
+    mitre_attack_tactic = "Initial Access"
+    mitre_attack_technique = "Phishing"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1566/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $login.metadata.product_name = "Okta"
+    $login.metadata.vendor_name = "Okta"
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.metadata.product_event_type = "user.authentication.auth_via_mfa"
+    $login.security_result.action = "BLOCK"
+    $login.security_result.category_details = "FastPass declined phishing attempt"
+    $login.target.user.userid = $userid
+
+  match:
+    $userid over 1h
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Initial Access"
+    $mitre_attack_technique = "Phishing"
+    $target_user_agent = array_distinct($login.network.http.user_agent)
+    $principal_ip = array_distinct($login.principal.ip)
+    $principal_ip_country = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($login.principal.ip_geo_artifact.location.state)
+    $principal_ip_city = array_distinct($login.principal.location.city)
+    $principal_user_email_addresses = array_distinct ($login.principal.user.email_addresses)
+    $security_result_summary = array_distinct($login.security_result.summary)
+    $target_user_email_addresses = array_distinct($login.target.user.email_addresses)
+    $target_user_userid = array_distinct($login.target.user.userid)
+    $security_result_risk_reason = array_distinct($login.security_result.detection_fields["Risk Reasons"])
+
+  condition:
+    $login
+}

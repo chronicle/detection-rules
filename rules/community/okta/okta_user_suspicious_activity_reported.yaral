@@ -1,0 +1,65 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule okta_user_suspicious_activity_reported {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "An Okta user reports suspicious activity in response to an end user security notification."
+    rule_id = "mr_09eaaa93-be5e-4b7f-9d6b-8675e63291a0"
+    rule_name = "Okta User Suspicious Activity Reported"
+    reference = "https://help.okta.com/en-us/Content/Topics/Security/suspicious-activity-reporting.htm"
+    mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    mitre_attack_technique = "Valid Accounts"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1078/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $suspicious.metadata.product_name = "Okta"
+    $suspicious.metadata.vendor_name = "Okta"
+    $suspicious.metadata.event_type = "USER_UNCATEGORIZED"
+    $suspicious.metadata.product_event_type = "user.account.report_suspicious_activity_by_enduser"
+    $suspicious.security_result.summary = "User report suspicious activity"
+    $suspicious.target.user.userid = $userid
+
+  match:
+    $userid over 1h
+
+  outcome:
+    $risk_score = max(
+      35 +
+      // Increase Risk based on suspiciousActivityEventType
+      if($suspicious.security_result.detection_fields["suspiciousActivityEventType"] = "system.email.mfa_enroll_notification.sent_message", 30)
+    )
+    $mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    $mitre_attack_technique = "Valid Accounts"
+    $target_user_agent = array_distinct($suspicious.network.http.user_agent)
+    $principal_ip = array_distinct($suspicious.principal.ip)
+    $principal_ip_country = array_distinct($suspicious.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($suspicious.principal.ip_geo_artifact.location.state)
+    $principal_ip_city = array_distinct($suspicious.principal.location.city)
+    $principal_user_email_addresses = array_distinct ($suspicious.principal.user.email_addresses)
+    $security_result_summary = array_distinct($suspicious.security_result.summary)
+    $target_user_email_addresses = array_distinct($suspicious.target.user.email_addresses)
+    $target_user_userid = array_distinct($suspicious.target.user.userid)
+
+  condition:
+    $suspicious
+}

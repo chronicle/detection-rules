@@ -1,7 +1,7 @@
 # Google Security Operations Detection Rules
 
 This repository contains example YARA-L rules and dashboards for use within
-[Google Security Operations (SecOps)](https://cloud.google.com/security/products/security-operations).
+[Google Security Operations (SecOps)](https://cloud.google.com/security/products/security-operations)
 
 The rules in this repository are distinct from Google SecOps
 [Curated Detections](https://cloud.google.com/chronicle/docs/detection/curated-detections)

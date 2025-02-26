@@ -22,10 +22,11 @@ You generally only need to submit a CLA once, so if you've already submitted one
 
 All submissions, including submissions by project maintainers, require review.
 
-Please follow the process below to contribute to this project after signing the
-[Contributor License Agreement](https://cla.developers.google.com/) mentioned
-above.
+Please follow the process below to contribute to this project. We've also
+[labeled](https://github.com/chronicle/detection-rules/contribute) some issues
+and pull requests with `good-first-issue` to help people who want to contribute.
 
+1.  Sign the [Contributor License Agreement](https://cla.developers.google.com/)
 1.  Familiarize yourself with this contribution guide and our rule
     [style guide](STYLE_GUIDE.md). This will increase the likelihood that your
     contributions will be accepted.

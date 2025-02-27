@@ -34,7 +34,7 @@
   events:
     $gcp.metadata.event_type = "RESOURCE_CREATION"
     $gcp.metadata.log_type = "GCP_CLOUDAUDIT"
-    $gcp.metadata.product_event_type = /compute.firewalls.insert/ nocase
+    $gcp.metadata.product_event_type = /compute.firewalls.insert$/ nocase
     $gcp.metadata.product_name = "Google Compute Engine"
     $gcp.security_result.action = "ALLOW"
     $gcp.target.resource.attribute.labels["source_ranges"] = "0.0.0.0/0"

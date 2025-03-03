@@ -1,0 +1,55 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule okta_mfa_pw_reset {
+
+  meta:
+    author = "Drew Pilarski - Tempus AI"
+    description = "This detection is looking for MFA and Password resets in a 30 minute window. This is suspicious given normal activity should only constitute a password reset OR MFA reset (ala a replacement phone)"
+    notes = "https://developer.okta.com/docs/reference/api/event-types/"
+    mitre_attack_tactic = "Credential Access, Defense Evasion, Persistence"
+    mitre_attack_technique = "Modify Authentication Process: Multi-Factor Authentication"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1556/006/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Okta"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $pw.metadata.vendor_name = "Okta"
+    $pw.metadata.product_event_type = "user.mfa.factor.reset_all"
+    $prin_user = $pw.principal.user.email_addresses
+
+    $mfa.metadata.vendor_name = "Okta"
+    $mfa.metadata.product_event_type = "user.account.reset_password"
+    $prin_user = $mfa.principal.user.email_addresses
+
+    match:
+      $prin_user over 30m
+    
+
+  outcome:
+    $user = array_distinct($prin_user)
+    $email = array_distinct($pw.principal.user.email_addresses)
+    $src_ip = array_distinct($pw.principal.ip)
+    $mitre_attack_tactic = "Credential Access, Defense Evasion, Persistence"
+    $mitre_attack_technique = "Modify Authentication Process: Multi-Factor Authentication"
+    $risk_score = 65
+
+  condition:
+    $pw and $mfa
+}

@@ -30,24 +30,27 @@ rule okta_user_password_and_mfa_factor_reset_or_deactivated {
     priority = "Medium"
 
   events:
+    $pw.metadata.product_name = "Okta"
     $pw.metadata.vendor_name = "Okta"
-    $pw.metadata.product_event_type = "user.mfa.factor.reset_all"
-    $prin_user = $pw.principal.user.email_addresses
+    (
+        $pw.metadata.product_event_type = "user.mfa.factor.reset_all" OR
+        $pw.metadata.product_event_type = "user.mfa.factor.deactivate"
+    )
+    
+    $user_id = $pw.target.user.product_object_id
 
+    $mfa.metadata.product_name = "Okta"
     $mfa.metadata.vendor_name = "Okta"
     $mfa.metadata.product_event_type = "user.account.reset_password"
-    $prin_user = $mfa.principal.user.email_addresses
+
+    $user_id = $mfa.target.user.product_object_id
 
     match:
-      $prin_user over 30m
-    
+      $user_id over 30m
 
   outcome:
-    $user = array_distinct($prin_user)
-    $email = array_distinct($pw.principal.user.email_addresses)
-    $src_ip = array_distinct($pw.principal.ip)
-    $mitre_attack_tactic = "Credential Access, Defense Evasion, Persistence"
-    $mitre_attack_technique = "Modify Authentication Process: Multi-Factor Authentication"
+    $principal_user_email = array_distinct($pw.principal.user.email_addresses)
+    $principal_ip = array_distinct($pw.principal.ip)
     $risk_score = 65
 
   condition:

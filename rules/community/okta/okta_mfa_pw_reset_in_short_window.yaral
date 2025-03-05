@@ -23,7 +23,6 @@ rule okta_user_password_and_mfa_factor_reset_or_deactivated {
     mitre_attack_tactic = "Credential Access"
     mitre_attack_technique = "Modify Authentication Process: Multi-Factor Authentication"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1556/006/"
-    mitre_attack_version = "v13.1"
     type = "Alert"
     data_source = "Okta"
     severity = "Medium"

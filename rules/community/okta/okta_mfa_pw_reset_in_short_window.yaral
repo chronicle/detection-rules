@@ -18,7 +18,7 @@ rule okta_user_password_and_mfa_factor_reset_or_deactivated {
 
   meta:
     author = "Drew Pilarski - Tempus AI"
-    description = "This detection is looking for MFA and Password resets in a 30 minute window. This is suspicious given normal activity should only constitute a password reset OR MFA reset (ala a replacement phone)"
+    description = "Detects when an Okta user's password is reset and MFA factor(s) are deactivated or reset within a 30 minute time window. This activity may indicate that the user account has been compromised.
     notes = "https://developer.okta.com/docs/reference/api/event-types/"
     mitre_attack_tactic = "Credential Access, Defense Evasion, Persistence"
     mitre_attack_technique = "Modify Authentication Process: Multi-Factor Authentication"

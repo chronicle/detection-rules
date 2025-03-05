@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-rule okta_mfa_pw_reset {
+rule okta_user_password_and_mfa_factor_reset_or_deactivated {
 
   meta:
     author = "Drew Pilarski - Tempus AI"

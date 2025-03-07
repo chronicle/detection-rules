@@ -1,0 +1,50 @@
+[
+  {
+      "name": "projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/findingsRefinements/fr_06f49a67-c478-411a-a449-cc553ed97b16",
+      "displayName": "Test 1",
+      "type": "DETECTION_EXCLUSION",
+      "createTime": "2025-03-11T16:59:27.955007Z",
+      "updateTime": "2025-03-11T16:59:27.955007Z",
+      "query": "(principal.hostname = \"lab-desktop-1234\")",
+      "deployment_state":
+      {
+          "name": "projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/findingsRefinements/fr_06f49a67-c478-411a-a449-cc553ed97b16/deployment",
+          "enabled": true,
+          "updateTime": "2025-03-11T16:59:29.604111Z",
+          "detectionExclusionApplication":
+          {
+              "curatedRuleSets":
+              [
+                  "projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/curatedRuleSetCategories/110fa43d-7165-2355-1985-a63b7cdf90e8/curatedRuleSets/07eab257-51fb-b9c5-2040-dd5d6f65ed79",
+                  "projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/curatedRuleSetCategories/110fa43d-7165-2355-1985-a63b7cdf90e8/curatedRuleSets/11c505d4-b424-65e3-d918-1a81232cc76b",
+                  "projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/curatedRuleSetCategories/110fa43d-7165-2355-1985-a63b7cdf90e8/curatedRuleSets/1bb02b3f-b870-e048-94d6-ad3d08eb2866"
+              ],
+              "curatedRules":
+              [
+                  "projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/curatedRules/ur_7f8204c2-0d54-4dab-b7fa-133f8b94a53b"
+              ]
+          }
+      }
+  },
+  {
+      "name": "projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/findingsRefinements/fr_0f60df02-e3bb-446b-8c9b-0fe17849e3c7",
+      "displayName": "Test 2",
+      "type": "DETECTION_EXCLUSION",
+      "createTime": "2025-03-11T16:58:10.633215Z",
+      "updateTime": "2025-03-11T16:58:10.633215Z",
+      "query": "(principal.hostname = \"lab-desktop-12345678\")",
+      "deployment_state":
+      {
+          "name": "projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/findingsRefinements/fr_0f60df02-e3bb-446b-8c9b-0fe17849e3c7/deployment",
+          "enabled": true,
+          "updateTime": "2025-03-11T16:58:14.217055Z",
+          "detectionExclusionApplication":
+          {
+              "curatedRuleSets":
+              [
+                  "projects/1013673362905/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/curatedRuleSetCategories/110fa43d-7165-2355-1985-a63b7cdf90e8/curatedRuleSets/43f7241e-a22c-6122-267b-3d1edc11c8c4"
+              ]
+          }
+      }
+  }
+]

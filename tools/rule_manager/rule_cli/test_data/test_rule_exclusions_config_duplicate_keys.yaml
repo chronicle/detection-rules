@@ -1,0 +1,26 @@
+Test 1:
+  archived: false
+  create_time: '2025-03-07T17:23:44.121775Z'
+  deployment_state_update_time: '2025-03-07T17:52:53.611183Z'
+  enabled: false
+  exclusion_applications:
+    curated_rule_sets:
+    - projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/curatedRuleSetCategories/110fa43d-7165-2355-1985-a63b7cdf90e8/curatedRuleSets/43f7241e-a22c-6122-267b-3d1edc11c8c4
+    curated_rules: null
+  query: (principal.user.userid = "56409778")
+  resource_name: projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/findingsRefinements/fr_7415c05b-3b00-4de5-9de8-73b46e0ee958
+  type: DETECTION_EXCLUSION
+  update_time: '2025-03-07T17:37:46.567951Z'
+Test 1:
+  archived: false
+  create_time: '2025-03-03T16:01:32.286719Z'
+  deployment_state_update_time: '2025-03-07T17:52:53.611183Z'
+  enabled: false
+  exclusion_applications:
+    curated_rule_sets:
+    - projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/curatedRuleSetCategories/110fa43d-7165-2355-1985-a63b7cdf90e8/curatedRuleSets/43f7241e-a22c-6122-267b-3d1edc11c8c4
+    curated_rules: null
+  query: (principal.hostname = "lab-desktop-1234")
+  resource_name: projects/1234567890123/locations/us/instances/871419d4-e315-454c-bc07-b3506aab606a/findingsRefinements/fr_1172e8f3-7b49-45ad-ad4f-ef19bb794106
+  type: DETECTION_EXCLUSION
+  update_time: '2025-03-06T21:26:57.766543Z'

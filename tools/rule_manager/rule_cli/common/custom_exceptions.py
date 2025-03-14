@@ -37,3 +37,7 @@ class DuplicateRuleNameError(Exception):
 
 class ReferenceListConfigError(Exception):
   """Raised when an issue with the reference list config file is found."""
+
+
+class RuleExclusionConfigError(Exception):
+  """Raised when an issue with the rule exclusion config file is found."""

@@ -462,33 +462,33 @@ if __name__ == "__main__":
     )
     update_remote_rules()
 
-  if args.pull_latest_reference_lists:
+  elif args.pull_latest_reference_lists:
     LOGGER.info(
         "Attempting to pull latest version of all reference lists from Google"
         " SecOps and update local files"
     )
     pull_latest_reference_lists()
 
-  if args.update_remote_reference_lists:
+  elif args.update_remote_reference_lists:
     LOGGER.info(
         "Attempting to update reference lists in Google SecOps based on local"
         " reference list files"
     )
     update_remote_ref_lists()
 
-    if args.pull_latest_rule_exclusions:
-      LOGGER.info(
-          "Attempting to pull latest version of all rule exclusions from Google"
-          " SecOps and update local config file"
-      )
-      pull_latest_rule_exclusions()
+  elif args.pull_latest_rule_exclusions:
+    LOGGER.info(
+        "Attempting to pull latest version of all rule exclusions from Google"
+        " SecOps and update local config file"
+    )
+    pull_latest_rule_exclusions()
 
-    if args.update_remote_rule_exclusions:
-      LOGGER.info(
-          "Attempting to update rule exclusions in Google SecOps based on "
-          "local config file"
-      )
-      update_remote_rule_exclusions()
+  elif args.update_remote_rule_exclusions:
+    LOGGER.info(
+        "Attempting to update rule exclusions in Google SecOps based on "
+        "local config file"
+    )
+    update_remote_rule_exclusions()
 
   elif args.subcommand == "verify-rule":
     rule_file_path = args.rule_file_path

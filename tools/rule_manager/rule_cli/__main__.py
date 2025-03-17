@@ -32,6 +32,7 @@ from google_secops_api.rules.verify_rule import verify_rule
 from rule_cli.common import datetime_converter
 from rule_cli.common.custom_exceptions import RuleVerificationError
 from rule_cli.reference_lists import ReferenceLists
+from rule_cli.rule_exclusions import RuleExclusions
 from rule_cli.rules import Rules
 
 LOGGER = logging.getLogger()
@@ -130,6 +131,43 @@ def update_remote_ref_lists():
   # Retrieve the latest version of all reference lists after any changes were
   # made and update the local Reference List files.
   pull_latest_reference_lists()
+
+
+def pull_latest_rule_exclusions():
+  """Retrieves the latest version of rule exclusions from Google SecOps and updates the local config file."""
+  http_session = initialize_http_session()
+
+  remote_rule_exclusions = RuleExclusions.get_remote_rule_exclusions(
+      http_session=http_session
+  )
+
+  if len(remote_rule_exclusions.rule_exclusions) == 0:  # pylint: disable="g-explicit-length-test"
+    LOGGER.info("No rule exclusions retrieved")
+    return
+
+  remote_rule_exclusions.dump_rule_exclusion_config()
+
+
+def update_remote_rule_exclusions():
+  """Update findings refinements in Google SecOps based on local config file."""
+  http_session = initialize_http_session()
+
+  rule_exclusion_updates = RuleExclusions.update_remote_rule_exclusions(
+      http_session=http_session
+  )
+
+  # Log summary of rule exclusion updates that occurred.
+  LOGGER.info("Logging summary of rule exclusion changes...")
+  for update_type, rule_exclusion_names in rule_exclusion_updates.items():
+    LOGGER.info(
+        "Rule exclusions %s: %s", update_type, len(rule_exclusion_names)
+    )
+    for rule_exclusion_name in rule_exclusion_names:
+      LOGGER.info("%s rule exclusion %s", update_type, rule_exclusion_name)
+
+  # Retrieve the latest version of all rule exclusions after any changes
+  # were made.
+  pull_latest_rule_exclusions()
 
 
 def verify_rule_text(rule_file: pathlib.Path):
@@ -298,6 +336,24 @@ if __name__ == "__main__":
       ),
   )
 
+  parser.add_argument(
+      "--pull-latest-rule-exclusions",
+      action="store_true",
+      help=(
+          "Retrieve the latest version of all rule exclusions from Google"
+          " SecOps and write them to a local config file."
+      ),
+  )
+
+  parser.add_argument(
+      "--update-remote-rule-exclusions",
+      action="store_true",
+      help=(
+          "Update rule exclusions in Google SecOps based on a local config"
+          " file."
+      ),
+  )
+
   subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
   verify_rule_subparser = subparsers.add_parser(
@@ -419,6 +475,20 @@ if __name__ == "__main__":
         " reference list files"
     )
     update_remote_ref_lists()
+
+    if args.pull_latest_rule_exclusions:
+      LOGGER.info(
+          "Attempting to pull latest version of all rule exclusions from Google"
+          " SecOps and update local config file"
+      )
+      pull_latest_rule_exclusions()
+
+    if args.update_remote_rule_exclusions:
+      LOGGER.info(
+          "Attempting to update rule exclusions in Google SecOps based on "
+          "local config file"
+      )
+      update_remote_rule_exclusions()
 
   elif args.subcommand == "verify-rule":
     rule_file_path = args.rule_file_path

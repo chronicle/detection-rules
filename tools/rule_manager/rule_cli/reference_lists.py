@@ -134,7 +134,7 @@ class ReferenceLists:
         if not file_path.name.endswith(".txt")
     ]
 
-    if len(non_ref_list_files) > 0:
+    if len(non_ref_list_files) > 0:  # pylint: disable="g-explicit-length-test"
       LOGGER.warning(
           "%s files found in reference_lists directory without .txt extension."
           " These files will not be processed",
@@ -255,7 +255,7 @@ class ReferenceLists:
         if key not in allowed_keys:
           invalid_keys.append(key)
 
-      if len(invalid_keys) > 0:
+      if len(invalid_keys) > 0:  # pylint: disable="g-explicit-length-test"
         raise ReferenceListConfigError(
             f"Invalid keys ({invalid_keys}) found for reference list -"
             f" {ref_list_name}"
@@ -401,7 +401,7 @@ class ReferenceLists:
         ref_lists_dir=ref_lists_dir, ref_list_config_file=ref_lists_config_file
     )
 
-    if len(local_ref_lists.ref_lists) == 0:
+    if len(local_ref_lists.ref_lists) == 0:  # pylint: disable="g-explicit-length-test"
       LOGGER.info("No local reference list files found")
       return
 
@@ -417,7 +417,7 @@ class ReferenceLists:
     # reference list's name as the key for each item.
     remote_ref_lists_dict = {}
 
-    if len(remote_ref_lists.ref_lists) > 0:
+    if len(remote_ref_lists.ref_lists) > 0:  # pylint: disable="g-explicit-length-test"
       for remote_ref_list in remote_ref_lists.ref_lists:
         remote_ref_lists_dict[remote_ref_list.name] = remote_ref_list
 

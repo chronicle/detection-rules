@@ -1,0 +1,52 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule gcp_kms_unauthorized_gsa_decryption {
+  meta:
+    author = "Drew Pilarski - Tempus AI"
+    description = "Alert on KMS *decryption* operations by a GSA not in the allowed list, potentially indicating unauthorized information access (T1078)."
+    rule_id = ""
+    rule_name = "KMS Unauthorized GSA Decryption"
+    reference = "Internal Security Policy" // Replace with a relevant public reference if available
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Valid Accounts"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1078/"
+    type = "Alert"
+    platform = "GCP"
+    data_source = "Cloud Audit Logs"
+    severity = "Medium"  // Adjust based on your risk assessment
+    priority = "Medium"  // Adjust based on your incident response process
+
+  events:
+
+    ( // Generic KMS Key Pattern - Pick the relevant one to your environment 
+    re.regex(string.to_lower($decrypt.target.resource.name), "projects/.*locations/.*keyRings/.*cryptoKeys/.*")
+    )
+    (
+    $decrypt.metadata.product_event_type = "Decrypt"
+    )
+    not $decrypt.principal.user.email_addresses in %ALLOWED_GSAs
+
+  outcome:
+    $action = $decrypt.metadata.product_event_type
+    $accountName = array_distinct($decrypt.principal.user.email_addresses)
+    $mitre_attack_tactic = array_distinct("Credential Access")
+    $mitre_attack_technique = array_distinct("Valid Accounts")
+    $mitre_attack_technique_id = array_distinct("T1078")
+
+  condition:
+    $decrypt
+}

@@ -43,7 +43,7 @@ rule gcp_identity_low_and_medium_severity_alert_escalation {
 
   match:
     $user_id over 24h
- 
+
   outcome:
     // Risk score is increased when the suspicious identity has been accessed from unexpected locations
     // This logic can be customized based on your organization's environment and normal activity
@@ -59,7 +59,7 @@ rule gcp_identity_low_and_medium_severity_alert_escalation {
     $principal_ip_state = array_distinct($medium_severity.principal.ip_geo_artifact.location.state)
     $event_count_low = count_distinct($low_severity.metadata.id)
     $principal_user_display_name = array_distinct($medium_severity.principal.user.user_display_name)
- 
+
   condition:
     $low_severity and $medium_severity
 }

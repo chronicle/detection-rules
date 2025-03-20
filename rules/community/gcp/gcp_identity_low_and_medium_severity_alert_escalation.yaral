@@ -17,7 +17,7 @@
 rule gcp_identity_low_and_medium_severity_alert_escalation {
 
   meta:
-    author = "Google Cloud Security"
+    author = "Mo Mohajerani"
     description = "Detects when a Google Cloud identity experiences a low severity event followed by medium severity event within 24 hours."
     rule_name = "Google Cloud identity low and medium alert escalation"
     rule_id = "mr_fafc6c00-aedb-4664-ae1a-5a48f3a7534d"

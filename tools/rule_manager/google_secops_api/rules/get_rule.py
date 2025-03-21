@@ -18,11 +18,14 @@ API reference:
 https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/get
 """
 
+import logging
 import os
 import time
 from typing import Any, Mapping
 
 from google.auth.transport import requests
+
+LOGGER = logging.getLogger()
 
 
 def get_rule(
@@ -46,18 +49,22 @@ def get_rule(
   Raises:
     requests.exceptions.HTTPError: HTTP request resulted in an error
     (response.status_code >= 400).
+    requests.exceptions.JSONDecodeError: If the server response is not valid
+    JSON.
   """
   url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{resource_name}"
   response = None
 
-  for _ in range(max_retries + 1):
+  for _ in range(max(max_retries, 0) + 1):
     response = http_session.request(method="GET", url=url)
 
     if response.status_code >= 400:
-      print(response.text)
+      LOGGER.warning(response.text)
 
     if response.status_code == 429:
-      print("API rate limit exceeded. Sleeping for 60s before retrying")
+      LOGGER.warning(
+          "API rate limit exceeded. Sleeping for 60s before retrying"
+          )
       time.sleep(60)
     else:
       break

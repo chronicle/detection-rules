@@ -33,16 +33,16 @@ rule gcp_identity_low_and_medium_severity_alert_escalation {
     // Low severity alert triggered in SCC
     $low_severity.metadata.product_name = "Security Command Center"
     $low_severity.security_result[0].severity = "LOW"
-    $low_severity.principal.user.userid = $user_id
+    $low_severity.principal.user.email_addresses = $user_email
     // Medium severity alert triggered in SCC
     $medium_severity.metadata.product_name = "Security Command Center"
     $medium_severity.security_result[0].severity = "MEDIUM"
-    $medium_severity.principal.user.userid = $user_id
+    $medium_severity.principal.user.email_addresses = $user_email
     // Enforces the sequence of events, ensuring the low severity event(s) triggered prior to the medium severity event(s)
     $low_severity.metadata.event_timestamp.seconds < $medium_severity.metadata.event_timestamp.seconds
 
   match:
-    $user_id over 24h
+    $user_email over 24h
 
   outcome:
     // Risk score is increased when the suspicious identity has been accessed from unexpected locations

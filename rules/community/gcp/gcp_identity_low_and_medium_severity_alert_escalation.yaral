@@ -1,0 +1,65 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule gcp_identity_low_and_medium_severity_alert_escalation {
+
+  meta:
+    author = "Mo Mohajerani"
+    description = "Detects when a Google Cloud identity experiences a low severity event followed by medium severity event within 24 hours."
+    rule_name = "Google Cloud identity low and medium alert escalation"
+    rule_id = "mr_fafc6c00-aedb-4664-ae1a-5a48f3a7534d"
+    type = "Alert"
+    platform = "GCP"
+    data_source = "Security Command Center Threat"
+    mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    mitre_attack_technique = "Valid Accounts"
+    severity = "High"
+    priority = "High"
+
+  events:
+    // Low severity alert triggered in SCC
+    $low_severity.metadata.product_name = "Security Command Center"
+    $low_severity.security_result[0].severity = "LOW"
+    $low_severity.principal.user.email_addresses = $user_email
+    // Medium severity alert triggered in SCC
+    $medium_severity.metadata.product_name = "Security Command Center"
+    $medium_severity.security_result[0].severity = "MEDIUM"
+    $medium_severity.principal.user.email_addresses = $user_email
+    // Enforces the sequence of events, ensuring the low severity event(s) triggered prior to the medium severity event(s)
+    $low_severity.metadata.event_timestamp.seconds < $medium_severity.metadata.event_timestamp.seconds
+
+  match:
+    $user_email over 24h
+
+  outcome:
+    // Risk score is increased when the suspicious identity has been accessed from unexpected locations
+    // This logic can be customized based on your organization's environment and normal activity
+    $risk_score = max(80 + if($low_severity.principal.location.country_or_region != "Germany", 10))
+    $mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    $mitre_attack_technique = "Valid Accounts"
+    $mitre_attack_technique_id = "T1078"
+    $security_category = array_distinct($medium_severity.security_result.category)
+    $security_category_details = array_distinct($medium_severity.security_result.category_details)
+    $security_summary = array_distinct($medium_severity.security_result.summary)
+    $affected_identity = array_distinct($medium_severity.principal.user.userid)
+    $principal_ip_country = array_distinct($medium_severity.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($medium_severity.principal.ip_geo_artifact.location.state)
+    $event_count_low = count_distinct($low_severity.metadata.id)
+    $principal_user_display_name = array_distinct($medium_severity.principal.user.user_display_name)
+
+  condition:
+    $low_severity and $medium_severity
+}

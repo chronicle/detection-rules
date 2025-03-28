@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-rule o365_onedrive_anonymous_filedownload {
+rule o365_onedrive_anonymous_file_accessed {
 
   meta:
     author = "Google Cloud Security"
-    description = "Anonymous links can be used to export files from OneDrive. While this isn't always a sign of malicious activity, some organizations do not support the use of anonymous links because of the risk of data leakage. This rule detects when anonymous links are used to download files from OneDrive."
-    rule_id = "mr_f713e2b0-31b1-4165-8764-59a5e2c5eabb"
-    rule_name = "O365 OneDrive Anonymous File Downloaded"
-    mitre_attack_tactic = "Exfiltration"
-    mitre_attack_technique = "Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1048/002/"
-    mitre_attack_version = "v14.1"
+    description = "Anonymous links can be used to export files from OneDrive. While this isn't always a sign of malicious activity, some organizations do not support the use of anonymous links because of the risk of data leakage. This rule detects when anonymous links are used to access files from OneDrive."
+    rule_id = "mr_f713e2b0-31b1-4165-8764-59a5e2c5eabc"
+    rule_name = "O365 OneDrive Anonymous File Accessed"
+    tactic = "TA0010"
+    technique = "T1048.002"
     type = "hunt"
     platform = "azure"
     data_source = "o365"
@@ -32,11 +30,10 @@ rule o365_onedrive_anonymous_filedownload {
     priority = "Medium"
 
   events:
-    $file.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT"
-    $file.metadata.product_event_type = "FileDownloaded"
+    $file.metadata.event_type = "USER_RESOURCE_ACCESS"
+    $file.metadata.product_event_type = "FileAccessed"
     $file.metadata.product_name = "Office 365"
     $file.metadata.vendor_name = "Microsoft"
-    $file.target.application = "OneDrive"
     (
         $file.principal.user.userid = /^urn:spo:anon#/ or
         $file.principal.user.userid = "anonymous"
@@ -48,19 +45,15 @@ rule o365_onedrive_anonymous_filedownload {
 
   outcome:
     $risk_score = 35
-    $mitre_attack_tactic = "Exfiltration"
-    $mitre_attack_technique = "Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol"
-    $mitre_attack_technique_id = "T1048.002"
     $event_count = count_distinct($file.metadata.id)
     $referral_url = array_distinct($file.network.http.referral_url)
     $user_agent = array_distinct($file.network.http.user_agent)
     $principal_application = array_distinct($file.principal.application)
-    $principal_ip = array_distinct($file.principal.ip)
+    $principal_ip = array_distinct($file.principal.ip)  //IP is a Microsoft IP address not the individual who accessed the file
     $target_application = array_distinct($file.target.application)
-    //$principal_user_email_address = array_distinct(principal.user.email_addresses)
     $principal_user_userid = array_distinct($file.principal.user.userid)
-    $src_file_full_path = array_distinct($file.src.file.full_path)
-    $src_url = array_distinct($file.src.url)
+    $target_file_full_path = array_distinct($file.target.file.full_path)
+    $target_url = array_distinct($file.target.url)
 
   condition:
     $file

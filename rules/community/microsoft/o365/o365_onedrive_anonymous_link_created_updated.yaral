@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ rule o365_onedrive_anonymous_link_created_updated {
 
   meta:
     author = "Google Cloud Security"
-    description = "Anonymous links can be used to export files from OneDrive. While this isn't always a sign of malicious activity, some organizations do not support the creation of anonymous links because of the risk of data leakage. This rule detects the creation and modification of anonymous links in OneDrive."
+    description = "Anonymous links can be used to export files from OneDrive. While this isn't always a sign of malicious activity, some organizations do not support the creation of anonymous links because of the risk of data leakage. This rule detects the creation or modification of anonymous links in OneDrive."
     rule_id = "mr_3e2572c1-cc14-4c2b-b60b-434db1b0f4ae"
-    rule_name = "O365 OneDrive Anonymous Link Created Updated"
+    rule_name = "O365 OneDrive Anonymous Link Created or Updated"
     type = "hunt"
     platform = "azure"
     data_source = "o365"
@@ -41,7 +41,6 @@ rule o365_onedrive_anonymous_link_created_updated {
     )
     $file.metadata.product_name = "Office 365"
     $file.metadata.vendor_name = "Microsoft"
-    $file.target.application = "OneDrive"
     $file.principal.user.userid = $user
 
   match:
@@ -53,11 +52,10 @@ rule o365_onedrive_anonymous_link_created_updated {
     $referral_url = array_distinct($file.network.http.referral_url)
     $user_agent = array_distinct($file.network.http.user_agent)
     $principal_application = array_distinct($file.principal.application)
-    //The IP address is a Microsoft IP address not the individual who created or modified the link, commenting it out for this reason
-    //$principal_ip = array_distinct($file.principal.ip)
+    //The IP address for creation is a Microsoft IP address while update is the system making the change
+    $principal_ip = array_distinct($file.principal.ip)
     $target_application = array_distinct($file.target.application)
-    //$principal_user_email_address = array_distinct(principal.user.email_addresses)
-    //$principal_user_userid = array_distinct($file.principal.user.userid)
+    $principal_user_userid = array_distinct($file.principal.user.userid)
     $target_file_full_path = array_distinct($file.target.file.full_path)
     $target_url = array_distinct($file.target.url)
 

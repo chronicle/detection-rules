@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,8 @@ rule o365_persistent_login_activity_to_azure_ADPowerShell_app {
     description = "Continual logins to Azure AD PowerShell app are not a security best practice, if this is observed, additional investigation is needed"
     rule_id = "mr_4e61ae7f-d9fc-4c2a-b086-69d9d50dc5cc"
     rule_name = "O365 Persistent Login Activity To Azure AD PowerShell App"
-    mitre_attack_tactic = "Lateral Movement"
-    mitre_attack_technique = "Remote Services: Cloud Services"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1021/007/"
-    mitre_attack_version = "v14.1"
+    tactic = "TA0008"
+    technique = "T1021.007"
     type = "alert"
     platform = "azure"
     data_source = "o365"
@@ -46,9 +44,6 @@ rule o365_persistent_login_activity_to_azure_ADPowerShell_app {
 
   outcome:
     $risk_score = 65
-    $mitre_attack_tactic = "Lateral Movement"
-    $mitre_attack_technique = "Remote Services: Cloud Services"
-    $mitre_attack_technique_id = "T1021.007"
     $event_count = count_distinct($login.metadata.id)
     $entra_id_login_threshold = 2
     $security_summary = array_distinct($login.security_result.summary)
@@ -56,8 +51,7 @@ rule o365_persistent_login_activity_to_azure_ADPowerShell_app {
     $country_region_login_attempt = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
     //added to populate alert graph with additional context
     $principal_ip = array_distinct($login.principal.ip)
-    //$target_user_email_addresses = array_distinct($login.target.user.email_addresses)
-    //$target_user_userid = array_distinct($login.target.user.userid)
+    $target_user_userid = array_distinct($login.target.user.userid)
 
   condition:
     // Can set based on your own threshold

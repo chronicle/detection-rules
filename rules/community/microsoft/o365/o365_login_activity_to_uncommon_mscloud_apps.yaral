@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,8 @@ rule o365_login_activity_to_uncommon_mscloud_apps {
     rule_id = "mr_eca0cd3d-7d65-47f6-9df2-1a16664819ae"
     rule_name = "O365 Login Activity To Uncommon Microsoft Cloud Apps"
     assumption = "The list first_party_ms_cloud_apps is populated as needed"
-    mitre_attack_tactic = "Initial Access"
-    mitre_attack_technique = "Valid Accounts: Cloud Accounts"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"
-    mitre_attack_version = "v14.1"
+    tactic = "TA0001"
+    technique = "T1078.004"
     reference = "https://learn.microsoft.com/en-us/troubleshoot/azure/active-directory/verify-first-party-apps-sign-in"
     type = "alert"
     platform = "azure"
@@ -56,9 +54,6 @@ rule o365_login_activity_to_uncommon_mscloud_apps {
 
   outcome:
     $risk_score = 65
-    $mitre_attack_tactic = "Initial Access"
-    $mitre_attack_technique = "Valid Accounts: Cloud Accounts"
-    $mitre_attack_technique_id = "T1078.004"
     $event_count = count_distinct($login.metadata.id)
     $target_application = array_distinct($login.target.resource.product_object_id)
     $security_summary = array_distinct($login.security_result.summary)
@@ -66,7 +61,7 @@ rule o365_login_activity_to_uncommon_mscloud_apps {
     $country_region_login_attempt = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
     //added to populate alert graph with additional context
     $principal_ip = array_distinct($login.principal.ip)
-    //$target_user_userid = array_distinct($login.target.user.userid)
+    $target_user_userid = array_distinct($login.target.user.userid)
 
   condition:
     $login

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-rule o365_onedrive_anonymous_link_accessed {
+rule o365_onedrive_anonymous_filedownload {
 
   meta:
     author = "Google Cloud Security"
-    description = "Anonymous links can be used to access files from OneDrive. While this isn't always a sign of malicious activity, some organizations do not support the use of anonymous links because of the risk of data leakage. This rule detects when anonymous links are used to access files from OneDrive."
-    rule_id = "mr_7e67005a-d5fc-4497-8e81-e6797b2f54e9"
-    rule_name = "O365 OneDrive Anonymous Link Accessed"
+    description = "Anonymous links can be used to export files from OneDrive. While this isn't always a sign of malicious activity, some organizations do not support the use of anonymous links because of the risk of data leakage. This rule detects when anonymous links are used to download files from OneDrive."
+    rule_id = "mr_f713e2b0-31b1-4165-8764-59a5e2c5eabb"
+    rule_name = "O365 OneDrive Anonymous File Downloaded"
     tactic = "TA0010"
     technique = "T1048.002"
     type = "hunt"
@@ -30,11 +30,14 @@ rule o365_onedrive_anonymous_link_accessed {
     priority = "Medium"
 
   events:
-    $file.metadata.event_type = "USER_RESOURCE_ACCESS"
-    $file.metadata.product_event_type = "AnonymousLinkUsed"
+    $file.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT"
+    $file.metadata.product_event_type = "FileDownloaded"
     $file.metadata.product_name = "Office 365"
     $file.metadata.vendor_name = "Microsoft"
-    $file.principal.user.userid = "anonymous"
+    (
+        $file.principal.user.userid = /^urn:spo:anon#/ or
+        $file.principal.user.userid = "anonymous"
+    )
     $file.principal.ip = $ip
 
   match:
@@ -49,8 +52,8 @@ rule o365_onedrive_anonymous_link_accessed {
     $principal_ip = array_distinct($file.principal.ip)
     $target_application = array_distinct($file.target.application)
     $principal_user_userid = array_distinct($file.principal.user.userid)
-    $target_file_full_path = array_distinct($file.target.file.full_path)
-    $target_url = array_distinct($file.target.url)
+    $src_file_full_path = array_distinct($file.src.file.full_path)
+    $src_url = array_distinct($file.src.url)
 
   condition:
     $file

@@ -32,52 +32,67 @@ rule hacktool_winpeas_execution_patterns {
       priority = "Medium"  // Adjust based on your incident response process
 
     events:
-      $winpeas_execution.metadata.event_type = "PROCESS_LAUNCH"
-      
-      (
-        $winpeas_execution.src.process.file.full_path = /winPEAS.exe|winPEASany.exe|winPEASany_ofs.exe|winPEASx64.exe|winPEASx64_ofs.exe|winPEASx86.exe|winPEASx86_ofs.exe/ nocase 
-        or $winpeas_execution.target.process.file.full_path = /\\winPEAS\.exe|\\winPEASany\.exe|\\winPEASany_ofs\.exe|\\winPEASx64\.exe|\\winPEASx64_ofs\.exe|\\winPEASx86\.exe|\\winPEASx86_ofs\.exe/ nocase
-      ) 
-      
-      or $winpeas_execution.target.process.command_line = /processinfo|servicesinfo|applicationsinfo|networkinfo|windowscreds|browserinfo|filesinfo|fileanalysis|eventsinfo/ nocase 
-      
-      or  (
-            $winpeas_execution.target.process.command_line = /raw\.githubusercontent\.com/ nocase and 
-            $winpeas_execution.target.process.command_line = /carlospolop/ nocase and 
-            $winpeas_execution.target.process.command_line = /winPEAS\.ps1/ nocase
-          ) 
-      
-      or (
-            $winpeas_execution.principal.process.command_line = / -linpeas$/ nocase or 
-            $winpeas_execution.target.process.command_line = / -linpeas$/ nocase
-          )
+      	$winpeas_execution.metadata.event_type = "PROCESS_LAUNCH"
+        /* if you receive false positives based on Powershell then exclude Powershell (see below)
+	*  metadata.eventType: PROCESS_LAUNCH
+	*  metadata.productName: Microsoft-Windows-PowerShell
+	*  metadata.productEventType: 4104
+	*  metadata.description: Script block logging
+	*  
+	*  or incldue the EventID based on you Log Sources: Sysmon, EDR etc.
+	*  Example: metadata.product_event_type = "1" or metadata.product_event_type = "4688"
+	*/ 
+	 
+	and 
+            (
+                
+                $winpeas_execution.src.process.file.full_path = /winPEAS.exe|winPEASany.exe|winPEASany_ofs.exe|winPEASx64.exe|winPEASx64_ofs.exe|winPEASx86.exe|winPEASx86_ofs.exe/ nocase or 
+                $winpeas_execution.target.process.file.full_path = /\\winPEAS\.exe|\\winPEASany\.exe|\\winPEASany_ofs\.exe|\\winPEASx64\.exe|\\winPEASx64_ofs\.exe|\\winPEASx86\.exe|\\winPEASx86_ofs\.exe/ nocase
 
-      // Capture the hostname where the event occurred
-		  $winpeas_execution.principal.hostname = $hostname
+                or $winpeas_execution.target.process.command_line = /processinfo|servicesinfo|applicationsinfo|networkinfo|windowscreds|browserinfo|filesinfo|fileanalysis|eventsinfo/ nocase 
+
+                or  (
+                        $winpeas_execution.target.process.command_line = /raw\.githubusercontent\.com/ nocase and 
+                        $winpeas_execution.target.process.command_line = /carlospolop/ nocase and 
+                        $winpeas_execution.target.process.command_line = /winPEAS\.ps1/ nocase
+                    ) 
+                
+                or  (
+                        $winpeas_execution.principal.process.command_line = / -linpeas$/ nocase or 
+                        $winpeas_execution.target.process.command_line = / -linpeas$/ nocase
+                    )
+            )
+        
+	not 
+                (   // Exclusion: Microsoft Defender Threat Protection Sensor Updates
+                    $winpeas_execution.additional.fields["current_directory"] = "C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Downloads\\"
+                ) 
+     	// Capture the hostname where the event occurred
+	$winpeas_execution.principal.hostname = $hostname
 
     match:
-      $hostname over 10m
+      	$hostname over 10m
 
     outcome:
-      // (CRITICAL:100 HIGH:50 MEDIUM:25 LOW:15 INFORMATIONAL:5)
-      $risk_score = max(25)
-      $event_count = count_distinct($winpeas_execution.metadata.id)
-      $mitre_attack_tactic = array_distinct("Privilege Escalation, Discovery")
-      $mitre_attack_technique = array_distinct("System Information Discovery, Abuse Elevation Control Mechanism, Access Token Manipulation")
-      $mitre_attack_technique_id = array_distinct("T1082, T1548, T1134")
-      $principal_process_pid = array_distinct($winpeas_execution.principal.process.pid)
-      $principal_process_command_line = array_distinct($winpeas_execution.principal.process.command_line)
-      $principal_process_file_sha256 = array_distinct($winpeas_execution.principal.process.file.sha256)
-      $principal_process_file_full_path = array_distinct($winpeas_execution.principal.process.file.full_path)
-      $principal_process_product_specific_process_id = array_distinct($winpeas_execution.principal.process.product_specific_process_id)
-      $principal_process_parent_process_product_specific_process_id = array_distinct($winpeas_execution.principal.process.parent_process.product_specific_process_id)
-      $target_process_pid = array_distinct($winpeas_execution.target.process.pid)
-      $target_process_command_line = array_distinct($winpeas_execution.target.process.command_line)
-      $target_process_file_sha256 = array_distinct($winpeas_execution.target.process.file.sha256)
-      $target_process_file_full_path = array_distinct($winpeas_execution.target.process.file.full_path)
-      $target_process_product_specific_process_id = array_distinct($winpeas_execution.target.process.product_specific_process_id)
-      $principal_user_userid = array_distinct($winpeas_execution.principal.user.userid)
+      	// (CRITICAL:100 HIGH:50 MEDIUM:25 LOW:15 INFORMATIONAL:5)
+      	$risk_score = max(25)
+      	$event_count = count_distinct($winpeas_execution.metadata.id)
+      	$mitre_attack_tactic = array_distinct("Privilege Escalation, Discovery")
+      	$mitre_attack_technique = array_distinct("System Information Discovery, Abuse Elevation Control Mechanism, Access Token Manipulation")
+      	$mitre_attack_technique_id = array_distinct("T1082, T1548, T1134")
+      	$principal_process_pid = array_distinct($winpeas_execution.principal.process.pid)
+      	$principal_process_command_line = array_distinct($winpeas_execution.principal.process.command_line)
+      	$principal_process_file_sha256 = array_distinct($winpeas_execution.principal.process.file.sha256)
+      	$principal_process_file_full_path = array_distinct($winpeas_execution.principal.process.file.full_path)
+      	$principal_process_product_specific_process_id = array_distinct($winpeas_execution.principal.process.product_specific_process_id)
+      	$principal_process_parent_process_product_specific_process_id = array_distinct($winpeas_execution.principal.process.parent_process.product_specific_process_id)
+      	$target_process_pid = array_distinct($winpeas_execution.target.process.pid)
+      	$target_process_command_line = array_distinct($winpeas_execution.target.process.command_line)
+      	$target_process_file_sha256 = array_distinct($winpeas_execution.target.process.file.sha256)
+      	$target_process_file_full_path = array_distinct($winpeas_execution.target.process.file.full_path)
+      	$target_process_product_specific_process_id = array_distinct($winpeas_execution.target.process.product_specific_process_id)
+      	$principal_user_userid = array_distinct($winpeas_execution.principal.user.userid)
 
     condition:
-      $winpeas_execution
+      	$winpeas_execution
 }

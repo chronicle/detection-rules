@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,8 @@ rule o365_login_activity_to_azure_ad_powershell_app {
     description = "Logins to Azure AD PowerShell app can have legitimate purposes, but are also abused to gain access to user information. Programmatic access to Entra ID (Azure AD) should generally be through apps, so reviewing these activities is needed."
     rule_id = "mr_0cc56eaf-4176-444d-874d-9780bbb29d4f"
     rule_name = "O365 Login Activity To Azure AD PowerShell App"
-    mitre_attack_tactic = "Initial Access"
-    mitre_attack_technique = "Valid Accounts: Cloud Accounts"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1078/004/"
-    mitre_attack_version = "v14.1"
+    tactic = "TA0001"
+    technique = "T1078.004"
     type = "hunt"
     platform = "azure"
     data_source = "o365"
@@ -49,17 +47,13 @@ rule o365_login_activity_to_azure_ad_powershell_app {
 
   outcome:
     $risk_score = 65
-    $mitre_attack_tactic = "Initial Access"
-    $mitre_attack_technique = "Valid Accounts: Cloud Accounts"
-    $mitre_attack_technique_id = "T1078.004"
     $event_count = count_distinct($login.metadata.id)
     $security_summary = array_distinct($login.security_result.summary)
     $user_agent = array_distinct($login.network.http.user_agent)
     $country_region_login_attempt = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
     //added to populate alert graph with additional context
     $principal_ip = array_distinct($login.principal.ip)
-    //$target_user_email_addresses = array_distinct($login.target.user.email_addresses)
-    //$target_user_userid = array_distinct($login.target.user.userid)
+    $target_user_userid = array_distinct($login.target.user.userid)
 
   condition:
     $login

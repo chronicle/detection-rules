@@ -22,9 +22,8 @@ rule o365_logging_disabled {
     rule_id = "mr_17a49d19-2ea1-4d7d-9e4d-bbc7ffb07099"
     rule_name = "Office 365 logging is disabled"
     assumption = "If logging is expected, there is no reason for this to be switched off. If it is disabled a gap in logging will occur."
-    mitre_attack_tactic = "Defense Evasion"
-    mitre_attack_technique = "Impair Defenses: Disable or Modify Cloud Logs"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1562/008/"
+    tactic = "TA0005"
+    technique = "T1562.008"
     type = "alert"
     platform = "azure"
     data_source = "o365"
@@ -50,8 +49,7 @@ rule o365_logging_disabled {
     $principal_application = array_distinct($log.principal.application)
     $principal_ip = array_distinct($log.principal.ip)
     $target_application = array_distinct($log.target.application)
-    //$principal_user_email_address = array_distinct(principal.user.email_addresses)
-    //$principal_user_userid = array_distinct($log.principal.user.userid)
+    $principal_user_userid = array_distinct($log.principal.user.userid)
     $session = array_distinct($log.network.session_id)
     $location = array_distinct(strings.coalesce($log.principal.location.state,$log.principal.location.country_or_region))
     $target_resource_resource_type = array_distinct($log.target.resource.resource_type)

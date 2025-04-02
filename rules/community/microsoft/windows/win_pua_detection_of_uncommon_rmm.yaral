@@ -218,7 +218,7 @@ rule win_pua_detection_of_uncommon_rmm {
         
         /* not 
         *        // Filter for known RMM Tools based on Customer Information
-        *        $rmm_tool.target.process.file.full_path in %wknown_rmm_tools nocase  
+        *        $rmm_tool.target.process.file.full_path in %known_rmm_tools nocase  
         *    )
         */
         

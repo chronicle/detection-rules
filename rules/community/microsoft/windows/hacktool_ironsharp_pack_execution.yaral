@@ -26,8 +26,8 @@ rule hacktool_ironsharp_pack_execution {
       mitre_attack_url = "https://attack.mitre.org/techniques/T1059/"
       references = "internal, https://github.com/BC-SECURITY/IronSharpPack"
       type = "alert"
-      platform = "Windows, EDR"
-      data_source = "Microsoft Sysmon, Windows Event Logs"
+      platform = "Linux, Windows, EDR"
+      data_source = "Sysmon for Linux, Microsoft Sysmon, Windows Event Logs"
       severity = "Medium"  // Adjust based on your risk assessment
       priority = "Medium"  // Adjust based on your incident response process
 

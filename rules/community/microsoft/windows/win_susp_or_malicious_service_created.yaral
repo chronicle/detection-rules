@@ -21,8 +21,8 @@ rule win_susp_or_malicious_service_created {
     description = "This detection rule identifies the creation of a Windows service with a suspicious or known malicious name, as logged by Windows Event ID 7045 (`A service was installed in the system`). Threat actors, including those associated with ransomware and other advanced persistent threats (APTs), often create services to achieve persistence, lateral movement, remote execution, or privilege escalation. Detection of such activity is critical for identifying early-stage post-compromise behavior."
     rule_id = "mr_965f922f-7a20-4579-a9df-1b1dea70672e"
     rule_name = "Suspicious Windows Service Installation Detected"
-    mitre_attack_tactic = "Persistence, Execution, Privilege Escalation"
-    mitre_attack_technique = "Create or Modify System Process: Windows Service"
+    tactic = "TA0003, TA0004"
+    technique = "T1543.003"
     mitre_attack_url = "https://attack.mitre.org/techniques/T1543/003/"
     reference = "https://github.com/mthcht/awesome-lists/blob/main/Lists/suspicious_windows_services_names_list.csv"
     type = "alert"
@@ -41,6 +41,7 @@ rule win_susp_or_malicious_service_created {
     $suspicious_service.principal.hostname = $hostname
     $suspicious_service.target.application = $service_name
 
+    // Create a reference list named `suspicious_windows_service_names_list` and populate it with suspicious service names such as the list found at https://github.com/mthcht/awesome-lists/blob/main/Lists/suspicious_windows_services_names_list.csv
     $service_name in %suspicious_windows_services_names_list
 
   
@@ -48,12 +49,7 @@ rule win_susp_or_malicious_service_created {
     $hostname, $service_name over 15m
 
   outcome:
-    // (CRITICAL:100 HIGH:50 MEDIUM:25 LOW:15 INFORMATIONAL:5)
-    $risk_score = max(25)
-
-    $mitre_attack_tactic = array_distinct("Persistence, Execution, Privilege Escalation")
-    $mitre_attack_technique = array_distinct("Create or Modify System Process: Windows Service")
-    $mitre_attack_technique_id = array_distinct("T1543.003")
+    $risk_score = max(65)
     $event_count = count_distinct($suspicious_service.metadata.id)
     $principal_hostname = array_distinct($suspicious_service.principal.hostname)
     $principal_user_userid = array_distinct($suspicious_service.principal.user.userid)

@@ -21,10 +21,10 @@ rule hacktool_ironsharp_pack_execution {
       description = "Detects the execution of known attacker tools, including but not limited to those in the IronSharpPack toolset. These tools are commonly used for offensive security operations and may indicate malicious activity if observed in unauthorized environments."
       rule_id = "mr_34f2ecef-cd3e-4dee-9c83-b7a9ec34becc"
       rule_name = "Hacktool - IronSharpPack Execution"
-      mitre_attack_tactic = "Execution"
-      mitre_attack_technique = "Command and Scripting Interpreter"
+      tactic = "TA0002"
+      technique = "T1059"
       mitre_attack_url = "https://attack.mitre.org/techniques/T1059/"
-      references = "internal, https://github.com/BC-SECURITY/IronSharpPack"
+      references = "https://github.com/BC-SECURITY/IronSharpPack"
       type = "alert"
       platform = "Linux, Windows, EDR"
       data_source = "Sysmon for Linux, Microsoft Sysmon, Windows Event Logs"
@@ -44,11 +44,8 @@ rule hacktool_ironsharp_pack_execution {
       $hostname over 15m
 
     outcome:
-      $risk_score = max(25)
+      $risk_score = max(65)
       $event_count = count_distinct($ironsharp_execution.metadata.id)
-      $mitre_attack_tactic = array_distinct("Execution")
-      $mitre_attack_technique = array_distinct("Command and Scripting Interpreter")
-      $mitre_attack_technique_id = array_distinct("T1059")
       $principal_process_pid = array_distinct($ironsharp_execution.principal.process.pid)
       $principal_process_command_line = array_distinct($ironsharp_execution.principal.process.command_line)
       $principal_process_file_sha256 = array_distinct($ironsharp_execution.principal.process.file.sha256)

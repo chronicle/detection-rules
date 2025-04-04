@@ -21,10 +21,10 @@ rule hacktool_purpleknight_execution {
       description = "This detection rule identifies the execution of the Purple Knight tool, a free Active Directory security assessment utility developed by Semperis. Purple Knight is designed to scan for AD vulnerabilities, misconfigurations, and common attack paths. While it is a legitimate tool used by defenders, its execution in production environments may also indicate red team activity or unauthorized reconnaissance by adversaries attempting to map domain weaknesses."
       rule_id = "mr_69e428bb-c946-4e3f-abb8-0e28316f2389"
       rule_name = "Purple Knight Tool Execution Detected"
-      mitre_attack_tactic = "Discovery"
-      mitre_attack_technique = "Account Discovery, Permission Groups Discovery, Remote System Discovery"
+      tactic = "TA0007"
+      technique = "T1087, T1069, T1018"
       mitre_attack_url = "https://attack.mitre.org/techniques/T1087/, https://attack.mitre.org/techniques/T1069/, https://attack.mitre.org/techniques/T1018/"
-      references = "internal, https://www.purple-knight.com/"
+      references = "https://www.purple-knight.com/"
       type = "alert"
       platform = "Windows, EDR"
       data_source = "Microsoft Sysmon, Windows Event Logs"
@@ -46,11 +46,8 @@ rule hacktool_purpleknight_execution {
       $hostname over 10m
 
     outcome:
-      $risk_score = max(25)
+      $risk_score = max(65)
       $event_count = count_distinct($purple_knight.metadata.id)
-      $mitre_attack_tactic = array_distinct("Discovery")
-      $mitre_attack_technique = array_distinct("Account Discovery, Permission Groups Discovery, Remote System Discovery")
-      $mitre_attack_technique_id = array_distinct("T1087, T1069, T1018")
       $principal_process_pid = array_distinct($purple_knight.principal.process.pid)
       $principal_process_command_line = array_distinct($purple_knight.principal.process.command_line)
       $principal_process_file_sha256 = array_distinct($purple_knight.principal.process.file.sha256)

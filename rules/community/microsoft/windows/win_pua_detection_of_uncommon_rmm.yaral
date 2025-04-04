@@ -21,8 +21,8 @@ rule win_pua_detection_of_uncommon_rmm {
         description = "This detection rule identifies uncommon or suspicious Remote Monitoring and Management (RMM) tools, leveraging intelligence from the LOL-RMM (Living Off the Land RMM) project. While RMM tools are widely used for IT administration, remote support, and network management, they are also frequently abused by attackers, initial access brokers (IABs), and ransomware operators to establish persistent remote access, execute malicious commands, or deploy additional payloads. This rule detects RMM software that is not commonly observed in the environment, indicating potential unauthorized access or lateral movement."
         rule_id = "mr_f5681a0f-215f-4055-80c7-864ee39bcfb8"
         rule_name = "Uncommon or Suspicious RMM Tool Execution Detected"
-        mitre_attack_tactic = "Command and Control"
-        mitre_attack_technique = "Remote Access Software"
+        tactic = "TA0011"
+        technique = "T1219"
         mitre_attack_url = "https://attack.mitre.org/techniques/T1219/"
         reference = "https://lolrmm.io/"
         type = "alert"
@@ -226,12 +226,8 @@ rule win_pua_detection_of_uncommon_rmm {
         $hostname, $image, $rmm_company_info over 10m
 
     outcome:
-        // (CRITICAL:100 HIGH:50 MEDIUM:25 LOW:15 INFORMATIONAL:5)
-        $risk_score = max(25)
+        $risk_score = max(65)
         $event_count = count_distinct($rmm_tool.metadata.id)
-        $mitre_attack_tactic = array_distinct("Command and Control")
-        $mitre_attack_technique = array_distinct("Remote Access Software")
-        $mitre_attack_technique_id = array_distinct("T1219")
         $principal_process_pid = array_distinct($rmm_tool.principal.process.pid)
         $principal_process_command_line = array_distinct($rmm_tool.principal.process.command_line)
         $principal_process_file_sha256 = array_distinct($rmm_tool.principal.process.file.sha256)

@@ -21,8 +21,8 @@ rule hacktool_winpeas_execution_patterns {
       description = "This detection rule identifies the execution of WinPEAS (Windows Privilege Escalation Awesome Script), a post-exploitation reconnaissance tool used to discover privilege escalation paths on Windows systems. WinPEAS performs a wide range of local enumeration checks, including service misconfigurations, permission issues, token privileges, and more. Its usage is commonly observed during red team assessments and by adversaries seeking to elevate privileges after gaining initial access. WinPEAS checks are well-documented in the HackTricks knowledge base."
       rule_id = "mr_9c9ad668-485a-4b10-b85d-36ba63546304"
       rule_name = "Hacktool - WinPEAS Execution Patterns"
-      mitre_attack_tactic = "Privilege Escalation, Discovery"
-      mitre_attack_technique = "System Information Discovery, Abuse Elevation Control Mechanism, Access Token Manipulation"
+      tactic = "TA0004,TA0007"
+      technique = "T1082, T1548, T1134"
       mitre_attack_url = "https://attack.mitre.org/techniques/T1082/, https://attack.mitre.org/techniques/T1548/, https://attack.mitre.org/techniques/T1134/"
       references = "https://github.com/carlospolop/PEASS-ng, https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation, https://www.microsoft.com/en-us/security/blog/2022-10-14/new-prestige-ransomware-impacts-organizations-in-ukraine-and-poland/, https://www.logpoint.com/wp-content/uploads/2023/02/emerging-threats-the-play-report.pdf"
       type = "alert"
@@ -75,11 +75,8 @@ rule hacktool_winpeas_execution_patterns {
 
     outcome:
       	// (CRITICAL:100 HIGH:50 MEDIUM:25 LOW:15 INFORMATIONAL:5)
-      	$risk_score = max(25)
+      	$risk_score = max(65)
       	$event_count = count_distinct($winpeas_execution.metadata.id)
-      	$mitre_attack_tactic = array_distinct("Privilege Escalation, Discovery")
-      	$mitre_attack_technique = array_distinct("System Information Discovery, Abuse Elevation Control Mechanism, Access Token Manipulation")
-      	$mitre_attack_technique_id = array_distinct("T1082, T1548, T1134")
       	$principal_process_pid = array_distinct($winpeas_execution.principal.process.pid)
       	$principal_process_command_line = array_distinct($winpeas_execution.principal.process.command_line)
       	$principal_process_file_sha256 = array_distinct($winpeas_execution.principal.process.file.sha256)

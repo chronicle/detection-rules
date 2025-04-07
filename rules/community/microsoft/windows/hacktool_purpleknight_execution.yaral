@@ -1,18 +1,18 @@
 /*
-  * Copyright 2025 Google LLC
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  *     https://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 rule hacktool_purpleknight_execution {
 
@@ -23,7 +23,6 @@ rule hacktool_purpleknight_execution {
       rule_name = "Purple Knight Tool Execution Detected"
       tactic = "TA0007"
       technique = "T1087, T1069, T1018"
-      mitre_attack_url = "https://attack.mitre.org/techniques/T1087/, https://attack.mitre.org/techniques/T1069/, https://attack.mitre.org/techniques/T1018/"
       references = "https://www.purple-knight.com/"
       type = "alert"
       platform = "Windows, EDR"
@@ -40,7 +39,7 @@ rule hacktool_purpleknight_execution {
       )  
 
       // Capture the hostname where the event occurred
-		  $purple_knight.principal.hostname = $hostname
+	  $purple_knight.principal.hostname = $hostname
 
     match:
       $hostname over 10m

@@ -22,7 +22,7 @@ rule hacktool_purpleknight_execution {
       rule_id = "mr_69e428bb-c946-4e3f-abb8-0e28316f2389"
       rule_name = "Purple Knight Tool Execution Detected"
       tactic = "TA0007"
-      technique = "T1087, T1069, T1018"
+      technique = "T1087"
       references = "https://www.purple-knight.com/"
       type = "alert"
       platform = "Windows, EDR"

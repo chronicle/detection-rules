@@ -32,8 +32,8 @@ rule hacktool_ironsharp_pack_execution {
 
     events:
       $ironsharp_execution.metadata.event_type = "PROCESS_LAUNCH"
-      $ironsharp_execution.target.process.file.full_path = /\\python/ nocase and 
-      $ironsharp_execution.target.process.command_line = /\\IronEmbed\.py/ nocase and 
+      $ironsharp_execution.target.process.file.full_path = /\\python/ nocase and
+      $ironsharp_execution.target.process.command_line = /\\IronEmbed\.py/ nocase and
       $ironsharp_execution.target.process.command_line = /\\IronADCSPwn\.py|\\IronADFSDump\.py|\\IronBetterSafetyKatz\.py|\\IronCertify\.py|\\IronDeployPrinterNightmare\.py|\\IronEDD\.py|\\IronGrouper2\.py|\\IronInveigh\.py|\\IronLockLess\.py|\\IronPassTheCert\.py|\\IronRubeus\.py|\\IronSafetyKatz\.py|\\IronSearchOutlook\.py|\\IronSeatbelt\.py|\\IronSharPersist\.py|\\IronSharp-SMBExec\.py|\\IronSharpAllowedToAct\.py|\\IronSharpBypassUAC\.py|\\IronSharpCOM\.py|\\IronSharpChisel\.py|\\IronSharpChrome\.py|\\IronSharpChromium\.py|\\IronSharpCloud\.py|\\IronSharpCookieMonster\.py|\\IronSharpCrashEventLog\.py|\\IronSharpDPAPI\.py|\\IronSharpDir\.py|\\IronSharpDoor\.py|\\IronSharpDump\.py|\\IronSharpEDRChecker\.py|\\IronSharpExec\.py|\\IronSharpGPOAbuse\.py|\\IronSharpHandler\.py|\\IronSharpKatz\.py|\\IronSharpLAPS\.py|\\IronSharpMapExec\.py|\\IronSharpMiniDump\.py|\\IronSharpMove\.py|\\IronSharpNamedPipePTH\.py|\\IronSharpReg\.py|\\IronSharpSQLPwn\.py|\\IronSharpSearch\.py|\\IronSharpSecDump\.py|\\IronSharpSniper\.py|\\IronSharpSpray\.py|\\IronSharpStay\.py|\\IronSharpTask\.py|\\IronSharpUp\.py|\\IronSharpWMI\.py|\\IronSharpWebServer\.py|\\IronSharpWifiGrabber\.py|\\IronSharpZeroLogon\.py|\\IronShhmon\.py|\\IronSqlClient\.py|\\IronStandIn\.py|\\IronStickyNotesExtract\.py|\\IronThunderFox\.py|\\IronTokenStomp\.py|\\IronWMIReg\.py|\\IronWatson\.py|\\Iron_RunasCs\.py|\\Ironscout\.py|\\Ironsharpfiles\.py|\\Ironsharpshares\.py/ nocase
 
       // Capture the hostname where the event occurred

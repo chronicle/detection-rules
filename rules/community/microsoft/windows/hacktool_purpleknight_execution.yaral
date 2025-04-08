@@ -33,13 +33,13 @@ rule hacktool_purpleknight_execution {
     events:
       $purple_knight.metadata.event_type = "PROCESS_LAUNCH"
       (
-        $purple_knight.target.process.file.full_path = /\\PurpleKnight\.exe$/ nocase or 
+        $purple_knight.target.process.file.full_path = /\\PurpleKnight\.exe$/ nocase or
         $purple_knight.principal.process.file.full_path = /\\PurpleKnight\.exe$/ nocase or
         $purple_knight.principal.process.command_line = "PurpleKnight.exe" nocase
       )  
 
       // Capture the hostname where the event occurred
-	  $purple_knight.principal.hostname = $hostname
+	    $purple_knight.principal.hostname = $hostname
 
     match:
       $hostname over 10m

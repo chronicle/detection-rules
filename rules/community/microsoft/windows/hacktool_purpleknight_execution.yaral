@@ -35,7 +35,7 @@ rule hacktool_purpleknight_execution {
       (
         $purple_knight.target.process.file.full_path = /\\PurpleKnight\.exe$/ nocase or
         $purple_knight.principal.process.file.full_path = /\\PurpleKnight\.exe$/ nocase or
-        $purple_knight.principal.process.command_line = "PurpleKnight.exe" nocase
+        $purple_knight.principal.process.command_line = /PurpleKnight/ nocase
       )
 
       // Capture the hostname where the event occurred

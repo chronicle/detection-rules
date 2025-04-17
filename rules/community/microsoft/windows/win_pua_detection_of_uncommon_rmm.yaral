@@ -29,7 +29,7 @@ rule win_pua_detection_of_uncommon_rmm {
     data_source = "Microsoft Sysmon, Windows Event Logs"
     severity = "Medium"  // Adjust based on your risk assessment
     priority = "Medium"  // Adjust based on your incident response process
-  
+
   events:
     $rmm_tool.metadata.event_type = "PROCESS_LAUNCH"
 

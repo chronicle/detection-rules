@@ -115,7 +115,7 @@ rule win_pua_detection_of_uncommon_rmm {
 
     (
       // Potential FixMe.it RMM Tool Process Activity
-      $rmm_tool.target.process.file.full_path = /\\FixMeit Unattended Access Setup\.exe|\\TiExpertStandalone\.exe|\\FixMeit Client\.exe|\\FixMeit Expert Setup\.exe|\\TiExpertCore\.exe|\\TiClientCore\.exe/ nocase 
+      $rmm_tool.target.process.file.full_path = /\\FixMeit Unattended Access Setup\.exe|\\TiExpertStandalone\.exe|\\FixMeit Client\.exe|\\FixMeit Expert Setup\.exe|\\TiExpertCore\.exe|\\TiClientCore\.exe/ nocase
     ) or
 
     (

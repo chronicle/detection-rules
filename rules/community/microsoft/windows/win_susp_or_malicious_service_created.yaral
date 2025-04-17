@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ rule win_susp_or_malicious_service_created {
     priority = "Medium"  // Adjust based on your incident response process
 
   events:
-
     $suspicious_service.metadata.event_type = "SERVICE_CREATION"
     $suspicious_service.metadata.product_name = "Service Control Manager"
     $suspicious_service.metadata.product_event_type = "7045"
@@ -40,10 +39,9 @@ rule win_susp_or_malicious_service_created {
     $suspicious_service.principal.hostname = $hostname
     $suspicious_service.target.application = $service_name
 
-    // Create a reference list named `suspicious_windows_service_names_list` and populate it with suspicious service names such as the list found at https://github.com/mthcht/awesome-lists/blob/main/Lists/suspicious_windows_services_names_list.csv
-    $service_name in %suspicious_windows_services_names_list
+    // Create a reference list named `suspicious_windows_service_names` and populate it with suspicious service names such as the list found at https://github.com/mthcht/awesome-lists/blob/main/Lists/suspicious_windows_services_names_list.csv
+    $service_name in %suspicious_windows_services_names
 
-  
   match:
     $hostname, $service_name over 15m
 

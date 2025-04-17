@@ -39,7 +39,7 @@ rule hacktool_purpleknight_execution {
       )
 
       // Capture the hostname where the event occurred
-	    $purple_knight.principal.hostname = $hostname
+	  $purple_knight.principal.hostname = $hostname
 
     match:
       $hostname over 10m

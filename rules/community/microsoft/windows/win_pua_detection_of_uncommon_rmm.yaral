@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,163 +31,136 @@ rule win_pua_detection_of_uncommon_rmm {
     priority = "Medium"  // Adjust based on your incident response process   
   
   events:
-
     $rmm_tool.metadata.event_type = "PROCESS_LAUNCH"
 
     (
-        // 247ithelp.com (ConnectWise) RMM
-        $rmm_tool.target.process.file.full_path = /\\Remote Workforce Client\.exe$/ nocase
-    )
-    
-    or
-    (
-        // Potential Acronic Cyber Protect (Remotix) RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\AcronisCyberProtectConnectAgent\.exe$/ nocase
-    )
-
-    or
+      // 247ithelp.com (ConnectWise) RMM
+      $rmm_tool.target.process.file.full_path = /\\Remote Workforce Client\.exe$/ nocase
+    ) or
     
     (
-        // Potential AeroAdmin RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\aeroadmin\.exe|\\AeroAdmin\.exe/ nocase
-    )
+      // Potential Acronic Cyber Protect (Remotix) RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\AcronisCyberProtectConnectAgent\.exe$/ nocase
+    ) or
     
-    or
     (
-        // Potential Air Live Drive RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\AirLiveDrive\.exe$/ nocase
-    )
-
-    or
-    (
-        // Potential AliWangWang-remote-control RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\alitask\.exe$/ nocase
-    )
+      // Potential AeroAdmin RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\aeroadmin\.exe|\\AeroAdmin\.exe/ nocase
+    ) or
     
-    or
     (
-        // Potential Alpemix RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\AlpemixService\.exe$/ nocase
-    )
-
-    or
+      // Potential Air Live Drive RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\AirLiveDrive\.exe$/ nocase
+    ) or
+    
     (
-        // Potential Any Support RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\ManualLauncher\.exe$/ nocase
-    )
-
-    or
+      // Potential AliWangWang-remote-control RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\alitask\.exe$/ nocase
+    ) or
+    
     (
-        // Potential Anyplace Control RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\apc_host\.exe$/ nocase
-    )
-
-    or
+      // Potential Alpemix RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\AlpemixService\.exe$/ nocase
+    ) or
+    
     (
-        // Potential aria2 RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\aria2c\.exe$/ nocase
-    )
+      // Potential Any Support RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\ManualLauncher\.exe$/ nocase
+    ) or
 
-    or
     (
-        // Potential Atera RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\AgentPackageNetworkDiscovery\.exe|\\AgentPackageTaskScheduler\.exe|\\AteraAgent\.exe|\\atera_agent\.exe|\\ateraagent\.exe/ nocase
-    )
-
-    or
+      // Potential Anyplace Control RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\apc_host\.exe$/ nocase
+    ) or
+    
+    (
+      // Potential aria2 RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\aria2c\.exe$/ nocase
+    ) or
+    
+    (
+      // Potential Atera RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\AgentPackageNetworkDiscovery\.exe|\\AgentPackageTaskScheduler\.exe|\\AteraAgent\.exe|\\atera_agent\.exe|\\ateraagent\.exe/ nocase
+    ) or
+    
     ( 
-        // Potential Auvik RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\auvik\.engine\.exe|\\auvik\.agent\.exe/ nocase
-    )
-
-    or
-    (
-        // Potential Absolute (Computrace) RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\rpcnet\.exe|\\ctes\.exe|\\ctespersitence\.exe|\\cteshostsvc\.exe|\\rpcld\.exe/ nocase
-    )
-
-    or
-    (
-        // Potential Bluetrait MSP Agent Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\Bluetrait MSP Agent\.exe|\\BluetraitUserAgent\.exe|\\Bluetrait Agent\\libraries\\paexec\.exe/ nocase
-    )
-
-    or
-    (
-        // Potential BeamYourScreen RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\beamyourscreen\.exe|\\beamyourscreen-host\.exe/ nocase
-    )
-
-    or
-    (
-        // Potential Connectwise Automate (LabTech) RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\ltsvc\.exe|\\ltsvcmon\.exe|\\lttray\.exe/ nocase
-    )
-
-    or
-    (
-        // Potential Duplicati RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\Duplicati\.Server\.exe$/ nocase
-    )
-
-    or
-    (
-        // Potential FixMe.it RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\FixMeit Unattended Access Setup\.exe|\\TiExpertStandalone\.exe|\\FixMeit Client\.exe|\\FixMeit Expert Setup\.exe|\\TiExpertCore\.exe|\\TiClientCore\.exe/ nocase 
-    )
-
-    or
-    (
-        // Potential FleetDeck.io RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\fleetdeck_agent_svc\.exe|\\fleetdeck_commander_svc\.exe|\\fleetdeck_installer\.exe|\\fleetdeck_commander_launcher\.exe|\\fleetdeck_agent\.exe/ nocase
-    )
-
-    or
-    (
-        // Potential Level.io RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\level-windows-amd64\.exe|\\level\.exe|\\level-remote-control-ffmpeg\.exe/ nocase
-    )
-
-    or
-    (
-        // Potential NetSupport Manager RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\pcictlui\.exe|\\client32\.exe|\\pcicfgui\.exe/ nocase
-    )
-
-    or
-    (
-        // Potential NinjaRMM RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\ninjarmmagent\.exe|\\NinjaRMMAgent\.exe|\\NinjaRMMAgenPatcher\.exe|\\ninjarmm-cli\.exe/ nocase
-    )
-
-    or
-    (
-        // Potential REMCOS RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\remcos/ nocase
-    )
-
-    or
-    (
-        // Potential Rocket Remote Desktop RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\RocketRemoteDesktop_Setup\.exe$/ nocase
-    )
-
-    or
-    (
-        // Potential Tactical RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\tacticalrmm\.exe$/ nocase
-    )
+      // Potential Auvik RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\auvik\.engine\.exe|\\auvik\.agent\.exe/ nocase
+    ) or
     
-    or
     (
-        // Potential TightVNC RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\tvnviewer\.exe|\\tvnserver\.exe/ nocase
-    )
+      // Potential Absolute (Computrace) RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\rpcnet\.exe|\\ctes\.exe|\\ctespersitence\.exe|\\cteshostsvc\.exe|\\rpcld\.exe/ nocase
+    ) or
+    
+    (
+      // Potential Bluetrait MSP Agent Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\Bluetrait MSP Agent\.exe|\\BluetraitUserAgent\.exe|\\Bluetrait Agent\\libraries\\paexec\.exe/ nocase
+    ) or
+    
+    (
+      // Potential BeamYourScreen RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\beamyourscreen\.exe|\\beamyourscreen-host\.exe/ nocase
+    ) or
+    
+    (
+      // Potential Connectwise Automate (LabTech) RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\ltsvc\.exe|\\ltsvcmon\.exe|\\lttray\.exe/ nocase
+    ) or
+    
+    (
+      // Potential Duplicati RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\Duplicati\.Server\.exe$/ nocase
+    ) or
+    
+    (
+      // Potential FixMe.it RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\FixMeit Unattended Access Setup\.exe|\\TiExpertStandalone\.exe|\\FixMeit Client\.exe|\\FixMeit Expert Setup\.exe|\\TiExpertCore\.exe|\\TiClientCore\.exe/ nocase 
+    ) or
+    
+    (
+      // Potential FleetDeck.io RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\fleetdeck_agent_svc\.exe|\\fleetdeck_commander_svc\.exe|\\fleetdeck_installer\.exe|\\fleetdeck_commander_launcher\.exe|\\fleetdeck_agent\.exe/ nocase
+    ) or
+    
+    (
+      // Potential Level.io RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\level-windows-amd64\.exe|\\level\.exe|\\level-remote-control-ffmpeg\.exe/ nocase
+    ) or
+    
+    (
+      // Potential NetSupport Manager RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\pcictlui\.exe|\\client32\.exe|\\pcicfgui\.exe/ nocase
+    ) or
+    
+    (
+      // Potential NinjaRMM RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\ninjarmmagent\.exe|\\NinjaRMMAgent\.exe|\\NinjaRMMAgenPatcher\.exe|\\ninjarmm-cli\.exe/ nocase
+    ) or
+    
+    (
+      // Potential REMCOS RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\remcos/ nocase
+    ) or
+    
+    (
+      // Potential Rocket Remote Desktop RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\RocketRemoteDesktop_Setup\.exe$/ nocase
+    ) or
+    
+    (
+      // Potential Tactical RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\tacticalrmm\.exe$/ nocase
+    ) or
 
-    or
     (
-        // Potential Zoho Assist RMM Tool Process Activity
-        $rmm_tool.target.process.file.full_path = /\\zaservice\.exe|\\ZA_Access\.exe|\\ZohoMeeting\.exe|\\Zohours\.exe|\\zohotray\.exe|\\ZohoURSService\.exe|\\Zaservice\.exe|\\za_connect\.exe|\\ZMAgent\.exe/ nocase
+      // Potential TightVNC RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\tvnviewer\.exe|\\tvnserver\.exe/ nocase
+    ) or
+    
+    (
+      // Potential Zoho Assist RMM Tool Process Activity
+      $rmm_tool.target.process.file.full_path = /\\zaservice\.exe|\\ZA_Access\.exe|\\ZohoMeeting\.exe|\\Zohours\.exe|\\zohotray\.exe|\\ZohoURSService\.exe|\\Zaservice\.exe|\\za_connect\.exe|\\ZMAgent\.exe/ nocase
     ) 
 
     $rmm_tool.principal.hostname = $hostname
@@ -196,7 +169,7 @@ rule win_pua_detection_of_uncommon_rmm {
     
     // Filter for known RMM Tools based on Customer Information
     // not $rmm_tool.target.process.file.full_path in %known_rmm_tools nocase
-        
+
   match:
     $hostname, $image, $rmm_company_info over 10m
 

@@ -34,7 +34,7 @@ rule hacktool_winpeas_execution_patterns {
       $winpeas_execution.metadata.event_type = "PROCESS_LAUNCH"
       and
         (
-          $winpeas_execution.src.process.file.full_path = /winPEAS.exe|winPEASany.exe|winPEASany_ofs.exe|winPEASx64.exe|winPEASx64_ofs.exe|winPEASx86.exe|winPEASx86_ofs.exe/ nocase or 
+          $winpeas_execution.src.process.file.full_path = /winPEAS.exe|winPEASany.exe|winPEASany_ofs.exe|winPEASx64.exe|winPEASx64_ofs.exe|winPEASx86.exe|winPEASx86_ofs.exe/ nocase or
           $winpeas_execution.target.process.file.full_path = /\\winPEAS\.exe|\\winPEASany\.exe|\\winPEASany_ofs\.exe|\\winPEASx64\.exe|\\winPEASx64_ofs\.exe|\\winPEASx86\.exe|\\winPEASx86_ofs\.exe/ nocase or
           $winpeas_execution.target.process.command_line = /processinfo|servicesinfo|applicationsinfo|networkinfo|windowscreds|browserinfo|filesinfo|fileanalysis|eventsinfo/ nocase
 
@@ -52,12 +52,12 @@ rule hacktool_winpeas_execution_patterns {
             )
         )
 
-      not 
+      not
         (
           // Exclusion: Microsoft Defender Threat Protection Sensor Updates
           $winpeas_execution.additional.fields["current_directory"] = "C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Downloads\\"
-        ) 
-    
+        )
+
       // Capture the hostname where the event occurred
       $winpeas_execution.principal.hostname = $hostname
 

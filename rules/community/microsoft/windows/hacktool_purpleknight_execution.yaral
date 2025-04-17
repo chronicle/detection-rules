@@ -29,7 +29,7 @@ rule hacktool_purpleknight_execution {
       data_source = "Microsoft Sysmon, Windows Event Logs"
       severity = "Medium"  // Adjust based on your risk assessment
       priority = "Medium"  // Adjust based on your incident response process
-     
+
     events:
       $purple_knight.metadata.event_type = "PROCESS_LAUNCH"
       (
@@ -38,8 +38,8 @@ rule hacktool_purpleknight_execution {
         $purple_knight.principal.process.command_line = /PurpleKnight/ nocase
       )
 
-      // Capture the hostname where the event occurred
-	  $purple_knight.principal.hostname = $hostname
+    // Capture the hostname where the event occurred
+    $purple_knight.principal.hostname = $hostname
 
     match:
       $hostname over 10m

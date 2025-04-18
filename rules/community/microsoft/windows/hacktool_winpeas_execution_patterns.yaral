@@ -23,7 +23,7 @@ rule hacktool_winpeas_execution_patterns {
       rule_name = "Hacktool - WinPEAS Execution Patterns"
       tactic = "TA0007"
       technique = "T1082"
-      references = "https://github.com/carlospolop/PEASS-ng, https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation, https://www.microsoft.com/en-us/security/blog/2022-10-14/new-prestige-ransomware-impacts-organizations-in-ukraine-and-poland/, https://www.logpoint.com/wp-content/uploads/2023/02/emerging-threats-the-play-report.pdf"
+      references = "https://github.com/carlospolop/PEASS-ng, https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html, https://www.microsoft.com/en-us/security/blog/2022-10-14/new-prestige-ransomware-impacts-organizations-in-ukraine-and-poland/, https://www.logpoint.com/wp-content/uploads/2023/02/emerging-threats-the-play-report.pdf"
       type = "alert"
       platform = "Windows, EDR"
       data_source = "Microsoft Sysmon, Windows Event Logs"

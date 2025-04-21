@@ -36,65 +36,65 @@ def create_reference_list(
     syntax_type: str | None = None,
     max_retries: int = 3,
 ) -> Mapping[str, Any]:
-  """Creates a new reference list.
+    """Creates a new reference list.
 
-  Args:
-    http_session: Authorized session for HTTP requests.
-    name: The name for the new reference list.
-    description: A user-provided description of the reference list.
-    entries: A list of entries for the reference list.
-    syntax_type: The syntax type indicating how list entries should be
-      validated. Reference:
-      https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.referenceLists#ReferenceListSyntaxType
-    max_retries (optional): Maximum number of times to retry HTTP request if
-      certain response codes are returned. For example: HTTP response status
-      code 429 (Too Many Requests)
+    Args:
+      http_session: Authorized session for HTTP requests.
+      name: The name for the new reference list.
+      description: A user-provided description of the reference list.
+      entries: A list of entries for the reference list.
+      syntax_type: The syntax type indicating how list entries should be
+        validated. Reference:
+        https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.referenceLists#ReferenceListSyntaxType
+      max_retries (optional): Maximum number of times to retry HTTP request if
+        certain response codes are returned. For example: HTTP response status
+        code 429 (Too Many Requests)
 
-  Returns:
-    New reference list.
+    Returns:
+      New reference list.
 
-  Raises:
-    requests.exceptions.HTTPError: HTTP request resulted in an error
-    (response.status_code >= 400).
-    requests.exceptions.JSONDecodeError: If the server response is not valid
-    JSON.
-  """
-  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{os.environ['GOOGLE_SECOPS_INSTANCE']}/referenceLists"
-  params = {"referenceListId": name}
-  response = None
+    Raises:
+      requests.exceptions.HTTPError: HTTP request resulted in an error
+      (response.status_code >= 400).
+      requests.exceptions.JSONDecodeError: If the server response is not valid
+      JSON.
+    """
+    url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{os.environ['GOOGLE_SECOPS_INSTANCE']}/referenceLists"
+    params = {"referenceListId": name}
+    response = None
 
-  if len(entries) == 0:  # pylint: disable="g-explicit-length-test"
-    # If 'entries' is an empty list, the reference list is empty [{}]
-    reference_list_entries = [{}]
-  else:
-    # Format reference list entries as a list of
-    # dictionaries: [{"value": <string>}, ...]
-    reference_list_entries = []
-    for entry in entries:
-      reference_list_entries.append({"value": entry.strip()})
-
-  body = {
-      "description": description,
-      "entries": reference_list_entries,
-      "syntax_type": syntax_type,
-  }
-
-  for _ in range(max(max_retries, 0) + 1):
-    response = http_session.request(
-        method="POST", url=url, json=body, params=params
-    )
-
-    if response.status_code >= 400:
-      LOGGER.warning(response.text)
-
-    if response.status_code == 429:
-      LOGGER.warning(
-          "API rate limit exceeded. Sleeping for 60s before retrying"
-          )
-      time.sleep(60)
+    if len(entries) == 0:  # pylint: disable="g-explicit-length-test"
+        # If 'entries' is an empty list, the reference list is empty [{}]
+        reference_list_entries = [{}]
     else:
-      break
+        # Format reference list entries as a list of
+        # dictionaries: [{"value": <string>}, ...]
+        reference_list_entries = []
+        for entry in entries:
+            reference_list_entries.append({"value": entry.strip()})
 
-  response.raise_for_status()
+    body = {
+        "description": description,
+        "entries": reference_list_entries,
+        "syntax_type": syntax_type,
+    }
 
-  return response.json()
+    for _ in range(max(max_retries, 0) + 1):
+        response = http_session.request(
+            method="POST", url=url, json=body, params=params
+        )
+
+        if response.status_code >= 400:
+            LOGGER.warning(response.text)
+
+        if response.status_code == 429:
+            LOGGER.warning(
+                "API rate limit exceeded. Sleeping for 60s before retrying"
+            )
+            time.sleep(60)
+        else:
+            break
+
+    response.raise_for_status()
+
+    return response.json()

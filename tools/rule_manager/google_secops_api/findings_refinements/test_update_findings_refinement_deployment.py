@@ -24,61 +24,61 @@ from google_secops_api.findings_refinements.update_findings_refinement_deploymen
 
 
 class UpdateRuleDeploymentTest(unittest.TestCase):
-  """Unit tests for the "update_findings_refinement_deployment" module."""
+    """Unit tests for the "update_findings_refinement_deployment" module."""
 
-  @mock.patch.object(
-      target=requests, attribute="AuthorizedSession", autospec=True
-  )
-  @mock.patch.object(
-      target=requests.requests, attribute="Response", autospec=True
-  )
-  def test_http_error(
-      self,
-      mock_response: unittest.mock.MagicMock,
-      mock_session: unittest.mock.MagicMock,
-  ):
-    """Test that an HTTP error occurs."""
-    mock_session.request.return_value = mock_response
-    type(mock_response).status_code = mock.PropertyMock(return_value=400)
-    mock_response.raise_for_status.side_effect = (
-        requests.requests.exceptions.HTTPError()
+    @mock.patch.object(
+        target=requests, attribute="AuthorizedSession", autospec=True
     )
-
-    with self.assertRaises(requests.requests.exceptions.HTTPError):
-      update_refinement_findings_deployment(
-          http_session=mock_session,
-          resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1",
-          update_mask=["enabled"],
-          updates={"enabled": True},
-      )
-
-  @mock.patch.object(
-      target=requests, attribute="AuthorizedSession", autospec=True
-  )
-  @mock.patch.object(
-      target=requests.requests, attribute="Response", autospec=True
-  )
-  def test_http_ok(
-      self,
-      mock_response: unittest.mock.MagicMock,
-      mock_session: unittest.mock.MagicMock,
-  ):
-    """Test that HTTP response 200 (OK) occurs."""
-    mock_session.request.return_value = mock_response
-    type(mock_response).status_code = mock.PropertyMock(return_value=200)
-    expected_response = {
-        "name": (
-            "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d00dc/deployment"
-        ),
-        "enabled": True,
-        "updateTime": "2025-03-11T15:45:50.522607Z",
-    }
-    mock_response.json.return_value = expected_response
-
-    response = update_refinement_findings_deployment(
-        http_session=mock_session,
-        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d00dc/deployment",
-        update_mask=["enabled"],
-        updates={"enabled": True},
+    @mock.patch.object(
+        target=requests.requests, attribute="Response", autospec=True
     )
-    self.assertEqual(response, expected_response)
+    def test_http_error(
+        self,
+        mock_response: unittest.mock.MagicMock,
+        mock_session: unittest.mock.MagicMock,
+    ):
+        """Test that an HTTP error occurs."""
+        mock_session.request.return_value = mock_response
+        type(mock_response).status_code = mock.PropertyMock(return_value=400)
+        mock_response.raise_for_status.side_effect = (
+            requests.requests.exceptions.HTTPError()
+        )
+
+        with self.assertRaises(requests.requests.exceptions.HTTPError):
+            update_refinement_findings_deployment(
+                http_session=mock_session,
+                resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1",
+                update_mask=["enabled"],
+                updates={"enabled": True},
+            )
+
+    @mock.patch.object(
+        target=requests, attribute="AuthorizedSession", autospec=True
+    )
+    @mock.patch.object(
+        target=requests.requests, attribute="Response", autospec=True
+    )
+    def test_http_ok(
+        self,
+        mock_response: unittest.mock.MagicMock,
+        mock_session: unittest.mock.MagicMock,
+    ):
+        """Test that HTTP response 200 (OK) occurs."""
+        mock_session.request.return_value = mock_response
+        type(mock_response).status_code = mock.PropertyMock(return_value=200)
+        expected_response = {
+            "name": (
+                "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d00dc/deployment"
+            ),
+            "enabled": True,
+            "updateTime": "2025-03-11T15:45:50.522607Z",
+        }
+        mock_response.json.return_value = expected_response
+
+        response = update_refinement_findings_deployment(
+            http_session=mock_session,
+            resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d00dc/deployment",
+            update_mask=["enabled"],
+            updates={"enabled": True},
+        )
+        self.assertEqual(response, expected_response)

@@ -35,53 +35,53 @@ def create_findings_refinement(
     query: str,
     max_retries: int = 3,
 ) -> Mapping[str, Any]:
-  """Creates a new findings refinement.
+    """Creates a new findings refinement.
 
-  Args:
-    http_session: Authorized session for HTTP requests.
-    display_name: Display name for the findings refinement
-    findings_refinement_type: The type of findings refinement to create.
-      Reference
-      https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.findingsRefinements#FindingsRefinementType
-    query: The query for the findings refinement. Works in conjunction with the
-      type field to determine the findings refinement behavior. The syntax of
-      this query is the same as a UDM search string.
-    max_retries (optional): Maximum number of times to retry HTTP request if
-      certain response codes are returned. For example: HTTP response status
-      code 429 (Too Many Requests)
+    Args:
+      http_session: Authorized session for HTTP requests.
+      display_name: Display name for the findings refinement
+      findings_refinement_type: The type of findings refinement to create.
+        Reference
+        https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.findingsRefinements#FindingsRefinementType
+      query: The query for the findings refinement. Works in conjunction with the
+        type field to determine the findings refinement behavior. The syntax of
+        this query is the same as a UDM search string.
+      max_retries (optional): Maximum number of times to retry HTTP request if
+        certain response codes are returned. For example: HTTP response status
+        code 429 (Too Many Requests)
 
-  Returns:
-    New findings refinement. Reference:
-      https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.findingsRefinements#FindingsRefinement
+    Returns:
+      New findings refinement. Reference:
+        https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.findingsRefinements#FindingsRefinement
 
-  Raises:
-    requests.exceptions.HTTPError: HTTP request resulted in an error
-    (response.status_code >= 400).
-    requests.exceptions.JSONDecodeError: If the server response is not valid
-    JSON.
-  """
-  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{os.environ['GOOGLE_SECOPS_INSTANCE']}/findingsRefinements"
-  body = {
-      "display_name": display_name,
-      "type": findings_refinement_type,
-      "query": query,
-  }
-  response = None
+    Raises:
+      requests.exceptions.HTTPError: HTTP request resulted in an error
+      (response.status_code >= 400).
+      requests.exceptions.JSONDecodeError: If the server response is not valid
+      JSON.
+    """
+    url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{os.environ['GOOGLE_SECOPS_INSTANCE']}/findingsRefinements"
+    body = {
+        "display_name": display_name,
+        "type": findings_refinement_type,
+        "query": query,
+    }
+    response = None
 
-  for _ in range(max(max_retries, 0) + 1):
-    response = http_session.request(method="POST", url=url, json=body)
+    for _ in range(max(max_retries, 0) + 1):
+        response = http_session.request(method="POST", url=url, json=body)
 
-    if response.status_code >= 400:
-      LOGGER.warning(response.text)
+        if response.status_code >= 400:
+            LOGGER.warning(response.text)
 
-    if response.status_code == 429:
-      LOGGER.warning(
-          "API rate limit exceeded. Sleeping for 60s before retrying"
-          )
-      time.sleep(60)
-    else:
-      break
+        if response.status_code == 429:
+            LOGGER.warning(
+                "API rate limit exceeded. Sleeping for 60s before retrying"
+            )
+            time.sleep(60)
+        else:
+            break
 
-  response.raise_for_status()
+    response.raise_for_status()
 
-  return response.json()
+    return response.json()

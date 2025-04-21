@@ -22,57 +22,57 @@ from google_secops_api.rules.get_rule_deployment import get_rule_deployment
 
 
 class GetRuleDeploymentTest(unittest.TestCase):
-  """Unit tests for the "get_rule_deployment" module."""
+    """Unit tests for the "get_rule_deployment" module."""
 
-  @mock.patch.object(
-      target=requests, attribute="AuthorizedSession", autospec=True
-  )
-  @mock.patch.object(
-      target=requests.requests, attribute="Response", autospec=True
-  )
-  def test_http_error(
-      self,
-      mock_response: unittest.mock.MagicMock,
-      mock_session: unittest.mock.MagicMock,
-  ):
-    """Test that an HTTP error occurs."""
-    mock_session.request.return_value = mock_response
-    type(mock_response).status_code = mock.PropertyMock(return_value=400)
-    mock_response.raise_for_status.side_effect = (
-        requests.requests.exceptions.HTTPError()
+    @mock.patch.object(
+        target=requests, attribute="AuthorizedSession", autospec=True
     )
-
-    with self.assertRaises(requests.requests.exceptions.HTTPError):
-      get_rule_deployment(
-          http_session=mock_session,
-          resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1",
-      )
-
-  @mock.patch.object(
-      target=requests, attribute="AuthorizedSession", autospec=True
-  )
-  @mock.patch.object(
-      target=requests.requests, attribute="Response", autospec=True
-  )
-  def test_http_ok(
-      self,
-      mock_response: unittest.mock.MagicMock,
-      mock_session: unittest.mock.MagicMock,
-  ):
-    """Test that HTTP response 200 (OK) occurs."""
-    mock_session.request.return_value = mock_response
-    type(mock_response).status_code = mock.PropertyMock(return_value=200)
-    expected_response = {
-        "name": "the rule's resource name",
-        "enabled": True,
-        "alerting": True,
-        "runFrequency": "LIVE",
-        "executionState": "DEFAULT",
-    }
-    mock_response.json.return_value = expected_response
-
-    response = get_rule_deployment(
-        http_session=mock_session,
-        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1",
+    @mock.patch.object(
+        target=requests.requests, attribute="Response", autospec=True
     )
-    self.assertEqual(response, expected_response)
+    def test_http_error(
+        self,
+        mock_response: unittest.mock.MagicMock,
+        mock_session: unittest.mock.MagicMock,
+    ):
+        """Test that an HTTP error occurs."""
+        mock_session.request.return_value = mock_response
+        type(mock_response).status_code = mock.PropertyMock(return_value=400)
+        mock_response.raise_for_status.side_effect = (
+            requests.requests.exceptions.HTTPError()
+        )
+
+        with self.assertRaises(requests.requests.exceptions.HTTPError):
+            get_rule_deployment(
+                http_session=mock_session,
+                resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1",
+            )
+
+    @mock.patch.object(
+        target=requests, attribute="AuthorizedSession", autospec=True
+    )
+    @mock.patch.object(
+        target=requests.requests, attribute="Response", autospec=True
+    )
+    def test_http_ok(
+        self,
+        mock_response: unittest.mock.MagicMock,
+        mock_session: unittest.mock.MagicMock,
+    ):
+        """Test that HTTP response 200 (OK) occurs."""
+        mock_session.request.return_value = mock_response
+        type(mock_response).status_code = mock.PropertyMock(return_value=200)
+        expected_response = {
+            "name": "the rule's resource name",
+            "enabled": True,
+            "alerting": True,
+            "runFrequency": "LIVE",
+            "executionState": "DEFAULT",
+        }
+        mock_response.json.return_value = expected_response
+
+        response = get_rule_deployment(
+            http_session=mock_session,
+            resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/rules/ru_cfc80c6b-f918-42ed-8d5c-9518c13586c1",
+        )
+        self.assertEqual(response, expected_response)

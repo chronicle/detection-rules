@@ -22,44 +22,44 @@ from google_secops_api.rules.verify_rule import verify_rule
 
 
 class VerifyRuleTest(unittest.TestCase):
-  """Unit tests for the "verify_rule" module."""
+    """Unit tests for the "verify_rule" module."""
 
-  @mock.patch.object(
-      target=requests, attribute="AuthorizedSession", autospec=True
-  )
-  @mock.patch.object(
-      target=requests.requests, attribute="Response", autospec=True
-  )
-  def test_http_error(
-      self,
-      mock_response: unittest.mock.MagicMock,
-      mock_session: unittest.mock.MagicMock,
-  ):
-    """Test that HTTP response 200 (OK) occurs."""
-    mock_session.request.return_value = mock_response
-    type(mock_response).status_code = mock.PropertyMock(return_value=400)
-    mock_response.raise_for_status.side_effect = (
-        requests.requests.exceptions.HTTPError()
+    @mock.patch.object(
+        target=requests, attribute="AuthorizedSession", autospec=True
     )
-
-    with self.assertRaises(requests.requests.exceptions.HTTPError):
-      verify_rule(
-          http_session=mock_session,
-          rule_text="new rule content",
-      )
-
-  @mock.patch.object(
-      target=requests, attribute="AuthorizedSession", autospec=True
-  )
-  @mock.patch.object(
-      target=requests.requests, attribute="Response", autospec=True
-  )
-  def test_http_ok(self, mock_response, mock_session):
-    """Test that HTTP response 200 (OK) occurs."""
-    mock_session.request.return_value = mock_response
-    type(mock_response).status_code = mock.PropertyMock(return_value=200)
-
-    verify_rule(
-        http_session=mock_session,
-        rule_text="new rule content",
+    @mock.patch.object(
+        target=requests.requests, attribute="Response", autospec=True
     )
+    def test_http_error(
+        self,
+        mock_response: unittest.mock.MagicMock,
+        mock_session: unittest.mock.MagicMock,
+    ):
+        """Test that HTTP response 200 (OK) occurs."""
+        mock_session.request.return_value = mock_response
+        type(mock_response).status_code = mock.PropertyMock(return_value=400)
+        mock_response.raise_for_status.side_effect = (
+            requests.requests.exceptions.HTTPError()
+        )
+
+        with self.assertRaises(requests.requests.exceptions.HTTPError):
+            verify_rule(
+                http_session=mock_session,
+                rule_text="new rule content",
+            )
+
+    @mock.patch.object(
+        target=requests, attribute="AuthorizedSession", autospec=True
+    )
+    @mock.patch.object(
+        target=requests.requests, attribute="Response", autospec=True
+    )
+    def test_http_ok(self, mock_response, mock_session):
+        """Test that HTTP response 200 (OK) occurs."""
+        mock_session.request.return_value = mock_response
+        type(mock_response).status_code = mock.PropertyMock(return_value=200)
+
+        verify_rule(
+            http_session=mock_session,
+            rule_text="new rule content",
+        )

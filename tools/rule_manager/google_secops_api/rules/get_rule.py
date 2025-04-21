@@ -33,42 +33,42 @@ def get_rule(
     resource_name: str,
     max_retries: int = 3,
 ) -> Mapping[str, Any]:
-  """Retrieves a rule.
+    """Retrieves a rule.
 
-  Args:
-    http_session: Authorized session for HTTP requests.
-    resource_name: The resource name of the rule to retrieve. Format:
-      projects/{project}/locations/{location}/instances/{instance}/rules/{rule_id}
-    max_retries (optional): Maximum number of times to retry HTTP request if
-      certain response codes are returned. For example: HTTP response status
-      code 429 (Too Many Requests)
+    Args:
+      http_session: Authorized session for HTTP requests.
+      resource_name: The resource name of the rule to retrieve. Format:
+        projects/{project}/locations/{location}/instances/{instance}/rules/{rule_id}
+      max_retries (optional): Maximum number of times to retry HTTP request if
+        certain response codes are returned. For example: HTTP response status
+        code 429 (Too Many Requests)
 
-  Returns:
-    Content and metadata about the requested rule.
+    Returns:
+      Content and metadata about the requested rule.
 
-  Raises:
-    requests.exceptions.HTTPError: HTTP request resulted in an error
-    (response.status_code >= 400).
-    requests.exceptions.JSONDecodeError: If the server response is not valid
-    JSON.
-  """
-  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{resource_name}"
-  response = None
+    Raises:
+      requests.exceptions.HTTPError: HTTP request resulted in an error
+      (response.status_code >= 400).
+      requests.exceptions.JSONDecodeError: If the server response is not valid
+      JSON.
+    """
+    url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{resource_name}"
+    response = None
 
-  for _ in range(max(max_retries, 0) + 1):
-    response = http_session.request(method="GET", url=url)
+    for _ in range(max(max_retries, 0) + 1):
+        response = http_session.request(method="GET", url=url)
 
-    if response.status_code >= 400:
-      LOGGER.warning(response.text)
+        if response.status_code >= 400:
+            LOGGER.warning(response.text)
 
-    if response.status_code == 429:
-      LOGGER.warning(
-          "API rate limit exceeded. Sleeping for 60s before retrying"
-          )
-      time.sleep(60)
-    else:
-      break
+        if response.status_code == 429:
+            LOGGER.warning(
+                "API rate limit exceeded. Sleeping for 60s before retrying"
+            )
+            time.sleep(60)
+        else:
+            break
 
-  response.raise_for_status()
+    response.raise_for_status()
 
-  return response.json()
+    return response.json()

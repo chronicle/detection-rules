@@ -49,11 +49,11 @@ jobs:
         run: pip install -r requirements_dev.txt
 
       - name: Check Python code formatting with black
-        run: python -m black google_secops_api rule_cli --line-length 120 --check
+        run: python -m black google_secops_api content_manager --line-length 120 --check
 
       - name: Run tests using pytest
         run: pytest -v
 
       - name: Verify YARA-L rules
         # Verify that all rules are valid YARA-L 2.0 rules via Google SecOps' API
-        run: python -m rule_cli --verify-rules
+        run: python -m content_manager --verify-rules

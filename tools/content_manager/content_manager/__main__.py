@@ -29,11 +29,11 @@ import google.auth.transport.requests
 from google_secops_api import auth
 from google_secops_api.rules.stream_test_rule import test_rule
 from google_secops_api.rules.verify_rule import verify_rule
-from rule_cli.common import datetime_converter
-from rule_cli.common.custom_exceptions import RuleVerificationError
-from rule_cli.reference_lists import ReferenceLists
-from rule_cli.rule_exclusions import RuleExclusions
-from rule_cli.rules import Rules
+from content_manager.common import datetime_converter
+from content_manager.common.custom_exceptions import RuleVerificationError
+from content_manager.reference_lists import ReferenceLists
+from content_manager.rule_exclusions import RuleExclusions
+from content_manager.rules import Rules
 
 LOGGER = logging.getLogger()
 

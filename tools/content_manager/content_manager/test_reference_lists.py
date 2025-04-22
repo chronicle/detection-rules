@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Tests for rule_cli.reference_lists."""
+"""Tests for content_manager.reference_lists."""
 import copy
 import json
 import pathlib
@@ -21,10 +21,10 @@ from typing import Any, Mapping, Sequence
 import pydantic
 import pytest
 import ruamel.yaml.constructor
-from rule_cli.common.custom_exceptions import ReferenceListConfigError
-from rule_cli.reference_lists import ReferenceList
-from rule_cli.reference_lists import ReferenceListConfigEntry
-from rule_cli.reference_lists import ReferenceLists
+from content_manager.common.custom_exceptions import ReferenceListConfigError
+from content_manager.reference_lists import ReferenceList
+from content_manager.reference_lists import ReferenceListConfigEntry
+from content_manager.reference_lists import ReferenceLists
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 REF_LISTS_DIR = ROOT_DIR / "reference_lists"

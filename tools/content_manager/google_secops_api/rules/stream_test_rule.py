@@ -24,7 +24,7 @@ import os
 from typing import Any, Iterator, Mapping, Sequence, Tuple
 
 from google.auth.transport import requests
-from rule_cli.common import datetime_converter
+from content_manager.common import datetime_converter
 
 # Set up logger that will include timestamps.
 logging.basicConfig(

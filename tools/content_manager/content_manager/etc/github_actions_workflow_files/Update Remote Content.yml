@@ -51,16 +51,16 @@ jobs:
         run: pip install -r requirements_dev.txt
 
       - name: Check Python code formatting with black
-        run: python -m black google_secops_api rule_cli --line-length 120 --check
+        run: python -m black google_secops_api content_manager --line-length 120 --check
 
       - name: Run tests using pytest
         run: pytest -v
 
       - name: Update reference lists in Google SecOps based on files in main branch
-        run: python -m rule_cli --update-remote-reference-lists
+        run: python -m content_manager --update-remote-reference-lists
 
       - name: Update rules in Google SecOps based on files in main branch
-        run: python -m rule_cli --update-remote-rules
+        run: python -m content_manager --update-remote-rules
 
       # After any changes are made to rules and reference lists in Google SecOps, the latest rules and reference lists are retrieved to update the main branch with the latest data (revision_id, revision_create_time, etc).
 

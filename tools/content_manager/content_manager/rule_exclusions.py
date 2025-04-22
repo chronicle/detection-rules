@@ -44,7 +44,7 @@ from google_secops_api.findings_refinements.update_findings_refinement_deploymen
 )
 import pydantic
 import ruamel.yaml
-from rule_cli.common.custom_exceptions import RuleExclusionConfigError
+from content_manager.common.custom_exceptions import RuleExclusionConfigError
 import yaml
 
 LOGGER = logging.getLogger()

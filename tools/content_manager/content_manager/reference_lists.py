@@ -34,7 +34,7 @@ from google_secops_api.reference_lists.update_reference_list import (
 )
 import pydantic
 import ruamel.yaml
-from rule_cli.common.custom_exceptions import ReferenceListConfigError
+from content_manager.common.custom_exceptions import ReferenceListConfigError
 import yaml
 
 LOGGER = logging.getLogger()

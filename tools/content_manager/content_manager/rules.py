@@ -35,10 +35,10 @@ from google_secops_api.rules.update_rule_deployment import (
 )
 import pydantic
 import ruamel.yaml
-from rule_cli.common.custom_exceptions import DuplicateRuleIdError
-from rule_cli.common.custom_exceptions import DuplicateRuleNameError
-from rule_cli.common.custom_exceptions import RuleConfigError
-from rule_cli.common.custom_exceptions import RuleError
+from content_manager.common.custom_exceptions import DuplicateRuleIdError
+from content_manager.common.custom_exceptions import DuplicateRuleNameError
+from content_manager.common.custom_exceptions import RuleConfigError
+from content_manager.common.custom_exceptions import RuleError
 import yaml
 
 LOGGER = logging.getLogger()

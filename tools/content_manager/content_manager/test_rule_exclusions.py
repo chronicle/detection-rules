@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Tests for rule_cli.rule_exclusions."""
+"""Tests for content_manager.rule_exclusions."""
 import copy
 import json
 import pathlib
@@ -22,10 +22,10 @@ import pydantic
 import pytest
 import ruamel.yaml
 import ruamel.yaml.constructor
-from rule_cli.common.custom_exceptions import RuleExclusionConfigError
-from rule_cli.rule_exclusions import RuleExclusion
-from rule_cli.rule_exclusions import RuleExclusionConfigEntry
-from rule_cli.rule_exclusions import RuleExclusions
+from content_manager.common.custom_exceptions import RuleExclusionConfigError
+from content_manager.rule_exclusions import RuleExclusion
+from content_manager.rule_exclusions import RuleExclusionConfigEntry
+from content_manager.rule_exclusions import RuleExclusions
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "test_data"

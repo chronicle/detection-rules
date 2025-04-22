@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Tests for rule_cli.rules."""
+"""Tests for content_manager.rules."""
 
 # pylint: disable="g-bool-id-comparison"
 
@@ -24,13 +24,13 @@ from typing import Any, Mapping, Sequence
 import pydantic
 import pytest
 import ruamel.yaml.constructor
-from rule_cli.common.custom_exceptions import DuplicateRuleIdError
-from rule_cli.common.custom_exceptions import DuplicateRuleNameError
-from rule_cli.common.custom_exceptions import RuleConfigError
-from rule_cli.common.custom_exceptions import RuleError
-from rule_cli.rules import Rule
-from rule_cli.rules import RuleConfigEntry
-from rule_cli.rules import Rules
+from content_manager.common.custom_exceptions import DuplicateRuleIdError
+from content_manager.common.custom_exceptions import DuplicateRuleNameError
+from content_manager.common.custom_exceptions import RuleConfigError
+from content_manager.common.custom_exceptions import RuleError
+from content_manager.rules import Rule
+from content_manager.rules import RuleConfigEntry
+from content_manager.rules import Rules
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 RULES_DIR = ROOT_DIR / "rules"

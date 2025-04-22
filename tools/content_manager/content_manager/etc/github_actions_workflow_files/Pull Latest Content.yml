@@ -51,16 +51,16 @@ jobs:
         run: pip install -r requirements_dev.txt
 
       - name: Check Python code formatting with black
-        run: python -m black google_secops_api rule_cli --line-length 120 --check
+        run: python -m black google_secops_api content_manager --line-length 120 --check
 
       - name: Run tests using pytest
         run: pytest -v
 
       - name: Pull latest version of all rules from Google SecOps
-        run: python -m rule_cli --pull-latest-rules
+        run: python -m content_manager --pull-latest-rules
 
       - name: Pull latest version of all reference lists from Google SecOps
-        run: python -m rule_cli --pull-latest-reference-lists
+        run: python -m content_manager --pull-latest-reference-lists
 
       - name: Add files to git staging area
         run: git add rules rule_config.yaml reference_lists reference_list_config.yaml

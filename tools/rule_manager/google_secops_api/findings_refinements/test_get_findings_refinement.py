@@ -24,60 +24,60 @@ from google_secops_api.findings_refinements.get_findings_refinement import (
 
 
 class GetFindingsRefinementTest(unittest.TestCase):
-    """Unit tests for the "get_findings_refinement" module."""
+  """Unit tests for the "get_findings_refinement" module."""
 
-    @mock.patch.object(
-        target=requests, attribute="AuthorizedSession", autospec=True
+  @mock.patch.object(
+      target=requests, attribute="AuthorizedSession", autospec=True
+  )
+  @mock.patch.object(
+      target=requests.requests, attribute="Response", autospec=True
+  )
+  def test_http_error(
+      self,
+      mock_response: unittest.mock.MagicMock,
+      mock_session: unittest.mock.MagicMock,
+  ):
+    """Test that an HTTP error occurs."""
+    mock_session.request.return_value = mock_response
+    type(mock_response).status_code = mock.PropertyMock(return_value=400)
+    mock_response.raise_for_status.side_effect = (
+        requests.requests.exceptions.HTTPError()
     )
-    @mock.patch.object(
-        target=requests.requests, attribute="Response", autospec=True
-    )
-    def test_http_error(
-        self,
-        mock_response: unittest.mock.MagicMock,
-        mock_session: unittest.mock.MagicMock,
-    ):
-        """Test that an HTTP error occurs."""
-        mock_session.request.return_value = mock_response
-        type(mock_response).status_code = mock.PropertyMock(return_value=400)
-        mock_response.raise_for_status.side_effect = (
-            requests.requests.exceptions.HTTPError()
-        )
 
-        with self.assertRaises(requests.requests.exceptions.HTTPError):
-            get_findings_refinement(
-                http_session=mock_session,
-                resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d0012",
-            )
+    with self.assertRaises(requests.requests.exceptions.HTTPError):
+      get_findings_refinement(
+          http_session=mock_session,
+          resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d0012",
+      )
 
-    @mock.patch.object(
-        target=requests, attribute="AuthorizedSession", autospec=True
-    )
-    @mock.patch.object(
-        target=requests.requests, attribute="Response", autospec=True
-    )
-    def test_http_ok(
-        self,
-        mock_response: unittest.mock.MagicMock,
-        mock_session: unittest.mock.MagicMock,
-    ):
-        """Test that HTTP response 200 (OK) occurs."""
-        mock_session.request.return_value = mock_response
-        type(mock_response).status_code = mock.PropertyMock(return_value=200)
-        expected_rule_exclusion = {
-            "name": (
-                "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d0012"
-            ),
-            "displayName": "Test 1",
-            "type": "DETECTION_EXCLUSION",
-            "createTime": "2025-03-11T15:19:39.156463Z",
-            "updateTime": "2025-03-11T15:19:39.156463Z",
-            "query": '(principal.hostname = "lab-desktop-1")',
-        }
-        mock_response.json.return_value = expected_rule_exclusion
+  @mock.patch.object(
+      target=requests, attribute="AuthorizedSession", autospec=True
+  )
+  @mock.patch.object(
+      target=requests.requests, attribute="Response", autospec=True
+  )
+  def test_http_ok(
+      self,
+      mock_response: unittest.mock.MagicMock,
+      mock_session: unittest.mock.MagicMock,
+  ):
+    """Test that HTTP response 200 (OK) occurs."""
+    mock_session.request.return_value = mock_response
+    type(mock_response).status_code = mock.PropertyMock(return_value=200)
+    expected_rule_exclusion = {
+        "name": (
+            "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d0012"
+        ),
+        "displayName": "Test 1",
+        "type": "DETECTION_EXCLUSION",
+        "createTime": "2025-03-11T15:19:39.156463Z",
+        "updateTime": "2025-03-11T15:19:39.156463Z",
+        "query": '(principal.hostname = "lab-desktop-1")',
+    }
+    mock_response.json.return_value = expected_rule_exclusion
 
-        response = get_findings_refinement(
-            http_session=mock_session,
-            resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d0012",
-        )
-        self.assertEqual(response, expected_rule_exclusion)
+    response = get_findings_refinement(
+        http_session=mock_session,
+        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/findingsRefinements/fr_caf666f6-bf55-45c9-8c25-7283616d0012",
+    )
+    self.assertEqual(response, expected_rule_exclusion)

@@ -37,71 +37,71 @@ def update_reference_list(
     update_mask: List[str] | None = None,
     max_retries: int = 3,
 ) -> Mapping[str, Any]:
-    """Updates an existing reference list.
+  """Updates an existing reference list.
 
-    Args:
-      http_session: Authorized session for HTTP requests.
-      resource_name: The resource name of the reference list to retrieve. Format:
-        projects/{project}/locations/{location}/instances/{instance}/referenceLists/{reference_list_name}
-        updates: A dictionary containing the updates to make to the reference
-        list. Example: A value of {"entries": ["entry1", "entry2"]} will update
-        the entries in the reference list accordingly.
-      update_mask (optional): The list of fields to update for the reference
-        list. If no update_mask is provided, all non-empty fields will be
-        updated. Example: An update_mask of ["entries"] will update the entries
-        for a reference list.
-      max_retries (optional): Maximum number of times to retry HTTP request if
-        certain response codes are returned. For example: HTTP response status
-        code 429 (Too Many Requests)
+  Args:
+    http_session: Authorized session for HTTP requests.
+    resource_name: The resource name of the reference list to retrieve. Format:
+      projects/{project}/locations/{location}/instances/{instance}/referenceLists/{reference_list_name}
+      updates: A dictionary containing the updates to make to the reference
+      list. Example: A value of {"entries": ["entry1", "entry2"]} will update
+      the entries in the reference list accordingly.
+    update_mask (optional): The list of fields to update for the reference
+      list. If no update_mask is provided, all non-empty fields will be
+      updated. Example: An update_mask of ["entries"] will update the entries
+      for a reference list.
+    max_retries (optional): Maximum number of times to retry HTTP request if
+      certain response codes are returned. For example: HTTP response status
+      code 429 (Too Many Requests)
 
-    Returns:
-      New version of the reference list.
+  Returns:
+    New version of the reference list.
 
-    Raises:
-      requests.exceptions.HTTPError: HTTP request resulted in an error
-      (response.status_code >= 400).
-      requests.exceptions.JSONDecodeError: If the server response is not valid
-      JSON.
-    """
-    url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{resource_name}"
-    response = None
+  Raises:
+    requests.exceptions.HTTPError: HTTP request resulted in an error
+    (response.status_code >= 400).
+    requests.exceptions.JSONDecodeError: If the server response is not valid
+    JSON.
+  """
+  url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{resource_name}"
+  response = None
 
-    # If no update_mask is provided, all non-empty fields will be updated
-    if update_mask is None:
-        params = {}
+  # If no update_mask is provided, all non-empty fields will be updated
+  if update_mask is None:
+    params = {}
+  else:
+    params = {"updateMask": update_mask}
+
+  if updates.get("entries") is not None:
+    if (
+        len(updates.get("entries")) == 0
+    ):  # pylint: disable=g-explicit-length-test
+      # If 'entries' is an empty list, the reference list is empty [{}]
+      updates["entries"] = [{}]
     else:
-        params = {"updateMask": update_mask}
+      # Format reference list entries as a list of
+      # dictionaries: [{"value": <string>}, ...]
+      reference_list_entries = []
+      for entry in updates["entries"]:
+        reference_list_entries.append({"value": entry.strip()})
+      updates["entries"] = copy.deepcopy(reference_list_entries)
 
-    if updates.get("entries") is not None:
-        if (
-            len(updates.get("entries")) == 0
-        ):  # pylint: disable=g-explicit-length-test
-            # If 'entries' is an empty list, the reference list is empty [{}]
-            updates["entries"] = [{}]
-        else:
-            # Format reference list entries as a list of
-            # dictionaries: [{"value": <string>}, ...]
-            reference_list_entries = []
-            for entry in updates["entries"]:
-                reference_list_entries.append({"value": entry.strip()})
-            updates["entries"] = copy.deepcopy(reference_list_entries)
+  for _ in range(max(max_retries, 0) + 1):
+    response = http_session.request(
+        method="PATCH", url=url, params=params, json=updates
+    )
 
-    for _ in range(max(max_retries, 0) + 1):
-        response = http_session.request(
-            method="PATCH", url=url, params=params, json=updates
-        )
+    if response.status_code >= 400:
+      LOGGER.warning(response.text)
 
-        if response.status_code >= 400:
-            LOGGER.warning(response.text)
+    if response.status_code == 429:
+      LOGGER.warning(
+          "API rate limit exceeded. Sleeping for 60s before retrying"
+      )
+      time.sleep(60)
+    else:
+      break
 
-        if response.status_code == 429:
-            LOGGER.warning(
-                "API rate limit exceeded. Sleeping for 60s before retrying"
-            )
-            time.sleep(60)
-        else:
-            break
+  response.raise_for_status()
 
-    response.raise_for_status()
-
-    return response.json()
+  return response.json()

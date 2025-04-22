@@ -16,28 +16,28 @@
 
 
 class RuleError(Exception):
-    """Raised when an issue is found with a YARA-L rule."""
+  """Raised when an issue is found with a YARA-L rule."""
 
 
 class RuleVerificationError(Exception):
-    """Raised when a YARA-L 2.0 rule verification error occurs."""
+  """Raised when a YARA-L 2.0 rule verification error occurs."""
 
 
 class RuleConfigError(Exception):
-    """Raised when an issue with the rule config file is found."""
+  """Raised when an issue with the rule config file is found."""
 
 
 class DuplicateRuleIdError(Exception):
-    """Raised when a duplicate rule ID is found."""
+  """Raised when a duplicate rule ID is found."""
 
 
 class DuplicateRuleNameError(Exception):
-    """Raised when a duplicate rule name is found."""
+  """Raised when a duplicate rule name is found."""
 
 
 class ReferenceListConfigError(Exception):
-    """Raised when an issue with the reference list config file is found."""
+  """Raised when an issue with the reference list config file is found."""
 
 
 class RuleExclusionConfigError(Exception):
-    """Raised when an issue with the rule exclusion config file is found."""
+  """Raised when an issue with the rule exclusion config file is found."""

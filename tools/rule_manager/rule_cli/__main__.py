@@ -77,9 +77,7 @@ class RuleOperations:
     remote_rules.dump_rule_config()
 
   @classmethod
-  def update(
-      cls
-    ):
+  def update(cls):
     """Update rules in Google SecOps based on local rule files."""
     http_session = initialize_http_session()
 

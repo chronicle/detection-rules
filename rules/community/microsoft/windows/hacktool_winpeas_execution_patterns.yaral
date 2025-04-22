@@ -1,0 +1,85 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule hacktool_winpeas_execution_patterns {
+
+    meta:
+      author = "Georg Lauenstein - suresecure GmbH"
+      description = "This detection rule identifies the execution of WinPEAS (Windows Privilege Escalation Awesome Script), a post-exploitation reconnaissance tool used to discover privilege escalation paths on Windows systems. WinPEAS performs a wide range of local enumeration checks, including service misconfigurations, permission issues, token privileges, and more. Its usage is commonly observed during red team assessments and by adversaries seeking to elevate privileges after gaining initial access. WinPEAS checks are well-documented in the HackTricks knowledge base."
+      rule_id = "mr_9c9ad668-485a-4b10-b85d-36ba63546304"
+      rule_name = "Hacktool - WinPEAS Execution Patterns"
+      tactic = "TA0007"
+      technique = "T1082"
+      references = "https://github.com/carlospolop/PEASS-ng, https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html, https://www.microsoft.com/en-us/security/blog/2022-10-14/new-prestige-ransomware-impacts-organizations-in-ukraine-and-poland/, https://www.logpoint.com/wp-content/uploads/2023/02/emerging-threats-the-play-report.pdf"
+      type = "alert"
+      platform = "Windows, EDR"
+      data_source = "Microsoft Sysmon, Windows Event Logs"
+      severity = "Medium"  // Adjust based on your risk assessment
+      priority = "Medium"  // Adjust based on your incident response process
+
+    events:
+      $winpeas_execution.metadata.event_type = "PROCESS_LAUNCH"
+      and
+        (
+          $winpeas_execution.src.process.file.full_path = /winPEAS.exe|winPEASany.exe|winPEASany_ofs.exe|winPEASx64.exe|winPEASx64_ofs.exe|winPEASx86.exe|winPEASx86_ofs.exe/ nocase or
+          $winpeas_execution.target.process.file.full_path = /\\winPEAS\.exe|\\winPEASany\.exe|\\winPEASany_ofs\.exe|\\winPEASx64\.exe|\\winPEASx64_ofs\.exe|\\winPEASx86\.exe|\\winPEASx86_ofs\.exe/ nocase or
+          $winpeas_execution.target.process.command_line = /processinfo|servicesinfo|applicationsinfo|networkinfo|windowscreds|browserinfo|filesinfo|fileanalysis|eventsinfo/ nocase
+
+          or
+            (
+              $winpeas_execution.target.process.command_line = /raw\.githubusercontent\.com/ nocase and
+              $winpeas_execution.target.process.command_line = /carlospolop/ nocase and
+              $winpeas_execution.target.process.command_line = /winPEAS\.ps1/ nocase
+            )
+
+          or
+            (
+              $winpeas_execution.principal.process.command_line = / -linpeas$/ nocase or
+              $winpeas_execution.target.process.command_line = / -linpeas$/ nocase
+            )
+        )
+
+      not
+        (
+          // Exclusion: Microsoft Defender Threat Protection Sensor Updates
+          $winpeas_execution.additional.fields["current_directory"] = "C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Downloads\\"
+        )
+
+      // Capture the hostname where the event occurred
+      $winpeas_execution.principal.hostname = $hostname
+
+    match:
+      $hostname over 10m
+
+    outcome:
+      $risk_score = max(65)
+      $event_count = count_distinct($winpeas_execution.metadata.id)
+      $principal_process_pid = array_distinct($winpeas_execution.principal.process.pid)
+      $principal_process_command_line = array_distinct($winpeas_execution.principal.process.command_line)
+      $principal_process_file_sha256 = array_distinct($winpeas_execution.principal.process.file.sha256)
+      $principal_process_file_full_path = array_distinct($winpeas_execution.principal.process.file.full_path)
+      $principal_process_product_specific_process_id = array_distinct($winpeas_execution.principal.process.product_specific_process_id)
+      $principal_process_parent_process_product_specific_process_id = array_distinct($winpeas_execution.principal.process.parent_process.product_specific_process_id)
+      $target_process_pid = array_distinct($winpeas_execution.target.process.pid)
+      $target_process_command_line = array_distinct($winpeas_execution.target.process.command_line)
+      $target_process_file_sha256 = array_distinct($winpeas_execution.target.process.file.sha256)
+      $target_process_file_full_path = array_distinct($winpeas_execution.target.process.file.full_path)
+      $target_process_product_specific_process_id = array_distinct($winpeas_execution.target.process.product_specific_process_id)
+      $principal_user_userid = array_distinct($winpeas_execution.principal.user.userid)
+
+    condition:
+      $winpeas_execution
+}

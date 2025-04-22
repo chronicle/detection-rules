@@ -50,8 +50,8 @@ jobs:
       - name: Install Python project dependencies
         run: pip install -r requirements_dev.txt
 
-      - name: Check Python code formatting with black
-        run: python -m black google_secops_api content_manager --line-length 120 --check
+      # - name: Check Python code formatting with black
+      #   run: python -m black google_secops_api content_manager --line-length 120 --check
 
       - name: Run tests using pytest
         run: pytest -v

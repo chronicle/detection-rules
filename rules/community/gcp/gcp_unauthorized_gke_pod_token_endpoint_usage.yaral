@@ -14,29 +14,22 @@
  * limitations under the License.
  */
 
-rule gcp_unauthorized_gke_pod_token_endpoint_usage{
-  
+rule gcp_unauthorized_gke_pod_token_endpoint_usage {
 
   meta:
-    
     author = "Drew Pilarski - Tempus AI"
     description = "Alerts when an authorization token originating from GKE activity is subsequently used within a command line on an endpoint system, suggesting potential credential exfiltration and reuse."
-    rule_id = ""
+    rule_id = "mr_c9a0cb63-0e35-45eb-8b43-ae48385985dc"
     rule_name = "GCP_Uunauthorized_GKE_Pod_Token_Endpoint_Usage"
-    mitre_attack_tactic = "Lateral Movement"
-    mitre_attack_technique = "Use Alternate Authentication Material (T1550)"
-    mitre_attack_sub_technique = "Application Access Token (T1550.001)"
+    tactic = "TA0008"
+    technique = "T1550.001"
     type = "Alert"
     platform = "GCP"
     data_source = "Cloud Audit Logs"
     severity = "Medium"  // Adjust based on your risk assessment
     priority = "Medium"  // Adjust based on your incident response process
 
-
-
   events:
-    
-    
     // This pulls the auth token from application in kubernetes events
     $app_token.metadata.base_labels.log_types = "KUBERNETES_NODE"
     $namespace = $app_token.metadata.base_labels.namespaces 
@@ -44,7 +37,7 @@ rule gcp_unauthorized_gke_pod_token_endpoint_usage{
     $pod_name = $app_token.target.resource_ancestors.attribute.labels["pod_name"]
     $auth_token = strings.concat("Authorization: ", $app_token.about.labels["Authorization"])
 
-    //This block enrichs the auth token statement sinces its missing critical field
+    //This block enriches the auth token statement sinces its missing critical field
     $k8_enrich.metadata.base_labels.log_types = "KUBERNETES_NODE"
     $traceIdValue = $k8_enrich.about[0].labels[0].value 
     $k8_enrich.target.ip != ""
@@ -62,10 +55,9 @@ rule gcp_unauthorized_gke_pod_token_endpoint_usage{
     $comp_enrich.metadata.log_type = "CS_EDR"
     $computer_name = $comp_enrich.principal.asset.hostname
     $username = $comp_enrich.target.user.userid 
-    
+
   match:
     $traceIdValue, $auth_token, $computer_name over 24h
-
 
   outcome:
     $token = array_distinct($auth_token)
@@ -79,9 +71,6 @@ rule gcp_unauthorized_gke_pod_token_endpoint_usage{
     $traceId = array_distinct($traceIdValue)
     $action = array_distinct($app_token.metadata.product_event_type)
     $account_name = array_distinct($comp_enrich.principal.user.email_addresses)
-    $mitre_attack_tactic = array_distinct("Lateral Movement")
-    $mitre_attack_technique = array_distinct("Use Alternate Authentication Material")
-    $mitre_attack_technique_id = array_distinct("T1550.001")
 
   condition:
     $app_token and $k8_enrich and $comp_token and $comp_enrich

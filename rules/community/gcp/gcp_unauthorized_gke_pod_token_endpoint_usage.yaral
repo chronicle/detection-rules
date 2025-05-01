@@ -31,6 +31,8 @@ rule gcp_unauthorized_gke_pod_token_endpoint_usage {
 
   events:
     // This pulls the auth token from application in kubernetes events
+    $app_token.metadata.vendor_name = "Google"
+    $app_token.metadata.log_type = "GCP_CLOUDAUDIT"
     $app_token.metadata.base_labels.log_types = "KUBERNETES_NODE"
     $namespace = $app_token.metadata.base_labels.namespaces
     $traceIdValue = $app_token.about.labels["traceId"]
@@ -38,6 +40,8 @@ rule gcp_unauthorized_gke_pod_token_endpoint_usage {
     $auth_token = strings.concat("Authorization: ", $app_token.about.labels["Authorization"])
 
     //This block enriches the auth token statement sinces its missing critical field
+    $k8_enrich.metadata.vendor_name = "Google"
+    $k8_enrich.metadata.log_type = "GCP_CLOUDAUDIT"
     $k8_enrich.metadata.base_labels.log_types = "KUBERNETES_NODE"
     $traceIdValue = $k8_enrich.about[0].labels[0].value
     $k8_enrich.target.ip != ""

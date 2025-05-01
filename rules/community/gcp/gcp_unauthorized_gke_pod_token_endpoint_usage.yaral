@@ -32,14 +32,14 @@ rule gcp_unauthorized_gke_pod_token_endpoint_usage {
   events:
     // This pulls the auth token from application in kubernetes events
     $app_token.metadata.base_labels.log_types = "KUBERNETES_NODE"
-    $namespace = $app_token.metadata.base_labels.namespaces 
+    $namespace = $app_token.metadata.base_labels.namespaces
     $traceIdValue = $app_token.about.labels["traceId"]
     $pod_name = $app_token.target.resource_ancestors.attribute.labels["pod_name"]
     $auth_token = strings.concat("Authorization: ", $app_token.about.labels["Authorization"])
 
     //This block enriches the auth token statement sinces its missing critical field
     $k8_enrich.metadata.base_labels.log_types = "KUBERNETES_NODE"
-    $traceIdValue = $k8_enrich.about[0].labels[0].value 
+    $traceIdValue = $k8_enrich.about[0].labels[0].value
     $k8_enrich.target.ip != ""
     $pod_ip_1 = $k8_enrich.target.ip[0]
     $email = $k8_enrich.target.user.email_addresses
@@ -48,13 +48,13 @@ rule gcp_unauthorized_gke_pod_token_endpoint_usage {
     $comp_token.metadata.log_type = "CS_EDR"
     $comp_token.target.process.command_line = /Bearer/
     $auth_token = strings.concat("Authorization: ", re.capture($comp_token.target.process.command_line, /Bearer [^\ |^\"]*/))
-    $computer_name = $comp_token.principal.asset.hostname 
+    $computer_name = $comp_token.principal.asset.hostname
     $tar_process = $comp_token.target.process.command_line
 
     $comp_enrich.metadata.event_type = "USER_LOGIN"
     $comp_enrich.metadata.log_type = "CS_EDR"
     $computer_name = $comp_enrich.principal.asset.hostname
-    $username = $comp_enrich.target.user.userid 
+    $username = $comp_enrich.target.user.userid
 
   match:
     $traceIdValue, $auth_token, $computer_name over 24h

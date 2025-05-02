@@ -578,7 +578,7 @@ class Rules:
         rules_dir=rules_dir, rule_config_file=rule_config_file
     )
 
-    if local_rules.rules:
+    if not local_rules.rules:
       LOGGER.info("No local rule files found")
       return
 

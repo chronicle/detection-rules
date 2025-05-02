@@ -117,7 +117,7 @@ GOOGLE_SECOPS_SERVICE_ACCOUNT_KEY={"type":"service_account","project_id":"xxx","
 This section provides a detailed explanation for each of the environment
 variables you'll need to configure in the `.env` file.
 
-Need help after reading this documentation? Please open an issue in this repo or reach out in the Google Cloud Security [community](https://www.googlecloudcommunity.com/gc/Google-Security-Operations/ct-p/security-chronicle). Please refrain from including any sensitive information such as service account keys or customer identifiers.
+Need help after reading this documentation? Please open an issue in this repo or reach out in the Google Cloud Security [community](https://secopscommunity.com). Please refrain from including any sensitive information such as service account keys or customer identifiers.
 
 #### `LOGGING_LEVEL`
 
@@ -490,4 +490,4 @@ Example output from update remote rule exclusions command.
 
 ## Need help?
 
-Please open an issue in this repo or reach out in the Google Cloud Security [community](https://www.googlecloudcommunity.com/gc/Google-Security-Operations/ct-p/security-chronicle).
+Please open an issue in this repo or reach out in the Google Cloud Security [community](https://secopscommunity.com).

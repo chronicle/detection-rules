@@ -157,7 +157,7 @@ Options:
 
 Commands:
   reference-lists  Manage reference lists.
-  rule-exclusions  Manage reference lists.
+  rule-exclusions  Manage rule exclusions.
   rules            Manage rules.
 ```
 

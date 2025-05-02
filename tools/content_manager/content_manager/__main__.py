@@ -488,7 +488,7 @@ def update_reference_lists():
 
 @click.group()
 def rule_exclusions():
-  """Manage reference lists."""
+  """Manage rule exclusions."""
 
 
 @rule_exclusions.command(
@@ -510,8 +510,7 @@ def get_rule_exclusions():
 @rule_exclusions.command(
     "update",
     short_help=(
-        "Retrieve the latest rule exclusions from Google SecOps and update"
-        " local config."
+        "Update rule exclusions in Google SecOps based on local config file"
     ),
 )
 def update():

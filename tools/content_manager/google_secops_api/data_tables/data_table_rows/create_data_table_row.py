@@ -31,7 +31,7 @@ LOGGER = logging.getLogger()
 def create_data_table_row(
     http_session: requests.AuthorizedSession,
     resource_name: str,
-    column_values: Sequence[str],
+    row_values: Sequence[str],
     max_retries: int = 3,
 ) -> Mapping[str, Any]:
   """Create a data table row.
@@ -40,8 +40,8 @@ def create_data_table_row(
     http_session: Authorized session for HTTP requests.
     resource_name: The resource name of the data table to create a row for.
       Format: projects/{project}/locations/{location}/instances/{instance}/dataTables/{data_table_name}
-    column_values: The column values for the row. These values should be in the
-      same order as data table's columns.
+    row_values: The values for the row. These values should be in the same order
+      as data table's columns.
     max_retries (optional): Maximum number of times to retry HTTP request if
       certain response codes are returned. For example: HTTP response status
       code 429 (Too Many Requests)
@@ -56,7 +56,7 @@ def create_data_table_row(
     JSON.
   """
   url = f"{os.environ['GOOGLE_SECOPS_API_BASE_URL']}/{resource_name}/dataTableRows"
-  body = {"values": column_values}
+  body = {"values": row_values}
 
   response = None
 

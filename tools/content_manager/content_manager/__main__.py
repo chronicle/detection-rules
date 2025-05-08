@@ -63,14 +63,6 @@ class RuleOperations:
     """Retrieves the latest version of all rules from Google SecOps and updates the local rule files."""
     http_session = initialize_http_session()
 
-    from google_secops_api.data_tables.data_table_rows.create_data_table_row import create_data_table_row
-
-    response = create_data_table_row(
-        http_session=http_session,
-        resource_name="projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/dataTables/data_table_4",
-        values=["test 1", "desktop89237489789"],
-    )
-
     remote_rules = Rules.get_remote_rules(http_session=http_session)
 
     if not remote_rules.rules:

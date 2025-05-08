@@ -41,9 +41,9 @@ def update_reference_list(
 
   Args:
     http_session: Authorized session for HTTP requests.
-    resource_name: The resource name of the reference list to retrieve. Format:
+    resource_name: The resource name of the reference list to update. Format:
       projects/{project}/locations/{location}/instances/{instance}/referenceLists/{reference_list_name}
-      updates: A dictionary containing the updates to make to the reference
+    updates: A dictionary containing the updates to make to the reference
       list. Example: A value of {"entries": ["entry1", "entry2"]} will update
       the entries in the reference list accordingly.
     update_mask (optional): The list of fields to update for the reference

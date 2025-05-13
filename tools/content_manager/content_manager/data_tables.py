@@ -41,7 +41,7 @@ DATA_TABLE_CONFIG_FILE = ROOT_DIR / "data_table_config.yaml"
 DATA_TABLE_COLUMN_TYPES = Literal["CIDR",  "STRING", "REGEX"]
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
-# (i.e. duplicate reference list names)
+# (i.e. duplicate data table names)
 ruamel_yaml = ruamel.yaml.YAML(typ="safe")
 
 

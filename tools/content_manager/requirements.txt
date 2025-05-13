@@ -1,0 +1,7 @@
+google-auth
+requests
+python-dotenv
+PyYAML
+ruamel.yaml
+pydantic~=2.6.0
+click

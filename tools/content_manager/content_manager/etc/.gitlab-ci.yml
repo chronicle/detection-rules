@@ -1,0 +1,133 @@
+image: python:3.10-slim
+
+stages:
+  - scheduled
+  - test
+  - deploy
+
+# Setup the environment.
+before_script:
+  - echo "Setting up Python environment."
+  - pip install --upgrade pip
+  - pip install virtualenv
+  - python -m virtualenv venv
+  - source venv/bin/activate
+  - which python  # Check that the virtual environment is activated.
+  - python --version ; pip --version
+  # Install project requirements.
+  - pip install -r requirements_dev.txt
+
+  # Setting up git environment.
+  - echo "Installing git."
+  - apt-get update -qy && apt-get upgrade -qy
+  - apt-get install -y git
+  - git --version
+
+# Run tests when commits are made to branches other than main.
+run-tests:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "main"
+  script:
+    # Commands for debugging purposes.
+    - which python
+    - pwd
+    - git branch
+
+    # Run tests
+    - pytest -v
+
+    # Verify that all rules are valid YARA-L 2.0 rules via Google SecOps's API
+    - python -m content_manager rules verify-all
+
+# Pull the latest version of all rules from Google SecOps and commit them to the repo.
+pull-latest-rules:
+  stage: scheduled
+  rules:
+    # This job should only be run manually or via a scheduled pipeline job.
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "main"
+      when: always
+  script:
+    # Commands for debugging purposes.
+    - which python
+    - pwd
+    - git branch
+
+    # Run tests
+    - pytest -v
+
+    # Clone the repository via HTTPS inside a new directory. The new directory is named using the CI_COMMIT_SHA variable (the commit revision the project is built for).
+    - git clone "https://${GITLAB_USERNAME}:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "${CI_COMMIT_SHA}"
+    # Go to the new directory.
+    - cd "${CI_COMMIT_SHA}"
+
+    # Set the username and email to be associated with commits.
+    - git config --global user.email "${GIT_USER_EMAIL:-$GITLAB_USER_EMAIL}"
+    - git config --global user.name "${GIT_USER_NAME:-$GITLAB_USER_NAME}"
+
+    # Pull the latest version of all rules from Google SecOps
+    - echo "Attempting to pull the latest version of all rules from Google SecOps"
+    - python -m content_manager rules get
+
+    # Add files to git staging area
+    - git add rules rule_config.yaml
+
+    # Check if there are any rule updates that need to be committed to the repo's main branch.
+    - echo "Checking for updates to rules."
+    - git status
+
+    # Get a count of changes.
+    - CHANGES=$(git status --porcelain | wc -l)
+
+    # Commit and push changes if there are any. Skip the CI pipeline (ci.skip).
+    - echo "There are $CHANGES changes to commit" && [ "$CHANGES" -gt "0" ] && git commit -m "latest rules pulled from google secops api" && git push origin "${CI_DEFAULT_BRANCH}" -o ci.skip
+
+    - echo "Current time is $(date)"
+    # Show last commit message.
+    - git log -1
+
+# Update rules in Google SecOps based on local rule files.
+update-remote-rules:
+  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
+  script:
+    # Commands for debugging purposes.
+    - which python
+    - pwd
+    - git branch
+
+    # Run tests
+    - pytest -v
+
+    # Clone the repository via HTTPS inside a new directory. The new directory is named using the CI_COMMIT_SHA variable (the commit revision the project is built for).
+    - git clone "https://${GITLAB_USERNAME}:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "${CI_COMMIT_SHA}"
+    # Go to the new directory.
+    - cd "${CI_COMMIT_SHA}"
+
+    # Set the username and email to be associated with commits.
+    - git config --global user.email "${GIT_USER_EMAIL:-$GITLAB_USER_EMAIL}"
+    - git config --global user.name "${GIT_USER_NAME:-$GITLAB_USER_NAME}"
+
+    # Update rules in Google SecOps based on rule files in main branch.
+    - echo "Attempting to update rules in Google SecOps based on local rule files."
+    - python -m content_manager rules update
+
+    # After any changes are made to rules in Google SecOps, the latest rules are retrieved to update the main branch with the latest rule data (revision_id, revision_create_time, etc).
+
+    # Add files to git staging area
+    - git add rules rule_config.yaml
+
+    # Check if there are any rule updates that need to be committed to the repo's main branch.
+    - echo "Checking for updates to rules."
+    - git status
+
+    # Get a count of changes.
+    - CHANGES=$(git status --porcelain | wc -l)
+
+    # Commit and push changes if there are any. Skip the CI pipeline (ci.skip).
+    - echo "There are $CHANGES changes to commit" && [ "$CHANGES" -gt "0" ] && git commit -m "latest rules pulled from google secops api" && git push origin "${CI_DEFAULT_BRANCH}" -o ci.skip
+
+    - echo "Current time is $(date)"
+    # Show last commit message.
+    - git log -1

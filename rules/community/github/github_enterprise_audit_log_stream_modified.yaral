@@ -34,7 +34,7 @@ rule github_enterprise_audit_log_stream_modified {
     reference = "https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise"
 
   events:
-    $github.metadata.vendor_name = "GITHUB"
+    $github.metadata.vendor_name = "GITHUB" nocase
     $github.metadata.product_name = "GITHUB"
     $github.metadata.product_event_type = "audit_log_streaming.update"
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,8 @@ rule o365_onedrive_anonymous_link_accessed {
     description = "Anonymous links can be used to access files from OneDrive. While this isn't always a sign of malicious activity, some organizations do not support the use of anonymous links because of the risk of data leakage. This rule detects when anonymous links are used to access files from OneDrive."
     rule_id = "mr_7e67005a-d5fc-4497-8e81-e6797b2f54e9"
     rule_name = "O365 OneDrive Anonymous Link Accessed"
-    //This rule addresses link access and not downloading. Some overlap between anonymous file download and anonymous link accessed rules are expected and combining them or tuning them is suggested.
-    mitre_attack_tactic = "Exfiltration"
-    mitre_attack_technique = "Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1048/002/"
-    mitre_attack_version = "v14.1"
+    tactic = "TA0010"
+    technique = "T1048.002"
     type = "hunt"
     platform = "azure"
     data_source = "o365"
@@ -37,11 +34,7 @@ rule o365_onedrive_anonymous_link_accessed {
     $file.metadata.product_event_type = "AnonymousLinkUsed"
     $file.metadata.product_name = "Office 365"
     $file.metadata.vendor_name = "Microsoft"
-    $file.target.application = "OneDrive"
-    (
-        $file.principal.user.userid = /^urn:spo:anon#/ or
-        $file.principal.user.userid = "anonymous"
-    )
+    $file.principal.user.userid = "anonymous"
     $file.principal.ip = $ip
 
   match:
@@ -49,9 +42,6 @@ rule o365_onedrive_anonymous_link_accessed {
 
   outcome:
     $risk_score = 35
-    $mitre_attack_tactic = "Exfiltration"
-    $mitre_attack_technique = "Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol"
-    $mitre_attack_technique_id = "T1048.002"
     $event_count = count_distinct($file.metadata.id)
     $referral_url = array_distinct($file.network.http.referral_url)
     $user_agent = array_distinct($file.network.http.user_agent)

@@ -1,0 +1,57 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule win_susp_or_malicious_service_created {
+
+  meta:
+    author = "Georg Lauenstein - suresecure GmbH"
+    description = "This detection rule identifies the creation of a Windows service with a suspicious or known malicious name, as logged by Windows Event ID 7045 (`A service was installed in the system`). Threat actors, including those associated with ransomware and other advanced persistent threats (APTs), often create services to achieve persistence, lateral movement, remote execution, or privilege escalation. Detection of such activity is critical for identifying early-stage post-compromise behavior."
+    rule_id = "mr_965f922f-7a20-4579-a9df-1b1dea70672e"
+    rule_name = "Suspicious Windows Service Installation Detected"
+    tactic = "TA0003"
+    technique = "T1543.003"
+    reference = "https://github.com/mthcht/awesome-lists/blob/main/Lists/suspicious_windows_services_names_list.csv"
+    type = "alert"
+    platform = "Windows"
+    data_source = "Windows System Event Log"
+    severity = "Medium"  // Adjust based on your risk assessment
+    priority = "Medium"  // Adjust based on your incident response process
+
+  events:
+    $suspicious_service.metadata.event_type = "SERVICE_CREATION"
+    $suspicious_service.metadata.product_name = "Service Control Manager"
+    $suspicious_service.metadata.product_event_type = "7045"
+
+    // Capture the hostname where the event occurred
+    $suspicious_service.principal.hostname = $hostname
+    $suspicious_service.target.application = $service_name
+
+    // Create a reference list named `suspicious_windows_service_names` and populate it with suspicious service names such as the list found at https://github.com/mthcht/awesome-lists/blob/main/Lists/suspicious_windows_services_names_list.csv
+    $service_name in %suspicious_windows_services_names
+
+  match:
+    $hostname, $service_name over 15m
+
+  outcome:
+    $risk_score = max(65)
+    $event_count = count_distinct($suspicious_service.metadata.id)
+    $principal_hostname = array_distinct($suspicious_service.principal.hostname)
+    $principal_user_userid = array_distinct($suspicious_service.principal.user.userid)
+    $principal_user_windows_sid = array_distinct($suspicious_service.principal.user.windows_sid)
+
+  condition:
+    $suspicious_service
+}

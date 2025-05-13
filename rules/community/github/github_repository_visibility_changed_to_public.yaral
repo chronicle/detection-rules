@@ -33,7 +33,7 @@ rule github_repository_visibility_changed_to_public {
   events:
     // If internal/private GitHub repositories are often made public by your organization, consider filtering events based on
     // what behavior is considered normal, e.g., is a specific GitHub account used to make repos public?
-    $github.metadata.vendor_name = "GITHUB"
+    $github.metadata.vendor_name = "GITHUB" nocase
     $github.metadata.product_name = "GITHUB"
     $github.metadata.product_event_type = "repo.access"
     $github.extracted.fields["previous_visibility"] = "internal"

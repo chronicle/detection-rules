@@ -21,10 +21,8 @@ rule o365_recently_created_entra_id_user_assigned_roles {
     description = "Detects when a user is created in Entra ID and assigned roles within a defined time window."
     rule_id = "mr_c0406a96-4ed1-4dd2-9629-aa5a2c881222"
     rule_name = "O365 Recently Created Entra ID User Assigned Roles"
-    mitre_attack_tactic = "Persistence"
-    mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"
-    mitre_attack_version = "v14.1"
+    tactic = "TA0003"
+    technique = "T1098.003"
     assumption = "The list msgraph_watchlist_roles is populated with role names, ie Application Administrator"
     type = "alert"
     platform = "azure"
@@ -57,16 +55,12 @@ rule o365_recently_created_entra_id_user_assigned_roles {
 
   outcome:
     $risk_score = max(if($role.target.resource.attribute.roles.name = /Administrator/ nocase, 85, 35))
-    $mitre_attack_tactic = "Persistence"
-    $mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
-    $mitre_attack_technique_id = "T1098.003"
     $security_summary = array_distinct($role.security_result.summary)
     $user_agent = array_distinct($role.network.http.user_agent)
     $assigned_role = array_distinct($role.target.resource.attribute.roles.name)
     //added to populate alert graph with additional context
     $principal_user_userid = array_distinct($create.principal.user.userid)
-    //Excluded since it is already being used as match variable
-    //$target_user_userid = array_distinct($create.target.user.userid)
+    $target_user_userid = array_distinct($create.target.user.userid)
 
   condition:
     $create and $role

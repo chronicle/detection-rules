@@ -1,31 +1,36 @@
-# Style Guide for YARA-L Detection Rules
+# Style Guide for Community Rules
 
-Detection Rules for Chronicle Security Operations are written in the
-[YARA-L](https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-overview) language.
+Detection rules for Google Security Operations are written in the
+[YARA-L](https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-overview)
+language.
 
-This style guide establishes baseline standards of quality, completeness, readability, and extensibility for
-community-published rules. This guide also sets an example for what high quality rules look like and what components
+This style guide establishes baseline standards of quality, completeness,
+readability, and extensibility for community rules in this project. This guide
+also sets an example for what high quality rules look like and what components
 detection engineers should include in their own rules.
 
 ## Characteristics of quality community detection rules
 
 Detection rules in this project should:
 
-- Provide value out of the box, even if users must tweak them to provide the most value. A rule should solve a real
-problem, meet a specific use case, or address a contemporary threat.
-- Serve as a jumping off point or inspiration for detection engineers to create their own detections.
-- Highlight capabilities that exist within Chronicle's detection engine.
+- Provide value out of the box, even if users must tweak them to provide the
+most value. A rule should solve a real problem, meet a specific use case, or
+address a contemporary threat.
+- Serve as a jumping off point or inspiration for detection engineers to create
+their own detections.
+- Highlight capabilities that exist within Google SecOps's detection engine.
 - Be optimized for performance wherever possible.
 
 ## Rule file format
 
-Each rule file should have a `.yaral` extension.
+Each rule file should have a short, descriptive name and a `.yaral` extension.
+Example: `entra_id_add_user_to_admin_role.yaral`.
 
 The following license must be included at the beginning of each rule file.
 
 ```
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,46 +58,53 @@ Guidance on the `meta` section of a rule.
 
 All rules should have:
 
-- An author of `Google Cloud Security`. 
-- A description that provides a base level of understanding of the detection itself. 
+- An author of `Google Cloud Security` or the name of the original author of the
+rule.
+- A description that explains what behavior the rule detects.
+- A `rule_id` that is unique to the rule. The value for this field must be a
+  UUIDv4 value that is unique to the rule with a prefix of `mr_`
+  (e.g. `mr_069a282b-a605-4572-921e-f466b93d0123`)
+- A `rule_name` that is unique to the rule and provides a human friendly,
+  short description for the rule.
 - A severity defined (`Info`, `Low`, `Medium`, `High`, or `Critical`).
 - A priority defined (`Info`, `Low`, `Medium`, `High`, or `Critical`).
 
-Values that would be helpful in providing additional context around the rule include the following and are considered
-optional:
+Values that would be helpful in providing additional context around the rule
+include the following and are considered optional:
 
 - `platform` - The platform(s) that this rule focuses on.
-  - It is possible to specify multiple platforms. For example, a Windows based EDR event that is correlated with events 
-    from Google Cloud.
-  - Not all rules will have this field/value, as some rules can be platform-agnostic.
+  - It is possible to specify multiple platforms. For example, a Windows based
+    EDR event that is correlated with events from Google Cloud.
+  - Not all rules will have this field/value, as some rules can be
+    platform-agnostic.
   - Example: `platform = "Windows, GCP"`
 
-
 - `type` - The rule type. Examples include `alert` or `hunt`.
-  - `alert` is used for higher fidelity rules that are candidates for deployment while `hunt` might cause false
-    positives but provide results that could be used as part of a threat hunt.
+  - `alert` is used for higher fidelity rules that are candidates for deployment
+    while `hunt` might cause false positives but provide results that could be
+    used as part of a threat hunt.
   - Example: `type = "hunt"`
 
-
-- `data_source` - What data sources were used for testing the rule, i.e., what logs should the rule run against.
-  - While it may not be possible to validate every data source, by providing representative data source(s), authors can
-    provide some level of understanding on the approach being taken in the rule.
+- `data_source` - What data sources were used for testing the rule, i.e., what
+  logs should the rule run against.
+  - While it may not be possible to validate every data source, by providing
+    representative data source(s), authors can provide some level of
+    understanding on the approach being taken in the rule.
   - Example: `data_source = "microsoft sysmon, custom misp parser"`
 
+- `assumptions` - What are the things that the author took into account when
+  writing the rule that someone deploying the rule should be aware of.
+    - Example: `assumption = "While it should work for any EDR systems and
+      ingested threat intel, the metadata.product_name for MISP should be
+      modified or commented out based upon event source."`
 
-- `assumptions` - What are the things that the author took into account when writing the rule that someone deploying
-  the rule should be aware of.
-    - Example: `assumption = "While it should work for any EDR systems and ingested threat intel, the
-      metadata.product_name for MISP should be modified or commented out based upon event source."`
-
-
-- `reference` - If a website has a write-up on this attack technique or the rule is ported from another platform's
-reference site, it should be cited here.
+- `reference` - If a website has a write-up on this attack technique or the rule
+  is ported from another platform's reference site, it should be cited here.
   - Example: `reference = "https://mysource.for.this.rule/if-applicable"`
 
-
-- `tags` - Used to denote ways to group rules using specific functionality. Example: `tags = “whois, vt”`. Additional
-  example values include: 
+- `tags` - Used to denote ways to group rules using specific functionality.
+  Example: `tags = “whois, vt”`. Additional
+  example values include:
   - `asset enrichment`
   - `threat indicators`
   - `asset entity`
@@ -113,27 +125,22 @@ reference site, it should be cited here.
 
 #### MITRE ATT&CK mapping
 
-All rules that map to [MITRE ATT&CK](https://attack.mitre.org/matrices/enterprise/) should include the following fields
-in the meta section:
-- Tactic
-- Technique: Sub-Technique (if applicable)
-- URL
-- Framework [Version](https://attack.mitre.org/resources/versions/) (e.g. `v13.1`, `v12`, `v11`)
-  - The purpose of this field is to "future-proof" a rule so if a technique is deprecated or evolves, a user can
-    reference the specific version of ATT&CK to understand the rationale of the rule based on the point of time it was
-    created. An example of this would be a rule for the technique `Common Port` which was deprecated. If the rule was
-    labeled correctly as `v6`, this technique could be seen in that version of the matrix.
+All rules that map to
+[MITRE ATT&CK](https://attack.mitre.org/matrices/enterprise/) should include the
+following fields in the meta section:
+  - Tactic
+  - Technique: Sub-Technique (if applicable)
 
 Example MITRE ATT&CK mapping in the `meta` section of a rule:
 
 ```
 meta:
   author = "Google Cloud Security"
-  description = "Detect the use of net use for SMB/Windows admin shares"
-  mitre_attack_tactic = "Lateral Movement"
-  mitre_attack_technique = "Remote Services: SMB/Windows Admin Shares"
-  mitre_attack_url = "https://attack.mitre.org/techniques/T1021/002/"
-  mitre_attack_version = "v13.1"
+  description = "Detects the use of net use for SMB/Windows admin shares"
+  rule_id = "mr_069a282b-a605-4572-921e-f466b93d0123"
+  rule_name = "net use usage for SMB/Windows admin shares"
+  tactic = "TA0008"
+  technique = "T1021.002"
   type = "alert"
   data_source = "microsoft sysmon, microsoft windows events"
   severity = "Low"
@@ -146,25 +153,31 @@ Guidance on the `events` section of a rule.
 
 #### Variables
 
-All event variables should be descriptive to ensure readability, preferably not `$event` and definitely not `$e1`.
+All event variables should be descriptive to ensure readability, preferably not
+`$event` and definitely not `$e1`.
 
-All placeholder variables should be descriptive enough to understand and if it concatenates multiple words together
-should be separated with underscores, i.e., `$my_variable_for_hostname`.
+All placeholder variables should be descriptive enough to understand and if it
+concatenates multiple words together should be separated with underscores, i.e.,
+`$my_variable_for_hostname`.
 
-- A placeholder like `$hostname` is perfectly fine particularly when joining disparate nouns together.
-- Using the same variable name with a different capitalization should be avoided if possible, i.e., `$Host` and `$host`.
+- A placeholder like `$hostname` is perfectly fine particularly when joining
+  disparate nouns together.
+- Using the same variable name with a different capitalization should be avoided
+  if possible, i.e., `$Host` and `$host`.
 
-Joins between events and entities should be represented with a placeholder variable in each line where possible to
-ensure readability and ease of understanding
+Joins between events and entities should be represented with a placeholder
+variable in each line where possible to ensure readability and ease of
+understanding.
 
-Joins on full field names are possible and will work, but using placeholder variables is preferred and can be used in
-outcomes fields as well.
+Joins on full field names are possible and will work, but using placeholder
+variables is preferred and can be used in outcomes fields as well.
 
-Additional fields and values that improve the performance of the rules should be used whenever possible. Examples of
-this include:
+Additional fields and values that improve the performance of the rules should
+be used whenever possible. Examples of this include:
 
-- Adding a `<hash> != "hash_value"` to narrow down process launch or file creation events except if the field is being
-  used as a match variable (see the `match` section of this guide below).
+- Adding a `<hash> != "hash_value"` to narrow down process launch or file
+  creation events except if the field is being used as a match variable (see
+  the `match` section of this guide below).
 - Using `metadata.entity_type` for all entity based rules.
 - Using `metadata.source_type` for all entity based rules.
 - Using `metadata.event_type` where possible for UDM events.
@@ -173,19 +186,21 @@ this include:
 
 Guidance on the `match` section of a rule.
 
-Most rules should have a `match` section, so that related alerts are grouped together into a single detection.
+Most rules should have a `match` section, so that related alerts are grouped
+together into a single detection.
 
-Match variables automatically exclude `NULL` values (`""` and `0` for strings and integers, respectively), unless the
-[`allow_zero_values`](https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-syntax#options_section_syntax) option
-is set. Unless that option is set, do not add conditions in the events section that duplicate this logic. The following
-is NOT correct:
+Match variables automatically exclude `NULL` values (`""` and `0` for strings
+and integers, respectively), unless the
+[`allow_zero_values`](https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-syntax#options_section_syntax)
+option is set. Unless that option is set, do not add conditions in the events
+section that duplicate this logic. The following is NOT correct:
 
 ```
 events:
   $e.target.ip = "1.1.1.1"
   $hostname = $e.principal.hostname
   $e.principal.hostname != "" // unnecessary
-  
+
 match:
   $hostname
 ```
@@ -194,15 +209,16 @@ match:
 
 Guidance on the `outcome` section of a rule.
 
-The `outcome` section can contain up to 20 outcome variables and should be populated with the below fields where
-possible.
+The `outcome` section can contain up to 20 outcome variables and should be
+populated with the below fields where possible.
 
-Outcome variables and associated names may find their way into 3rd party integrations, so descriptive names including
-the noun are preferred and should be separated with underscores, i.e., `$target_process_command_line`.
+Outcome variables and associated names may find their way into 3rd party
+integrations, so descriptive names including the noun are preferred and should
+be separated with underscores, i.e., `$target_process_command_line`.
 
 - `risk_score`
-  - In the absence of a specific risk score, applying a value that aligns with the rule's severity (specified in the
-    `meta` section) is reasonable.
+  - In the absence of a specific risk score, applying a value that aligns with
+    the rule's severity (specified in the `meta` section) is reasonable.
 
     | severity | risk_score |
     |----------|------------|
@@ -212,77 +228,61 @@ the noun are preferred and should be separated with underscores, i.e., `$target_
     | High     | 85         |
     | Critical | 95         |
 
-    - Specific criteria do not need to be applied unless the rule author has something in mind. Organizations have
-      different risk scoring metrics and Chronicle continues to evolve with the introduction of new capabilities.
-
+    - Specific criteria do not need to be applied unless the rule author has
+      something in mind. Organizations have different risk scoring metrics and
+      Google SecOps continues to evolve with the introduction of new
+      capabilities.
 
 - `event_count` - for single-event variable rules.
   - Example: `$event_count = count_distinct($e.metadata.id)`
 - Any hardcoded values in the condition section, greater than 1.
-  - Given a condition of `#failed_logons > 100`, define a variable of `$failed_logon_threshold = max(100)`
+  - Given a condition of `#failed_logons > 100`, define a variable of
+    `$failed_logon_threshold = 100`
 
-
-- MITRE ATT&CK tactic and technique:sub-technique should be added in the outcome section where applicable.
-  - This is in addition to values being displayed in the meta section. 
-  - Including this data in the outcome provides values that can be used in SOAR platforms or other reporting as it will
-    appear in the detection generated by the rule.
-  - If a technique is listed in multiple tactics, add all applicable tactics to the outcome variable as shown below. By
-    separating with a comma and space, additional parsing should be predictable.
-    - `$mitre_attack_tactic = array_distinct("Lateral Movement, Execution")`
-  - For techniques with a single tactic, the following format should be used.
-    - `$mitre_attack_tactic = array_distinct("Lateral Movement")`
-  - Techniques with sub-techniques will be delimited by a colon and space.
-    - `$mitre_attack_technique = array_distinct("Remote Services: SMB/Windows Admin Shares")`
-  - Technique ids should be represented in the following format.
-    - `$mitre_attack_technique_id = array_distinct("T1021.002")`
-
-
-- Consider adding the following fields, as they are utilized in the alert graph: `principal`, `target`, and `src`. 
-  - Within these families, the following fields can be used in the alert graph (preview, subject to change, fields in
-    bold will be visualized, all will provide active links to search). 
-    - **hostname**
-    - process.command_line
-    - **user.email_addresses**
-    - **ip**
-    - **process.file.md5**
-    - **file.md5**
-    - **mac**
-    - **process.file.sha1**
-    - **file.sha1**
-    - **asset_id**
-    - **process.file.sha256**
-    - **file.sha256**
-    - **asset.hostname**
-    - process.file.full_path
-    - file.full_path
-    - **asset.ip**
-    - process.product_specific_process_id
-    - **resource.name**
-    - **asset.mac**
-    - process.parent_process.product_specific_process_id
-    - **url**
-    - **asset.asset_id**
-    - **user.userid**
-    - **artifact.ip**
-    - asset.product_object_id 
-    - **user.windows_sid**
-    - **domain.name**
-    - process.pid 
-    - user.product_object_id 
-    - resource.product_object_id 
+- Consider adding the descriptive fields from the noun families:
+  `principal`, `target`, and `src`.
+  - Within these families, the a subset of the following fields are always a good starting point
+    - hostname
+    - ip
+    - mac
+    - asset.hostname
+    - asset.ip
+    - asset.mac
+    - user.userid
+    - user.windows_sid
+    - user.email_addresses
     - user.employee_id
-  - The syntax for these fields should be in the form of:
-    `$principal_hostname = array_distinct($event.principal.hostname)`
+    - process.command_line
+    - process.file.full_path
+    - process.product_specific_process_id
+    - process.parent_process.product_specific_process_id
+    - process.pid
+    - process.file.sha256
+    - process.file.sha1
+    - process.file.md5
+    - file.full_path
+    - file.sha256
+    - file.sha1
+    - file.md5
+    - resource.name
+    - url
+    - artifact.ip
+    - domain.name
 
+  - The names for these outcome variables should be descriptive. Example:
+  `$impacted_host = array_distinct($event.principal.hostname)` or
+  `$impacted_user = array_distinct($event.principal.user.userid)` or
 
-- Any additional summary values or fields of interest based upon the rule should also be included in the outcome section. 
+- Any additional summary values or fields of interest based upon the rule should
+  also be included in the outcome section.
 
 ## Appendix
 
 ### Example outcome variables for use with the alert graph
 
-These are based on a limited set of data sources during testing. These serve as a reference set of fields that will
-populate the alert graph for additional context based upon the `metadata.event_type` in the rule.
+These are based on a limited set of data sources during testing. These serve as
+a reference set of fields that will populate the alert graph for additional
+context based upon the `metadata.event_type` in the rule.
 
 #### Example outcome variables for event type `NETWORK_CONNECTION`
 

@@ -35,12 +35,12 @@ rule github_access_granted_to_personal_access_token_followed_by_high_number_of_c
 
   events:
     // GitHub Personal Access Token (PAT) access granted event
-    $github_pat.metadata.vendor_name = "GITHUB"
+    $github_pat.metadata.vendor_name = "GITHUB" nocase
     $github_pat.metadata.product_name = "GITHUB"
     $github_pat.metadata.product_event_type = "personal_access_token.access_granted"
 
     // GitHub repository clone event
-    $github_pat.metadata.vendor_name = "GITHUB"
+    $github_pat.metadata.vendor_name = "GITHUB" nocase
     $github_clone.metadata.product_name = "GITHUB"
     $github_clone.metadata.product_event_type = "git.clone"
     $github_clone.target.resource.name = $github_repo_name

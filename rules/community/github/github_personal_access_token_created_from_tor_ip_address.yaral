@@ -35,7 +35,7 @@ rule github_personal_access_token_created_from_tor_ip_address {
     tags = "tor"
 
   events:
-    $github.metadata.vendor_name = "GITHUB"
+    $github.metadata.vendor_name = "GITHUB" nocase
     $github.metadata.product_name = "GITHUB"
     $github.metadata.product_event_type = "personal_access_token.request_created"
     $github.principal.ip = $ip

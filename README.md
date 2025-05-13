@@ -25,7 +25,7 @@ you see fit.
 | Directory                                    | Description                    |
 |--------------------------------------------- | ------------------------------ |
 | [`rules/community/`](rules/community/)       | YARA-L rules created by members of the Google SecOps team and user community |
-| [`tools/rule_manager/`](tools/rule_manager/) | CLI tool used to manage rules and other content via Google SecOps' REST API |
+| [`tools/content_manager/`](tools/content_manager/) | CLI tool used to manage rules and other content via Google SecOps' REST API |
 
 ## Getting Started
 
@@ -45,7 +45,7 @@ managing rules via Google SecOps' [REST API](https://cloud.google.com/chronicle/
 
 If you have questions related to this project, please open a new issue in this
 GitHub repository. You can also ask questions related to Google SecOps in the
-[Google Cloud Security Community](https://www.googlecloudcommunity.com/gc/Google-Cloud-Security/ct-p/googlecloud-security).
+[Google Cloud Security Community](https://secopscommunity.com).
 
 ## How to Contribute
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Content Manager Command Line Interface - Manage content in Google SecOps such as rules, reference lists, and exclusions."""
+"""Content Manager Command Line Interface - Manage content in Google SecOps such as rules, data tables, reference lists, and exclusions."""
 
 # pylint: disable="invalid-name","g-bool-id-comparison"
 
@@ -25,6 +25,7 @@ import pathlib
 import click
 from content_manager.common import datetime_converter
 from content_manager.common.custom_exceptions import RuleVerificationError
+from content_manager.data_tables import DataTables
 from content_manager.reference_lists import ReferenceLists
 from content_manager.rule_exclusions import RuleExclusions
 from content_manager.rules import Rules
@@ -40,6 +41,7 @@ LOGGER = logging.getLogger()
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 RULES_DIR = ROOT_DIR / "rules"
 REF_LISTS_DIR = ROOT_DIR / "reference_lists"
+DATA_TABLES_DIR = ROOT_DIR / "data_tables"
 
 dotenv.load_dotenv()
 
@@ -221,6 +223,60 @@ class RuleOperations:
     #   )
 
 
+class DataTableOperations:
+  """Manage data tables in Google SecOps."""
+
+  @classmethod
+  def get(cls):
+    """Retrieves the latest version of all data tables from Google SecOps and updates local files."""
+    http_session = initialize_http_session()
+
+    remote_data_tables = DataTables.get_remote_data_tables(http_session=http_session)
+
+    if not remote_data_tables.data_tables:
+      return
+
+    remote_data_tables.dump_data_table_config()
+
+    # Delete existing local data table files before writing a fresh copy of
+    # all data tables pulled from Google SecOps
+    for local_data_table_file in list(DATA_TABLES_DIR.glob("*.csv")):
+      local_data_table_file.unlink()
+
+    # Retrieve the content (rows) for each data table and write it to
+    # local files
+    for data_table in remote_data_tables.data_tables:
+      DataTables.get_remote_data_table_rows(
+          http_session=http_session,
+          data_table_name=data_table.name,
+          data_table_resource_name=data_table.resource_name,
+          write_to_file=True,
+      )
+
+  @classmethod
+  def update(cls):
+    """Update data tables in Google SecOps based on local data table files."""
+    http_session = initialize_http_session()
+
+    data_table_updates = DataTables.update_remote_data_tables(http_session=http_session)
+
+    # Log summary of data table updates that occurred.
+    LOGGER.info("Logging summary of data table changes...")
+    for update_type, data_table_names in data_table_updates.items():
+      LOGGER.info("Data tables %s: %s", update_type, len(data_table_names))
+      for data_table_name in data_table_names:
+        LOGGER.info("%s Data table %s", update_type, data_table_name)
+
+    # Retrieve the latest version of all data tables and update the local
+    # config file
+    remote_data_tables = DataTables.get_remote_data_tables(http_session=http_session)
+
+    if not remote_data_tables.data_tables:
+      return
+
+    remote_data_tables.dump_data_table_config()
+
+
 class ReferenceListOperations:
   """Manage reference lists in Google SecOps."""
 
@@ -308,7 +364,7 @@ class RuleExclusionOperations:
 
 @click.group()
 def cli():
-  """Content Manager - Manage content in Google SecOps such as rules, reference lists, and exclusions."""
+  """Content Manager - Manage content in Google SecOps such as rules, data tables, reference lists, and exclusions."""
 
 
 @click.group()
@@ -450,6 +506,39 @@ def test(
 
 
 @click.group()
+def data_tables():
+  """Manage data tables."""
+
+
+@data_tables.command(
+    "get",
+    short_help=(
+        "Retrieve the latest data tables from Google SecOps and update " "local files."
+    ),
+)
+def get_data_tables():
+  """Retrieve the latest data tables from Google SecOps and update local files."""
+  LOGGER.info(
+      "Attempting to pull latest version of all data tables from Google SecOps "
+      "and update local files"
+  )
+  DataTableOperations.get()
+
+
+@data_tables.command(
+    "update",
+    short_help=("Update data tables in Google SecOps based on local files and config."),
+)
+def update_data_tables():
+  """Update data tables in Google SecOps based on local files and config."""
+  LOGGER.info(
+      "Attempting to update data tables in Google SecOps based on local"
+      " data table files"
+  )
+  DataTableOperations.update()
+
+
+@click.group()
 def reference_lists():
   """Manage reference lists."""
 
@@ -529,8 +618,11 @@ if __name__ == "__main__":
     RULES_DIR.mkdir()
   if not REF_LISTS_DIR.is_dir():
     REF_LISTS_DIR.mkdir()
+  if not DATA_TABLES_DIR.is_dir():
+    DATA_TABLES_DIR.mkdir()
 
   cli.add_command(rules)
+  cli.add_command(data_tables)
   cli.add_command(reference_lists)
   cli.add_command(rule_exclusions)
 

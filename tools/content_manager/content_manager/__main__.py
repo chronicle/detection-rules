@@ -21,6 +21,7 @@ import json
 import logging
 import os
 import pathlib
+from typing import Literal
 
 import click
 from content_manager.common import datetime_converter
@@ -34,6 +35,7 @@ import google.auth.transport.requests
 from google_secops_api import auth
 from google_secops_api.rules.stream_test_rule import test_rule
 from google_secops_api.rules.verify_rule import verify_rule
+from google_secops_api.data_tables.delete_data_table import delete_data_table
 
 
 LOGGER = logging.getLogger()
@@ -275,6 +277,72 @@ class DataTableOperations:
       return
 
     remote_data_tables.dump_data_table_config()
+
+  @classmethod
+  def delete(cls, scope: Literal["all", "unmanaged"]):
+    """Update reference lists in Google SecOps based on local reference list files."""
+    http_session = initialize_http_session()
+
+    remote_data_tables = DataTables.get_remote_data_tables(http_session=http_session)
+
+    # Maintain a list of data tables that are deleted
+    deleted_data_tables = []
+
+    if scope == "all":
+      for remote_data_table in remote_data_tables.data_tables:
+        LOGGER.info(
+            "Deleting data table %s (%s)",
+            remote_data_table.name,
+            remote_data_table.resource_name,
+        )
+        delete_data_table(
+            http_session=http_session,
+            resource_name=remote_data_table.resource_name,
+            force=True,
+        )
+        delete_data_tables.append(
+            (remote_data_table.name, remote_data_table.resource_name)
+        )
+      DataTableOperations.get()
+
+    if scope == "unmanaged":
+      local_data_tables = DataTables.load_data_table_config()
+
+      # Create a list of UUIDs for data tables that are being managed as code
+      managed_data_tables = [
+          local_data_table["resource_name"]
+          for local_data_table_name, local_data_table in local_data_tables.items()
+          if local_data_table.get("resource_name")
+      ]
+
+      for remote_data_table in remote_data_tables.data_tables:
+        if remote_data_table.resource_name not in managed_data_tables:
+          LOGGER.info(
+              "Deleting data table %s (%s)",
+              remote_data_table.name,
+              remote_data_table.resource_name,
+          )
+          delete_data_table(
+              http_session=http_session,
+              resource_name=remote_data_table.resource_name,
+              force=True,
+          )
+          deleted_data_tables.append(
+              (remote_data_table.name, remote_data_table.resource_name)
+          )
+        else:
+          LOGGER.debug(
+              "Data table %s (%s) is managed and won't be deleted.",
+              remote_data_table.name,
+              remote_data_table.resource_name,
+          )
+
+    if not deleted_data_tables:
+      LOGGER.info("0 data tables were deleted")
+    else:
+      LOGGER.info("%s data tables were deleted", len(deleted_data_tables))
+      for deleted_data_table in deleted_data_tables:
+        LOGGER.info("Deleted data table: %s", deleted_data_table)
 
 
 class ReferenceListOperations:
@@ -536,6 +604,19 @@ def update_data_tables():
       " data table files"
   )
   DataTableOperations.update()
+
+
+@data_tables.command("delete", short_help="Delete data tables in Google SecOps.")
+@click.option(
+    "--scope",
+    type=click.Choice(["all", "unmanaged"]),
+    required=True,
+    help="The scope of data tables to delete in Google SecOps. 'all': Delete all data tables. 'unmanaged': Delete data tables that are not present in the local config file or data_tables directory.",
+)
+def delete_data_tables(scope: str):
+  """Delete data tables in Google SecOps."""
+  LOGGER.info("Attempting to delete data tables in Google SecOps with scope %s", scope)
+  DataTableOperations.delete(scope=scope)
 
 
 @click.group()

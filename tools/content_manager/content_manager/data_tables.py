@@ -14,6 +14,7 @@
 #
 """Manage data tables in Google SecOps."""
 
+import os
 import csv
 import json
 import logging
@@ -48,7 +49,7 @@ ruamel_yaml = ruamel.yaml.YAML(typ="safe")
 class DataTableColumn(pydantic.BaseModel):
   """Class for a data table column."""
   column_index: int | None
-  column_name: str
+  original_column: str
   column_type: str | None
   mapped_column_path: str | None
   key_column: bool | None
@@ -260,7 +261,7 @@ class DataTables:
         parsed_columns.append(
             DataTableColumn(
                 column_index=column["column_index"],
-                column_name=column["column_name"],
+                original_column=column["original_column"],
                 column_type=column.get("column_type"),
                 mapped_column_path=column.get("mapped_column_path"),
                 key_column=column.get("key_column"),
@@ -293,7 +294,7 @@ class DataTables:
         parsed_columns.append(
             DataTableColumn(
                 column_index=column["columnIndex"],
-                column_name=column["originalColumn"],
+                original_column=column["originalColumn"],
                 column_type=column.get("columnType"),
                 mapped_column_path=column.get("mappedColumnPath"),
                 key_column=column.get("keyColumn"),
@@ -531,6 +532,14 @@ class DataTables:
         "Attempting to update data tables in Google SecOps based on local files"
     )
 
+    # Raise an error if the GOOGLE_SECOPS_API_UPLOAD_BASE_URL environment
+    # variable is not found
+    if not os.getenv("GOOGLE_SECOPS_API_UPLOAD_BASE_URL"):
+      raise ValueError(
+          "GOOGLE_SECOPS_API_UPLOAD_BASE_URL environment variable is not "
+          "set. Set this value as per the instructions in the readme."
+      )
+
     data_table_config = DataTables.load_data_table_config(
         data_table_config_file=data_tables_config_file, data_tables_dir=data_tables_dir
     )
@@ -568,9 +577,6 @@ class DataTables:
             " Creating a new data table",
             data_table_name,
         )
-
-        # Raise an error if the GOOGLE_SECOPS_API_UPLOAD_BASE_URL environment
-        # variable is not found
 
         response = upload_data_table(
             http_session=http_session,

@@ -95,7 +95,7 @@ def test_data_table():
       match=r"Field required \[type=missing",
   ):
     DataTable(
-        resource_name="projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/dataTables/data_table_1",
+        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/data_table_1",
         uuid="091bafa1234d4f7396ea09f79fb6d209",
         description=100,
         create_time="2025-05-13T22:22:40.952537Z",
@@ -103,14 +103,14 @@ def test_data_table():
         columns=[
             DataTableColumn(
                 column_index=0,
-                column_name="user_id",
+                original_column="user_id",
                 column_type="STRING",
                 mapped_column_path=None,
                 key_column=False,
             ),
             DataTableColumn(
                 column_index=1,
-                column_name="hostname",
+                original_column="hostname",
                 column_type="STRING",
                 mapped_column_path=None,
                 key_column=False,
@@ -131,7 +131,7 @@ def test_data_table():
   ):
     DataTable(
         name=4,
-        resource_name="projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/dataTables/data_table_1",
+        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/data_table_1",
         uuid="091bafa1234d4f7396ea09f79fb6d209",
         description="data table 1",
         create_time="2025-05-13T22:22:40.952537Z",
@@ -139,14 +139,14 @@ def test_data_table():
         columns=[
             DataTableColumn(
                 column_index=0,
-                column_name="user_id",
+                original_column="user_id",
                 column_type="STRING",
                 mapped_column_path=None,
                 key_column=False,
             ),
             DataTableColumn(
                 column_index=1,
-                column_name="hostname",
+                original_column="hostname",
                 column_type="STRING",
                 mapped_column_path=None,
                 key_column=False,
@@ -173,16 +173,16 @@ def test_data_table_column():
   with pytest.raises(
       expected_exception=pydantic.ValidationError,
       match=(
-          r"validation error for DataTableColumn\ncolumn_name\n  Input should be a valid string"
+          r"validation error for DataTableColumn\noriginal_column\n  Input should be a valid string"
       ),
   ):
     DataTableColumn(
-      column_index=0,
-      column_name=100,
-      column_type="STRING",
-      mapped_column_path=None,
-      key_column=False
-      )
+        column_index=0,
+        original_column=100,
+        column_type="STRING",
+        mapped_column_path=None,
+        key_column=False,
+    )
 
 
 def test_compare_data_table_contents():
@@ -244,7 +244,7 @@ def test_data_table_config_entry():
       match=r"Field required \[type=missing",
   ):
     DataTableConfigEntry(
-        resource_name="projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/dataTables/data_table_1",
+        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/data_table_1",
         uuid="091bafa1234d4f7396ea09f79fb6d209",
         description="data table 1",
         create_time="2025-05-13T22:22:40.952537Z",
@@ -280,7 +280,7 @@ def test_data_table_config_entry():
   ):
     DataTableConfigEntry(
         name="data_table_1",
-        resource_name="projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/dataTables/data_table_1",
+        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/data_table_1",
         uuid="091bafa1234d4f7396ea09f79fb6d209",
         description="data table 1",
         create_time="2025-05-13T22:22:40.952537Z",
@@ -288,14 +288,14 @@ def test_data_table_config_entry():
         columns=[
             DataTableColumn(
                 column_index=0,
-                column_name="user_id",
+                original_column="user_id",
                 column_type="STRING",
                 mapped_column_path=None,
                 key_column=False,
             ),
             DataTableColumn(
                 column_index=1,
-                column_name="hostname",
+                original_column="hostname",
                 column_type="STRING",
                 mapped_column_path=None,
                 key_column=False,

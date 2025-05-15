@@ -4,12 +4,12 @@ cisco_umbrella_top_1k_domains:
     column_type: STRING
     key_column: null
     mapped_column_path: null
-    column_name: rank
+    original_column: rank
   - column_index: 1
     column_type: STRING
     key_column: null
     mapped_column_path: null
-    column_name: domain
+    original_column: domain
   create_time: '2025-05-13T20:22:30.616601Z'
   description: Cisco Umbrella top 1,000 domains
   resource_name: projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/cisco_umbrella_top_1k_domains
@@ -24,12 +24,12 @@ cisco_umbrella_top_1k_domains:
     column_type: STRING
     key_column: null
     mapped_column_path: null
-    column_name: rank
+    original_column: rank
   - column_index: 1
     column_type: STRING
     key_column: null
     mapped_column_path: null
-    column_name: domain
+    original_column: domain
   create_time: '2025-05-13T20:22:30.616601Z'
   description: Cisco Umbrella top 1,000 domains
   resource_name: projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/cisco_umbrella_top_1k_domains

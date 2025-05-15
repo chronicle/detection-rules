@@ -4,12 +4,12 @@ data_table_1:
     column_type: STRING
     key_column: null
     mapped_column_path: null
-    column_name: user_id
+    original_column: user_id
   - column_index: 1
     column_type: STRING
     key_column: null
     mapped_column_path: null
-    column_name: hostname
+    original_column: hostname
   create_time: '2025-05-13T20:22:30.616601Z'
   description: Data table 1
   resource_name: projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/data_table_1

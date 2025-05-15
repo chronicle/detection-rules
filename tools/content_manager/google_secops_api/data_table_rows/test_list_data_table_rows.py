@@ -41,7 +41,7 @@ class ListDataTableRowsTest(unittest.TestCase):
     with self.assertRaises(requests.requests.exceptions.HTTPError):
       list_data_table_rows(
           http_session=mock_session,
-          resource_name="projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/dataTables/data_table_1",
+          resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/data_table_1",
       )
 
   @mock.patch.object(target=requests, attribute="AuthorizedSession", autospec=True)

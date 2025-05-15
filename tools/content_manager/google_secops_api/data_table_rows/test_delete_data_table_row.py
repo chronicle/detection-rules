@@ -12,3 +12,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+"""Unit tests for the "delete_data_table_row" module."""
+
+import unittest
+from unittest import mock
+
+from google.auth.transport import requests
+from google_secops_api.data_table_rows.delete_data_table_row import delete_data_table_row
+
+
+class DeleteDataTableRowTest(unittest.TestCase):
+  """Unit tests for the "delete_data_table_row" module."""
+
+  @mock.patch.object(target=requests, attribute="AuthorizedSession", autospec=True)
+  @mock.patch.object(target=requests.requests, attribute="Response", autospec=True)
+  def test_http_error(
+      self,
+      mock_response: unittest.mock.MagicMock,
+      mock_session: unittest.mock.MagicMock,
+  ):
+    """Test that an HTTP error occurs."""
+    mock_session.request.return_value = mock_response
+    type(mock_response).status_code = mock.PropertyMock(return_value=400)
+    mock_response.raise_for_status.side_effect = (
+        requests.requests.exceptions.HTTPError()
+    )
+
+    with self.assertRaises(requests.requests.exceptions.HTTPError):
+      delete_data_table_row(
+          http_session=mock_session,
+          resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/data_table_1/dataTableRows/f67213b122a5d442d2b93bda8cc45c56",
+      )
+
+  @mock.patch.object(target=requests, attribute="AuthorizedSession", autospec=True)
+  @mock.patch.object(target=requests.requests, attribute="Response", autospec=True)
+  def test_http_ok(
+      self,
+      mock_response: unittest.mock.MagicMock,
+      mock_session: unittest.mock.MagicMock,
+  ):
+    """Test that HTTP response 200 (OK) occurs."""
+    mock_session.request.return_value = mock_response
+    type(mock_response).status_code = mock.PropertyMock(return_value=200)
+    expected_response = {}
+    mock_response.json.return_value = expected_response
+
+    actual_response = {}
+    self.assertEqual(actual_response, expected_response)

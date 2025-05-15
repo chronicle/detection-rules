@@ -48,7 +48,7 @@ ruamel_yaml = ruamel.yaml.YAML(typ="safe")
 class DataTableColumn(pydantic.BaseModel):
   """Class for a data table column."""
   column_index: int | None
-  original_column: str
+  column_name: str
   column_type: str | None
   mapped_column_path: str | None
   key_column: bool | None
@@ -91,6 +91,33 @@ class DataTables:
     self.data_tables: Sequence[DataTable] = data_tables
 
   @classmethod
+  def parse_data_table(cls, data_table: Mapping[str, Any]) -> DataTable:
+    """Parse a data table into a DataTable object."""
+    try:
+      parsed_data_table = DataTable(
+          name=data_table["displayName"],
+          resource_name=data_table.get("name"),
+          uuid=data_table.get("dataTableUuid"),
+          description=data_table.get("description"),
+          create_time=data_table.get("createTime"),
+          update_time=data_table.get("updateTime"),
+          columns=DataTables.parse_data_table_columns(columns=data_table["columnInfo"]),
+          row_time_to_live=data_table.get("rowTimeToLive"),
+          rules=data_table.get("rules"),
+          rule_associations_count=data_table.get("ruleAssociationsCount"),
+      )
+    except pydantic.ValidationError as e:
+      LOGGER.error(
+          """ValidationError occurred for data table %s"
+                  %s""",
+          data_table,
+          json.dumps(e.errors(), indent=4),
+      )
+      raise
+
+    return parsed_data_table
+
+  @classmethod
   def parse_data_tables(
       cls, data_tables: Sequence[Mapping[str, Any]]
   ) -> List[DataTable]:
@@ -98,56 +125,7 @@ class DataTables:
     parsed_data_tables = []
 
     for data_table in data_tables:
-      parsed_data_table_columns = []
-
-      for column in data_table["columnInfo"]:
-        try:
-          if column.get("columnIndex") is None:
-            column["columnIndex"] = 0
-
-          parsed_data_table_columns.append(
-              DataTableColumn(
-                  column_index=column.get("columnIndex"),
-                  original_column=column.get("originalColumn"),
-                  column_type=column.get("columnType"),
-                  mapped_column_path=column.get("mappedColumnPath"),
-                  key_column=column.get("keyColumn"),
-              )
-          )
-        except pydantic.ValidationError as e:
-          LOGGER.error(
-              """ValidationError occurred for data table column %s in data
-                      table %s"
-                      %s""",
-              column,
-              data_table,
-              json.dumps(e.errors(), indent=4),
-          )
-          raise
-
-      try:
-        parsed_data_table = DataTable(
-            name=data_table["displayName"],
-            resource_name=data_table.get("name"),
-            uuid=data_table.get("dataTableUuid"),
-            description=data_table.get("description"),
-            create_time=data_table.get("createTime"),
-            update_time=data_table.get("updateTime"),
-            columns=parsed_data_table_columns,
-            row_time_to_live=data_table.get("rowTimeToLive"),
-            rules=data_table.get("rules"),
-            rule_associations_count=data_table.get("ruleAssociationsCount"),
-        )
-      except pydantic.ValidationError as e:
-        LOGGER.error(
-            """ValidationError occurred for data table %s"
-                    %s""",
-            data_table,
-            json.dumps(e.errors(), indent=4),
-        )
-        raise
-
-      parsed_data_tables.append(parsed_data_table)
+      parsed_data_tables.append(DataTables.parse_data_table(data_table))
 
     return parsed_data_tables
 
@@ -173,7 +151,9 @@ class DataTables:
             description=data_table_config_entry.get("description"),
             create_time=data_table_config_entry.get("create_time"),
             update_time=data_table_config_entry.get("update_time"),
-            columns=data_table_config_entry["columns"],
+            columns=DataTables.parse_data_table_config_entry_columns(
+                columns=data_table_config_entry.get("columns")
+            ),
             row_time_to_live=data_table_config_entry.get("row_time_to_live"),
             rules=data_table_config_entry.get("rules"),
             rule_associations_count=data_table_config_entry.get(
@@ -235,6 +215,100 @@ class DataTables:
         )
 
     return data_table_config_parsed
+
+  @classmethod
+  def parse_data_table_config_entry(
+      cls, data_table_name: str, data_table_config_entry: Mapping[str, Any]
+  ):
+    """Parse a data table config entry into a DataTableConfigEntry object."""
+    try:
+      data_table_config_entry_parsed = DataTableConfigEntry(
+          name=data_table_name,
+          resource_name=data_table_config_entry.get("resource_name"),
+          uuid=data_table_config_entry.get("uuid"),
+          description=data_table_config_entry.get("description"),
+          create_time=data_table_config_entry.get("create_time"),
+          update_time=data_table_config_entry.get("update_time"),
+          columns=DataTables.parse_data_table_config_entry_columns(
+              columns=data_table_config_entry.get("columns")
+          ),
+          row_time_to_live=data_table_config_entry.get("row_time_to_live"),
+          rules=data_table_config_entry.get("rules"),
+          rule_associations_count=data_table_config_entry.get(
+              "rule_associations_count"
+          ),
+      )
+    except pydantic.ValidationError as e:
+      LOGGER.error(
+          "ValidationError occurred for data table %s\n" "%s",
+          data_table_name,
+          json.dumps(e.errors(), indent=4),
+      )
+      raise
+
+    return data_table_config_entry_parsed
+
+  @classmethod
+  def parse_data_table_config_entry_columns(
+      cls, columns: Sequence[Mapping[str, Any]]
+  ) -> Sequence[DataTableColumn]:
+    """Parse a list of data table columns from the local data table config file into a list of DataTableColumn objects."""
+    parsed_columns = []
+
+    for column in columns:
+      try:
+        parsed_columns.append(
+            DataTableColumn(
+                column_index=column["column_index"],
+                column_name=column["column_name"],
+                column_type=column.get("column_type"),
+                mapped_column_path=column.get("mapped_column_path"),
+                key_column=column.get("key_column"),
+            )
+        )
+      except pydantic.ValidationError as e:
+        LOGGER.error(
+            """ValidationError occurred for data table column %s"
+            %s""",
+            column,
+            json.dumps(e.errors(), indent=4),
+        )
+        raise
+
+    return parsed_columns
+
+  @classmethod
+  def parse_data_table_columns(
+      cls, columns: Sequence[Mapping[str, Any]]
+  ) -> DataTableColumn:
+    """Parse a list of data columns retrieved from Google SecOps API into a list of DataTableColumn objects."""
+    parsed_columns = []
+
+    for column in columns:
+      # This column should have an index of 0 (it's the first column)
+      if column.get("columnIndex") is None:
+        column["columnIndex"] = 0
+
+      try:
+        parsed_columns.append(
+            DataTableColumn(
+                column_index=column["columnIndex"],
+                column_name=column["originalColumn"],
+                column_type=column.get("columnType"),
+                mapped_column_path=column.get("mappedColumnPath"),
+                key_column=column.get("keyColumn"),
+            )
+        )
+      except pydantic.ValidationError as e:
+        LOGGER.error(
+            """ValidationError occurred for data table column %s"
+            %s""",
+            column,
+            json.dumps(e.errors(), indent=4),
+        )
+        raise
+
+    return parsed_columns
 
   @classmethod
   def check_data_table_config(cls, config: Mapping[str, Any]):
@@ -441,9 +515,9 @@ class DataTables:
 
     if data_table_1_set == data_table_2_set:
       return False
-
-    # Return True if the content of the two data tables is the same.
-    return True
+    else:
+      # Return True if the content of the two data tables is different.
+      return True
 
   @classmethod
   def update_remote_data_tables(
@@ -494,6 +568,9 @@ class DataTables:
             " Creating a new data table",
             data_table_name,
         )
+
+        # Raise an error if the GOOGLE_SECOPS_API_UPLOAD_BASE_URL environment
+        # variable is not found
 
         response = upload_data_table(
             http_session=http_session,

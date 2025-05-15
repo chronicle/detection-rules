@@ -1,0 +1,21 @@
+[
+  {
+    "name": "projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/dataTables/cisco_umbrella_top_1k_domains",
+    "displayName": "cisco_umbrella_top_1k_domains",
+    "createTime": "2025-05-13T22:17:40.340730Z",
+    "updateTime": "2025-05-13T22:22:40.952537Z",
+    "columnInfo": [
+      {
+        "originalColumn": "rank",
+        "columnType": "STRING"
+      },
+      {
+        "columnIndex": 1,
+        "originalColumn": "domain",
+        "columnType": "STRING"
+      }
+    ],
+    "dataTableUuid": "091bafa0e63d4f7396ea09f80fb6d209",
+    "approximateRowCount": "1000"
+  }
+]

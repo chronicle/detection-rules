@@ -27,7 +27,7 @@ in a CI/CD pipeline (in GitHub, GitLab, CircleCI, etc) to do the following:
 * Retrieve the latest version of all detection rules from Google SecOps and write them to local `.yaral` files along with their current state/configuration
 * Update detection rules in Google SecOps based on local rule files, e.g., create new rules, create a new rule version, or enable/disable/archive rules
 * Retrieve the latest version of all data tables from Google SecOps and write them to local files along with their current state/configuration
-* Update data tables in Google SecOps based on local files
+* Create or update data tables in Google SecOps based on local files
 * Retrieve the latest version of all reference lists from Google SecOps and write them to local files along with their current state/configuration
 * Create or update reference lists in Google SecOps based on local files
 * Manage [rule exclusions](https://cloud.google.com/chronicle/docs/detection/rule-exclusions) in Google SecOps based on a local config file
@@ -443,7 +443,7 @@ deletes all data tables in Google SecOps. The `unmanaged` scope deletes data tab
 
 <span style="color: red;">**Warning**</span>: Deleting data tables is a
 destructive action. It is not reversible, so please take a backup of your data
-tables before running this command.
+tables before running this command if needed.
 
 Note: The deletion of a data table will fail if it is referenced by a rule.
 

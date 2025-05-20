@@ -1,0 +1,21 @@
+[
+  {
+    "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/cisco_umbrella_top_1k_domains",
+    "displayName": "cisco_umbrella_top_1k_domains",
+    "createTime": "2025-05-13T22:17:40.340730Z",
+    "updateTime": "2025-05-13T22:22:40.952537Z",
+    "columnInfo": [
+      {
+        "originalColumn": "rank",
+        "columnType": "STRING"
+      },
+      {
+        "columnIndex": 1,
+        "originalColumn": "domain",
+        "columnType": "STRING"
+      }
+    ],
+    "dataTableUuid": "091bafa0e63d4f7396ea09f80fb6d209",
+    "approximateRowCount": "1000"
+  }
+]

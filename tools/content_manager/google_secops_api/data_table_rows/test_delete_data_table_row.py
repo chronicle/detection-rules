@@ -1,4 +1,4 @@
-# Copyright 2024 Google LLC
+# Copyright 2025 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,19 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Unit tests for the "get_reference_list" module."""
+"""Unit tests for the "delete_data_table_row" module."""
 
 import unittest
 from unittest import mock
 
 from google.auth.transport import requests
-from google_secops_api.reference_lists.get_reference_list import (
-    get_reference_list,
-)
+from google_secops_api.data_table_rows.delete_data_table_row import delete_data_table_row
 
 
-class GetReferenceListTest(unittest.TestCase):
-  """Unit tests for the "get_reference_list" module."""
+class DeleteDataTableRowTest(unittest.TestCase):
+  """Unit tests for the "delete_data_table_row" module."""
 
   @mock.patch.object(
       target=requests, attribute="AuthorizedSession", autospec=True
@@ -45,9 +43,9 @@ class GetReferenceListTest(unittest.TestCase):
     )
 
     with self.assertRaises(requests.requests.exceptions.HTTPError):
-      get_reference_list(
+      delete_data_table_row(
           http_session=mock_session,
-          resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/list_1",
+          resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/data_table_1/dataTableRows/f67213b122a5d442d2b93bda8cc45c56",
       )
 
   @mock.patch.object(
@@ -64,19 +62,8 @@ class GetReferenceListTest(unittest.TestCase):
     """Test that HTTP response 200 (OK) occurs."""
     mock_session.request.return_value = mock_response
     type(mock_response).status_code = mock.PropertyMock(return_value=200)
-    expected_ref_list = {
-        "name": "projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_1",
-        "displayName": "test_list_1",
-        "revisionCreateTime": "2024-02-13T22:26:31.415855Z",
-        "description": "Test list 1",
-        "entries": [{}],
-        "syntaxType": "REFERENCE_LIST_SYNTAX_TYPE_PLAIN_TEXT_STRING",
-    }
+    expected_response = {}
+    mock_response.json.return_value = expected_response
 
-    mock_response.json.return_value = expected_ref_list
-
-    response = get_reference_list(
-        http_session=mock_session,
-        resource_name="projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/test_list_1",
-    )
-    self.assertEqual(response, expected_ref_list)
+    actual_response = {}
+    self.assertEqual(actual_response, expected_response)

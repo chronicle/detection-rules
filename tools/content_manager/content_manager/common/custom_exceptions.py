@@ -35,6 +35,10 @@ class DuplicateRuleNameError(Exception):
   """Raised when a duplicate rule name is found."""
 
 
+class DataTableConfigError(Exception):
+  """Raised when an issue with the data table config file is found."""
+
+
 class ReferenceListConfigError(Exception):
   """Raised when an issue with the reference list config file is found."""
 

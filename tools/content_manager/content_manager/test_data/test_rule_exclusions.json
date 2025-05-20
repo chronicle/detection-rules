@@ -42,7 +42,7 @@
           {
               "curatedRuleSets":
               [
-                  "projects/1013673362905/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/curatedRuleSetCategories/110fa43d-7165-2355-1985-a63b7cdf90e8/curatedRuleSets/43f7241e-a22c-6122-267b-3d1edc11c8c4"
+                  "projects/1013673362905/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508//curatedRuleSetCategories/110fa43d-7165-2355-1985-a63b7cdf90e8/curatedRuleSets/43f7241e-a22c-6122-267b-3d1edc11c8c4"
               ]
           }
       }

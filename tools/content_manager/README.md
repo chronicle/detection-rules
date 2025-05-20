@@ -4,8 +4,10 @@
 
 Content Manager is a command-line tool that can be used to manage content in
 [Google SecOps](https://cloud.google.com/security/products/security-operations)
-such as rules, reference lists, and rule exclusions. Content Manager can be
-utilized in a CI/CD pipeline to implement Detection-as-Code with Google SecOps.
+such as rules, data, tables, reference lists, and rule exclusions. Content
+Manager can be utilized in a CI/CD pipeline to implement Detection-as-Code with
+Google SecOps or ran locally using
+[Application Default Credentials (ADC)](https://cloud.google.com/docs/authentication/application-default-credentials) for authentication.
 
 If you're new to the concept of managing detection rules and other content using
 CI/CD tools, we recommend reading our
@@ -24,6 +26,8 @@ in a CI/CD pipeline (in GitHub, GitLab, CircleCI, etc) to do the following:
 * Verify that a rule is a valid YARA-L rule without creating a new rule or evaluating it over data
 * Retrieve the latest version of all detection rules from Google SecOps and write them to local `.yaral` files along with their current state/configuration
 * Update detection rules in Google SecOps based on local rule files, e.g., create new rules, create a new rule version, or enable/disable/archive rules
+* Retrieve the latest version of all data tables from Google SecOps and write them to local files along with their current state/configuration
+* Create or update data tables in Google SecOps based on local files
 * Retrieve the latest version of all reference lists from Google SecOps and write them to local files along with their current state/configuration
 * Create or update reference lists in Google SecOps based on local files
 * Manage [rule exclusions](https://cloud.google.com/chronicle/docs/detection/rule-exclusions) in Google SecOps based on a local config file
@@ -52,6 +56,7 @@ following section.
 # Example contents of .env file
 LOGGING_LEVEL=INFO
 GOOGLE_SECOPS_API_BASE_URL="https://us-chronicle.googleapis.com/v1alpha"
+GOOGLE_SECOPS_API_UPLOAD_BASE_URL="https://us-chronicle.googleapis.com/upload/v1alpha"
 GOOGLE_SECOPS_INSTANCE="projects/{google-cloud-project-id}/locations/{google-secops-instance-location}/instances/{google-secops-instance-id}"
 AUTHORIZATION_SCOPES={"GOOGLE_SECOPS_API":["https://www.googleapis.com/auth/cloud-platform"]}
 ```
@@ -60,10 +65,29 @@ AUTHORIZATION_SCOPES={"GOOGLE_SECOPS_API":["https://www.googleapis.com/auth/clou
 
 By default, authentication to the Google SecOps API is attempted using [Application Default Credentials (ADC)](https://cloud.google.com/docs/authentication/application-default-credentials).
 
-To eliminate the security risks and maintenance burden associated with long-lived credentials (i.e. service account keys), it is recommended to configure your CI/CD pipeline to authenticate using [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation) and use short-lived credentials to access Google Cloud resources. Please refer to Google Cloud's [documentation](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines) for configuring Workload Identity Federation or refer to the blog series, [Securing Your CI/CD Pipeline: Eliminate Long-Lived Credentials with Workload Identity Federation](https://www.googlecloudcommunity.com/gc/Community-Blog/Securing-Your-CI-CD-Pipeline-Eliminate-Long-Lived-Credentials/ba-p/818736
-)
+To run commands for Content Manager locally, you can run the following command
+to authenticate to the Google Cloud project that's linked to your Google SecOps
+tenant and acquire credentials to use Application Default Credentials:
+`gcloud auth application-default login`
 
-Google SecOps integrates with Google Cloud Identity and Access Management (IAM) to provide Google SecOps-specific permissions and predefined roles. Google SecOps administrators can control access to Google SecOps features by creating IAM policies that bind users or groups to predefined roles or to IAM custom roles. You can read more about configuring Google SecOps roles and permissions in IAM [here](https://cloud.google.com/chronicle/docs/onboard/configure-feature-access).
+If you're running Content Manager in a CI/CD pipeline, to eliminate the security
+risks and maintenance burden associated with long-lived credentials
+(i.e. service account keys), it is recommended to configure your CI/CD pipeline
+to authenticate using
+[Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)
+and use short-lived credentials to access Google Cloud resources. Please refer
+to Google Cloud's
+[documentation](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines)
+for configuring Workload Identity Federation or refer to the blog series,
+[Securing Your CI/CD Pipeline: Eliminate Long-Lived Credentials with Workload Identity Federation](https://www.googlecloudcommunity.com/gc/Community-Blog/Securing-Your-CI-CD-Pipeline-Eliminate-Long-Lived-Credentials/ba-p/818736)
+
+Google SecOps integrates with Google Cloud Identity and Access Management (IAM)
+to provide Google SecOps-specific permissions and predefined roles. Google
+SecOps administrators can control access to Google SecOps features by creating
+IAM policies that bind users or groups to predefined roles or to IAM custom
+roles. You can read more about configuring Google SecOps roles and permissions
+in IAM
+[here](https://cloud.google.com/chronicle/docs/onboard/configure-feature-access).
 
 If you're using Workload Identity Federation, you can provide your CI/CD pipeline access to Google SecOps by [granting direct resource access to the principal](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines#access).
 
@@ -82,6 +106,23 @@ chronicle.rules.list
 chronicle.rules.listRevisions
 chronicle.rules.update
 chronicle.rules.verifyRuleText
+# Permissions required to manage data tables
+chronicle.dataTables.create
+chronicle.dataTables.get
+chronicle.dataTables.list
+chronicle.dataTables.update
+chronicle.dataTables.delete
+chronicle.dataTableRows.create
+chronicle.dataTableRows.get
+chronicle.dataTableRows.list
+chronicle.dataTableRows.update
+chronicle.dataTableRows.delete
+chronicle.dataTableRows.bulkCreate
+chronicle.dataTableRows.bulkReplace
+chronicle.dataTableRows.bulkUpdate
+chronicle.dataTableRows.asyncBulkCreate
+chronicle.dataTableRows.asyncBulkReplace
+chronicle.dataTableRows.asyncBulkUpdate
 # Permissions required to manage reference lists
 chronicle.referenceLists.get
 chronicle.referenceLists.list
@@ -130,6 +171,15 @@ Need help after reading this documentation? Please open an issue in this repo or
 https://us-chronicle.googleapis.com/v1alpha and the base URL for the regional
 service endpoint in Europe is https://eu-chronicle.googleapis.com/v1alpha
 
+#### `GOOGLE_SECOPS_API_UPLOAD_BASE_URL`
+
+* Set the `GOOGLE_SECOPS_API_UPLOAD_BASE_URL` variable to your regional service
+endpoint for the Google SecOps upload API. This API endpoint is used to upload
+files for Google SecOps such as csv files to create data tables.
+* For example, the base URL for the regional service endpoint in the US is
+https://us-chronicle.googleapis.com/upload/v1alpha and the base URL for the regional
+service endpoint in Europe is https://eu-chronicle.googleapis.com/upload/v1alpha
+
 #### `GOOGLE_SECOPS_INSTANCE`
 
 * Set the `GOOGLE_SECOPS_INSTANCE` variable as follows: `projects/{google-cloud-project-id}/locations/{google-secops-instance-location}/instances/{google-secops-instance-id}`
@@ -156,10 +206,17 @@ Options:
   --help  Show this message and exit.
 
 Commands:
+  data-tables      Manage data tables.
   reference-lists  Manage reference lists.
   rule-exclusions  Manage rule exclusions.
   rules            Manage rules.
 ```
+
+A logical first step after reading the contents of this readme file and
+understanding Content Manager's various commands is to run the `get` commands to
+retrieve your existing content from Google SecOps and write it to local files
+(e.g. `python -m content_manager rules get` or
+`python -m content_manager data-tables get`).
 
 ### Running the tests
 
@@ -323,6 +380,118 @@ Example output from `rules test` command:
 01-May-25 12:01:47 MDT | DEBUG | stream_test_rule | Logging retrieved detections for rule: ...
 ```
 
+## Managing data tables in Google SecOps
+
+### Retrieve data tables from Google SecOps
+
+The `data-tables get` command retrieves the latest version of all data tables
+from Google SecOps and writes them to `.csv` files in the `data_tables`
+directory.
+
+The data table configuration & metadata is written to the
+`data_table_config.yaml` file.
+
+Example output from `data-tables get` command
+
+```
+(venv) $ python -m content_manager data-tables get
+15-May-25 13:34:08 MDT | INFO | <module> | Content Manager started
+15-May-25 13:34:08 MDT | INFO | get_data_tables | Attempting to pull latest version of all data tables from Google SecOps and update local files
+15-May-25 13:34:09 MDT | INFO | get_remote_data_tables | Retrieved a total of 15 data tables
+15-May-25 13:34:09 MDT | INFO | dump_data_table_config | Writing data table config to /Users/x/Documents/projects/detection-rules/tools/content_manager/data_table_config.yaml
+15-May-25 13:34:09 MDT | INFO | get_remote_data_table_rows | Attempting to retrieve all rows for data table cisco_umbrella_top_1k_domains from Google SecOps and write them to local file /Users/x/Documents/projects/detection-rules/tools/content_manager/data_tables/cisco_umbrella_top_1k_domains.csv
+...
+```
+
+### Update data tables in Google SecOps
+
+The `data-tables update` command updates data tables in Google
+SecOps based on local data table (`.csv`) files and the
+`data_table_config.yaml` file.
+
+Data table updates include:
+
+* Create a new data table
+* Replace the contents of an existing data table
+* Update the description or row time-to-live value for a data table
+
+Please refer to the example data table in the `data_tables` directory
+and the example `data_table_config.yaml` file to understand the expected
+format for these files.
+
+Below is an example entry in the `data_table_config.yaml` file before running
+the `data-tables update` command.
+
+```yaml
+cisco_umbrella_top_1k_domains:
+  description: Cisco Umbrella top 1,000 domains
+  columns:
+  - column_index: 0
+    original_column: rank
+    column_type: STRING
+  - column_index: 1
+    original_column: domain
+    column_type: STRING
+```
+
+And below are the first 3 lines of the `cisco_umbrella_top_1k_domains.csv` file
+in the `data_tables` directory.
+
+```
+1,google.com
+2,microsoft.com
+3,www.google.com
+```
+
+Example output from the `data-tables update` command is shown below.
+
+```
+(venv) $ python -m content_manager data-tables update
+15-May-25 14:03:04 MDT | INFO | <module> | Content Manager started
+15-May-25 14:03:04 MDT | INFO | update_data_tables | Attempting to update data tables in Google SecOps based on local data table files
+15-May-25 14:03:04 MDT | INFO | load_data_table_config | Loading data table config from file /Users/x/Documents/projects/detection-rules/tools/content_manager/data_table_config.yaml
+15-May-25 14:03:04 MDT | INFO | load_data_table_config | Loaded metadata and config for 15 data tables from file /Users/x/Documents/projects/detection-rules/tools/content_manager/data_tables
+15-May-25 14:03:04 MDT | INFO | update_remote_data_tables | Attempting to retrieve latest version of all data tables from Google SecOps
+15-May-25 14:03:05 MDT | INFO | get_remote_data_tables | Retrieved a total of 14 data tables
+15-May-25 14:03:12 MDT | INFO | update_remote_data_tables | Local data table name cisco_umbrella_top_1k_domains not found in remote data tables. Creating a new data table
+15-May-25 14:03:13 MDT | INFO | update | Logging summary of data table changes...
+15-May-25 14:03:13 MDT | INFO | update | Data tables created: 1
+15-May-25 14:03:13 MDT | INFO | update | created Data table cisco_umbrella_top_1k_domains
+15-May-25 14:03:13 MDT | INFO | update | Data tables config_updated: 0
+15-May-25 14:03:13 MDT | INFO | update | Data tables content_updated: 0
+```
+
+### Deleting data tables in Google SecOps
+
+The `data-tables delete` command deletes data tables in Google SecOps. Use the
+`--scope` option to define which data tables should be deleted. The `all` scope
+deletes all data tables in Google SecOps. The `unmanaged` scope deletes data
+tables that are not present in the `data_table_config.yaml` file or
+`data_tables` directory.
+
+<span style="color: red;">**Warning**</span>: Deleting data tables is a
+destructive action. It is not reversible, so please take a backup of your data
+tables before running this command if needed.
+
+Note: The deletion of a data table will fail if it is referenced by a rule.
+
+```
+(venv) $ python -m content_manager data-tables delete --help
+python -m content_manager data-tables delete --help
+15-May-25 14:08:23 MDT | INFO | <module> | Content Manager started
+Usage: python -m content_manager data-tables delete [OPTIONS]
+
+  Delete data tables in Google SecOps.
+
+Options:
+  --scope [all|unmanaged]  The scope of data tables to delete in Google
+                           SecOps. 'all': Delete all data tables. 'unmanaged':
+                           Delete data tables that are not present in the
+                           local config file or data_tables directory.
+                           [required]
+  --help                   Show this message and exit.
+```
+
 ## Managing reference lists in Google SecOps
 
 ### Retrieve reference lists from Google SecOps
@@ -337,7 +506,7 @@ The reference list configuration & metadata is written to the
 Example output from `reference-lists get` command:
 
 ```
-python -m content_manager reference-lists get
+(venv) $ python -m content_manager reference-lists get
 01-May-25 12:06:01 MDT | INFO | <module> | Content Manager started
 01-May-25 12:06:01 MDT | INFO | get_reference_lists | Attempting to pull latest version of all reference lists from Google SecOps and update local files
 01-May-25 12:06:01 MDT | INFO | get_remote_ref_lists | Attempting to retrieve all reference lists from Google SecOps

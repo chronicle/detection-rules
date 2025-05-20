@@ -22,6 +22,7 @@ jobs:
     env:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       GOOGLE_SECOPS_API_BASE_URL: ${{ vars.GOOGLE_SECOPS_API_BASE_URL }}
+      GOOGLE_SECOPS_API_UPLOAD_BASE_URL: ${{ vars.GOOGLE_SECOPS_API_UPLOAD_BASE_URL }}
       GOOGLE_SECOPS_INSTANCE: ${{ vars.GOOGLE_SECOPS_INSTANCE }}
       AUTHORIZATION_SCOPES: ${{ vars.AUTHORIZATION_SCOPES }}
 
@@ -59,13 +60,16 @@ jobs:
       - name: Update reference lists in Google SecOps based on files in main branch
         run: python -m content_manager reference-lists update
 
+      - name: Update data tables in Google SecOps based on files in main branch
+        run: python -m content_manager data-tables update
+
       - name: Update rules in Google SecOps based on files in main branch
         run: python -m content_manager rules update
 
       # After any changes are made to rules and reference lists in Google SecOps, the latest rules and reference lists are retrieved to update the main branch with the latest data (revision_id, revision_create_time, etc).
 
       - name: Add files to git staging area
-        run: git add rules rule_config.yaml reference_lists reference_list_config.yaml
+        run: git add rules rule_config.yaml data_tables data_table_config.yaml reference_lists reference_list_config.yaml
 
       - name: Run git status command
         run: git status  # For debugging

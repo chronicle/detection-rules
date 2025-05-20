@@ -22,6 +22,7 @@ jobs:
     env:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       GOOGLE_SECOPS_API_BASE_URL: ${{ vars.GOOGLE_SECOPS_API_BASE_URL }}
+      GOOGLE_SECOPS_API_UPLOAD_BASE_URL: ${{ vars.GOOGLE_SECOPS_API_UPLOAD_BASE_URL }}
       GOOGLE_SECOPS_INSTANCE: ${{ vars.GOOGLE_SECOPS_INSTANCE }}
       AUTHORIZATION_SCOPES: ${{ vars.AUTHORIZATION_SCOPES }}
 
@@ -59,11 +60,14 @@ jobs:
       - name: Pull latest version of all rules from Google SecOps
         run: python -m content_manager rules get
 
+      - name: Pull latest version of all data tables from Google SecOps
+        run: python -m content_manager data-tables get
+
       - name: Pull latest version of all reference lists from Google SecOps
         run: python -m content_manager reference-lists get
 
       - name: Add files to git staging area
-        run: git add rules rule_config.yaml reference_lists reference_list_config.yaml
+        run: git add rules rule_config.yaml data_tables data_table_config.yaml reference_lists reference_list_config.yaml
 
       - name: Run git status command
         run: git status  # For debugging

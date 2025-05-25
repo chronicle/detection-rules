@@ -29,8 +29,8 @@ rule gmail_spike_in_undeliverables {
     mitre_attack_url = "https://attack.mitre.org/techniques/T1566/"
 
   events:
-    $email.metadata.vendor_name = "Google Workspace" 
-    $email.metadata.product_name = "gmail" 
+    $email.metadata.vendor_name = "Google Workspace"
+    $email.metadata.product_name = "gmail"
     $email.metadata.event_type = "EMAIL_TRANSACTION"
     $email.network.email.subject = /Undeliverable\:/ nocase
     $email.target.user.email_addresses = $user

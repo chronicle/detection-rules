@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 rule entra_id_devicecode_phishing_attack {
 
   meta:
@@ -37,8 +37,8 @@ rule entra_id_devicecode_phishing_attack {
     $email.about.url = /microsoft.com\/devicelogin/ or
     $email.about.url = /oauth2\/deviceauth/
     //user clicks the device code phish URL.
-    $email.about.labels.value = /71|9/   
-    
+    $email.about.labels.value = /71|9/
+
     $entra.metadata.vendor_name = "Microsoft"
     $entra.metadata.product_name = "Azure AD"
     //Entra error code 50199: The user was asked to confirm that this app is the application they intended to sign into.

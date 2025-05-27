@@ -432,7 +432,7 @@ class Rules:
   @classmethod
   def check_for_duplicate_rule_names(cls, rules: List[Rule]):
     """Check for duplicate rule names in a list of rules."""
-    rule_name_counts = collections.Counter([rule.name for rule in rules])
+    rule_name_counts = collections.Counter([rule.name.lower() for rule in rules])
     duplicate_rule_names = [
         rule_name_count
         for rule_name_count in rule_name_counts.items()

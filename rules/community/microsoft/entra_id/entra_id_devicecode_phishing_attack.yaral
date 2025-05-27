@@ -1,0 +1,66 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+rule entra_id_devicecode_phishing_attack {
+
+  meta:
+    author = "Bastradamus"
+    description = "Detects strong indicators of a successful device code phishing attack."
+    severity = "High"
+    priority = "High"
+    rule_id = "mr_8b29e3d1-5c42-4f91-9aef-b673ad89f0e4"
+    rule_name = "Microsoft Entra ID Device code phishing attack"
+    type = "alert"
+    data_source = "Workspace Activity, azure ad"
+    reference = "https://systemweakness.com/detecting-device-code-phishing-in-google-security-operations-9bf1c282cff0"
+    mitre_attack_tactic = "Initial Access"
+    mitre_attack_technique = "Phishing"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1566/"
+
+  events:
+    $email.network.email.to = $user
+    $email.metadata.vendor_name = "Google Workspace"
+    $email.metadata.product_name = "gmail" nocase
+    $email.about.url = /microsoft.com\/devicelogin/ or
+    $email.about.url = /oauth2\/deviceauth/
+    //user clicks the device code phish URL.
+    $email.about.labels.value = /71|9/   
+    
+    $entra.metadata.vendor_name = "Microsoft"
+    $entra.metadata.product_name = "Azure AD"
+    //Entra error code 50199: The user was asked to confirm that this app is the application they intended to sign into.
+    $entra.security_result.rule_id = /^(0|50199)$/
+
+    //join
+    $email.network.email.to = $entra.target.user.userid
+
+  match:
+    //Time window based on the fact that the device code expires within 15 minutes. Added an extra 60 seconds.
+    $user over 16m
+
+  outcome:
+    $mitre_attack_tactic = array_distinct("Initial Access")
+    $mitre_attack_technique = array_distinct("Phishing")
+    $mitre_attack_technique_id = array_distinct("T1566")
+    $target_user_distinct_count = count_distinct($user)
+    $target_user_count = count($user)
+    $principal_ip = array_distinct($email.principal.ip)
+    $sender_from = array_distinct($email.principal.network.email.from)
+    $recipient = array_distinct($email.network.email.to)
+
+  condition:
+    $email and $entra
+}

@@ -193,6 +193,15 @@ def test_check_for_duplicate_rule_names(parsed_test_rules):
   ):
     Rules.check_for_duplicate_rule_names(rules)
 
+  # Ensure a DuplicateRuleNameError exception is raised when duplicate rule
+  # names are found with different character casing
+  rules[0].name = rules[1].name.upper()
+  with pytest.raises(
+      expected_exception=DuplicateRuleNameError,
+      match=r"Duplicate rule names found",
+  ):
+    Rules.check_for_duplicate_rule_names(rules)
+
 
 def test_check_for_duplicate_rule_ids(parsed_test_rules):
   """Tests for rules.Rules.check_for_duplicate_rule_ids."""

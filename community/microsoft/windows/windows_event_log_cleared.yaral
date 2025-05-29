@@ -1,0 +1,78 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule windows_event_log_cleared {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects the clearing of event logs within the Windows Event Viewer."
+    type = "alert"
+    data_source = "microsoft sysmon, microsoft windows events"
+    platform = "Windows"
+    tactic = "TA0005"
+    technique = "T1070.001"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    (
+        $process.metadata.event_type = "PROCESS_LAUNCH" and
+        // currently the command line is focused on the three primary log sets, could expand this further if desired
+        re.regex($process.target.process.command_line, `wevtutil.*cl.*(system|application|security)`) nocase
+    )
+    or
+    (
+        $process.metadata.event_type = "SYSTEM_AUDIT_LOG_WIPE" and
+        $process.metadata.vendor_name = "Microsoft"
+    )
+    or
+    (
+        $process.metadata.event_type = "STATUS_UPDATE" and
+        $process.metadata.product_name = "PowerShell" and
+        $process.metadata.vendor_name = "Microsoft" and
+        (
+            re.regex($process.security_result.description, `Remove-EventLog`) nocase or
+            re.regex($process.security_result.description, `Clear-EventLog`) nocase
+        )
+    )
+    $process.principal.hostname = $hostname
+
+  match:
+    $hostname over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($process.metadata.id)
+    $process_description = array_distinct($process.metadata.description)
+    // added to populate alert graph with additional context
+    // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$principal_hostname = array_distinct($process.principal.hostname)
+    $principal_process_pid = array_distinct($process.principal.process.pid)
+    $principal_process_command_line = array_distinct($process.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
+    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($process.principal.user.userid)
+
+  condition:
+    $process
+}

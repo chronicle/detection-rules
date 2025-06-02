@@ -38,7 +38,7 @@ rule safebrowsing_process_creation_hashes_seen_more_than_7_days {
     $safebrowse.graph.metadata.product_name = "Google Safe Browsing"
     $safebrowse.graph.metadata.source_type = "GLOBAL_CONTEXT"
 
-    // derived from events ingested by Chronicle
+    // derived from events ingested by Google SecOps
     $seen.graph.entity.file.sha256 = $sha256
     $seen.graph.metadata.entity_type = "FILE"
     $seen.graph.metadata.source_type = "DERIVED_CONTEXT"

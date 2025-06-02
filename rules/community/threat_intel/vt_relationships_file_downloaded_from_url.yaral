@@ -58,7 +58,7 @@ rule vt_relationships_file_downloaded_from_url {
     $userid over 1m
 
   outcome:
-    $risk_score = max(95)
+    $risk_score = 95
     //added to populate alert graph with additional context
     $principal_hostname = array_distinct($http.principal.hostname)
     $target_hostname = array_distinct($file.target.hostname)

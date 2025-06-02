@@ -31,7 +31,7 @@ rule ip_target_prevalence {
     $network.metadata.event_type = "NETWORK_CONNECTION"
     $network.target.ip = $ip
 
-    // derived from events ingested by Chronicle
+    // derived from events ingested by Google SecOps
     $prevalence.graph.metadata.entity_type = "IP_ADDRESS"
     $prevalence.graph.metadata.source_type = "DERIVED_CONTEXT"
     $prevalence.graph.entity.artifact.prevalence.day_count = 10
@@ -43,7 +43,7 @@ rule ip_target_prevalence {
     $ip over 5m
 
   outcome:
-    $risk_score = max(35)
+    $risk_score = 35
     $event_count = count_distinct($network.metadata.id)
     // added to populate alert graph with additional context
     $principal_ip = array_distinct($network.principal.ip)

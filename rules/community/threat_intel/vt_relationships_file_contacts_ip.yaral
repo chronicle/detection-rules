@@ -49,7 +49,7 @@ rule vt_relationships_file_contacts_ip {
     $hostname over 5m
 
   outcome:
-    $risk_score = max(85)
+    $risk_score = 85
     $event_count = count_distinct($network.metadata.id)
     // added to populate alert graph with additional context
     $principal_ip = array_distinct($network.principal.ip)

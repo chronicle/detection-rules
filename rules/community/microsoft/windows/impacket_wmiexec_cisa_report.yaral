@@ -23,10 +23,8 @@ rule impacket_wmiexec_cisa_report {
     rule_name = "Impacket WMIExec CISA Report"
     type = "alert"
     data_source = "microsoft sysmon, microsoft windows events"
-    mitre_attack_tactic = "Execution"
-    mitre_attack_technique = "Windows Management Instrumentation"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1047/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0002"
+    technique = "T1047"
     reference = "https://media.defense.gov/2023/May/24/2003229517/-1/-1/0/CSA_Living_off_the_Land.PDF"
     severity = "Medium"
     priority = "Medium"
@@ -47,10 +45,7 @@ rule impacket_wmiexec_cisa_report {
     $hostname over 5m
 
   outcome:
-    $risk_score = max(65)
-    $mitre_attack_tactic = "Execution"
-    $mitre_attack_technique = "Windows Management Instrumentation"
-    $mitre_attack_technique_id = "T1047"
+    $risk_score = 65
     // added to populate alert graph with additional context
     $principal_hostname = array_distinct($process.principal.hostname)
     $principal_process_pid = array_distinct($process.principal.process.pid)

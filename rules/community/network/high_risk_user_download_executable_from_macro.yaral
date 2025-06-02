@@ -28,10 +28,8 @@ rule high_risk_user_download_executable_from_macro {
     priority = "High"
     platform = "Windows"
     assumption = "This rule assumes that GCP DLP has been deployed and resources have been assigned to a user context"
-    mitre_attack_tactic = "Execution"
-    mitre_attack_technique = "User Execution: Malicious File"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1204/002/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0002"
+    technique = "T1204.002"
 
   events:
     // proxy event with suspected executable download
@@ -66,9 +64,6 @@ rule high_risk_user_download_executable_from_macro {
 
   outcome:
     $risk_score = max(if($table_context.graph.entity.resource.attribute.labels.value = "US_SOCIAL_SECURITY_NUMBER", 80))
-    $mitre_attack_tactic = array_distinct("Execution")
-    $mitre_attack_technique = array_distinct("User Execution: Malicious File")
-    $mitre_attack_technique_id = array_distinct("T1204.002")
     $entity_resource_name = array_distinct($table_context.graph.entity.resource.name)
     // added to populate alert graph with additional context
     $principal_hostname = array_distinct($proxy_event.principal.hostname)

@@ -21,10 +21,8 @@ rule google_safebrowsing_file_contacts_tor_exit_node {
     description = "A malicious file contacting a known Tor Exit Node."
     rule_id = "mr_f6733319-50b3-477e-bad6-96bb4c14c632"
     rule_name = "Google Safebrowsing File Contacts Tor Exit Node"
-    mitre_attack_tactic = "Command and Control"
-    mitre_attack_technique = "Proxy: Multi-hop Proxy"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0011"
+    technique = "T1090.003"
     type = "alert"
     data_source = "microsoft defender atp, crowdstrike, microsoft sysmon"
     severity = "Critical"
@@ -56,10 +54,7 @@ rule google_safebrowsing_file_contacts_tor_exit_node {
     $hostname over 1h
 
   outcome:
-    $risk_score = max(95)
-    $mitre_attack_tactic = array_distinct("Command and Control")
-    $mitre_attack_technique = array_distinct("Proxy: Multi-hop Proxy")
-    $mitre_attack_technique_id = array_distinct("T1090.003")
+    $risk_score = 95
     $event_count = count_distinct($network.metadata.id)
     //added to populate alert graph with additional context
     $principal_ip = array_distinct($network.principal.ip)

@@ -21,10 +21,8 @@ rule rw_mimikatz_T1003 {
     description = "Detects the process mimikatz being issued from the command line."
     rule_id = "mr_fa96ead4-7f1f-4dbb-bacb-a526f985c12f"
     rule_name = "MITRE ATT&CK T1003 RW Mimikatz"
-    mitre_attack_tactic = "Credential Access"
-    mitre_attack_technique = "OS Credential Dumping"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1003/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0006"
+    technique = "T1003"
     type = "alert"
     platform = "Windows"
     data_source = "microsoft sysmon, microsoft windows events"
@@ -40,10 +38,7 @@ rule rw_mimikatz_T1003 {
     $event_type over 5m
 
   outcome:
-    $risk_score = max(95)
-    $mitre_attack_tactic = array_distinct("Credential Access")
-    $mitre_attack_technique = array_distinct("OS Credential Dumping")
-    $mitre_attack_technique_id = array_distinct("T1003")
+    $risk_score = 95
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     $principal_hostname = array_distinct($process.principal.hostname)

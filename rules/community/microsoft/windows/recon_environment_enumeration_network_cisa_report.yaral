@@ -18,16 +18,14 @@ rule recon_environment_enumeration_network_cisa_report {
 
   meta:
     author = "Google Cloud Security"
-    description = "Detects network enumeration commands as identified in CISA Living of the Land pdf. Alone they may be normal but in concert, they may be worth looking into"
+    description = "Detects network enumeration commands as identified in CISA Living off the Land pdf. Alone they may be normal but in concert, they may be worth looking into"
     rule_id = "mr_9ca49a46-fb60-4ada-b722-5714d5cb7f53"
     rule_name = "Recon Environment Enumeration Network CISA Report"
     type = "hunt"
     platform = "Windows"
     data_source = "microsoft sysmon, windows event logs"
-    mitre_attack_tactic = "Discovery"
-    mitre_attack_technique = "System Network Configuration Discovery"
-    mitre_attack_url = "https://attack.mitre.org/versions/v13/techniques/T1016/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0007"
+    technique = "T1016"
     reference = "https://media.defense.gov/2023/May/24/2003229517/-1/-1/0/CSA_Living_off_the_Land.PDF"
     severity = "Low"
     priority = "Low"
@@ -68,12 +66,9 @@ rule recon_environment_enumeration_network_cisa_report {
     $hostname over 15m
 
   outcome:
-    $risk_score = max(35)
-    $mitre_attack_tactic = "Discovery"
-    $mitre_attack_technique = "System Network Configuration Discovery"
-    $mitre_attack_technique_id = "T1016"
+    $risk_score = 35
     $event_count = count_distinct($process.metadata.id)
-    $unique_command_line_threshold = max(5)
+    $unique_command_line_threshold = 5
     // added to populate alert graph with additional context
     // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results
     //$principal_hostname = array_distinct($process.principal.hostname)

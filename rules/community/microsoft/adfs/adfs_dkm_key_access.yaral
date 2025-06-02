@@ -23,10 +23,8 @@ rule adfs_dkm_key_access {
     rule_name = "ADFS DKM Key Access"
     reference = "https://github.com/OTRF/BHEU22-ADFS/blob/main/Slide-Deck.pdf"
     type = "alert"
-    mitre_attack_tactic = "Credential Access"
-    mitre_attack_technique = "Unsecured Credentials: Private Keys"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1552/004/"
-    mitre_attack_version = "v14.1"
+    tactic = "TA0006"
+    technique = "T1552.004"
     platform = "Windows"
     data_source = "windows security events"
     severity = "High"
@@ -52,9 +50,6 @@ rule adfs_dkm_key_access {
 
   outcome:
     $risk_score = 85
-    $mitre_attack_tactic = "Credential Access"
-    $mitre_attack_technique = "Unsecured Credentials: Private Keys"
-    $mitre_attack_technique_id = array_distinct("T1552.004")
     //added to populate alert graph with additional context
     //Commented out because it is the same as the match variable, if match variable changes, uncomment to use
     //$principal_hostname = array_distinct($logon.principal.hostname)

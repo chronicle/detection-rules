@@ -21,10 +21,8 @@ rule mitre_attack_T1021_002_windows_admin_share_with_user_entity {
     description = "Net use commands for SMB/Windows admin shares focused on specific user entity characteristics"
     rule_id = "mr_18cff6cc-0d2d-4b83-9424-c854c84c4241"
     rule_name = "MITRE ATT&CK T1021.002 Windows Admin Share With User Entity"
-    mitre_attack_tactic = "Lateral Movement"
-    mitre_attack_technique = "Remote Services: SMB/Windows Admin Shares"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1021/002/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0008"
+    technique = "T1021.002"
     type = "alert"
     tags = "user entity"
     platform = "Windows"
@@ -55,10 +53,7 @@ rule mitre_attack_T1021_002_windows_admin_share_with_user_entity {
     $userid over 5m
 
   outcome:
-    $risk_score = max(35)
-    $mitre_attack_tactic = array_distinct("Lateral Movement")
-    $mitre_attack_technique = array_distinct("Remote Services: SMB/Windows Admin Shares")
-    $mitre_attack_technique_id = array_distinct("T1021.002")
+    $risk_score = 35
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     $principal_hostname = array_distinct($process.principal.hostname)

@@ -49,7 +49,7 @@ rule vt_relationships_file_contacts_domain {
     $hostname_or_userid over 5m
 
   outcome:
-    $risk_score = max(85)
+    $risk_score = 85
     $event_count = count_distinct($dns.metadata.id)
     $network_dns_questions_name = array_distinct($dns.network.dns.questions.name)
     $network_dns_answers_data = array_distinct($dns.network.dns.answers.data)

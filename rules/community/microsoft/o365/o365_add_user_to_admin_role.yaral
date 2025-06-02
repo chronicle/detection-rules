@@ -22,10 +22,8 @@ rule o365_add_user_to_admin_role {
     rule_id = "mr_ee28c257-d2c7-490c-addf-aef35d07f29d"
     rule_name = "O365 Add User To Admin Role"
     assumption = "The list msgraph_watchlist_roles is populated with role names, example: Application Administrator"
-    mitre_attack_tactic = "Persistence"
-    mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"
-    mitre_attack_version = "v14.1"
+    mitre_attack_tactic = "TA0003"
+    mitre_attack_technique = "T1098.003"
     type = "alert"
     platform = "azure"
     data_source = "o365"
@@ -46,9 +44,6 @@ rule o365_add_user_to_admin_role {
 
   outcome:
     $risk_score = 65
-    $mitre_attack_tactic = "Persistence"
-    $mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
-    $mitre_attack_technique_id = "T1098.003"
     $event_count = count_distinct($app.metadata.id)
     $security_summary = array_distinct($app.security_result.summary)
     $user_agent = array_distinct($app.network.http.user_agent)

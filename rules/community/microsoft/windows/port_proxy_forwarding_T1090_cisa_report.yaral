@@ -24,10 +24,8 @@ rule port_proxy_forwarding_T1090_cisa_report {
     type = "hunt"
     platform = "Windows"
     data_source = "microsoft sysmon, windows event log"
-    mitre_attack_tactic = "Command and Control"
-    mitre_attack_technique = "Proxy"
-    mitre_attack_url = "https://attack.mitre.org/versions/v13/techniques/T1090/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0011"
+    technique = "T1090"
     reference = "https://media.defense.gov/2023/May/24/2003229517/-1/-1/0/CSA_Living_off_the_Land.PDF"
     severity = "Low"
     priority = "Low"
@@ -57,10 +55,7 @@ rule port_proxy_forwarding_T1090_cisa_report {
     $hostname over 5m
 
   outcome:
-    $risk_score = max(35)
-    $mitre_attack_tactic = "Command and Control"
-    $mitre_attack_technique = "Proxy"
-    $mitre_attack_technique_id = "T1090"
+    $risk_score = 35
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results

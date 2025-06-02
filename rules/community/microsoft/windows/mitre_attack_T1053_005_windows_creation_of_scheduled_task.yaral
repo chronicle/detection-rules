@@ -21,10 +21,8 @@ rule mitre_attack_T1053_005_windows_creation_of_scheduled_task {
     description = "Creation of scheduled task using command line"
     rule_id = "mr_14beda0b-8ef1-4805-a227-df9d8bbc6804"
     rule_name = "MITRE ATT&CK T1053.005 Windows Creation Of Scheduled Task"
-    mitre_attack_tactic = "Execution, Persistence, Privilege Escalation"
-    mitre_attack_technique = "Scheduled Task/Job: Scheduled Task"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1053/005/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0002"
+    technique = "T1053.005"
     type = "alert"
     platform = "Windows"
     data_source = "sentinelone"
@@ -40,10 +38,7 @@ rule mitre_attack_T1053_005_windows_creation_of_scheduled_task {
     $hostname over 5m
 
   outcome:
-    $risk_score = max(15)
-    $mitre_attack_tactic = array_distinct("Execution, Persistence, Privilege Escalation")
-    $mitre_attack_technique = array_distinct("Scheduled Task/Job: Scheduled Task")
-    $mitre_attack_technique_id = array_distinct("T1053.005")
+    $risk_score = 15
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results

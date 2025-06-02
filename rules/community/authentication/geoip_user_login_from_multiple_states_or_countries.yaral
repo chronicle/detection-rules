@@ -41,9 +41,9 @@ rule geoip_user_login_from_multiple_states_or_countries {
     $user, $product over 1h
 
   outcome:
-    $risk_score = max(35)
+    $risk_score = 35
     $event_count = count_distinct($login.metadata.id)
-    $state_login_threshold = max(2)
+    $state_login_threshold = 2
     $dc_state = count_distinct($login.principal.ip_geo_artifact.location.state)
     $array_state = array_distinct($login.principal.ip_geo_artifact.location.state)
     $dc_country_or_region = count_distinct($login.principal.ip_geo_artifact.location.country_or_region)

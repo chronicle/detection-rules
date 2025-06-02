@@ -18,16 +18,14 @@ rule wmic_ntds_dit_T1003_003_cisa_report {
 
   meta:
     author = "Google Cloud Security"
-    description = "Detects extraction of ntds.dit file using vssadmin.exe or ntdsutil.exe with wmic as identified in CISA Living of the Land pdf"
+    description = "Detects extraction of ntds.dit file using vssadmin.exe or ntdsutil.exe with wmic as identified in CISA Living off the Land pdf"
     rule_id = "mr_b1719d37-6689-485d-b80c-b509fdaa1af8"
     rule_name = "MITRE ATT&CK T1003.003 WMIC Ntds.dit CISA Report"
     type = "alert"
     platform = "Windows"
     data_source = "microsoft sysmon, windows event logs"
-    mitre_attack_tactic = "Credential Access"
-    mitre_attack_technique = "OS Credential Dumping: NTDS"
-    mitre_attack_url = "https://attack.mitre.org/versions/v13/techniques/T1003/003/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0006"
+    technique = "T1003.003"
     reference = "https://media.defense.gov/2023/May/24/2003229517/-1/-1/0/CSA_Living_off_the_Land.PDF"
     severity = "High"
     priority = "High"
@@ -70,10 +68,7 @@ rule wmic_ntds_dit_T1003_003_cisa_report {
     $hostname over 5m
 
   outcome:
-    $risk_score = max(85)
-    $mitre_attack_tactic = "Credential Access"
-    $mitre_attack_technique = "OS Credential Dumping: NTDS"
-    $mitre_attack_technique_id = "T1003.003"
+    $risk_score = 85
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results

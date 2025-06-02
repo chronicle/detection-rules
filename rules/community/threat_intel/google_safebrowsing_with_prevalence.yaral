@@ -51,7 +51,7 @@
     $hostname, $hash over 5m
 
    outcome:
-    $risk_score = max(95)
+    $risk_score = 95
     $event_count = count_distinct($execution.metadata.id)
     // added to populate alert graph with additional context
     // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results

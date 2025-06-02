@@ -21,10 +21,8 @@ rule mitre_attack_T1021_002_windows_admin_share_basic {
     description = "Detect the use of net use for SMB/Windows admin shares"
     rule_id = "mr_ceadd402-7315-4462-9716-8b41a6329bdd"
     rule_name = "MITRE ATT&CK T1021.002 Windows Admin Share Basic"
-    mitre_attack_tactic = "Lateral Movement"
-    mitre_attack_technique = "Remote Services: SMB/Windows Admin Shares"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1021/002/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0008"
+    technique = "T1021.002"
     type = "alert"
     platform = "Windows"
     data_source = "microsoft sysmon, microsoft windows events"
@@ -37,9 +35,6 @@ rule mitre_attack_T1021_002_windows_admin_share_basic {
 
   outcome:
     $risk_score = 35
-    $mitre_attack_tactic = "Lateral Movement"
-    $mitre_attack_technique = "Remote Services: SMB/Windows Admin Shares"
-    $mitre_attack_technique_id = "T1021.002"
     // added to populate alert graph with additional context
     $principal_hostname = $process.principal.hostname
     $principal_process_pid = $process.principal.process.pid

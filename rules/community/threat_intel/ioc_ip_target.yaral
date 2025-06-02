@@ -46,7 +46,7 @@ rule ioc_ip_target {
     $ip over 5m
 
   outcome:
-    $risk_score = max(65)
+    $risk_score = 65
     $event_count = count_distinct($network.metadata.id)
     // added to populate alert graph with additional context
     $principal_ip = array_distinct($network.principal.ip)

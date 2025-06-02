@@ -48,7 +48,7 @@ rule network_connection_first_seen_in_past_day {
     $ip over 24h
 
   outcome:
-    $risk_score = max(35)
+    $risk_score = 35
     $event_count = count_distinct($network.metadata.id)
     //added to populate alert graph with additional context
     $principal_ip = array_distinct($network.principal.ip)

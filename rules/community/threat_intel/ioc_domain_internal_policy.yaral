@@ -48,7 +48,7 @@ rule ioc_domain_internal_policy {
     $dns_query over 5m
 
   outcome:
-    $risk_score = max(35)
+    $risk_score = 35
     $event_count = count_distinct($dns.metadata.id)
     // If not doing any additional extractions to $info placeholder variable, the following outcome variable can be removed
     $threat_info = array_distinct($info)

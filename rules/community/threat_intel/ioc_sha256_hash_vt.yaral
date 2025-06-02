@@ -46,7 +46,7 @@ rule ioc_sha256_hash_vt {
     $hostname over 15m
 
   outcome:
-    $risk_score = max(65)
+    $risk_score = 65
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results

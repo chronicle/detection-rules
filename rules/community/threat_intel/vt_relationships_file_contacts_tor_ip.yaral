@@ -21,10 +21,8 @@ rule vt_relationships_file_contacts_tor_ip {
     description = "Alert on known Hash contacting Tor IP with VT Relationships."
     rule_id = "mr_a6f8b114-8fdb-4f39-8820-8961dcbb1079"
     rule_name = "VT Relationships File Contacts Tor IP"
-    mitre_attack_tactic = "Command and Control"
-    mitre_attack_technique = "Proxy: Multi-hop Proxy"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0011"
+    technique = "T1090.003"
     type = "alert"
     tags = "vt, tor"
     data_source = "microsoft defender atp"
@@ -70,9 +68,6 @@ rule vt_relationships_file_contacts_tor_ip {
         if($network.target.ip_geo_artifact.location.country_or_region = "Russia", 20) +
         if($network.target.ip_geo_artifact.location.country_or_region = "Syria", 20)
     )
-    $mitre_attack_tactic = array_distinct("Command and Control")
-    $mitre_attack_technique = array_distinct("Proxy: Multi-hop Proxy")
-    $mitre_attack_technique_id = array_distinct("T1090.003")
     $event_count = count_distinct($network.metadata.id)
     $count_file_hash = count_distinct($file_hash)
     $count_tor_ips = count_distinct($ip)

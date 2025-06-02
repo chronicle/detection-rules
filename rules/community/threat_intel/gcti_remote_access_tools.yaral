@@ -21,10 +21,8 @@ rule gcti_remote_access_tools {
     description = "Alert process and file create events that are associated with hashes from the GCTI Remote Access Tool list"
     rule_id = "mr_d838d64d-4a6f-4999-a895-0b5771d02aa6"
     rule_name = "GCTI Remote Access Tools"
-    mitre_attack_tactic = "Command and Control"
-    mitre_attack_technique = "Remote Access Software"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1219/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0011"
+    technique = "T1219"
     type = "alert"
     tags = "rat"
     data_source = "crowdstrike, microsoft sysmon, microsoft defender atp"
@@ -52,10 +50,7 @@ rule gcti_remote_access_tools {
     $hostname over 5m
 
   outcome:
-    $risk_score = max(65)
-    $mitre_attack_tactic = "Command and Control"
-    $mitre_attack_technique = "Remote Access Software"
-    $mitre_attack_technique_id = "T1219"
+    $risk_score = 65
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results

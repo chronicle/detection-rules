@@ -24,10 +24,8 @@ rule recon_successful_logon_enumeration_powershell_T1033_cisa_report {
     type = "hunt"
     platform = "Windows"
     data_source = "microsoft sysmon"
-    mitre_attack_tactic = "Discovery"
-    mitre_attack_technique = "System Owner/User Discovery"
-    mitre_attack_url = "https://attack.mitre.org/versions/v13/techniques/T1033/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0007"
+    mitre_attack_technique = "T1033"
     reference = "https://media.defense.gov/2023/May/24/2003229517/-1/-1/0/CSA_Living_off_the_Land.PDF"
     severity = "Info"
     priority = "Info"
@@ -50,10 +48,7 @@ rule recon_successful_logon_enumeration_powershell_T1033_cisa_report {
     $hostname over 15m
 
   outcome:
-    $risk_score = max(15)
-    $mitre_attack_tactic = "Discovery"
-    $mitre_attack_technique = "System Owner/User Discovery"
-    $mitre_attack_technique_id = "T1033"
+    $risk_score = 15
     $event_count = count_distinct($process.metadata.id)
     $security_result_description = array_distinct($process.security_result.description)
     // added to populate alert graph with additional context

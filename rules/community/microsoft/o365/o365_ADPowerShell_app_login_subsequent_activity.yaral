@@ -22,10 +22,8 @@ rule o365_ADPowerShell_app_login_subsequent_activity {
     rule_id = "mr_2d781f34-05f3-43aa-b5ec-257c03787a66"
     rule_name = "O365 AD PowerShell App Login Subsequent Activity"
     assumption = "This does not take into account attempts that were blocked, just any logging of attempts for any of these actions"
-    mitre_attack_tactic = "Persistence"
-    mitre_attack_technique = "Account Manipulation: Additional Cloud Credentials"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1098/001/"
-    mitre_attack_version = "v14.1"
+    tactic = "TA0003"
+    technique = "T1098.001"
     type = "alert"
     platform = "azure"
     data_source = "o365"
@@ -83,9 +81,6 @@ rule o365_ADPowerShell_app_login_subsequent_activity {
                         if($other.metadata.product_event_type = "Update application.", 10, 0) +
                         if($other.metadata.product_event_type = "Add delegated permission grant.", 10, 0) +
                         if($other.metadata.product_event_type = /Update application.*Certificates and secrets management/ nocase, 55, 0))
-    $mitre_attack_tactic = "Persistence"
-    $mitre_attack_technique = "Account Manipulation: Additional Cloud Credentials"
-    $mitre_attack_technique_id = "T1098.001"
     $subsequent_action_threshold = 1
     $product_event_type = array_distinct($other.metadata.product_event_type)
     $country_region_login_attempt = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)

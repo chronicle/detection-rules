@@ -21,10 +21,8 @@ rule mitre_attack_T1021_002_windows_admin_share_with_asset_entity {
     description = "Net use commands for SMB/Windows admin shares based on asset entity group"
     rule_id = "mr_7b7fbe57-12a8-4254-ad73-b9e9024cbc8a"
     rule_name = "MITRE ATT&CK T1021.002 Windows Admin Share With Asset Entity"
-    mitre_attack_tactic = "Lateral Movement"
-    mitre_attack_technique = "Remote Services: SMB/Windows Admin Shares"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1021/002/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0008"
+    technique = "T1021.002"
     type = "alert"
     tags = "asset entity"
     platform = "Windows"
@@ -50,10 +48,7 @@ rule mitre_attack_T1021_002_windows_admin_share_with_asset_entity {
     $ip over 5m
 
   outcome:
-    $risk_score = max(35)
-    $mitre_attack_tactic = array_distinct("Lateral Movement")
-    $mitre_attack_technique = array_distinct("Remote Services: SMB/Windows Admin Shares")
-    $mitre_attack_technique_id = array_distinct("T1021.002")
+    $risk_score = 35
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     // Commented out principal.hostname because principal.ip is already represented in graph as match variable. If match changes, can uncomment to add to results

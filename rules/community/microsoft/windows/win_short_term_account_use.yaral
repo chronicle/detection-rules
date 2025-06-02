@@ -47,7 +47,7 @@ rule win_short_term_account_use {
     $targetUser over 4h
 
   outcome:
-    $risk_score = max(65)
+    $risk_score = 65
     $event_count = count_distinct($login.metadata.id)
     // added to populate alert graph with additional context
     $principal_hostname = array_distinct($login.principal.hostname)

@@ -21,10 +21,8 @@ rule mitre_attack_T1570_suspicious_command_psexec {
     description = "Command-line execution of the PsExec tool on Windows"
     rule_id = "mr_b1c34e7b-79c2-4d44-a105-d8166f6fd2c5"
     rule_name = "MITRE ATT&CK T1570 Suspicious Command PSExec"
-    mitre_attack_tactic = "Lateral Movement"
-    mitre_attack_technique = "Lateral Tool Transfer"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1570/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0008"
+    technique = "T1570"
     type = "alert"
     platform = "Windows"
     data_source = "sentinelone"
@@ -40,10 +38,7 @@ rule mitre_attack_T1570_suspicious_command_psexec {
     $hostname over 5m
 
   outcome:
-    $risk_score = max(15)
-    $mitre_attack_tactic = array_distinct("Lateral Movement")
-    $mitre_attack_technique = array_distinct("Lateral Tool Transfer")
-    $mitre_attack_technique_id = array_distinct("T1570")
+    $risk_score = 15
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results

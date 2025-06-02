@@ -21,10 +21,8 @@ rule gcti_benign_binaries_contacts_tor_exit_node {
     description = "Alert on Benign Binary contacting a TOR IP"
     rule_id = "mr_8bb13cf7-d66b-41f2-9bbc-0a1884a77f70"
     rule_name = "GCTI Benign Binaries Contacts Tor Exit Node"
-    mitre_attack_tactic = "Command and Control"
-    mitre_attack_technique = "Proxy: Multi-hop Proxy"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1090/003/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0011"
+    technique = "T1090.003"
     type = "alert"
     tags = "tor, benign binaries"
     data_source = "crowdstrike"
@@ -65,9 +63,6 @@ rule gcti_benign_binaries_contacts_tor_exit_node {
         if($network.target.ip_geo_artifact.location.country_or_region = "Russia", 20) +
         if($network.target.ip_geo_artifact.location.country_or_region = "Syria", 20)
     )
-    $mitre_attack_tactic = array_distinct("Command and Control")
-    $mitre_attack_technique = array_distinct("Proxy: Multi-hop Proxy")
-    $mitre_attack_technique_id = array_distinct("T1090.003")
     $event_count = count_distinct($network.metadata.id)
     $tor_ip_country = array_distinct($network.target.ip_geo_artifact.location.country_or_region)
     // added to populate alert graph with additional context

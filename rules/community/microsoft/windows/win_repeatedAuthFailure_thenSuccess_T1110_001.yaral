@@ -26,10 +26,8 @@ rule win_repeatedAuthFailure_thenSuccess_T1110_001 {
     platform = "Windows"
     severity = "Medium"
     priority = "Medium"
-    mitre_attack_tactic = "Credential Access"
-    mitre_attack_technique = "Brute Force: Password Guessing"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/001/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0006"
+    technique = "T1110.001"
 
   events:
     $fail.metadata.event_type = "USER_LOGIN"
@@ -54,14 +52,11 @@ rule win_repeatedAuthFailure_thenSuccess_T1110_001 {
   outcome:
     // increment risk score if the system targeted is active directory server, can modify as you see fit, using this as an example
     $risk_score = max(if($hostname = /activedir/, 75, 50))
-    $mitre_attack_tactic = array_distinct("Credential Access")
-    $mitre_attack_technique = array_distinct("Brute Force: Password Guessing")
-    $mitre_attack_technique_id = array_distinct("T1110.001")
-    $failed_login_threshold = max(5)
+    $failed_login_threshold = 5
     $impacted_systems = array_distinct($hostname)
     $impacted_users = array_distinct($user)
-    $alert_type = array_distinct("Successful Brute Force Attack")
-    $tlp = array_distinct("red")
+    $alert_type = "Successful Brute Force Attack"
+    $tlp = "red"
     // added to populate alert graph with additional context
     // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results
     //$principal_hostname = array_distinct($success.principal.hostname)

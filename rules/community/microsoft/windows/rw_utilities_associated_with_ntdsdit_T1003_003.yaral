@@ -26,10 +26,8 @@ rule rw_utilities_associated_with_ntdsdit_T1003_003 {
     assumption = "Assumes lists for key servers and ntds suspicious processes have been created"
     data_source = "microsoft sysmon, microsoft windows events"
     platform = "Windows"
-    mitre_attack_tactic = "Credential Access"
-    mitre_attack_technique = "OS Credential Dumping: NTDS"
-    mitre_attack_url = "https://attack.mitre.org/techniques/T1003/003/"
-    mitre_attack_version = "v13.1"
+    tactic = "TA0006"
+    technique = "T1003.003"
     severity = "High"
     priority = "High"
 
@@ -47,10 +45,7 @@ rule rw_utilities_associated_with_ntdsdit_T1003_003 {
   $event_type over 5m
 
  outcome:
-    $risk_score = max(85)
-    $mitre_attack_tactic = array_distinct("Credential Access")
-    $mitre_attack_technique = array_distinct("OS Credential Dumping: NTDS")
-    $mitre_attack_technique_id = array_distinct("T1003.003")
+    $risk_score = 85
     $event_count = count_distinct($process.metadata.id)
     // added to populate alert graph with additional context
     $principal_hostname = array_distinct($process.principal.hostname)

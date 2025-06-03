@@ -237,6 +237,10 @@ class Rules:
     with open(rule_config_file, "r", encoding="utf-8") as f:
       rule_config = ruamel_yaml.load(f)
 
+    if not rule_config:
+      LOGGER.info("Rule config file is empty.")
+      return rule_config_parsed
+
     Rules.check_rule_config(rule_config)
     rule_files = list(rules_dir.glob("*.yaral"))
     rule_file_names = [rule_file_path.stem for rule_file_path in rule_files]
@@ -362,6 +366,10 @@ class Rules:
         break
 
     LOGGER.info("Retrieved a total of %s rules", len(raw_rules))
+
+    if not raw_rules:
+      LOGGER.info("No rules found")
+      return Rules(rules=[])
 
     rule_deployments = []
     next_page_token = None

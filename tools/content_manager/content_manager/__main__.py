@@ -42,8 +42,12 @@ LOGGER = logging.getLogger()
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 RULES_DIR = ROOT_DIR / "rules"
+RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
 REF_LISTS_DIR = ROOT_DIR / "reference_lists"
+REF_LIST_CONFIG_FILE = ROOT_DIR / "reference_list_config.yaml"
 DATA_TABLES_DIR = ROOT_DIR / "data_tables"
+DATA_TABLE_CONFIG_FILE = ROOT_DIR / "data_table_config.yaml"
+RULE_EXCLUSIONS_CONFIG_FILE = ROOT_DIR / "rule_exclusions_config.yaml"
 
 dotenv.load_dotenv()
 
@@ -86,6 +90,9 @@ class RuleOperations:
     http_session = initialize_http_session()
 
     rule_updates = Rules.update_remote_rules(http_session=http_session)
+
+    if not rule_updates:
+      return
 
     # Log summary of rule updates that occurred.
     LOGGER.info("Logging summary of rule changes...")
@@ -266,6 +273,9 @@ class DataTableOperations:
         http_session=http_session
     )
 
+    if not data_table_updates:
+      return
+
     # Log summary of data table updates that occurred.
     LOGGER.info("Logging summary of data table changes...")
     for update_type, data_table_names in data_table_updates.items():
@@ -385,6 +395,9 @@ class ReferenceListOperations:
         http_session=http_session
     )
 
+    if not ref_list_updates:
+      return
+
     # Log summary of reference list updates that occurred.
     LOGGER.info("Logging summary of reference list changes...")
     for update_type, ref_list_names in ref_list_updates.items():
@@ -423,6 +436,9 @@ class RuleExclusionOperations:
     rule_exclusion_updates = RuleExclusions.update_remote_rule_exclusions(
         http_session=http_session
     )
+
+    if not rule_exclusion_updates:
+      return
 
     # Log summary of rule exclusion updates that occurred.
     LOGGER.info("Logging summary of rule exclusion changes...")
@@ -714,12 +730,15 @@ def update():
 if __name__ == "__main__":
   LOGGER.info("Content Manager started")
   # Create content directories if they don't exist.
-  if not RULES_DIR.is_dir():
-    RULES_DIR.mkdir()
-  if not REF_LISTS_DIR.is_dir():
-    REF_LISTS_DIR.mkdir()
-  if not DATA_TABLES_DIR.is_dir():
-    DATA_TABLES_DIR.mkdir()
+  RULES_DIR.mkdir(exist_ok=True)
+  REF_LISTS_DIR.mkdir(exist_ok=True)
+  DATA_TABLES_DIR.mkdir(exist_ok=True)
+
+  # Create config files if they don't exist
+  RULE_CONFIG_FILE.touch(exist_ok=True)
+  REF_LIST_CONFIG_FILE.touch(exist_ok=True)
+  DATA_TABLE_CONFIG_FILE.touch(exist_ok=True)
+  RULE_EXCLUSIONS_CONFIG_FILE.touch(exist_ok=True)
 
   cli.add_command(rules)
   cli.add_command(data_tables)

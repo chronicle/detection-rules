@@ -180,6 +180,10 @@ class RuleExclusions:
     with open(rule_exclusion_config_file, "r", encoding="utf-8") as f:
       rule_exclusion_config = ruamel_yaml.load(f)
 
+    if not rule_exclusion_config:
+      LOGGER.info("Rule exclusion config file is empty.")
+      return RuleExclusions(rule_exclusions=[])
+
     RuleExclusions.check_rule_exclusion_config(rule_exclusion_config)
 
     rule_exclusions_parsed = []
@@ -378,6 +382,9 @@ class RuleExclusions:
         "Retrieved a total of %s rule exclusions", raw_rule_exclusions_count
     )
 
+    if not raw_rule_exclusions:
+      return RuleExclusions(rule_exclusions=[])
+
     rule_exclusion_deployments = []
     next_page_token = None
 
@@ -458,6 +465,9 @@ class RuleExclusions:
         rule_exclusions_config_file,
     )
     local_rule_exclusions = RuleExclusions.load_rule_exclusion_config()
+
+    if not local_rule_exclusions.rule_exclusions:
+      return None
 
     LOGGER.info(
         "Attempting to retrieve latest version of all rule exclusions from"

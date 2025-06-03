@@ -128,6 +128,9 @@ class ReferenceLists:
     """Load reference list files and config from disk."""
     ref_list_config = ReferenceLists.load_ref_list_config(ref_list_config_file)
 
+    if not ref_list_config:
+      return ReferenceLists(ref_lists=[])
+
     ref_list_files = list(ref_lists_dir.glob("*.txt"))
     non_ref_list_files = [
         file_path
@@ -204,6 +207,10 @@ class ReferenceLists:
     )
     with open(ref_list_config_file, "r", encoding="utf-8") as f:
       ref_list_config = ruamel_yaml.load(f)
+
+    if not ref_list_config:
+      LOGGER.info("Reference list config file is empty.")
+      return
 
     ReferenceLists.check_ref_list_config(ref_list_config)
 

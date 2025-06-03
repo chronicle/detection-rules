@@ -135,7 +135,7 @@ class DataTables:
       cls,
       data_table_config_file: pathlib.Path = DATA_TABLE_CONFIG_FILE,
       data_tables_dir: pathlib.Path = DATA_TABLES_DIR,
-  ) -> Mapping[str, Any]:
+  ) -> Mapping[str, Any] | None:
     """Load data table config from file."""
     data_table_config_parsed = {}
 
@@ -144,6 +144,10 @@ class DataTables:
     )
     with open(data_table_config_file, "r", encoding="utf-8") as f:
       data_table_config = ruamel_yaml.load(f)
+
+    if not data_table_config:
+      LOGGER.info("Data table config file is empty.")
+      return
 
     DataTables.check_data_table_config(data_table_config)
 
@@ -551,6 +555,9 @@ class DataTables:
         data_table_config_file=data_tables_config_file,
         data_tables_dir=data_tables_dir,
     )
+
+    if not data_table_config:
+      return
 
     LOGGER.info(
         "Attempting to retrieve latest version of all data tables from"

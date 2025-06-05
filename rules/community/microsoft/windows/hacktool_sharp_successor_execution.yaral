@@ -27,12 +27,12 @@ rule hacktool_sharp_successor_execution {
     type = "alert"
     platform = "Windows, EDR"
     data_source = "Microsoft Sysmon, Windows Security Event Log, Microsoft Defender XDR"
-    severity = "High" 
-    priority = "High" 
+    severity = "High"
+    priority = "High"
 
   events:
-    
-    ( 
+
+    (
       $sharp_successor_execution.metadata.event_type = "PROCESS_LAUNCH"
       and (
             $sharp_successor_execution.src.process.file.full_path = "SharpSuccessor.exe" nocase or
@@ -48,9 +48,9 @@ rule hacktool_sharp_successor_execution {
       and (
             $sharp_successor_execution.metadata.description = "A privileged service was called" and
             $sharp_successor_execution.target.process.command_line = /SharpSuccessor/ nocase
-          )     
+          )
     )
-    
+
     // Capture the hostname where the event occurred
     $sharp_successor_execution.principal.hostname = $hostname
 
@@ -58,7 +58,7 @@ rule hacktool_sharp_successor_execution {
     $hostname over 10m
 
   outcome:
-    $risk_score = max(65)
+    $risk_score = 65
     $event_count = count_distinct($sharp_successor_execution.metadata.id)
     $principal_process_pid = array_distinct($sharp_successor_execution.principal.process.pid)
     $principal_process_command_line = array_distinct($sharp_successor_execution.principal.process.command_line)

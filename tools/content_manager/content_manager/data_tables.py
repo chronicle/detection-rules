@@ -135,7 +135,7 @@ class DataTables:
       cls,
       data_table_config_file: pathlib.Path = DATA_TABLE_CONFIG_FILE,
       data_tables_dir: pathlib.Path = DATA_TABLES_DIR,
-  ) -> Mapping[str, Any] | None:
+  ) -> Mapping[str, Any]:
     """Load data table config from file."""
     data_table_config_parsed = {}
 
@@ -147,7 +147,7 @@ class DataTables:
 
     if not data_table_config:
       LOGGER.info("Data table config file is empty.")
-      return
+      return {}
 
     DataTables.check_data_table_config(data_table_config)
 

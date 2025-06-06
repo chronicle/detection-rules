@@ -1,0 +1,67 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule hacktool_generic_process_access {
+
+  meta:
+    author = "Nasreddine Bencherchali (Nextron Systems), Swachchhanda Shrawan Poudel"
+    description = "Detects process access requests from hacktool processes based on their default image name"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_access/proc_access_win_hktl_generic_access.yml"
+    license = "https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md"
+    rule_name = "HackTool - Generic Process Access"
+    sigma_uuid = "d0d2f720-d14f-448d-8242-51ff396a334e"
+    sigma_status = "test"
+    rule_id = "mr_1e8861fd-060a-4162-8e00-fa2b2a27e1e2"
+    tactic = "TA0006"
+    technique = "T1003.001"
+    type = "Detection"
+    data_source = "Sysmon"
+    platform = "Windows"
+    severity = "High"
+    priority = "High"
+    false_positives = "Unlikely"
+
+  events:
+    $process.metadata.event_type = "PROCESS_OPEN"
+    (
+        //reference lists for this rule are found in the reference_lists folder in community
+        $process.principal.process.file.full_path IN regex %hacktool_regex nocase or
+        $process.principal.process.file.full_path IN regex %hacktool_contains nocase
+    )
+    $process.principal.hostname = $hostname
+
+  match:
+    $hostname over 5m
+
+  outcome:
+    //example usage of specifying test hostname to adjust risk score
+    $risk_score = max(if($process.principal.hostname = "hostname", 0, 15))
+    $principal_process_pid = array_distinct($process.principal.process.pid)
+    $principal_process_command_line = array_distinct($process.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
+    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $log_type = array_distinct(strings.concat($process.metadata.log_type,"/",$process.metadata.product_event_type))
+
+  condition:
+    $process
+}

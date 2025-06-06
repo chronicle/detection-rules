@@ -1,0 +1,71 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule pua_nimgrab_execution {
+
+  meta:
+    author = "frack113"
+    description = "Detects the usage of nimgrab, a tool bundled with the Nim programming framework and used for downloading files."
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_nimgrab.yml"
+    license = "https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md"
+    rule_name = "PUA - Nimgrab Execution"
+    sigma_uuid = "74a12f18-505c-4114-8d0b-8448dd5485c6"
+    sigma_status = "test"
+    rule_id = "mr_70b5f0f8-6bd3-42ab-be2f-928084b09942"
+    tactic = "TA0011"
+    technique = "T1105"
+    type = "Detection"
+    data_source = "Sysmon"
+    platform = "Windows"
+    severity = "High"
+    priority = "High"
+    false_positives = "Legitimate use of Nim on a developer systems"
+
+  events:
+    $process.metadata.event_type = "PROCESS_LAUNCH"
+    (
+        re.regex($process.target.process.file.full_path, `\\nimgrab\.exe$`) nocase or
+        (
+            strings.contains(strings.to_upper($process.target.process.file.md5), "2DD44C3C29D667F5C0EF5F9D7C7FFB8B") or
+            strings.contains(strings.to_upper($process.target.process.file.sha256), "F266609E91985F0FE3E31C5E8FAEEEC4FFA5E0322D8B6F15FE69F4C5165B9559") or
+            strings.contains(strings.to_upper($process.target.process.file.pe_file.imphash), "C07FDDD21D123EA9B3A08EEF44AAAC45")
+        )
+    )
+    $process.principal.hostname = $hostname
+
+  match:
+    $hostname over 5m
+
+  outcome:
+    //example usage of specifying test user and hostname to adjust risk score
+    $risk_score = max(if($process.principal.user.userid = "user" and $process.principal.hostname = "hostname", 0, 15))
+    $principal_process_pid = array_distinct($process.principal.process.pid)
+    $principal_process_command_line = array_distinct($process.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
+    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($process.principal.user.userid)
+    $log_type = array_distinct(strings.concat($process.metadata.log_type,"/",$process.metadata.product_event_type))
+
+  condition:
+    $process
+}

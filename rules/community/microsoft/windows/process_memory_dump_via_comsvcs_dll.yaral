@@ -1,0 +1,101 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule process_memory_dump_via_comsvcs_dll {
+
+  meta:
+    author = "Florian Roth (Nextron Systems), Modexp, Nasreddine Bencherchali (Nextron Systems), Swachchhanda Shrawan Poudel (Nextron Systems)"
+    description = "Detects a process memory dump via comsvcs.dll using rundll32, covering multiple different techniques"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_process_dump_via_comsvcs.yml"
+    license = "https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md"
+    rule_name = "Process Memory Dump Via Comsvcs.DLL"
+    sigma_uuid = "646ea171-dded-4578-8a4d-65e9822892e3"
+    sigma_status = "test"
+    rule_id = "mr_ad21bd09-c624-48c8-a949-a82a40fbb88c"
+    tactic = "TA0006"
+    technique = "T1003.001"
+    type = "Detection"
+    data_source = "Sysmon"
+    platform = "Windows"
+    severity = "High"
+    priority = "High"
+    false_positives = "Unlikely"
+
+  events:
+    $process.metadata.event_type = "PROCESS_LAUNCH"
+    (
+        (
+            (
+                re.regex($process.target.process.file.full_path, `\\rundll32\.exe$`) nocase or
+                $process.src.process.file.full_path = "RUNDLL32.EXE" nocase or
+                strings.contains(strings.to_lower($process.target.process.command_line), "rundll32")
+            )
+            and
+            (
+                (
+                    strings.contains(strings.to_lower($process.target.process.command_line), "comsvcs") and
+                    strings.contains(strings.to_lower($process.target.process.command_line), "full")
+                )
+                or
+                (
+                    strings.contains($process.target.process.command_line, "#-") or
+                    strings.contains($process.target.process.command_line, "#+") or
+                    strings.contains($process.target.process.command_line, "#24") or
+                    strings.contains($process.target.process.command_line, "24 ") or
+                    strings.contains(strings.to_lower($process.target.process.command_line), "minidump")
+                )
+            )
+        )
+        or
+        (
+                (
+                    strings.contains($process.target.process.command_line, "24") and
+                    strings.contains(strings.to_lower($process.target.process.command_line), "comsvcs") and
+                    strings.contains(strings.to_lower($process.target.process.command_line), "full")
+                )
+                and
+                (
+                    strings.contains($process.target.process.command_line, " #") or
+                    strings.contains($process.target.process.command_line, ",#") or
+                    strings.contains($process.target.process.command_line, ", #")
+                )
+        )
+    )
+    $process.principal.hostname = $hostname
+
+  match:
+    $hostname over 5m
+
+  outcome:
+    //example usage of specifying test user and hostname to adjust risk score
+    $risk_score = max(if($process.principal.user.userid = "user" and $process.principal.hostname = "hostname", 0, 15))
+    $principal_process_pid = array_distinct($process.principal.process.pid)
+    $principal_process_command_line = array_distinct($process.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
+    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($process.principal.user.userid)
+    $log_type = array_distinct(strings.concat($process.metadata.log_type,"/",$process.metadata.product_event_type))
+
+  condition:
+    $process
+}

@@ -1,0 +1,73 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule suspicious_certreq_command_to_download {
+
+  meta:
+    author = "Christian Burkard (Nextron Systems)"
+    description = "Detects a suspicious certreq execution taken from the LOLBAS examples, which can be abused to download (small) files"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_susp_certreq_download.yml"
+    license = "https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md"
+    rule_name = "Suspicious Certreq Command to Download"
+    sigma_uuid = "4480827a-9799-4232-b2c4-ccc6c4e9e12b"
+    sigma_status = "test"
+    rule_id = "mr_c615e9f9-ded5-40ff-a571-7564b67da2e0"
+    tactic = "TA0011"
+    technique = "T1105"
+    type = "Detection"
+    data_source = "Sysmon"
+    platform = "Windows"
+    severity = "High"
+    priority = "High"
+    false_positives = "Unlikely"
+
+  events:
+    $process.metadata.event_type = "PROCESS_LAUNCH"
+    (
+        re.regex($process.target.process.file.full_path, `\\certreq\.exe$`) nocase or
+        $process.src.process.file.full_path = "certreq.exe" nocase
+    )
+    (
+        strings.contains(strings.to_lower($process.target.process.command_line), " -post ") and
+        strings.contains(strings.to_lower($process.target.process.command_line), " -config ") and
+        strings.contains(strings.to_lower($process.target.process.command_line), " http") and
+        strings.contains(strings.to_lower($process.target.process.command_line), " c:\\windows\\win.ini ")
+    )
+    $process.principal.hostname = $hostname
+
+  match:
+    $hostname over 5m
+
+  outcome:
+    //example usage of specifying test user and hostname to adjust risk score
+    $risk_score = max(if($process.principal.user.userid = "user" and $process.principal.hostname = "hostname", 0, 15))
+    $principal_process_pid = array_distinct($process.principal.process.pid)
+    $principal_process_command_line = array_distinct($process.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
+    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($process.principal.user.userid)
+    $log_type = array_distinct(strings.concat($process.metadata.log_type,"/",$process.metadata.product_event_type))
+
+  condition:
+    $process
+}

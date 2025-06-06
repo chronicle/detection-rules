@@ -1,0 +1,93 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule potential_tampering_with_rdp_related_registry_keys_via_reg_exe {
+
+  meta:
+    author = "pH-T (Nextron Systems), @Kostastsale, TheDFIRReport"
+    description = "Detects the execution of reg.exe for enabling/disabling the RDP service on the host by tampering with the CurrentControlSet\\Control\\Terminal Server values"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_rdp_keys_tamper.yml"
+    license = "https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md"
+    rule_name = "Potential Tampering With RDP Related Registry Keys Via Reg.EXE"
+    sigma_uuid = "0d5675be-bc88-4172-86d3-1e96a4476536"
+    sigma_status = "test"
+    rule_id = "mr_60818065-6198-4650-ab78-306267b5f165"
+    tactic = "TA0005"
+    technique = "T1112"
+    type = "Detection"
+    data_source = "Windows Event Logs"
+    platform = "Windows"
+    severity = "High"
+    priority = "High"
+    false_positives = "Unknown"
+
+  events:
+    $process.metadata.event_type = "PROCESS_LAUNCH"
+    (
+        re.regex($process.target.process.file.full_path, `\\reg\.exe$`) nocase or
+        $process.src.process.file.full_path = "reg.exe" nocase
+    )
+    (
+        strings.contains(strings.to_lower($process.target.process.command_line), " add ") and
+        strings.contains(strings.to_lower($process.target.process.command_line), "\\currentcontrolset\\control\\terminal server") and
+        strings.contains(strings.to_upper($process.target.process.command_line), "REG_DWORD") and
+        strings.contains(strings.to_lower($process.target.process.command_line), " /f")
+    )
+    (
+        (
+        strings.contains(strings.to_lower($process.target.process.command_line), "licensing core") and
+        strings.contains(strings.to_lower($process.target.process.command_line), "enableconcurrentsessions")
+        )
+        or
+        (
+            strings.contains(strings.to_lower($process.target.process.command_line), "winstations\\rdp-tcp") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "maxinstancecount") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "fenablewinstation") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "tsuserenabled") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "tsenabled") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "tsapcompat") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "idlewinstationpoolcount") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "tsadvertise") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "allowtsconnections") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "fsinglesessionperuser") or
+            strings.contains(strings.to_lower($process.target.process.command_line), "fdenytsconnections")
+        )
+    )
+    $process.principal.hostname = $hostname
+
+  match:
+    $hostname over 5m
+
+  outcome:
+    //example usage of specifying test user and hostname to adjust risk score
+    $risk_score = max(if($process.principal.user.userid = "user" and $process.principal.hostname = "hostname", 0, 15))
+    $principal_process_pid = array_distinct($process.principal.process.pid)
+    $principal_process_command_line = array_distinct($process.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
+    $principal_process_product_specfic_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specfic_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specfic_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($process.principal.user.userid)
+    $log_type = array_distinct(strings.concat($process.metadata.log_type,"/",$process.metadata.product_event_type))
+
+  condition:
+    $process
+}

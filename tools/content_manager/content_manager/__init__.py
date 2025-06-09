@@ -16,6 +16,7 @@
 
 import logging
 import os
+import pathlib
 
 import dotenv
 
@@ -30,3 +31,23 @@ logging.basicConfig(
 )
 
 LOGGER = logging.getLogger()
+
+ROOT_DIR = pathlib.Path(__file__).parent.parent
+RULES_DIR = ROOT_DIR / "rules"
+RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
+REF_LISTS_DIR = ROOT_DIR / "reference_lists"
+REF_LIST_CONFIG_FILE = ROOT_DIR / "reference_list_config.yaml"
+DATA_TABLES_DIR = ROOT_DIR / "data_tables"
+DATA_TABLE_CONFIG_FILE = ROOT_DIR / "data_table_config.yaml"
+RULE_EXCLUSIONS_CONFIG_FILE = ROOT_DIR / "rule_exclusions_config.yaml"
+
+# Create content directories if they don't exist.
+RULES_DIR.mkdir(exist_ok=True)
+REF_LISTS_DIR.mkdir(exist_ok=True)
+DATA_TABLES_DIR.mkdir(exist_ok=True)
+
+# Create config files if they don't exist
+RULE_CONFIG_FILE.touch(exist_ok=True)
+REF_LIST_CONFIG_FILE.touch(exist_ok=True)
+DATA_TABLE_CONFIG_FILE.touch(exist_ok=True)
+RULE_EXCLUSIONS_CONFIG_FILE.touch(exist_ok=True)

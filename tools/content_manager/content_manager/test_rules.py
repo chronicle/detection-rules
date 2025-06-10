@@ -34,6 +34,7 @@ import ruamel.yaml.constructor
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 RULES_DIR = ROOT_DIR / "rules"
+RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "test_data"
 TEST_RULES_DIR = TEST_DATA_DIR / "rules"
 TEST_RULE_CONFIG_FILE = TEST_DATA_DIR / "test_rule_config.yaml"
@@ -57,6 +58,9 @@ def raw_test_rules_fixture() -> Sequence[Mapping[str, Any]]:
 
 def test_load_rules():
   """Tests for rules.Rules.load_rules."""
+  RULES_DIR.mkdir(exist_ok=True)
+  RULE_CONFIG_FILE.touch(exist_ok=True)
+
   # Test that all local rules can be loaded
   rule_files_count = len(list(RULES_DIR.glob("*.yaral")))
   rules = Rules.load_rules()

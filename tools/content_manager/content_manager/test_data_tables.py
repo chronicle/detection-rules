@@ -31,17 +31,18 @@ import ruamel.yaml.constructor
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 DATA_TABLES_DIR = ROOT_DIR / "data_tables"
+DATA_TABLE_CONFIG_FILE = ROOT_DIR / "data_table_config.yaml"
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "test_data"
 TEST_DATA_TABLES_DIR = TEST_DATA_DIR / "data_tables"
-TEST_DATA_TABLES_CONFIG_FILE = TEST_DATA_DIR / "test_data_tables_config.yaml"
+TEST_DATA_TABLE_CONFIG_FILE = TEST_DATA_DIR / "test_data_table_config.yaml"
 
 
 @pytest.fixture(name="parsed_test_data_tables")
 def parsed_test_data_tables_fixture() -> DataTables:
   """Load and parse test data_tables."""
   return DataTables.load_data_table_config(
-      data_table_config_file=TEST_DATA_TABLES_CONFIG_FILE,
-      data_tables_dir=TEST_DATA_TABLES_CONFIG_FILE,
+      data_table_config_file=TEST_DATA_TABLE_CONFIG_FILE,
+      data_tables_dir=TEST_DATA_TABLE_CONFIG_FILE,
   )
 
 
@@ -55,6 +56,8 @@ def raw_test_data_tables_fixture() -> Sequence[Mapping[str, Any]]:
 
 def test_load_data_table_config():
   """Tests for data_tables.DataTables.load_data_table_config."""
+  DATA_TABLE_CONFIG_FILE.touch(exist_ok=True)
+
   # Compare number of data table files in data tables dir to number of entries
   # in data tables config file
   data_tables_count = len(list(DATA_TABLES_DIR.glob("*.csv")))
@@ -220,7 +223,7 @@ def test_check_data_table_config():
     )
 
   data_table_config = DataTables.load_data_table_config(
-      data_table_config_file=TEST_DATA_TABLES_CONFIG_FILE,
+      data_table_config_file=TEST_DATA_TABLE_CONFIG_FILE,
       data_tables_dir=TEST_DATA_TABLES_DIR,
   )
 

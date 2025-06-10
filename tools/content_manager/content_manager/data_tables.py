@@ -544,7 +544,7 @@ class DataTables:
       cls,
       http_session: requests.AuthorizedSession,
       data_tables_dir: pathlib.Path = DATA_TABLES_DIR,
-      data_tables_config_file: pathlib.Path = DATA_TABLE_CONFIG_FILE,
+      data_table_config_file: pathlib.Path = DATA_TABLE_CONFIG_FILE,
   ) -> Mapping[str, Sequence[tuple[str, str]]] | None:
     """Update data tables in Google SecOps based on local files."""
     LOGGER.info(
@@ -552,7 +552,7 @@ class DataTables:
     )
 
     data_table_config = DataTables.load_data_table_config(
-        data_table_config_file=data_tables_config_file,
+        data_table_config_file=data_table_config_file,
         data_tables_dir=data_tables_dir,
     )
 

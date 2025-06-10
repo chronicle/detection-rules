@@ -28,6 +28,7 @@ import ruamel.yaml
 import ruamel.yaml.constructor
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
+RULE_EXCLUSIONS_CONFIG_FILE = ROOT_DIR / "rule_exclusions_config.yaml"
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "test_data"
 TEST_RULE_EXCLUSIONS_CONFIG_FILE = (
     TEST_DATA_DIR / "test_rule_exclusions_config.yaml"
@@ -107,6 +108,8 @@ def test_rule_exclusion():
 
 def test_load_rule_exclusion_config():
   """Tests for rule_exclusions.load_rule_exclusion_config."""
+  RULE_EXCLUSIONS_CONFIG_FILE.touch(exist_ok=True)
+
   # Test that all local rule exclusions can be loaded
   RuleExclusions.load_rule_exclusion_config()
 

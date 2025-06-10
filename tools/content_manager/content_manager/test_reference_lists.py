@@ -30,6 +30,7 @@ import ruamel.yaml.constructor
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
 REF_LISTS_DIR = ROOT_DIR / "reference_lists"
+REF_LIST_CONFIG_FILE = ROOT_DIR / "reference_list_config.yaml"
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "test_data"
 TEST_REF_LISTS_DIR = TEST_DATA_DIR / "reference_lists"
 TEST_REF_LISTS_CONFIG_FILE = TEST_DATA_DIR / "test_reference_list_config.yaml"
@@ -54,6 +55,8 @@ def raw_ref_lists_fixture() -> Sequence[Mapping[str, Any]]:
 
 def test_load_ref_lists():
   """Tests for reference_lists.ReferenceLists.load_ref_lists."""
+  REF_LIST_CONFIG_FILE.touch(exist_ok=True)
+
   # Test that all local reference lists can be loaded
   ref_list_files_count = len(list(REF_LISTS_DIR.glob("*.txt")))
   ref_lists = ReferenceLists.load_ref_lists()

@@ -1,0 +1,102 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule new_run_key_pointing_to_suspicious_folder {
+
+  meta:
+    author = "Florian Roth (Nextron Systems), Markus Neis, Sander Wiebing, Swachchhanda Shrawan Poudel (Nextron Systems)"
+    description = "Detects suspicious new RUN key element pointing to an executable in a suspicious folder"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_susp_run_key_img_folder.yml"
+    license = "https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md"
+    rule_name = "New RUN Key Pointing to Suspicious Folder"
+    rule_id = "mr_ffc6cf7a-3eaf-4ca1-8dba-9a2d466f2a3a"
+    sigma_uuid = "02ee49e2-e294-4d0f-9278-f5b3212fc588"
+    sigma_status = "experimental"
+    tactic = "TA0005"
+    technique = "T1547.001"
+    type = "Detection"
+    data_source = "Sysmon"
+    platform = "Windows"
+    severity = "High"
+    priority = "High"
+    false_positives = "Software using weird folders for updates"
+
+  events:
+    $reg.metadata.event_type = "REGISTRY_MODIFICATION"
+    (
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\software\\microsoft\\windows\\currentversion\\run") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\software\\wow6432node\\microsoft\\windows\\currentversion\\run") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\software\\microsoft\\windows\\currentversion\\policies\\explorer\\run")
+    )
+    and
+    (
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), ":\\perflogs") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), ":\\programdata") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), ":\\windows\\temp") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), ":\\temp") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\appdata\\local\\temp") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\appdata\\roaming") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), ":\\$recycle.bin") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), ":\\users\\default") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), ":\\users\\public") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "%temp%") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "%tmp%") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "%public%") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "%appdata%") or
+        (
+            strings.contains(strings.to_lower($reg.target.registry.registry_value_data), ":\\users\\") and
+            (
+                strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\favorites") or
+                strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\favourites") or
+                strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\contacts") or
+                strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\music") or
+                strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\pictures") or
+                strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\documents") or
+                strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\photos")
+            )
+        )
+    )
+    not (
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\microsoft\\windows\\currentversion\\runonce\\") and
+        strings.starts_with(strings.to_lower($reg.principal.process.file.full_path), "c:\\windows\\softwaredistribution\\download\\") and
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "rundll32.exe ") and
+        strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "c:\\windows\\system32\\advpack.dll,delnoderundll32") and
+        (
+            strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "\\appdata\\local\\temp\\") or
+            strings.contains(strings.to_lower($reg.target.registry.registry_value_data), "c:\\windows\\temp\\")
+        )
+    )
+
+    $reg.principal.hostname = $hostname
+
+  match:
+    $hostname over 5m
+
+  outcome:
+    //example usage of specifying test user and hostname to adjust risk score
+    $risk_score = max(if($reg.principal.user.userid = "user" and $reg.principal.hostname = "hostname", 0, 15))
+    $principal_hostname = array_distinct($reg.principal.hostname)
+    $principal_process_pid = array_distinct($reg.principal.process.pid)
+    $principal_process_file_full_path = array_distinct($reg.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($reg.principal.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($reg.principal.user.userid)
+    $target_registry_key = array_distinct($reg.target.registry.registry_key)
+    $target_registry_value_data = array_distinct($reg.target.registry.registry_value_data)
+    $log_type = array_distinct(strings.concat($reg.metadata.log_type,"/",$reg.metadata.product_event_type))
+
+  condition:
+    $reg
+}

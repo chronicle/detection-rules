@@ -1,0 +1,99 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule currentcontrolset_autorun_keys_modification {
+
+  meta:
+    author = "Victor Sergeev, Daniil Yugoslavskiy, Gleb Sukhodolskiy, Timur Zinniatullin, oscd.community, Tim Shelton, frack113 (split)"
+    description = "Detects modification of autostart extensibility point (ASEP) in registry"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_asep_reg_keys_modification_currentcontrolset.yml"
+    license = "https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md"
+    rule_name = "CurrentControlSet Autorun Keys Modification"
+    rule_id = "mr_701ab297-b615-4441-a78b-941c9737d117"
+    sigma_uuid = "f674e36a-4b91-431e-8aef-f8a96c2aca35"
+    sigma_status = "test"
+    tactic = "TA0003"
+    technique = "T1547.001"
+    data_source = "Sysmon Windows Registry"
+    platform = "Windows"
+    severity = "Medium"
+    priority = "Medium"
+    false_positives = "Legitimate software automatically (mostly, during installation) sets up autorun keys for legitimate reason"
+
+  events:
+    $reg.metadata.event_type = "REGISTRY_MODIFICATION"
+    strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\system\\currentcontrolset\\control") and
+    (
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\terminal server\\winstations\\rdp-tcp\\initialprogram") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\terminal server\\wds\\rdpwd\\startupprograms") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\securityproviders\\securityproviders") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\safeboot\\alternateshell") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\print\\providers") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\print\\monitors") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\networkprovider\\order") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\lsa\\notification packages") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\lsa\\authentication packages") or
+        strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\bootverificationprogram\\imagepath")
+    )
+    not (
+            $reg.target.registry.registry_value_data = "(Empty)" or
+            (
+                $reg.principal.process.file.full_path = "c:\\windows\\system32\\spoolsv.exe" nocase and
+                strings.contains(strings.to_lower($reg.target.registry.registry_key), "\\print\\monitors\\cutepdf writer monitor") and
+                (
+                    $reg.target.registry.registry_value_data = "cpwmon64_v40.dll" nocase or
+                    $reg.target.registry.registry_value_data = "CutePDF Writer" nocase
+                )
+            ) or
+            (
+                $reg.principal.process.file.full_path = "c:\\windows\\system32\\spoolsv.exe" nocase and
+                strings.contains(strings.to_lower($reg.target.registry.registry_key), "print\\monitors\\appmon\\ports\\microsoft.office.onenote_") and
+                (
+                    strings.contains(strings.to_upper($reg.principal.user.userid), "AUTHORI") or
+                    strings.contains(strings.to_upper($reg.principal.user.userid), "AUTORI")
+                )
+            ) or
+            (
+                $reg.principal.process.file.full_path = "c:\\windows\\system32\\poqexec.exe" nocase and
+                re.regex($reg.target.registry.registry_key, `\\networkprovider\\order\\providerorder$`) nocase
+            ) or
+            (
+                $reg.principal.process.file.full_path = "c:\\windows\\system32\\spoolsv.exe" nocase and
+                re.regex($reg.target.registry.registry_key, `\\print\\monitors\\monvnc\\driver$`) nocase and
+                $reg.target.registry.registry_value_data = "VNCpm.dll" nocase
+            )
+    )
+
+    $reg.principal.hostname = $hostname
+
+  match:
+    $hostname over 5m
+
+  outcome:
+    //example usage of specifying test user and hostname to adjust risk score
+    $risk_score = max(if($reg.principal.user.userid = "user" and $reg.principal.hostname = "hostname", 0, 15))
+    $principal_hostname = array_distinct($reg.principal.hostname)
+    $principal_process_pid = array_distinct($reg.principal.process.pid)
+    $principal_process_file_full_path = array_distinct($reg.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($reg.principal.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($reg.principal.user.userid)
+    $target_registry_key = array_distinct($reg.target.registry.registry_key)
+    $target_registry_value_data = array_distinct($reg.target.registry.registry_value_data)
+    $log_type = array_distinct(strings.concat($reg.metadata.log_type,"/",$reg.metadata.product_event_type))
+
+  condition:
+    $reg
+}

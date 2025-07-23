@@ -1,0 +1,61 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule ttp_windows_suspicious_filewrites_to_sharepoint_layouts {
+
+  meta:
+    author = "Google Cloud Security"
+    rule_name = "Suspicious Filewrites To Sharepoint Layouts"
+    description = "Detects a command-line interpreter (cmd.exe or powershell.exe) writing a file to a SharePoint (\TEMPLATE\LAYOUTS) directory."
+    severity = "High"
+    tactic = "TA0003"
+    technique = "T1505.003"
+    rule_id = "mr_06c0d5b5-8185-4584-8db0-28c8fd4971ea"
+
+  events:
+    (
+      $e.metadata.event_type = "FILE_CREATION" or
+      $e.metadata.event_type = "FILE_MODIFICATION" or
+      $e.metadata.event_type = "FILE_MOVE"
+    )
+    $e.target.file.full_path = /\\\d{1,2}\\TEMPLATE\\LAYOUTS\\[^\\]+$/ nocase
+    $e.principal.process.file.full_path = /(^|\\)(pwsh|cmd|powershell)\.exe$/ nocase
+    not $e.principal.process.command_line = /C:\\SP\\Automation\\\\AutoSPInstallerMain.ps1\s+C:\\SP\\Automation\\\\AutoSPInstallerInput.xml/ nocase
+
+  outcome:
+    $principal_hostname = $e.principal.hostname
+    $risk_score = 85
+    $vendor_name = array($e.metadata.vendor_name)
+    $product_name = $e.metadata.product_name
+    $victim_uid = $e.principal.asset.asset_id
+    $victim_name = $e.principal.asset.hostname
+    $victim_netid = array($e.principal.ip)
+    $adversary_uid = $e.principal.user.userid
+    $adversary_name = $e.principal.user.user_display_name
+    $adversary_netid = $e.principal.user.windows_sid
+    $tmp1 = max(
+      if($e.security_result.action != "BLOCK" and $e.security_result.action != "UNKNOWN_ACTION", 2)
+    )
+    $tmp2 = max(
+      if($e.security_result.action = "BLOCK", 1)
+    )
+    $result = arrays.index_to_str(strings.split("attempted,failed,succeeded,succeeded"), $tmp1 + $tmp2)
+    $result_time = $e.metadata.event_timestamp.seconds
+    $event_count = 1
+
+  condition:
+    $e
+}

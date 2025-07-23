@@ -1,56 +1,59 @@
 /*
- * Copyright 2025 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2025 Google LLC
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     https://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 rule ttp_windows_sharepoint_cve_2025_53770_webshell_succeeded {
-  meta:
-    author = "Google Cloud Security"
-    rule_name = "Successful SharePoint Webshell Creation CVE-2025-53770"
-    description = "Detects the creation of a file containing 'spinstall0' in specific SharePoint LAYOUTS directories. This activity is a strong indicator of successful post-exploitation of the SharePoint Server vulnerability CVE-2025-53770, where an attacker has likely placed a web shell for persistent access."
-    severity = "Critical"
-    tactic = "TA0003"
-    technique = "T1505.003"
-    false_positives = "Extremely Low, as the filename and location are highly specific to this exploit."
-    reference = "https://msrc.microsoft.com/blog/2025/07/customer-guidance-for-sharepoint-vulnerability-cve-2025-53770/"
-    rule_id = "mr_91fc647d-5d75-4e06-97a1-8326c9be4488"
 
- events:
-    $e.metadata.event_type = "FILE_CREATION"
-    re.regex(
-      "(?i)\\\\(Program Files|PROGRA~[0-9])\\\\(Common Files|COMMON~[0-9])\\\\(Microsoft Shared|MICROS~[0-9])\\\\(Web Server Extensions|WEBSER~[0-9])\\\\(15|16)\\\\TEMPLATE\\\\LAYOUTS\\\\",
-      $e.target.file.full_path
-    )
-    $e.target.file.full_path = /\bspinstall0\.aspx/ nocase
-    $e.security_result.action = "ALLOW"
-    $hostname = $e.principal.hostname
+   meta:
+      author = "Google Cloud Security"
+      rule_name = "Successful SharePoint Webshell Creation CVE-2025-53770"
+      description = "Detects the creation of a file containing 'spinstall0' in specific SharePoint LAYOUTS directories. This activity is a strong indicator of successful post-exploitation of the SharePoint Server vulnerability CVE-2025-53770, where an attacker has likely placed a web shell for persistent access."
+      severity = "Critical"
+      tactic = "TA0003"
+      technique = "T1505.003"
+      false_positives = "Extremely Low, as the filename and location are highly specific to this exploit."
+      reference = "https://msrc.microsoft.com/blog/2025/07/customer-guidance-for-sharepoint-vulnerability-cve-2025-53770/"
+      rule_id = "mr_91fc647d-5d75-4e06-97a1-8326c9be4488"
 
- match:
-    $hostname over 5m
+   events:
+      // Event must be a file creation on a Windows system
+      (
+         $e.metadata.event_type = "FILE_CREATION" or
+         $e.metadata.event_type = "STATUS_UPDATE"
+      )
+      // The file path must be within the SharePoint 15 or 16 hive's LAYOUTS directory.
+      $e.target.file.full_path = /[\x2F\x5C]+(?:Program\ Files|Progra~[1-9])[\x2F\x5C]+(?:Common\ Files|Common~[1-9])[\x2F\x5C]+(?:Microsoft\ Shared|Micros~[1-9])[\x2F\x5C]+(?:Web\ Server\ Extensions|WebSer~[1-9])[\x2F\x5C]+16[\x2F\x5C]+TEMPLATE[\x2F\x5C]+LAYOUTS[\x2F\x5C]+spinstall0\.aspx/ nocase
+      $e.security_result.action = "ALLOW"
+      // Capture hostname for match
+      $hostname = strings.coalesce($e.principal.asset_id, $e.principal.asset.asset_id, $e.principal.hostname)
 
- outcome:
-    $risk_score = max(95)
-    $vendor_name = array_distinct($e.metadata.vendor_name)
-    $product_name = array_distinct($e.metadata.product_name)
-    $event_count = count_distinct($e.metadata.id)
-    $victim_name = array_distinct($hostname)
-    $victim_asset_id = array_distinct($e.principal.asset.asset_id)
-    $victim_ip = array_distinct($e.principal.asset.ip)
-    $result = "succeeded"
-    $result_time = min($e.metadata.event_timestamp.seconds)
-    $file_paths = array_distinct($e.target.file.full_path)
+   match:
+      $hostname over 5m
 
- condition:
-    $e
+   outcome:
+      $risk_score = max(95)
+      $vendor_name = array_distinct($e.metadata.vendor_name)
+      $product_name = array_distinct($e.metadata.product_name)
+      $event_count = count_distinct($e.metadata.id)
+      $victim_name = array_distinct($hostname)
+      $victim_asset_id = array_distinct($e.principal.asset.asset_id)
+      $victim_ip = array_distinct($e.principal.asset.ip)
+      $result = "succeeded"
+      $result_time = min($e.metadata.event_timestamp.seconds)
+      $file_paths = array_distinct($e.target.file.full_path)
+
+   condition:
+      $e
 }

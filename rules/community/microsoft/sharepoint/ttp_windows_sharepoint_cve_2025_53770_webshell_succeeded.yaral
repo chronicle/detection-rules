@@ -34,7 +34,7 @@ rule ttp_windows_sharepoint_cve_2025_53770_webshell_succeeded {
          $e.metadata.event_type = "STATUS_UPDATE"
       )
       // The file path must be within the SharePoint 15 or 16 hive's LAYOUTS directory.
-      $e.target.file.full_path = /[\x2F\x5C]+(?:Program\ Files|Progra~[1-9])[\x2F\x5C]+(?:Common\ Files|Common~[1-9])[\x2F\x5C]+(?:Microsoft\ Shared|Micros~[1-9])[\x2F\x5C]+(?:Web\ Server\ Extensions|WebSer~[1-9])[\x2F\x5C]+16[\x2F\x5C]+TEMPLATE[\x2F\x5C]+LAYOUTS[\x2F\x5C]+spinstall0\.aspx/ nocase
+      $e.target.file.full_path = /[\x2F\x5C]+(?:Program\ Files|Progra~[1-9])[\x2F\x5C]+(?:Common\ Files|Common~[1-9])[\x2F\x5C]+(?:Microsoft\ Shared|Micros~[1-9])[\x2F\x5C]+(?:Web\ Server\ Extensions|WebSer~[1-9])[\x2F\x5C]+(15|16)[\x2F\x5C]+TEMPLATE[\x2F\x5C]+LAYOUTS[\x2F\x5C]+spinstall0\.aspx/ nocase
       $e.security_result.action = "ALLOW"
       // Capture hostname for match
       $hostname = strings.coalesce($e.principal.asset_id, $e.principal.asset.asset_id, $e.principal.hostname)

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-rule ttp_windows_potential_sharpyshell_webshell_execution {
+rule ttp_windows_webserver_process_potential_webshell_execution {
   meta:
     author = "Google Cloud Security"
-    rule_name = "Potential SharPyShell Webshell Execution"
-    description = "Detects on the execution arguments associated with cmd.exe invocations originating from an active SharPyShell webshell. SharPyShell is a small, obfuscated ASP.NET webshell that allows an unauthenticated remote attacker to execute arbitrary commands received by the target system over encrypted communication channels."
+    rule_name = "Potential Webshell Process Execution"
+    description = "Detects on the execution arguments associated with cmd.exe invocations originating from an active ASP.NET webshell."
     severity = "Medium"
     tactic = "TA0003"
     technique = "T1505.003"

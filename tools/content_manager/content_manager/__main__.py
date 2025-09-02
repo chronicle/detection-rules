@@ -24,6 +24,7 @@ import pathlib
 from typing import Literal
 
 import click
+from content_manager.common.constants import Constants
 from content_manager.common import datetime_converter
 from content_manager.common.custom_exceptions import RuleVerificationError
 from content_manager.data_tables import DataTables
@@ -40,14 +41,13 @@ from google_secops_api.rules.verify_rule import verify_rule
 
 LOGGER = logging.getLogger()
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
-RULES_DIR = ROOT_DIR / "rules"
-RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
-REF_LISTS_DIR = ROOT_DIR / "reference_lists"
-REF_LIST_CONFIG_FILE = ROOT_DIR / "reference_list_config.yaml"
-DATA_TABLES_DIR = ROOT_DIR / "data_tables"
-DATA_TABLE_CONFIG_FILE = ROOT_DIR / "data_table_config.yaml"
-RULE_EXCLUSIONS_CONFIG_FILE = ROOT_DIR / "rule_exclusions_config.yaml"
+RULES_DIR = Constants.ROOT_DIR / "rules"
+RULE_CONFIG_FILE = Constants.ROOT_DIR / "rule_config.yaml"
+REF_LISTS_DIR = Constants.ROOT_DIR / "reference_lists"
+REF_LIST_CONFIG_FILE = Constants.ROOT_DIR / "reference_list_config.yaml"
+DATA_TABLES_DIR = Constants.ROOT_DIR / "data_tables"
+DATA_TABLE_CONFIG_FILE = Constants.ROOT_DIR / "data_table_config.yaml"
+RULE_EXCLUSIONS_CONFIG_FILE = Constants.ROOT_DIR / "rule_exclusions_config.yaml"
 
 dotenv.load_dotenv()
 

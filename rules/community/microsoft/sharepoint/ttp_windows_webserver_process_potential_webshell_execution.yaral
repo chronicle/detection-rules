@@ -18,7 +18,7 @@ rule ttp_windows_webserver_process_potential_webshell_execution {
   meta:
     author = "Google Cloud Security"
     rule_name = "Potential Webshell Process Execution"
-    description = "Detects on the execution arguments associated with cmd.exe invocations originating from an active ASP.NET webshell"
+    description = "Detects on the execution arguments associated with cmd.exe invocations originating from an active ASP.NET webshell."
     severity = "Medium"
     tactic = "TA0003"
     technique = "T1505.003"

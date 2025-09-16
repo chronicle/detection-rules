@@ -37,7 +37,7 @@ rule google_workspace_external_user_added_to_group {
     $ws.metadata.product_event_type = "ADD_GROUP_MEMBER"
 
     $group_domain = re.capture($ws.target.group.email_addresses, `@[a-zA-Z0-9\.]*`)
-    $user_domain = re.capture($ws.src.user.email_addresses, `@[a-zA-Z0-9\.]*`)
+    $user_domain = re.capture($ws.target.user.email_addresses, `@[a-zA-Z0-9\.]*`)
 
     $group_domain != $user_domain
 

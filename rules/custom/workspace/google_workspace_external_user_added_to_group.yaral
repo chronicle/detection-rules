@@ -37,7 +37,7 @@ rule google_workspace_external_user_added_to_group {
     $ws.metadata.product_event_type = "ADD_GROUP_MEMBER"
 
     $group_domain = re.capture($ws.target.group.email_addresses, `@[a-zA-Z0-9\.]*`)
-    $user_domain = re.capture($ws.src.user.email_addresses, `@[a-zA-Z0-9\.]*`)
+    $user_domain = re.capture($ws.target.user.email_addresses, `@[a-zA-Z0-9\.]*`)
 
     $group_domain != $user_domain
 
@@ -47,15 +47,11 @@ rule google_workspace_external_user_added_to_group {
     $mitre_attack_technique = "Valid Accounts: Cloud Accounts"
     $mitre_attack_technique_id = "T1078.004"
     $event_count = count_distinct($ws.metadata.id)
+    $admin_emails = array_distinct($ws.principal.user.email_addresses)
+    $target_user_emails = array_distinct($ws.target.user.email_addresses)
+    $group_emails = array_distinct($ws.target.group.email_addresses)
     $target_group_domain = $group_domain
-    $src_user_domain = $user_domain
-    $target_group_emails = array_distinct($ws.target.group.email_addresses)
-    $src_user_emails = array_distinct($ws.src.user.email_addresses)
-    $principal_ip = array_distinct($ws.principal.ip)
-    $principal_country = array_distinct($ws.principal.ip_geo_artifact.location.country_or_region)
-    $principal_state = array_distinct($ws.principal.ip_geo_artifact.location.state)
-    $principal_user_emails = array_distinct($ws.principal.user.email_addresses)
-    $principal_user_id = $ws.principal.user.userid
+    $target_user_domain = $user_domain
 
   condition:
     $ws

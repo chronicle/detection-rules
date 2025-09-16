@@ -1,35 +1,28 @@
-<!--
+### Description
 
-Thank you for your interest in contributing to this project. Please familiarize yourself with the contribution guide (https://github.com/chronicle/detection-rules/blob/main/CONTRIBUTING.md) and rule style guide (https://github.com/chronicle/detection-rules/blob/main/STYLE_GUIDE.md) if you haven't done so already.
+[Please include a short summary of the change and if it is an issue, which issue is fixed. Include relevant motivation and context. List any dependencies that are required for this change.]
 
--->
+**Linked Jira ticket**: [BEAT-XXX](https://beatdapp.atlassian.net/browse/BEAT-XXX)
 
-## Related Issue(s)
+### How Has This Been Tested?
 
-<!--
+[Please describe the tests that you ran to verify your changes. Provide instructions so reviewers can reproduce.]
 
-Use GitHub supported keywords to link your pull request to related issues. GitHub documentation: https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
+### Documentation Updates
 
-For example, Resolves #1
+- [ ] My change requires a change to the documentation.
+- [ ] I have updated the documentation accordingly.
 
--->
+- [ ] My change is solely a change to the documentation
 
-## Summary
+### Is a Review Required? If no, why?
 
-<!--
+[Please describe if a review is required and why.]
 
-Write a brief summary of your proposed changes.
+- [ ] Not business critical
 
-The issue(s) that you linked to above should contain a more detailed explanation of these changes.
+### Checklist:
 
--->
-
-## Supporting Documentation
-
-<!--
-
-Include any documentation in this section that you think supports your proposed changes.
-
-For example, screenshots from SecOps of detections/alerts (with any confidential/PII data masked/sanitized).
-
--->
+- [ ] I have performed a self-review of my own code.
+- [ ] I have commented my code in hard-to-understand areas.
+- [ ] I have tagged this pull request with the relevant label.

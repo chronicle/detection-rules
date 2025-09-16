@@ -1446,8 +1446,8 @@ google_workspace_external_user_added_to_group:
   enabled: true
   id: ru_a9a1bd5c-a077-4eec-9ad6-4599dc9d0dd9
   resource_name: projects/137411790380/locations/northamerica-northeast2/instances/87bb0359-c967-420b-952c-3956c9bdc3d3/rules/ru_a9a1bd5c-a077-4eec-9ad6-4599dc9d0dd9
-  revision_create_time: '2025-06-24T18:45:35.035791Z'
-  revision_id: v_1750790735_035791000
+  revision_create_time: '2025-09-16T17:57:17.311695Z'
+  revision_id: v_1758045437_311695000
   run_frequency: LIVE
   type: SINGLE_EVENT
 google_workspace_file_shared_from_google_drive_to_free_email_domain:

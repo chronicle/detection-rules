@@ -1,0 +1,40 @@
+rule jamf_telemetry_authentication_simple {
+  meta:
+    author = "Security Engineering Team"
+    description = "Detects authentication anomalies from JAMF telemetry data"
+    severity = "MEDIUM"
+    priority = "MEDIUM"
+    mitre_attack_tactic = "TA0006"
+    mitre_attack_technique = "T1110"
+    reference = "https://attack.mitre.org/techniques/T1110/"
+    platform = "macOS"
+    data_source = "JAMF_TELEMETRY"
+    false_positives = "Password resets, legitimate failed login attempts"
+    
+  events:
+    $event.metadata.vendor_name = "Jamf"
+    $event.metadata.product_name = "Jamf Protect"
+    $event.metadata.log_type = "JAMF_TELEMETRY"
+    $event.metadata.product_event_type = /AUE_(AUTH_USER|LW_LOGIN|openssh)/
+    
+    $user_name = $event.principal.user.user_display_name
+    $hostname = $event.principal.hostname
+    $process_name = $event.principal.process.file.full_path
+    
+    // Filter out system accounts
+    not $user_name = /^(_|root|daemon|nobody).*$/
+    $user_name != ""
+
+  match:
+    $hostname, $user_name over 15m
+
+  outcome:
+    $auth_attempts = count($event.metadata.id)
+    $unique_processes = count_distinct($process_name)
+
+  condition:
+    $event and (
+      $auth_attempts >= 10 or
+      ($unique_processes >= 3 and $auth_attempts >= 5)
+    )
+} 

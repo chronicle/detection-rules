@@ -1,0 +1,75 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule whois_expired_domain_accessed {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Example usage of WHOIS data, detecting an executable file download from a domain that's recently expired"
+    rule_id = "mr_7b487c4f-cbf9-4b11-8b25-632ada3f90a3"
+    rule_name = "WHOIS Expired Domain Accessed"
+    type = "alert"
+    tags = "whois"
+    data_source = "zscalar"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $access.metadata.event_type = "NETWORK_HTTP"
+    $access.target.hostname = $hostname
+
+    // join access event to entity graph to use WHOIS data
+    $whois.graph.entity.domain.name = $hostname
+
+    // Whois domains provided by GCTI Feed
+    $whois.graph.metadata.entity_type = "DOMAIN_NAME"
+    $whois.graph.metadata.vendor_name = "WHOIS"
+    $whois.graph.metadata.product_name = "WHOISXMLAPI Simple Whois"
+    $whois.graph.metadata.source_type = "GLOBAL_CONTEXT"
+    // Filter out domains without expiration time
+    $whois.graph.entity.domain.expiration_time.seconds > 0
+    // Domain expired before the event
+    $whois.graph.entity.domain.expiration_time.seconds < $access.metadata.event_timestamp.seconds
+
+  match:
+    $hostname over 1h
+
+  outcome:
+    $risk_score = 20
+    $event_count = count_distinct($access.metadata.id)
+    //added to populate alert graph with additional context
+    $principal_hostname = array_distinct($access.principal.hostname)
+    // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$target_hostname = array_distinct($access.target.hostname)
+    $principal_process_pid = array_distinct($access.principal.process.pid)
+    $principal_process_command_line = array_distinct($access.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($access.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($access.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($access.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($access.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($access.target.process.pid)
+    $target_process_command_line = array_distinct($access.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($access.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($access.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($access.target.process.product_specific_process_id)
+    $target_process_parent_process_product_specific_process_id = array_distinct($access.target.process.parent_process.product_specific_process_id)
+    $principal_user_userid = array_distinct($access.principal.user.userid)
+    $target_user_userid = array_distinct($access.target.user.userid)
+    $target_url = array_distinct($access.target.url)
+
+ condition:
+    $access and $whois
+}

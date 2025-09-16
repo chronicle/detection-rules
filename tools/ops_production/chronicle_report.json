@@ -1,0 +1,1183 @@
+{
+  "summary": {
+    "local_rules_count": 167,
+    "remote_rules_count": 100,
+    "report_date": "2025-09-16T09:53:26.087667"
+  },
+  "local_rules": [
+    {
+      "name": "google_workspace_multiple_files_sent_as_email_attachment_from_google_drive",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a user sends multiple files from Google Drive as an email attachment to a free email domain, which may indicate data exfiltration.",
+      "file_size": 2741
+    },
+    {
+      "name": "google_workspace_password_policy_changed",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Identifies when Google Workspace password policy is changed. Security teams can monitor for changes to password policy configuration that may weaken the organization's security posture.",
+      "file_size": 2501
+    },
+    {
+      "name": "google_workspace_mfa_disabled",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when multi-factor authentication (MFA) is disabled for a Google Workspace organization. Security teams can monitor for changes to MFA configuration that may weaken the organization's security posture.",
+      "file_size": 2308
+    },
+    {
+      "name": "gmail_spike_in_undeliverables",
+      "severity": "Medium",
+      "author": "Bastradamus",
+      "description": "Detects a spike in undeliverable emails, this can be an early indication of a targeted phishing campaign or a compromised user account.",
+      "file_size": 2165
+    },
+    {
+      "name": "google_workspace_suspicious_login_and_google_drive_file_download",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a Google Workspace user downloads a file from Google Drive after a suspicious login event occurred.",
+      "file_size": 2897
+    },
+    {
+      "name": "google_workspace_saml_idp_configuration_change",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies SAML provider configuration changes in Google Workspace. Security teams can monitor for changes to SAML provider configuration that may weaken the organization's security posture.",
+      "file_size": 2624
+    },
+    {
+      "name": "google_workspace_admin_role_assignment",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when an administrator role is assigned to a user account in Google Workspace. Security teams can monitor for the malicious or accidental assignment of administrator privileges to prevent unauthorized access to data.",
+      "file_size": 2536
+    },
+    {
+      "name": "google_workspace_marketplace_allowlist_configuration",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Identifies when the Google Workspace Marketplace allowlist is configured to allow users to install and run any apps from the Marketplace. Allowing users to install and run any apps may increase the organization's risk of data exfiltration/leakage and increase its attack surface.",
+      "file_size": 2591
+    },
+    {
+      "name": "google_workspace_alerts_aggregated_by_severity",
+      "severity": "LOW",
+      "author": "Google Cloud Security",
+      "description": "Generates alerts based on Google Workspace alerts center and aggregates them based on severity.",
+      "file_size": 2022
+    },
+    {
+      "name": "google_workspace_new_trusted_domain_added",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a domain is added to the list of trusted domains in Google Workspace. An adversary may attempt to manipulate sharing settings for trusted domains to gain unauthorized access to sensitive files and folders within an organization.",
+      "file_size": 2343
+    },
+    {
+      "name": "google_workspace_suspicious_login_and_google_drive_file_share",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a Google Workspace user shares a file on Google Drive after a suspicious login event occurred.",
+      "file_size": 3098
+    },
+    {
+      "name": "google_workspace_multiple_files_deleted_from_google_drive",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a user deletes multiple files from Google Drive, which may indicate data destruction.",
+      "file_size": 2371
+    },
+    {
+      "name": "google_workspace_user_ou_changed",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a Google Workspace user account is moved between Organizational Units.",
+      "file_size": 2289
+    },
+    {
+      "name": "google_workspace_malicious_file_downloaded",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a user downloads a potentially malicious file from Google Drive.",
+      "file_size": 2363
+    },
+    {
+      "name": "google_workspace_application_added",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a Marketplace app is added in a Google Workspace organization. Installing certain apps may increase the organization's risk of data exfiltration/leakage and increase its attack surface.",
+      "file_size": 2176
+    },
+    {
+      "name": "google_workspace_external_user_added_to_group",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Identifies when an external user account is added to a group in Google Workspace. Security teams can monitor for unexpected user accounts being added to Google Workspace groups to prevent unauthorized access to data.",
+      "file_size": 2630
+    },
+    {
+      "name": "google_workspace_ownership_transferred_on_google_drive",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a Google Workspace user transfers the ownership of a file.",
+      "file_size": 2289
+    },
+    {
+      "name": "google_workspace_file_shared_from_google_drive_to_free_email_domain",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a user shares a file on Google Drive with a free email domain, which may indicate data exfiltration.",
+      "file_size": 2786
+    },
+    {
+      "name": "google_workspace_encryption_key_files_accessed_by_anonymous_user",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Identifies when an encryption key file is accessed by an anonymous user in Google Drive. An adversary may attempt to access encryption keys before moving laterally and compromising sensitive data.",
+      "file_size": 2676
+    },
+    {
+      "name": "google_workspace_user_unsuspended",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a user account is unsuspended in Google Workspace.",
+      "file_size": 2057
+    },
+    {
+      "name": "chrome_browser_safe_browsing_user_bypass",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects and alerts on users bypassing Chrome Safe Browsing warnings and accessing potentially dangerous content or downloads",
+      "file_size": 2679
+    },
+    {
+      "name": "google_workspace_custom_admin_role_created",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a custom administrator role is created in Google Workspace. Security teams can monitor for malicious or accidental configuration of administrator privileges to prevent unauthorized access to data.",
+      "file_size": 2498
+    },
+    {
+      "name": "google_workspace_multiple_files_downloaded_from_google_drive",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a user downloads multiple files from Google Drive, which may indicate data exfiltration.",
+      "file_size": 2550
+    },
+    {
+      "name": "google_workspace_multiple_files_copied_from_google_drive",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identifies when a user copies multiple files from Google Drive, which may indicate data exfiltration.",
+      "file_size": 2411
+    },
+    {
+      "name": "high_risk_user_download_executable_from_macro",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Executable downloaded by Microsoft Excel by user with GCP entity relationship",
+      "file_size": 4913
+    },
+    {
+      "name": "suspicious_asn_watchlist",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Identify any network connections to a list of ASNs",
+      "file_size": 3165
+    },
+    {
+      "name": "suspicious_asn",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Identify network traffic based on a specific ASN",
+      "file_size": 3063
+    },
+    {
+      "name": "network_traffic_to_specific_country",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Identify network traffic based on target country",
+      "file_size": 3126
+    },
+    {
+      "name": "Admin_elavation",
+      "severity": "HIGH",
+      "author": "Security Team",
+      "description": "Detects when a user is assigned administrative privileges in Google Workspace",
+      "file_size": 1249
+    },
+    {
+      "name": "gcp_admin_privileged_roles_added_to_service_accounts",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect when admin privileged roles such as Owner or Editor are added to a Service Account.",
+      "file_size": 2740
+    },
+    {
+      "name": "gcp_security_command_center_service_disabled",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when GCP Security Command Center services are disabled.",
+      "file_size": 2333
+    },
+    {
+      "name": "gcp_multiple_hmac_keys_deleted",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when multiple HMAC authentication keys are deleted from GCP Storage settings.",
+      "file_size": 2299
+    },
+    {
+      "name": "gcp_cloud_audit_logging_removed_from_all_services",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when GCP Cloud Audit logs are removed from all services at project or organization level. Audit logging helps organizations maintain security and minimize risk.",
+      "file_size": 2821
+    },
+    {
+      "name": "gcp_unauthorized_gke_pod_token_endpoint_usage",
+      "severity": "Medium",
+      "author": "Drew Pilarski - Tempus AI",
+      "description": "Alerts when an authorization token originating from GKE activity is subsequently used within a command line on an endpoint system, suggesting potential credential exfiltration and reuse.",
+      "file_size": 3640
+    },
+    {
+      "name": "gcp_storage_bucket_opened_to_public",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when Google Cloud Storage buckets are opened to public by adding allUsers or allAuthenticatedUsers to the access policy.",
+      "file_size": 2789
+    },
+    {
+      "name": "gcp_multiple_kms_keys_disabled_or_destroyed",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when multiple KMS crypto key versions are disabled or destroyed from GCP Cloud KMS.",
+      "file_size": 2522
+    },
+    {
+      "name": "gcp_multiple_secrets_deleted",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when multiple secrets or secret versions are deleted from GCP Secret Manager.",
+      "file_size": 2456
+    },
+    {
+      "name": "gcp_service_account_key_used_from_multiple_countries",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects usage of service account key from multiple countries using Chronicle GeoIP enrichment.",
+      "file_size": 2613
+    },
+    {
+      "name": "gcp_free_gmail_domains_added_to_iam_policy",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when free Google Email addressess are added to IAM Policy such as gmail.com, googlemail.com or googlegroups.com.",
+      "file_size": 2717
+    },
+    {
+      "name": "gcp_iam_organization_policy_updated_or_deleted",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when GCP IAM Organization Policy is updated or deleted.",
+      "file_size": 2524
+    },
+    {
+      "name": "gcp_service_api_key_retrieved",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects a successful attempt to retrieve the service API Keys.",
+      "file_size": 2397
+    },
+    {
+      "name": "gcp_workload_identity_pool_disabled_or_deleted",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when GCP Workload identity pools are disabled or deleted. Disabling or deleting a pool will prevent any connected identities from accessing all GCP resources.",
+      "file_size": 2754
+    },
+    {
+      "name": "gcp_multiple_service_apis_disabled",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when multiple GCP Service APIs are disabled in a short period of time.",
+      "file_size": 2472
+    },
+    {
+      "name": "gcp_excessive_permission_denied_events",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects excessive PermissionDenied events within an hour timeframe from a user",
+      "file_size": 2406
+    },
+    {
+      "name": "gcp_successful_api_from_tor_exit_node",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects successful API executions from a Tor exit node.",
+      "file_size": 3014
+    },
+    {
+      "name": "gcp_kms_decryption_by_unexpected_service_account",
+      "severity": "Medium",
+      "author": "Drew Pilarski - Tempus AI",
+      "description": "Detects when a Key Management Service (KMS) decryption operation is carried out by a service account that's not in the allowlist. This behavior may indicate unauthorized access to information.",
+      "file_size": 2323
+    },
+    {
+      "name": "gcp_exempt_principals_from_audit_log",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when GCP Cloud Audit logs are exempted for principals in all services at project or organization level. Audit logging helps organizations maintain security and minimize risk.",
+      "file_size": 2814
+    },
+    {
+      "name": "gcp_gce_image_open_to_public",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when GCP Compute Image is opened to public by adding allAuthenticatedUsers to the access policy.",
+      "file_size": 2606
+    },
+    {
+      "name": "gcp_bigquery_results_downloaded_from_multiple_tables",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect a user downloads GCP BigQuery results from multiple tables which might indicate data exfiltration activity.",
+      "file_size": 2657
+    },
+    {
+      "name": "gcp_firewall_rule_opened_to_world",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when a GCP Firewall rule is opened to the world (0.0.0.0/0) on all protocols.",
+      "file_size": 2513
+    },
+    {
+      "name": "google_cloud_service_account_key_created_or_uploaded",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects when a service account key is created in or uploaded to a monitored Google Cloud project.",
+      "file_size": 2847
+    },
+    {
+      "name": "gcp_identity_low_and_medium_severity_alert_escalation",
+      "severity": "High",
+      "author": "Mo Mohajerani",
+      "description": "Detects when a Google Cloud identity experiences a low severity event followed by medium severity event within 24 hours.",
+      "file_size": 3258
+    },
+    {
+      "name": "gcp_bigquery_datasets_opened_to_public",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when GCP BigQuery datasets are opened to public by adding allUsers or allAuthenticatedUsers to the access policy.",
+      "file_size": 2879
+    },
+    {
+      "name": "github_repository_deploy_key_created_or_modified",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when an SSH deploy key is added or modified in a GitHub repository. A compromised or unauthorized deploy key could allow malicious actors to push unauthorized changes into production environments, potentially bypassing code reviews and testing procedures. This could lead to the introduction of backdoors, malware, or the exfiltration of sensitive data.",
+      "file_size": 3223
+    },
+    {
+      "name": "github_personal_access_token_created_from_tor_ip_address",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GitHub Personal Access Token is created from a known Tor exit node IP address. An adversary may create a Personal Access Token before carrying out follow up actions such as cloning GitHub repositories to steal data.",
+      "file_size": 3423
+    },
+    {
+      "name": "github_invitation_sent_to_non_company_email_domain",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when an invitation to join a GitHub enterprise or organization is sent to a non-company email address. This rule can be customized to alert you when a GitHub invitation is sent to an unexpected domain i.e. not one of your company's domains used for email.",
+      "file_size": 3049
+    },
+    {
+      "name": "github_user_unblocked_from_accessing_organization_repositories",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when a user is unblocked from accessing repositories within a GitHub organization.",
+      "file_size": 2516
+    },
+    {
+      "name": "github_enterprise_audit_log_stream_destroyed",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GitHub audit log stream is destroyed. An adversary may attempt to destroy audit logs to erase their tracks.",
+      "file_size": 2708
+    },
+    {
+      "name": "github_repository_visibility_changed_to_public",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when the visibility for a GitHub repository is changed to public.",
+      "file_size": 2906
+    },
+    {
+      "name": "github_organization_removed_from_enterprise",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GitHub organization is removed from an enterprise.",
+      "file_size": 2866
+    },
+    {
+      "name": "github_enterprise_audit_log_stream_modified",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GitHub audit log stream is modified (e.g. paused, enabled, or disabled). An adversary may attempt to interrupt audit logging to erase their tracks.",
+      "file_size": 2745
+    },
+    {
+      "name": "github_high_number_of_non_public_github_repositories_downloaded",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a user downloads a high number of non-public GitHub repositories. An adversary may attempt to steal the contents of several GitHub repositories after compromising a user account.",
+      "file_size": 3223
+    },
+    {
+      "name": "github_enterprise_deleted",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GitHub enterprise is deleted.",
+      "file_size": 2714
+    },
+    {
+      "name": "github_two_factor_authentication_requirement_disabled",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when two-factor authentication requirements are disabled for a GitHub enterprise or organization.",
+      "file_size": 2813
+    },
+    {
+      "name": "github_dependabot_vulnerability_alerts_disabled",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when vulnerability alerts are disabled for GitHub Dependabot.",
+      "file_size": 3342
+    },
+    {
+      "name": "github_outgoing_organization_transfer_initiated",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GitHub organization is transferred to another enterprise account. An adversary may attempt to transfer a GitHub organization to an enterprise account they control in order to steal data.",
+      "file_size": 2796
+    },
+    {
+      "name": "github_repository_branch_protection_rules_disabled",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects when branch protection rules are disabled for a GitHub repository.",
+      "file_size": 2890
+    },
+    {
+      "name": "github_application_installed",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GitHub application is installed within an organization. An untrusted application can be installed and granted permissions to access data within a GitHub organization.",
+      "file_size": 2330
+    },
+    {
+      "name": "github_repository_archived_or_deleted",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GitHub repository is archived or deleted.",
+      "file_size": 2812
+    },
+    {
+      "name": "github_secret_scanning_disabled_or_bypassed",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when components of GitHub secret scanning is disabled for an enterprise or organization.",
+      "file_size": 3873
+    },
+    {
+      "name": "github_enterprise_or_organization_recovery_codes_activity",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects when the Single Sign-On (SSO) recovery codes are accessed for a GitHub enterprise or organization. An adversary may attempt to access or steal SSO recovery codes in order to maintain access to their target's GitHub environment.",
+      "file_size": 3239
+    },
+    {
+      "name": "github_secret_scanning_alert",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a secret is found in a GitHub repository. Adversaries may attempt to harvest leaked/exposed secrets to further infiltrate their target's environment, maintain access, or steal data.",
+      "file_size": 2697
+    },
+    {
+      "name": "github_sso_configuration_modified",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when changes are made to a GitHub enterprise or organization's Single Sign-On (SSO) configuration.",
+      "file_size": 3440
+    },
+    {
+      "name": "github_user_blocked_from_accessing_organization_repositories",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when a user is blocked from accessing repositories within a GitHub organization.",
+      "file_size": 2508
+    },
+    {
+      "name": "github_oauth_application_access_restrictions_disabled",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when third-party application access restrictions are disabled for a GitHub organization.",
+      "file_size": 2298
+    },
+    {
+      "name": "github_personal_access_token_auto_approve_policy_modified",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects when changes are made to a GitHub organization's fine-grained Personal Access Token approval policy.",
+      "file_size": 3075
+    },
+    {
+      "name": "github_outgoing_repository_transfer_initiated",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GitHub repository is transferred.",
+      "file_size": 2428
+    },
+    {
+      "name": "github_high_number_of_non_public_github_repositories_cloned",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a user clones a high number of non-public GitHub repositories. An adversary may attempt to steal the contents of several GitHub repositories after compromising a user account.",
+      "file_size": 3210
+    },
+    {
+      "name": "github_access_granted_to_personal_access_token_followed_by_high_number_of_cloned_non_public_repositories",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a user grants access to a GitHub Personal Access Token prior to cloning several GitHub non-public GitHub repositories. An adversary may grant access to a Personal Access Token before attempting to steal the contents of several GitHub repositories using a an automated script or offensive tool.",
+      "file_size": 4096
+    },
+    {
+      "name": "geoip_user_login_from_multiple_states_or_countries",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect multiple user logins from multiple states or countries using Chronicle GeoIP enrichment.",
+      "file_size": 2894
+    },
+    {
+      "name": "logins_from_terminated_employees",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Allowed Logins from Terminated Employees",
+      "file_size": 2449
+    },
+    {
+      "name": "dns_query_to_recently_created_domain",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "DNS query to a recently created domain",
+      "file_size": 2802
+    },
+    {
+      "name": "ioc_ip_target",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detect network events that indicate communication to a watchlisted IP address",
+      "file_size": 3610
+    },
+    {
+      "name": "whois_recently_created_domain_access",
+      "severity": "Info",
+      "author": "Google Cloud Security",
+      "description": "Detects access attempts to a newly created domain via WHOIS enrichment.",
+      "file_size": 3652
+    },
+    {
+      "name": "gcti_tor_exit_nodes",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Alert traffic destined for known Tor exit nodes",
+      "file_size": 3567
+    },
+    {
+      "name": "ip_target_prevalence",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect events that are communicating to IP addresses that have a low rolling max prevalence.",
+      "file_size": 3477
+    },
+    {
+      "name": "hash_prevalence",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Correlate process events with hashes that have a low rolling max over the past 10 days",
+      "file_size": 3130
+    },
+    {
+      "name": "network_http_low_prevalence_domain_access",
+      "severity": "Critical",
+      "author": "Google Cloud Security",
+      "description": "Detects network web access to a low prevalence domain",
+      "file_size": 3074
+    },
+    {
+      "name": "google_safebrowsing_file_contacts_tor_exit_node",
+      "severity": "Critical",
+      "author": "Google Cloud Security",
+      "description": "A malicious file contacting a known Tor Exit Node.",
+      "file_size": 3811
+    },
+    {
+      "name": "ioc_domain_internal_policy",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect DNS events that communicate with gaming sites in MISP. These violate policy.",
+      "file_size": 3337
+    },
+    {
+      "name": "safebrowsing_process_creation_hashes_seen_more_than_7_days",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Identify process and file creation using safe browsing hashes where the first and last seen are more than 7 days apart",
+      "file_size": 4716
+    },
+    {
+      "name": "vt_relationships_file_contacts_ip",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Alert on known Hash contacting known IP with VT Relationships",
+      "file_size": 3520
+    },
+    {
+      "name": "vt_relationships_file_executes_file",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Alert on known File Hash executing known File Hash with VT Relationships.",
+      "file_size": 3456
+    },
+    {
+      "name": "gcti_benign_binaries_contacts_tor_exit_node",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Alert on Benign Binary contacting a TOR IP",
+      "file_size": 4543
+    },
+    {
+      "name": "gcti_remote_access_tools",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Alert process and file create events that are associated with hashes from the GCTI Remote Access Tool list",
+      "file_size": 3867
+    },
+    {
+      "name": "network_connection_first_seen_in_past_day",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect network connection to an ip address that was only seen for the first time in the past 24 hours",
+      "file_size": 3820
+    },
+    {
+      "name": "vt_relationships_file_downloaded_from_url",
+      "severity": "Critical",
+      "author": "Google Cloud Security",
+      "description": "Alert on downloading a known file hash from a known IP with VT Relationships.",
+      "file_size": 4175
+    },
+    {
+      "name": "whois_expired_domain_executable_downloaded",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect web traffic to a recently expired domain followed by an exe file creation event",
+      "file_size": 4241
+    },
+    {
+      "name": "whois_dns_query_to_typosquatting_domain",
+      "severity": "low",
+      "author": "Google Cloud Security",
+      "description": "Provides example usage of WHOIS data, detecting a DNS query for a domain that contains a specific string and is not registered with the defined domain registrar.",
+      "file_size": 3894
+    },
+    {
+      "name": "whois_expired_domain_accessed",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Example usage of WHOIS data, detecting an executable file download from a domain that's recently expired",
+      "file_size": 3670
+    },
+    {
+      "name": "ioc_sha256_hash",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detect file/process events that match watchlisted hashes in MISP",
+      "file_size": 3311
+    },
+    {
+      "name": "low_prevalence_hash_on_process_launch_low_prevalence_domain_accessed",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when a low prevalence hash is seen during a process launch event, and a low prevalence domain is accessed within 10m.",
+      "file_size": 5140
+    },
+    {
+      "name": "ioc_domain_C2",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect DNS events that indicate communication to a C2 domain in MISP",
+      "file_size": 2802
+    },
+    {
+      "name": "vt_relationships_file_contacts_domain",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Alert on known Hash querying a known hostname with VT Relationships",
+      "file_size": 3056
+    },
+    {
+      "name": "ioc_hash_prevalence",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect process/file events that match hashes found in our MISP instance and have low rolling max prevalence",
+      "file_size": 3788
+    },
+    {
+      "name": "process_launch_vt_enrichment",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Identify process creations that are tagged exploit in VT",
+      "file_size": 3038
+    },
+    {
+      "name": "google_safebrowsing_file_process_creation",
+      "severity": "Critical",
+      "author": "Google Cloud Security",
+      "description": "Detection of process/file events that match Safe Browsing hashes, which are files deemed to be malicious",
+      "file_size": 3704
+    },
+    {
+      "name": "google_safebrowsing_with_prevalence",
+      "severity": "Critical",
+      "author": "Google Cloud Security",
+      "description": "Detect process launch events that correlate to Safe Browsing hash data and have low prevalence",
+      "file_size": 3644
+    },
+    {
+      "name": "vt_relationships_file_contacts_tor_ip",
+      "severity": "Critical",
+      "author": "Google Cloud Security",
+      "description": "Alert on known Hash contacting Tor IP with VT Relationships.",
+      "file_size": 4893
+    },
+    {
+      "name": "ioc_sha256_hash_vt",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detect file/process events with watchlisted hashes from MISP that VT flagged as MS Office docx file types",
+      "file_size": 3593
+    },
+    {
+      "name": "domain_prevalence",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects DNS events querying domains that have a low rolling max prevalence.",
+      "file_size": 2699
+    },
+    {
+      "name": "vt_relationships_file_downloaded_from_ip",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Alert on downloading a known file hash from a known IP with VT Relationships.",
+      "file_size": 3963
+    },
+    {
+      "name": "aws_kms_key_disabled_or_scheduled_for_deletion",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when a KMS (Key Management Service) key is disabled or scheduled for deletion.",
+      "file_size": 2472
+    },
+    {
+      "name": "aws_ses_service_modification",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detect when the Amazon Simple Email Service (SES) has been modified where an attacker can modify Amazon SES service to propagate phishing emails campaigns.",
+      "file_size": 3542
+    },
+    {
+      "name": "aws_user_creates_permanent_access_key",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects when an AWS IAM user creates an AWS Access Key for programmatic calls.",
+      "file_size": 2545
+    },
+    {
+      "name": "aws_guardduty_disabled",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GuardDuty Detector is disabled or suspended.",
+      "file_size": 2488
+    },
+    {
+      "name": "aws_s3_made_public_by_acl",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when an AWS S3 bucket is made public using ACL.",
+      "file_size": 2833
+    },
+    {
+      "name": "aws_iam_administrator_access_policy_attached",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when AWS IAM AdministratorAccess policy is attached to a user, group or role which can be used for privilege escalation.",
+      "file_size": 2852
+    },
+    {
+      "name": "aws_high_number_of_unknown_user_authentication_attempts",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when a high number of failed authentication attempts happen for unknown users.",
+      "file_size": 2702
+    },
+    {
+      "name": "aws_delete_vpc_flow_logs",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when AWS VPC FLow Logs are deleted.",
+      "file_size": 2572
+    },
+    {
+      "name": "aws_rds_snapshot_shared_publicly",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when an Amazon RDS Snapshot is shared publicly.",
+      "file_size": 2873
+    },
+    {
+      "name": "aws_unusual_number_of_failed_authentications_from_the_same_ip",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects unusual number of failed authentications from the same IP for valid users.",
+      "file_size": 3200
+    },
+    {
+      "name": "aws_privilege_escalation_using_iam_access_key",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect when a user creates a new access key for another user and escalates privileges using this newly created access key from the same IP.",
+      "file_size": 3241
+    },
+    {
+      "name": "aws_cloudfront_insecure_ssl_policy",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when an insecure SSL policy is configured for an AWS CloudFront distribution.",
+      "file_size": 3386
+    },
+    {
+      "name": "aws_backup_plan_deleted",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when AWS Backup Plan is deleted.",
+      "file_size": 2381
+    },
+    {
+      "name": "aws_ec2_get_windows_admin_password",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects a successful attempt to retrieve the encrypted Administrator password for a Windows EC2 instance.",
+      "file_size": 2560
+    },
+    {
+      "name": "aws_password_policy_change",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects when an existing password policy is updated or deleted in an AWS account.",
+      "file_size": 2351
+    },
+    {
+      "name": "aws_iam_access_denied_discovery_events",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects excessive AccessDenied events within an hour timeframe from an IAM User",
+      "file_size": 3020
+    },
+    {
+      "name": "aws_delete_cloudwatch_log_group",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a CloudWatch log group is deleted.",
+      "file_size": 2594
+    },
+    {
+      "name": "aws_api_call_outside_of_organization",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects API Calls from AWS accounts that are not part of the organization.",
+      "file_size": 2941
+    },
+    {
+      "name": "aws_iam_activity_by_s3_browser_utility",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect AWS IAM activities associated with the S3 Browser utility.",
+      "file_size": 2957
+    },
+    {
+      "name": "aws_s3_public_access_block_removed",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when the S3 Public Access Block configuration has been removed from a bucket or an account.",
+      "file_size": 3289
+    },
+    {
+      "name": "aws_enable_disable_region",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects when an AWS region is enabled or disabled.",
+      "file_size": 2466
+    },
+    {
+      "name": "aws_successful_login_after_multiple_failed_attempts",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects successful login after multiple failed attempts",
+      "file_size": 3722
+    },
+    {
+      "name": "aws_successful_api_from_tor_exit_node",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects successful API executions from a Tor exit node.",
+      "file_size": 3216
+    },
+    {
+      "name": "aws_saml_identity_provider_changes",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects create, update or delete events of a SAML provider in AWS.",
+      "file_size": 2648
+    },
+    {
+      "name": "aws_guardduty_publishing_destination_deleted",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GuardDuty Detector's publishing destination has been deleted which will prevent the exporting of findings.",
+      "file_size": 2470
+    },
+    {
+      "name": "aws_account_leaving_or_removed_from_organization",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect an AWS account attempting to leave or being removed from an AWS organization.",
+      "file_size": 2479
+    },
+    {
+      "name": "aws_iam_compromised_key_quarantine_policy_attached",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when the AWS managed policy AWSCompromisedKeyQuarantine has been attached to a user, role, or group. It is applied by the AWS team in the event that the credentials of an IAM user has been compromised or publicly exposed.",
+      "file_size": 2824
+    },
+    {
+      "name": "aws_ec2_high_number_of_api_calls",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect when an EC2 instance makes high number of API calls.",
+      "file_size": 2561
+    },
+    {
+      "name": "aws_ec2_user_data_modified",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect modifications to user data script on an EC2 instance.",
+      "file_size": 2712
+    },
+    {
+      "name": "aws_api_gateway_get_keys",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when AWS API Gateway keys are accessed.",
+      "file_size": 2859
+    },
+    {
+      "name": "aws_guardduty_trusted_or_threat_ip_lists_tampered",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when a GuardDuty Detector's trusted or threat intel IP lists are deleted or disabled.",
+      "file_size": 3264
+    },
+    {
+      "name": "aws_cloudtrail_logging_tampered",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when CloudTrail logging is updated, stopped or deleted.",
+      "file_size": 2816
+    },
+    {
+      "name": "aws_multi_factor_authentication_disabled",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects attempts to disable multi-factor authentication for an AWS IAM user.",
+      "file_size": 2994
+    },
+    {
+      "name": "aws_lambda_update_function_code",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects an IAM user attempting to update/modify AWS lambda code.",
+      "file_size": 2550
+    },
+    {
+      "name": "aws_ec2_ami_or_snapshot_shared_publicly",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when an Amazon EC2 AMI or Snapshot is shared publicly.",
+      "file_size": 2765
+    },
+    {
+      "name": "aws_successful_console_authentication_from_multiple_ips",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects when an AWS user successfully authenticating from more than one unique IP address within 5 minutes.",
+      "file_size": 3037
+    },
+    {
+      "name": "aws_iam_access_analyzer_deleted",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when AWS IAM Access Analyzer is deleted.",
+      "file_size": 2455
+    },
+    {
+      "name": "aws_config_service_modified",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detects when AWS Config Service is updated, stopped or deleted.",
+      "file_size": 2926
+    },
+    {
+      "name": "aws_privilege_escalation_using_iam_login_profile",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect when a user creates or updates a login profile for another user and escalates privileges using this new user from the same IP.",
+      "file_size": 3313
+    },
+    {
+      "name": "aws_new_mfa_method_registered_for_user",
+      "severity": "Medium",
+      "author": "Google Cloud Security",
+      "description": "Detects the registration of a new Multi Factor authentication method for an AWS user.",
+      "file_size": 2984
+    },
+    {
+      "name": "aws_alb_insecure_ssl_policy",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects when an insecure SSL policy is configured for an AWS Application Load Balancer.",
+      "file_size": 3908
+    },
+    {
+      "name": "aws_security_group_open_to_world",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect when an AWS security group is opened to the world (0.0.0.0/0) or (::/0)",
+      "file_size": 2801
+    },
+    {
+      "name": "aws_iam_activity_from_ec2_instance",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Detect AWS IAM activities made by AWS EC2 instances to retain access or escalate privileges.",
+      "file_size": 3439
+    },
+    {
+      "name": "aws_console_login_without_mfa",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect when a user logs into AWS console without MFA.",
+      "file_size": 2761
+    },
+    {
+      "name": "aws_lateral_movement_using_iam_session_token",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detect when an IAM session token is created and used from a different IP.",
+      "file_size": 3144
+    },
+    {
+      "name": "aws_excessive_successful_discovery_events",
+      "severity": "Low",
+      "author": "Google Cloud Security",
+      "description": "Detects excessive successful events within a 5 minute timeframe from an IAM User.",
+      "file_size": 2789
+    },
+    {
+      "name": "aws_guardduty_command_and_control_activity_detected",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Amazon GuardDuty detects Command and control activity in Amazon EC2, AWS Lambda or Amazon EKS Runtimes.",
+      "file_size": 2806
+    },
+    {
+      "name": "aws_guardduty_malicious_or_suspicious_file_executed",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Amazon GuardDuty detects a malicious or suspicious file on an Amazon EC2 instance or a container workload.",
+      "file_size": 2822
+    },
+    {
+      "name": "aws_guardduty_denial_of_service_activity_detected",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Amazon GuardDuty detects a Denial of Service (DoS) activity in an Amazon EC2 instance.",
+      "file_size": 2774
+    },
+    {
+      "name": "aws_guardduty_black_hole_traffic_detected",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Amazon GuardDuty detects an Amazon EC2 instance or a container attempting to communicate with a black hole IP address.",
+      "file_size": 2806
+    },
+    {
+      "name": "aws_guardduty_brute_force_activity_detected",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Amazon GuardDuty detects a brute force activity in an Amazon EC2 or Amazon RDS instance.",
+      "file_size": 2739
+    },
+    {
+      "name": "aws_guardduty_penetration_testing_activity_detected",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Amazon GuardDuty detects penetration testing activity from known offensive security distros such as KaliLinux, ParrotLinux or PentooLinux.",
+      "file_size": 2825
+    },
+    {
+      "name": "aws_guardduty_crypto_currency_activity_detected",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Amazon GuardDuty detects CryptoCurrency activity in Amazon EC2, AWS Lambda or Amazon EKS Runtimes.",
+      "file_size": 2794
+    },
+    {
+      "name": "aws_guardduty_dga_domain_activity_detected",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Amazon GuardDuty detects an Amazon EC2 instance or a container querying algorithmically generated domains (DGA).",
+      "file_size": 2854
+    },
+    {
+      "name": "aws_guardduty_tor_network_activity_detected",
+      "severity": "High",
+      "author": "Google Cloud Security",
+      "description": "Amazon GuardDuty detects Tor Network activity in an AWS account.",
+      "file_size": 2770
+    }
+  ],
+  "remote_rules_summary": {
+    "total": 100,
+    "enabled": 0,
+    "disabled": 0
+  }
+}

@@ -1,0 +1,59 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_encryption_key_files_accessed_by_anonymous_user {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identifies when an encryption key file is accessed by an anonymous user in Google Drive. An adversary may attempt to access encryption keys before moving laterally and compromising sensitive data."
+    rule_id = "mr_5d7defeb-13d4-48f3-b6b0-d2cdab30ab57"
+    rule_name = "Google Workspace Encryption Key File Accessed By An Anonymous User"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Unsecured Credentials: Private Keys"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1552/004/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Workspace Activity"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $ws.metadata.vendor_name = "Google Workspace"
+    $ws.metadata.product_name = "drive"
+    ($ws.metadata.product_event_type = "download" or
+    $ws.metadata.product_event_type = "view" or
+    $ws.metadata.product_event_type = "copy")
+
+    ($ws.target.resource.attribute.labels["visibility"] = "people_with_link" or
+    $ws.target.resource.attribute.labels["visibility"] = "public_on_the_web")
+    $ws.target.resource.name = /.*token|.*assig|.*pssc|.*keystore|.*pub|.*pgp.asc|.*ps1xml|.*pem|.*gpg.sig|.*der|.*key|.*p7r|.*p12|.*asc|.*jks|.*p7b|.*signature|.*gpg|.*pgp.sig|.*sst|.*pgp|.*gpgz|.*pfx|.*crt|.*p8|.*sig|.*pkcs7|.*jceks|.*pkcs8|.*psc1|.*p7c|.*csr|.*cer|.*spc|.*ps2xml/
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Unsecured Credentials: Private Keys"
+    $mitre_attack_technique_id = "T1552.004"
+    $event_count = count_distinct($ws.metadata.id)
+    $product_event_type = $ws.metadata.product_event_type
+    $userid = $ws.principal.user.userid
+    $doc_type = $ws.src.resource.attribute.labels["doc_type"]
+    $owner = $ws.target.resource.attribute.labels["owner"]
+    $doc_name = $ws.target.resource.name
+    //$doc_id = $ws.target.resource.product_object_id
+
+  condition:
+    $ws
+}

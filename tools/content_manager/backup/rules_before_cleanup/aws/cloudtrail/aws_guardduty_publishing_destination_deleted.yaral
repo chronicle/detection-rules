@@ -1,0 +1,58 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule aws_guardduty_publishing_destination_deleted {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when a GuardDuty Detector's publishing destination has been deleted which will prevent the exporting of findings."
+    rule_id = "mr_630cd3d0-d22f-4e8a-9065-425bdbe1ab32"
+    rule_name = "AWS GuardDuty Publishing Destination Deleted"
+    mitre_attack_tactic = "Defense Evasion"
+    mitre_attack_technique = "Impair Defenses"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1562/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "AWS CloudTrail"
+    platform = "AWS"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $cloudtrail.metadata.vendor_name = "AMAZON"
+    $cloudtrail.metadata.product_name = "AWS CloudTrail"
+    $cloudtrail.metadata.product_event_type = "DeletePublishingDestination"
+    $cloudtrail.security_result.action = "ALLOW"
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Defense Evasion"
+    $mitre_attack_technique = "Impair Defenses"
+    $mitre_attack_technique_id = "T1562"
+    $event_count = count_distinct($cloudtrail.metadata.id)
+    $network_http_user_agent = $cloudtrail.network.http.user_agent
+    $principal_ip = array_distinct($cloudtrail.principal.ip)
+    $principal_ip_country = array_distinct($cloudtrail.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($cloudtrail.principal.ip_geo_artifact.location.state)
+    $principal_user_display_name = $cloudtrail.principal.user.user_display_name
+    $recipient_aws_account_id = $cloudtrail.additional.fields["recipientAccountId"]
+    $aws_region = $cloudtrail.principal.location.name
+    $target_resource_name = $cloudtrail.target.resource.name
+    $target_resource_product_object_id = $cloudtrail.target.resource.product_object_id
+
+  condition:
+    $cloudtrail
+}

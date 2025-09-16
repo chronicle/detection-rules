@@ -1,0 +1,64 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_file_shared_from_google_drive_to_free_email_domain {
+
+    meta:
+      author = "Google Cloud Security"
+      description = "Identifies when a user shares a file on Google Drive with a free email domain, which may indicate data exfiltration."
+      rule_id = "mr_054c422b-2a42-4dde-b937-e80d063f65e7"
+      rule_name = "Google Workspace File Shared From Google Drive To Free Email Domain"
+      mitre_attack_tactic = "Exfiltration"
+      mitre_attack_technique = "Exfiltration Over Web Service"
+      mitre_attack_url = "https://attack.mitre.org/techniques/T1567/"
+      mitre_attack_version = "v13.1"
+      type = "Alert"
+      data_source = "Workspace Activity"
+      severity = "High"
+      priority = "High"
+
+    events:
+      $ws.metadata.vendor_name = "Google Workspace"
+      $ws.metadata.product_name = "drive"
+
+      (
+          $ws.metadata.product_event_type = "change_user_access" or
+          $ws.metadata.product_event_type = "change_document_visibility" or
+          $ws.metadata.product_event_type = "change_document_access_scope" or
+          $ws.metadata.product_event_type = "change_acl_editors"
+      )
+
+      // File shared externally with free email domains
+      $ws.target.resource.attribute.labels["visibility"] = "shared_externally"
+      $ws.target.user.email_addresses = /.*@gmail\.com|.*@aol\.com|.*@ymail\.com|.*@ymail\.com|.*@hotmail\.com|.*@outlook\.com|.*@icloud\.com/
+
+    outcome:
+      $risk_score = max(75)
+      $mitre_attack_tactic = "Exfiltration"
+      $mitre_attack_technique = "Exfiltration Over Web Service"
+      $mitre_attack_technique_id = "T1567"
+      $event_count = count_distinct($ws.metadata.id)
+      $product_event_type = array_distinct($ws.metadata.product_event_type)
+      $userid = array_distinct($ws.principal.user.userid)
+      $doc_type = array_distinct($ws.src.resource.attribute.labels["doc_type"])
+      $owner = array_distinct($ws.target.resource.attribute.labels["owner"])
+      $target_emails = array_distinct($ws.target.user.email_addresses)
+      $doc_name = array_distinct($ws.target.resource.name)
+      $doc_id = array_distinct($ws.target.resource.product_object_id)
+
+    condition:
+      $ws
+  }

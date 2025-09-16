@@ -1,0 +1,37 @@
+rule jamf_threat_prevention_alert {
+  meta:
+    author = "Google SecOps Engineering"
+    description = "Detects threat prevention events from Jamf Protect indicating blocked malicious activity"
+    severity = "High"
+    mitre_attack_tactic = "TA0011" // Command and Control
+    mitre_attack_technique = "T1071" // Application Layer Protocol
+    reference = "https://attack.mitre.org/techniques/T1071/"
+    version = "1.0"
+    rule_type = "detection"
+
+  events:
+    $jamf.metadata.vendor_name = "Jamf"
+    $jamf.metadata.product_name = "Jamf Protect"
+    $jamf.metadata.product_event_type = "GPThreatMatchExecEvent"
+    
+    // Focus on high-severity threats
+    $jamf.security_result.severity = "HIGH" or $jamf.security_result.severity = "CRITICAL"
+    
+    // Capture threat details
+    $jamf.security_result.threat_name = $threat_name
+    $jamf.security_result.action = "BLOCK"
+    $jamf.principal.hostname = $hostname
+    $jamf.target.file.sha256 = $file_hash
+
+  match:
+    $hostname over 10m
+
+  outcome:
+    $risk_score = 90
+    $threat_names = array_distinct($threat_name)
+    $blocked_files = array_distinct($file_hash)
+    $affected_hostname = array_distinct($hostname)
+
+  condition:
+    $jamf and #threat_name >= 1
+} 

@@ -1,0 +1,57 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_custom_admin_role_created {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identifies when a custom administrator role is created in Google Workspace. Security teams can monitor for malicious or accidental configuration of administrator privileges to prevent unauthorized access to data."
+    rule_id = "mr_a15f64fc-3eaf-49f0-9f74-c533a63cb531"
+    rule_name = "Google Workspace Custom Admin Role Created"
+    mitre_attack_tactic = "Persistence"
+    mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Workspace Activity"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $ws.metadata.vendor_name = "Google Workspace"
+    $ws.metadata.product_name = "admin"
+    $ws.metadata.event_type = "USER_RESOURCE_CREATION"
+    $ws.metadata.product_event_type = "CREATE_ROLE"
+    $ws.security_result.category_details = "DELEGATED_ADMIN_SETTINGS"
+
+  outcome:
+    $risk_score = max(85)
+    $mitre_attack_tactic = "Persistence"
+    $mitre_attack_technique = "Account Manipulation: Additional Cloud Roles"
+    $mitre_attack_technique_id = "T1098.003"
+    $event_count = count_distinct($ws.metadata.id)
+    $principal_ip = array_distinct($ws.principal.ip)
+    $principal_country = array_distinct($ws.principal.ip_geo_artifact.location.country_or_region)
+    $principal_state = array_distinct($ws.principal.ip_geo_artifact.location.state)
+    $principal_user_emails = array_distinct($ws.principal.user.email_addresses)
+    $target_user_emails = array_distinct($ws.target.user.email_addresses)
+    $principal_user_id = $ws.principal.user.userid
+    $role_id = $ws.target.resource.attribute.labels["role_id"]
+    $role_name = array_distinct($ws.target.resource.attribute.roles.name)
+
+  condition:
+    $ws
+}

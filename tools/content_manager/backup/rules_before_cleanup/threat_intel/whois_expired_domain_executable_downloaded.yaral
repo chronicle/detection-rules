@@ -1,0 +1,86 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule whois_expired_domain_executable_downloaded {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect web traffic to a recently expired domain followed by an exe file creation event"
+    rule_id = "mr_ce0a1979-ec95-40d4-8107-748ee6d1e93f"
+    rule_name = "WHOIS Expired Domain Executable Downloaded"
+    type = "alert"
+    tags = "whois"
+    data_source = "zscalar, microsoft sysmon"
+    platform = "Windows"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $access.metadata.event_type = "NETWORK_HTTP"
+    $access.principal.hostname = $hostname
+    $access.target.hostname = $domain
+
+    // join access event to entity graph to use WHOIS data
+    $whois.graph.entity.domain.name = $domain
+
+    // Whois domains provided by GCTI Feed
+    $whois.graph.metadata.entity_type = "DOMAIN_NAME"
+    $whois.graph.metadata.vendor_name = "WHOIS"
+    $whois.graph.metadata.product_name = "WHOISXMLAPI Simple Whois"
+    $whois.graph.metadata.source_type = "GLOBAL_CONTEXT"
+    // Filter out domains without expiration time
+    $whois.graph.entity.domain.expiration_time.seconds > 0
+    // Domain expired before the event
+    $whois.graph.entity.domain.expiration_time.seconds < $access.metadata.event_timestamp.seconds
+
+    // join access event with executable file creation event by principal hostname
+    $creation.principal.hostname = $hostname
+    $creation.metadata.event_type = "FILE_CREATION"
+    $creation.target.file.full_path = /\.exe/ nocase
+
+    // file creation comes after network event
+    $creation.metadata.event_timestamp.seconds > $access.metadata.event_timestamp.seconds
+
+  match:
+    $hostname over 1h
+
+  outcome:
+    $risk_score = 20
+    // added to populate alert graph with additional context
+    // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$principal_hostname = array_distinct($access.principal.hostname)
+    $target_hostname = array_distinct($access.target.hostname)
+    $principal_process_pid = array_distinct($access.principal.process.pid)
+    $principal_process_command_line = array_distinct($access.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($access.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($access.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($access.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($access.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($access.target.process.pid)
+    $target_process_command_line = array_distinct($access.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($access.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($access.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($access.target.process.product_specific_process_id)
+    $target_process_parent_process_product_specific_process_id = array_distinct($access.target.process.parent_process.product_specific_process_id)
+    $principal_user_userid = array_distinct($access.principal.user.userid)
+    $target_user_userid = array_distinct($access.target.user.userid)
+    $target_url = array_distinct($access.target.url)
+    $target_file_sha256 = array_distinct($creation.target.file.sha256)
+    $target_file_full_path = array_distinct($creation.target.file.full_path)
+
+  condition:
+    $access and $whois and $creation
+}

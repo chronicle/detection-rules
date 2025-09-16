@@ -1,0 +1,38 @@
+rule jamf_gatekeeper_bypass_attempt {
+  meta:
+    author = "Google SecOps Engineering"
+    description = "Detects potential Gatekeeper bypass attempts on macOS devices monitored by Jamf Protect"
+    severity = "High"
+    mitre_attack_tactic = "TA0005" // Defense Evasion
+    mitre_attack_technique = "T1553.001" // Subvert Trust Controls: Gatekeeper Bypass
+    reference = "https://attack.mitre.org/techniques/T1553/001/"
+    version = "1.0"
+    rule_type = "detection"
+
+  events:
+    $jamf.metadata.vendor_name = "Jamf"
+    $jamf.metadata.product_name = "Jamf Protect"
+    $jamf.metadata.product_event_type = "GPGatekeeperEvent"
+    
+    // Look for Gatekeeper bypass indicators
+    (
+      re.regex($jamf.security_result.description, `.*bypass.*gatekeeper.*`) nocase or
+      re.regex($jamf.security_result.summary, `.*quarantine.*removed.*`) nocase or
+      re.regex($jamf.target.process.command_line, `.*xattr.*-d.*com\.apple\.quarantine.*`) nocase or
+      re.regex($jamf.target.process.command_line, `.*spctl.*--master-disable.*`) nocase
+    )
+    
+    $jamf.principal.hostname = $hostname
+    $jamf.target.file.full_path = $file_path
+
+  match:
+    $hostname over 15m
+
+  outcome:
+    $risk_score = 85
+    $suspicious_files = array_distinct($file_path)
+    $gatekeeper_events = count($jamf.metadata.id)
+
+  condition:
+    $jamf
+} 

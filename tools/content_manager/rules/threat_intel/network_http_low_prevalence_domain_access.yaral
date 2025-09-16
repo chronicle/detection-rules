@@ -1,0 +1,70 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule network_http_low_prevalence_domain_access {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects network web access to a low prevalence domain"
+    rule_id = "mr_c376478e-1c93-4d27-8bea-a56c3c0052f5"
+    rule_name = "Network HTTP Low Prevalence Domain Access"
+    type = "alert"
+    tags = "prevalence"
+    data_source = "zscalar"
+    severity = "Critical"
+    priority = "Critical"
+
+  events:
+    $http.metadata.event_type = "NETWORK_HTTP"
+    $http.principal.ip = $ip
+    // filter out URLs with RFC 1918 IP addresses, i.e., internal assets
+    not re.regex($http.target.hostname, `(127(?:\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$)|(10(?:\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$)|(192\.168(?:\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){2}$)|(172\.(?:1[6-9]|2\d|3[0-1])(?:\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){2})`)
+    // only match valid FQDN, filter out background non-routable noise
+    re.regex($http.target.hostname, `(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]`)
+    $http.target.hostname = $domain_name
+
+    $prevalence.graph.entity.domain.name = $domain_name
+    // derived from events ingested by Google SecOps
+    $prevalence.graph.metadata.entity_type = "DOMAIN_NAME"
+    $prevalence.graph.metadata.source_type = "DERIVED_CONTEXT"
+    $prevalence.graph.entity.domain.prevalence.day_count = 10
+    // tune prevalence as fits your results
+    $prevalence.graph.entity.domain.prevalence.rolling_max > 0
+    $prevalence.graph.entity.domain.prevalence.rolling_max <= 3
+
+  match:
+    $ip over 1h
+
+  outcome:
+    $risk_score = max(
+      // increment risk score based upon rolling_max prevalence
+      if ( $prevalence.graph.entity.domain.prevalence.rolling_max >= 10, 10) +
+      if ( $prevalence.graph.entity.domain.prevalence.rolling_max >= 2 and $prevalence.graph.entity.domain.prevalence.rolling_max <= 9 , 20) +
+      if ( $prevalence.graph.entity.domain.prevalence.rolling_max = 1, 30)
+    )
+    $event_count = count_distinct($http.metadata.id)
+    $domain_list = array_distinct($domain_name)
+    $domain_count = count_distinct($domain_name)
+    // added to populate alert graph with additional context
+    $principal_hostname = array_distinct($http.principal.hostname)
+    $target_hostname = array_distinct($http.target.hostname)
+    $principal_user_userid = array_distinct($http.principal.user.userid)
+    $target_url = array_distinct($http.target.url)
+
+
+  condition:
+    $http and $prevalence
+}

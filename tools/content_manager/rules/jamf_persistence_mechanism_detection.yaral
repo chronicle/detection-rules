@@ -1,0 +1,45 @@
+rule jamf_persistence_mechanism_detection {
+  meta:
+    author = "Google SecOps Engineering"
+    description = "Detects persistence mechanisms on macOS systems monitored by Jamf Protect"
+    severity = "Medium"
+    mitre_attack_tactic = "TA0003" // Persistence
+    mitre_attack_technique = "T1037" // Boot or Logon Autostart Execution
+    reference = "https://attack.mitre.org/techniques/T1037/"
+    version = "1.0"
+    rule_type = "detection"
+
+  events:
+    $jamf.metadata.vendor_name = "Jamf"
+    $jamf.metadata.product_name = "Jamf Protect"
+    $jamf.metadata.product_event_type = "GPFSEvent"
+    
+    // Look for persistence-related file modifications
+    (
+      re.regex($jamf.target.file.full_path, `.*/Library/LaunchAgents/.*\\.plist`) nocase or
+      re.regex($jamf.target.file.full_path, `.*/Library/LaunchDaemons/.*\\.plist`) nocase or
+      re.regex($jamf.target.file.full_path, `.*/Library/StartupItems/.*`) nocase or
+      re.regex($jamf.target.file.full_path, `.*/\\.bash_profile`) nocase or
+      re.regex($jamf.target.file.full_path, `.*/\\.bashrc`) nocase or
+      re.regex($jamf.target.file.full_path, `.*/\\.zshrc`) nocase or
+      re.regex($jamf.target.file.full_path, `.*/Library/Preferences/com\\.apple\\.loginwindow\\.plist`) nocase
+    )
+    
+    // Focus on creation and modification events
+    ($jamf.metadata.event_type = "FILE_CREATION" or $jamf.metadata.event_type = "FILE_MODIFICATION")
+    
+    $jamf.principal.hostname = $hostname
+    $jamf.principal.user.userid = $user_id
+
+  match:
+    $hostname over 30m
+
+  outcome:
+    $risk_score = 70
+    $persistence_files = array_distinct($jamf.target.file.full_path)
+    $affected_users = array_distinct($user_id)
+    $file_count = count($jamf.target.file.full_path)
+
+  condition:
+    $jamf and $file_count >= 1
+} 

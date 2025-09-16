@@ -1,0 +1,53 @@
+rule jamf_telemetry_network_simple {
+  meta:
+    author = "Security Engineering Team"
+    description = "Detects suspicious network connection patterns from JAMF telemetry data"
+    severity = "MEDIUM"
+    priority = "MEDIUM"
+    mitre_attack_tactic = "TA0011"
+    mitre_attack_technique = "T1071"
+    reference = "https://attack.mitre.org/techniques/T1071/"
+    platform = "macOS"
+    data_source = "JAMF_TELEMETRY"
+    false_positives = "Legitimate network services, system updates"
+    
+  events:
+    $event.metadata.vendor_name = "Jamf"
+    $event.metadata.product_name = "Jamf Protect"
+    $event.metadata.log_type = "JAMF_TELEMETRY"
+    $event.metadata.product_event_type = /AUE_(CONNECT|BIND)/
+    
+    $process_name = $event.principal.process.file.full_path
+    $dest_ip = $event.target.ip
+    $hostname = $event.principal.hostname
+    $user_id = $event.principal.user.userid
+    
+    // Focus on suspicious network activity
+    (
+      // Network tools making connections
+      $process_name = /.*\/(nc|netcat|curl|wget|python|perl|ruby|php)$/ or
+      // Processes from temporary directories
+      $process_name = /^\/tmp\/.*|^\/var\/tmp\/.*/ or
+      // Scripts making network connections
+      $process_name = /.*\.(sh|py|pl|rb|php)$/
+    )
+    
+    // Filter out system processes
+    not $process_name = /^\/System\/.*|^\/usr\/bin\/.*|^\/Applications\/.*/
+    $dest_ip != ""
+
+  match:
+    $hostname, $user_id over 10m
+
+  outcome:
+    $connection_count = count($event.metadata.id)
+    $unique_destinations = count_distinct($dest_ip)
+    $unique_processes = count_distinct($process_name)
+
+  condition:
+    $event and (
+      $connection_count >= 20 or
+      $unique_destinations >= 10 or
+      ($unique_processes >= 3 and $connection_count >= 5)
+    )
+} 

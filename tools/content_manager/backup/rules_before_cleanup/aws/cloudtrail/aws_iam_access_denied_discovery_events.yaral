@@ -1,0 +1,67 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule aws_iam_access_denied_discovery_events {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects excessive AccessDenied events within an hour timeframe from an IAM User"
+    rule_id = "mr_a175b0d9-4488-46cc-880a-2408cb301f41"
+    rule_name = "AWS IAM Access Denied Discovery Events"
+    mitre_attack_tactic = "Discovery"
+    mitre_attack_technique = "Cloud Infrastructure Discovery"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1580/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "AWS CloudTrail"
+    platform = "AWS"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $cloudtrail.metadata.vendor_name = "AMAZON"
+    $cloudtrail.metadata.product_name = "AWS CloudTrail"
+    $cloudtrail.security_result.rule_id = "AccessDenied"
+    $cloudtrail.security_result.action = "BLOCK"
+    $cloudtrail.principal.user.userid = $user_id
+    $cloudtrail.target.application = $target_application
+    $cloudtrail.metadata.product_event_type = $product_event_type
+
+  match:
+    $user_id over 1h
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Discovery"
+    $mitre_attack_technique = "Cloud Infrastructure Discovery"
+    $mitre_attack_technique_id = "T1580"
+    $event_count = count_distinct($cloudtrail.metadata.id)
+    $network_http_user_agent = array_distinct($cloudtrail.network.http.user_agent)
+    $principal_ip = array_distinct($cloudtrail.principal.ip)
+    $principal_ip_country = array_distinct($cloudtrail.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($cloudtrail.principal.ip_geo_artifact.location.state)
+    $principal_user_display_name = array_distinct($cloudtrail.principal.user.user_display_name)
+    $recipient_aws_account_id = array_distinct($cloudtrail.additional.fields["recipientAccountId"])
+    $aws_region = array_distinct($cloudtrail.principal.location.name)
+    $target_resource_name = array_distinct($cloudtrail.target.resource.name)
+    $target_resource_product_object_id = array_distinct($cloudtrail.target.resource.product_object_id)
+    $security_result_description = array_distinct($cloudtrail.security_result.description)
+    $target_applications = array_distinct($cloudtrail.target.application)
+    $product_event_types = array_distinct($cloudtrail.metadata.product_event_type)
+
+  condition:
+    #cloudtrail > 5 and #target_application > 1 and #product_event_type > 1
+}

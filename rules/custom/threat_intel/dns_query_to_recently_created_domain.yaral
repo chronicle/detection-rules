@@ -1,0 +1,65 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule dns_query_to_recently_created_domain {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "DNS query to a recently created domain"
+    rule_id = "mr_a5cff3f1-8092-48a0-b4a3-f3f856299474"
+    rule_name = "DNS Query To Recently Created Domain"
+    type = "alert"
+    tags = "whois"
+    data_source = "microsoft sysmon"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $dns.metadata.event_type = "NETWORK_DNS"
+    $dns.network.dns.questions.name = $dns_query
+    $dns.principal.user.userid = $user
+
+    // whois data provided by GCTI
+    $whois.graph.entity.hostname = $dns_query
+    $whois.graph.metadata.entity_type = "DOMAIN_NAME"
+    $whois.graph.metadata.vendor_name = "WHOIS"
+    $whois.graph.entity.domain.creation_time.seconds > 0
+    // domain was created in the last 30 days
+    2592000 > timestamp.current_seconds() - $whois.graph.entity.domain.creation_time.seconds
+
+  match:
+    $user over 1h
+
+  outcome:
+   $risk_score = max(35)
+   $event_count = count_distinct($dns.metadata.id)
+   $network_dns_questions_name = array_distinct($dns.network.dns.questions.name)
+   $network_dns_answers_data = array_distinct($dns.network.dns.answers.data)
+   // added to populate alert graph with additional context
+   $principal_ip = array_distinct($dns.principal.ip)
+   $target_ip = array_distinct($dns.target.ip)
+   $principal_process_pid = array_distinct($dns.principal.process.pid)
+   $principal_process_file_full_path = array_distinct($dns.principal.process.file.full_path)
+   $principal_process_product_specific_process_id = array_distinct($dns.principal.process.product_specific_process_id)
+   $principal_process_command_line = array_distinct($dns.principal.process.command_line)
+   $principal_process_file_sha256 = array_distinct($dns.principal.process.file.sha256)
+   $principal_process_parent_process_product_specific_process_id = array_distinct($dns.principal.process.parent_process.product_specific_process_id)
+   // Commented out principal.user.userid because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+   //$principal_user_userid = array_distinct($dns.principal.user.userid)
+
+  condition:
+    $dns and $whois
+}

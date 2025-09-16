@@ -1,0 +1,29 @@
+rule Admin_Privilege_Elevation {
+    meta:
+        author = "Security Team"
+        description = "Detects when a user is assigned administrative privileges in Google Workspace"
+        severity = "HIGH"
+        mitre_attack = "Privilege Escalation"
+    
+    events:
+        $admin_event.metadata.log_type = "WORKSPACE_ACTIVITY" 
+        $admin_event.metadata.event_type = "USER_RESOURCE_UPDATE_PERMISSIONS" 
+        $admin_event.metadata.product_event_type = "ASSIGN_ROLE"
+        $admin_event.metadata.product_name = "admin"
+        $admin_event.metadata.vendor_name = "Google Workspace"
+        
+        // Capture who granted the privilege
+        $admin_event.principal.user.email_addresses = $granter
+        
+        // Capture who received the privilege
+        $admin_event.target.user.email_addresses = $recipient
+        
+        // Look for specific admin roles (use exact matches)
+        ($admin_event.target.resource.attribute.roles.name = "_SEED_ADMIN_ROLE" or
+         $admin_event.target.resource.attribute.roles.name = "SUPER_ADMIN" or
+         $admin_event.target.resource.attribute.roles.name = "ADMIN" or
+         $admin_event.target.resource.attribute.roles.name = "_GROUPS_ADMIN_ROLE")
+
+    condition:
+        $admin_event
+}

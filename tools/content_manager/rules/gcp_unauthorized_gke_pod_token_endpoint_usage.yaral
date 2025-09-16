@@ -1,0 +1,81 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule gcp_unauthorized_gke_pod_token_endpoint_usage {
+
+  meta:
+    author = "Drew Pilarski - Tempus AI"
+    description = "Alerts when an authorization token originating from GKE activity is subsequently used within a command line on an endpoint system, suggesting potential credential exfiltration and reuse."
+    rule_id = "mr_c9a0cb63-0e35-45eb-8b43-ae48385985dc"
+    rule_name = "GCP_Uunauthorized_GKE_Pod_Token_Endpoint_Usage"
+    tactic = "TA0008"
+    technique = "T1550.001"
+    type = "Alert"
+    platform = "GCP"
+    data_source = "Cloud Audit Logs"
+    severity = "Medium"  // Adjust based on your risk assessment
+    priority = "Medium"  // Adjust based on your incident response process
+
+  events:
+    // This pulls the auth token from application in kubernetes events
+    $app_token.metadata.vendor_name = "Google"
+    $app_token.metadata.log_type = "GCP_CLOUDAUDIT"
+    $app_token.metadata.base_labels.log_types = "KUBERNETES_NODE"
+    $namespace = $app_token.metadata.base_labels.namespaces
+    $traceIdValue = $app_token.about.labels["traceId"]
+    $pod_name = $app_token.target.resource_ancestors.attribute.labels["pod_name"]
+    $auth_token = strings.concat("Authorization: ", $app_token.about.labels["Authorization"])
+
+    //This block enriches the auth token statement sinces its missing critical field
+    $k8_enrich.metadata.vendor_name = "Google"
+    $k8_enrich.metadata.log_type = "GCP_CLOUDAUDIT"
+    $k8_enrich.metadata.base_labels.log_types = "KUBERNETES_NODE"
+    $traceIdValue = $k8_enrich.about[0].labels[0].value
+    $k8_enrich.target.ip != ""
+    $pod_ip_1 = $k8_enrich.target.ip[0]
+    $email = $k8_enrich.target.user.email_addresses
+
+    $comp_token.metadata.event_type = "PROCESS_LAUNCH"
+    $comp_token.metadata.log_type = "CS_EDR"
+    $comp_token.target.process.command_line = /Bearer/
+    $auth_token = strings.concat("Authorization: ", re.capture($comp_token.target.process.command_line, /Bearer [^\ |^\"]*/))
+    $computer_name = $comp_token.principal.asset.hostname
+    $tar_process = $comp_token.target.process.command_line
+
+    $comp_enrich.metadata.event_type = "USER_LOGIN"
+    $comp_enrich.metadata.log_type = "CS_EDR"
+    $computer_name = $comp_enrich.principal.asset.hostname
+    $username = $comp_enrich.target.user.userid
+
+  match:
+    $traceIdValue, $auth_token, $computer_name over 24h
+
+  outcome:
+    $token = array_distinct($auth_token)
+    $k8_account = array_distinct($email)
+    $comp_user = array_distinct($username)
+    $hostname = array_distinct($computer_name)
+    $tar_processline = array_distinct($tar_process)
+    $auth_t_namespace = array_distinct($namespace)
+    $pod = array_distinct($pod_name)
+    $pod_ip = array_distinct($pod_ip_1)
+    $traceId = array_distinct($traceIdValue)
+    $action = array_distinct($app_token.metadata.product_event_type)
+    $account_name = array_distinct($comp_enrich.principal.user.email_addresses)
+
+  condition:
+    $app_token and $k8_enrich and $comp_token and $comp_enrich
+}

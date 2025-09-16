@@ -1,0 +1,72 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule aws_lateral_movement_using_iam_session_token {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect when an IAM session token is created and used from a different IP."
+    rule_id = "mr_ac0df875-fe5b-49af-bf2a-3da341177754"
+    rule_name = "AWS Lateral Movement Using IAM Session Token"
+    mitre_attack_tactic = "Lateral Movement"
+    mitre_attack_technique = "Use Alternate Authentication Material"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1550/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "AWS CloudTrail"
+    platform = "AWS"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $accesskey.metadata.vendor_name = "AMAZON"
+    $accesskey.metadata.product_name = "AWS CloudTrail"
+    $accesskey.metadata.product_event_type = "GetSessionToken"
+    $accesskey.security_result.action= "ALLOW"
+    $accesskey.principal.user.userid = $p_userid
+
+    $latmove.metadata.vendor_name = "AMAZON"
+    $latmove.metadata.product_name = "AWS CloudTrail"
+
+    //Different IP address and Same Temp Session Token used
+    $accesskey.principal.ip != $latmove.principal.ip
+    $latmove.additional.fields["accessKeyId"] != ""
+    $accesskey.target.resource.product_object_id = $latmove.additional.fields["accessKeyId"]
+    $accesskey.metadata.event_timestamp.seconds < $latmove.metadata.event_timestamp.seconds
+
+  match:
+    $p_userid over 1h
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Lateral Movement"
+    $mitre_attack_technique = "Use Alternate Authentication Material"
+    $mitre_attack_technique_id = "T1550"
+    $event_count = count_distinct($latmove.metadata.id)
+    $network_http_user_agent = array_distinct($latmove.network.http.user_agent)
+    $principal_ip = array_distinct($latmove.principal.ip)
+    $principal_ip_country = array_distinct($latmove.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($latmove.principal.ip_geo_artifact.location.state)
+    $principal_user_display_name = array_distinct($latmove.principal.user.user_display_name)
+    $dc_principal_user_display_name = count_distinct($latmove.principal.user.user_display_name)
+    $is_mfa_used = array_distinct($latmove.extensions.auth.auth_details)
+    $target_resource_name = array_distinct($latmove.target.resource.name)
+    $target_resource_product_object_id = array_distinct($latmove.target.resource.product_object_id)
+    $product_event_types = array_distinct($latmove.metadata.product_event_type)
+
+  condition:
+    $accesskey and $latmove
+}

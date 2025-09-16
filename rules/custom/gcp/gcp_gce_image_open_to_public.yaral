@@ -1,0 +1,62 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ rule gcp_gce_image_open_to_public {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect when GCP Compute Image is opened to public by adding allAuthenticatedUsers to the access policy."
+    rule_id = "mr_4a1525be-9e17-41d6-ba67-a11058ee4d3c"
+    rule_name = "GCP GCE Image Open To Public"
+    mitre_attack_tactic = "Exfiltration"
+    mitre_attack_technique = "Transfer Data to Cloud Account"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1537/"
+    mitre_attack_version = "v14.1"
+    type = "Alert"
+    data_source = "GCP Cloud Audit"
+    platform = "GCP"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $gcp.metadata.event_type = "USER_RESOURCE_UPDATE_PERMISSIONS"
+    $gcp.metadata.log_type = "GCP_CLOUDAUDIT"
+    $gcp.metadata.vendor_name = "Google Cloud Platform"
+    $gcp.metadata.product_event_type = "beta.compute.images.setIamPolicy"
+    $gcp.target.application = "compute.googleapis.com"
+    $gcp.security_result.action = "ALLOW"
+    any $gcp.target.resource.attribute.labels.value = "allAuthenticatedUsers"
+    $gcp.target.resource.resource_subtype = "gce_image"
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Exfiltration"
+    $mitre_attack_technique = "Transfer Data to Cloud Account"
+    $mitre_attack_technique_id = "T1537"
+    $event_count = count_distinct($gcp.metadata.id)
+    $network_http_user_agent = array_distinct($gcp.network.http.user_agent)
+    $principal_ip = array_distinct($gcp.principal.ip)
+    $principal_ip_country = array_distinct($gcp.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($gcp.principal.ip_geo_artifact.location.state)
+    $principal_user_id = $gcp.principal.user.userid
+    $principal_user_display_name = $gcp.principal.user.user_display_name
+    $target_resource_name = $gcp.target.resource.name
+    $event_name = $gcp.metadata.product_event_type
+    $target_email_addresses = array_distinct($gcp.target.user.email_addresses)
+
+  condition:
+    $gcp
+}

@@ -1,0 +1,62 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ rule gcp_multiple_service_apis_disabled {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect when multiple GCP Service APIs are disabled in a short period of time."
+    rule_id = "mr_5a4ce357-e4da-4a4b-8cc2-ed5515f1043d"
+    rule_name = "GCP Multiple Service APIs Disabled"
+    mitre_attack_tactic = "Impact"
+    mitre_attack_technique = "Service Stop"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1489/"
+    mitre_attack_version = "v14.1"
+    type = "Alert"
+    data_source = "GCP Cloud Audit"
+    platform = "GCP"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $gcp.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT"
+    $gcp.metadata.log_type = "GCP_CLOUDAUDIT"
+    $gcp.metadata.product_event_type = "google.api.serviceusage.v1.ServiceUsage.DisableService"
+    $gcp.security_result.action = "ALLOW"
+    $gcp.target.application = "serviceusage.googleapis.com"
+    $gcp.principal.user.userid = $userid
+
+  match:
+    $userid over 1h
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Impact"
+    $mitre_attack_technique = "Service Stop"
+    $mitre_attack_technique_id = "T1489"
+    $event_count = count_distinct($gcp.metadata.id)
+    $network_http_user_agent = array_distinct($gcp.network.http.user_agent)
+    $principal_ip = array_distinct($gcp.principal.ip)
+    $principal_ip_country = array_distinct($gcp.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($gcp.principal.ip_geo_artifact.location.state)
+    $principal_user_id = array_distinct($gcp.principal.user.userid)
+    $principal_user_display_name = array_distinct($gcp.principal.user.user_display_name)
+    $target_resource_name = array_distinct($gcp.target.resource.name)
+    $dc_target_resource_name = count_distinct($gcp.target.resource.name)
+
+  condition:
+    $gcp and $dc_target_resource_name > 5
+}

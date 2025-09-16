@@ -1,0 +1,55 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_application_added {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identifies when a Marketplace app is added in a Google Workspace organization. Installing certain apps may increase the organization's risk of data exfiltration/leakage and increase its attack surface."
+    rule_id = "mr_bb4f5ff0-76b8-4b08-8b1b-fcb81e5a10cc"
+    rule_name = "Google Workspace Application Added"
+    mitre_attack_tactic = "Persistence"
+    mitre_attack_technique = ""
+    mitre_attack_url = ""
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Workspace Activity"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $ws.metadata.vendor_name = "Google Workspace"
+    $ws.metadata.product_name = "admin"
+    $ws.metadata.product_event_type = "ADD_APPLICATION"
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Persistence"
+    $mitre_attack_technique = ""
+    $mitre_attack_technique_id = ""
+    $event_count = count_distinct($ws.metadata.id)
+    $principal_ip = array_distinct($ws.principal.ip)
+    $principal_country = array_distinct($ws.principal.ip_geo_artifact.location.country_or_region)
+    $principal_state = array_distinct($ws.principal.ip_geo_artifact.location.state)
+    $principal_user_emails = array_distinct($ws.principal.user.email_addresses)
+    $principal_user_id = array_distinct($ws.principal.user.userid)
+    $target_application = $ws.target.application
+    $application_enabled = $ws.target.labels["application_enabled"]
+    $application_id = $ws.target.resource.name
+
+  condition:
+    $ws
+}

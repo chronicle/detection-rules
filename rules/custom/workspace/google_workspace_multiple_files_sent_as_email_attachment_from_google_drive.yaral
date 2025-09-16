@@ -1,0 +1,62 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_multiple_files_sent_as_email_attachment_from_google_drive {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identifies when a user sends multiple files from Google Drive as an email attachment to a free email domain, which may indicate data exfiltration."
+    rule_id = "mr_125c517c-3ef9-4687-8af6-d71eff83d0e9"
+    rule_name = "Google Workspace Multiple Files Sent As Email Attachments From Google Drive"
+    mitre_attack_tactic = "Exfiltration"
+    mitre_attack_technique = "Exfiltration Over Web Service"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1567/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Workspace Activity"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $email.metadata.vendor_name = "Google Workspace"
+    $email.metadata.product_name = "drive"
+    $email.metadata.event_type = "EMAIL_TRANSACTION"
+    $email.metadata.product_event_type = "email_as_attachment"
+    $email.target.user.email_addresses = /.*@gmail\.com|.*@aol\.com|.*@ymail\.com|.*@ymail\.com|.*@hotmail\.com|.*@outlook\.com|.*@icloud\.com/
+    $email.principal.user.userid = $user_id
+
+  match:
+    $user_id over 1h
+
+  outcome:
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Exfiltration"
+    $mitre_attack_technique = "Exfiltration Over Web Service"
+    $mitre_attack_technique_id = "T1567"
+    $event_count = count_distinct($email.metadata.id)
+    $product_event_type = array_distinct($email.metadata.product_event_type)
+    $userid = array_distinct($email.principal.user.userid)
+    $doc_type = array_distinct($email.src.resource.attribute.labels["doc_type"])
+    $owner = array_distinct($email.target.resource.attribute.labels["owner"])
+    $target_emails = array_distinct($email.target.user.email_addresses)
+    $doc_name = array_distinct($email.target.resource.name)
+    $doc_id = array_distinct($email.target.resource.product_object_id)
+    $count_docs = count_distinct($email.target.resource.product_object_id)
+
+  condition:
+    // Customize the value of $count_docs to set the alerting threshold for your environment
+    $email and $count_docs > 10
+}

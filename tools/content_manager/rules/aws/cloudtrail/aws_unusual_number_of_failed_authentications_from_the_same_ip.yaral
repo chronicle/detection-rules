@@ -1,0 +1,71 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule aws_unusual_number_of_failed_authentications_from_the_same_ip {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects unusual number of failed authentications from the same IP for valid users."
+    rule_id = "mr_cf1787a4-0145-4093-ad35-2de17f1980ce"
+    rule_name = "AWS Unusual Number Of Failed Authentication Attempts From The Same IP"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Brute Force: Credential Stuffing"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/004/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "AWS CloudTrail"
+    platform = "AWS"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $fail.metadata.vendor_name = "AMAZON"
+    $fail.metadata.product_name = "AWS CloudTrail"
+    $fail.metadata.event_type = "USER_LOGIN"
+    $fail.metadata.product_event_type = "ConsoleLogin"
+    $fail.security_result.action = "BLOCK"
+    $fail.security_result.description = "Reason: Failed authentication"
+    $fail.principal.ip = $ip
+
+  match:
+    $ip over 5m
+
+  outcome:
+    $risk_score = max(
+        // Unauthorized geographies
+        if($fail.principal.ip_geo_artifact.location.country_or_region = "Cuba", 40) +
+        if($fail.principal.ip_geo_artifact.location.country_or_region = "Iran", 40) +
+        if($fail.principal.ip_geo_artifact.location.country_or_region = "North Korea" , 40) +
+        if($fail.principal.ip_geo_artifact.location.country_or_region = "Russia", 40) +
+        if($fail.principal.ip_geo_artifact.location.country_or_region = "Syria", 40)
+    )
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Brute Force: Credential Stuffing"
+    $mitre_attack_technique_id = "T1110.004"
+    $event_count = count_distinct($fail.metadata.id)
+    $network_http_user_agent = array_distinct($fail.network.http.user_agent)
+    $principal_ip = array_distinct($fail.principal.ip)
+    $principal_ip_country = array_distinct($fail.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($fail.principal.ip_geo_artifact.location.state)
+    $principal_user_display_name = array_distinct($fail.principal.user.user_display_name)
+    $dc_target_user_display_name = count_distinct($fail.target.user.user_display_name)
+    $is_mfa_used = array_distinct($fail.extensions.auth.auth_details)
+    $target_resource_name = array_distinct($fail.target.resource.name)
+    $target_resource_product_object_id = array_distinct($fail.target.resource.product_object_id)
+
+  condition:
+    $fail and $dc_target_user_display_name > 5
+}

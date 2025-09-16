@@ -1,0 +1,80 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule safebrowsing_process_creation_hashes_seen_more_than_7_days {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identify process and file creation using safe browsing hashes where the first and last seen are more than 7 days apart"
+    rule_id = "mr_9970945d-45cf-44ed-887a-ff876d5a072b"
+    rule_name = "Safebrowsing Process Creation Hashes Seen More Than 7 Days"
+    type = "alert"
+    tags = "safe browsing, first last seen"
+    data_source = "microsoft sysmon, crowdstrike"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    ($execution.metadata.event_type = "PROCESS_LAUNCH" or $execution.metadata.event_type = "FILE_CREATION")
+    $execution.principal.hostname = $hostname
+    $execution.target.process.file.sha256 = $sha256
+
+    // Safe Browsing file hashes provided by GCTI Feed
+    $safebrowse.graph.entity.file.sha256 = $sha256
+    $safebrowse.graph.metadata.entity_type = "FILE"
+    $safebrowse.graph.metadata.product_name = "Google Safe Browsing"
+    $safebrowse.graph.metadata.source_type = "GLOBAL_CONTEXT"
+
+    // derived from events ingested by Google SecOps
+    $seen.graph.entity.file.sha256 = $sha256
+    $seen.graph.metadata.entity_type = "FILE"
+    $seen.graph.metadata.source_type = "DERIVED_CONTEXT"
+    $seen.graph.entity.file.last_seen_time.seconds > 0
+    604800 <= $seen.graph.entity.file.last_seen_time.seconds - $seen.graph.entity.file.first_seen_time.seconds
+
+  match:
+    $sha256 over 1h
+
+  outcome:
+    $risk_score = max( if($seen.graph.entity.file.last_seen_time.seconds - $seen.graph.entity.file.first_seen_time.seconds > 604800 and
+        $seen.graph.entity.file.last_seen_time.seconds - $seen.graph.entity.file.first_seen_time.seconds < 1209600, 25, 0) +
+            if($seen.graph.entity.file.last_seen_time.seconds - $seen.graph.entity.file.first_seen_time.seconds >= 1209600 and
+                $seen.graph.entity.file.last_seen_time.seconds - $seen.graph.entity.file.first_seen_time.seconds < 1814400, 50, 0) +
+            if($seen.graph.entity.file.last_seen_time.seconds - $seen.graph.entity.file.first_seen_time.seconds >= 1814400 and
+                $seen.graph.entity.file.last_seen_time.seconds - $seen.graph.entity.file.first_seen_time.seconds < 2592000, 75, 0) +
+            if($seen.graph.entity.file.last_seen_time.seconds - $seen.graph.entity.file.first_seen_time.seconds >= 2592000, 100, 0))
+    $event_count = count_distinct($execution.metadata.id)
+    // added to populate alert graph with additional context
+    $principal_hostname = array_distinct($execution.principal.hostname)
+    $principal_process_pid = array_distinct($execution.principal.process.pid)
+    $principal_process_command_line = array_distinct($execution.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($execution.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($execution.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($execution.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($execution.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($execution.target.process.pid)
+    $target_process_command_line = array_distinct($execution.target.process.command_line)
+    // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$target_process_file_sha256 = array_distinct($execution.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($execution.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($execution.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($execution.principal.user.userid)
+    $target_file_sha256 = array_distinct($execution.target.file.sha256)
+    $target_file_full_path = array_distinct($execution.target.file.full_path)
+
+  condition:
+    $execution and $safebrowse and $seen
+}

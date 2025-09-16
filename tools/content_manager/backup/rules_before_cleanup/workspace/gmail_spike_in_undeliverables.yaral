@@ -1,0 +1,56 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule gmail_spike_in_undeliverables {
+
+  meta:
+    author = "Bastradamus"
+    description = "Detects a spike in undeliverable emails, this can be an early indication of a targeted phishing campaign or a compromised user account."
+    severity = "Medium"
+    priority = "Medium"
+    type = "alert"
+    platform = "Google workspace"
+    data_source = "Workspace Activity, gmail"
+    mitre_attack_tactic = "Initial Access"
+    mitre_attack_technique = "Phishing"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1566/"
+
+  events:
+    $email.metadata.vendor_name = "Google Workspace"
+    $email.metadata.product_name = "gmail"
+    $email.metadata.event_type = "EMAIL_TRANSACTION"
+    $email.network.email.subject = /Undeliverable\:/ nocase
+    $email.target.user.email_addresses = $user
+    $email.network.email.subject = $subject
+
+  match:
+    $user over 10m
+
+  outcome:
+    $mitre_attack_tactic = array_distinct("Initial Access")
+    $mitre_attack_technique = array_distinct("Phishing")
+    $mitre_attack_technique_id = array_distinct("T1566")
+    $event_count = count_distinct($email.metadata.description)
+    $target_user_distinct_count = count_distinct($user)
+    $target_user_count = count($user)
+    $principal_ip = array_distinct($email.principal.ip)
+    $count_subject_bounce = count_distinct($subject)
+    $count_bounce_distinct_mail_id = count_distinct($email.network.email.mail_id)
+    $sender_from = array_distinct($email.principal.network.email.from)
+
+  condition:
+    $email and $count_bounce_distinct_mail_id > 10 and $count_subject_bounce = 1
+}

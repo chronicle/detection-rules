@@ -1,0 +1,60 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule logins_from_terminated_employees {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Allowed Logins from Terminated Employees"
+    rule_id = "mr_69178541-285b-45cb-b723-e2b5d88f22d3"
+    rule_name = "Logins From Terminated Employees"
+    assumptions = "This rule requires a context data source such as AzureAD AD Context or Workday to demonstrate the correlation of context logs with event logs"
+    type = "alert"
+    tags = "user enrichment"
+    data_source = "microsoft windows events"
+    tactic = "TA0001"
+    technique = "T1078"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.security_result.action = "ALLOW"
+    $login.target.user.userid = $user
+    $login.target.user.termination_date.seconds > 0
+    $login.target.user.termination_date.seconds < $login.metadata.event_timestamp.seconds
+
+  match:
+    $user over 1d
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($login.metadata.id)
+    $employee_last_login = max($login.target.user.termination_date.seconds)
+    $total_distinct_ips = count_distinct($login.principal.ip)
+    // added to populate alert graph with additional context
+    $principal_hostname = array_distinct($login.principal.hostname)
+    $target_hostname = array_distinct($login.target.hostname)
+    $principal_user_userid = array_distinct($login.principal.user.userid)
+    // Commented out target.user.userid because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$target_user_userid = array_distinct($login.target.user.userid)
+    $principal_resource_name = array_distinct($login.principal.resource.name)
+    $target_resource_name = array_distinct($login.target.resource.name)
+    $target_url = array_distinct($login.target.url)
+
+  condition:
+    $login
+}

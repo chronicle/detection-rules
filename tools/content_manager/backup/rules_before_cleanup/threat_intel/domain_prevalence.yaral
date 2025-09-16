@@ -1,0 +1,64 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule domain_prevalence {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects DNS events querying domains that have a low rolling max prevalence."
+    rule_id = "mr_cf5dd851-d7e9-42b8-baf9-f4527ab61bf3"
+    rule_name = "Domain Prevalence"
+    type = "alert"
+    tags = "prevalence"
+    data_source = "extrahop, tanium, microsoft sysmon, gcp dns, crowdstrike"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $dns.metadata.event_type = "NETWORK_DNS"
+    $dns.network.dns.questions.name = $domain
+
+    // derived from events ingested by Chronicle
+    $prevalence.graph.metadata.entity_type = "DOMAIN_NAME"
+    $prevalence.graph.metadata.source_type = "DERIVED_CONTEXT"
+    $prevalence.graph.entity.hostname = $domain
+    $prevalence.graph.entity.domain.prevalence.day_count = 10
+    $prevalence.graph.entity.domain.prevalence.rolling_max <= 3
+    $prevalence.graph.entity.domain.prevalence.rolling_max > 0
+
+  match:
+    $domain over 5m
+
+  outcome:
+    $risk_score = max(35)
+    $event_count = count_distinct($dns.metadata.id)
+    $network_dns_questions_name = array_distinct($dns.network.dns.questions.name)
+    $network_dns_answers_data = array_distinct($dns.network.dns.answers.data)
+    // added to populate alert graph with additional context
+    $principal_ip = array_distinct($dns.principal.ip)
+    $target_ip = array_distinct($dns.target.ip)
+    $principal_process_pid = array_distinct($dns.principal.process.pid)
+    $principal_process_file_full_path = array_distinct($dns.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($dns.principal.process.product_specific_process_id)
+    $principal_process_command_line = array_distinct($dns.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($dns.principal.process.file.sha256)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($dns.principal.process.parent_process.product_specific_process_id)
+    $principal_user_userid = array_distinct($dns.principal.user.userid)
+
+
+  condition:
+    $dns and $prevalence
+}

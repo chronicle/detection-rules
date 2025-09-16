@@ -1,0 +1,60 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_multiple_files_downloaded_from_google_drive {
+
+    meta:
+      author = "Google Cloud Security"
+      description = "Identifies when a user downloads multiple files from Google Drive, which may indicate data exfiltration."
+      rule_id = "mr_72855af9-fba4-4424-b879-4de733374e8b"
+      rule_name = "Google Workspace Multiple Files Downloaded From Google Drive"
+      mitre_attack_tactic = "Exfiltration"
+      mitre_attack_technique = "Exfiltration Over Web Service"
+      mitre_attack_url = "https://attack.mitre.org/techniques/T1567/"
+      mitre_attack_version = "v13.1"
+      type = "Alert"
+      data_source = "Workspace Activity"
+      severity = "High"
+      priority = "High"
+
+    events:
+      // Document downloaded from Google Drive
+      $download.metadata.vendor_name = "Google Workspace"
+      $download.metadata.product_name = "drive"
+      $download.metadata.product_event_type = "download"
+      $download.principal.user.userid = $user_id
+
+    match:
+      $user_id over 1h
+
+    outcome:
+      $risk_score = max(75)
+      $mitre_attack_tactic = "Exfiltration"
+      $mitre_attack_technique = "Exfiltration Over Web Service"
+      $mitre_attack_technique_id = "T1567"
+      $event_count = count_distinct($download.metadata.id)
+      $product_event_type = array_distinct($download.metadata.product_event_type)
+      $userid = array_distinct($download.principal.user.userid)
+      $doc_type = array_distinct($download.src.resource.attribute.labels["doc_type"])
+      $owner = array_distinct($download.target.resource.attribute.labels["owner"])
+      $doc_name = array_distinct($download.target.resource.name)
+      $doc_id = array_distinct($download.target.resource.product_object_id)
+      $count_docs = count_distinct($download.target.resource.product_object_id)
+
+    condition:
+      // Customize the value of $count_docs to set the alerting threshold for your environment
+      $download and $count_docs > 10
+  }

@@ -1,0 +1,28 @@
+rule rule_1742942218799 {
+  // This rule matches single events. Rules can also match multiple events within
+  // some time window. For details about how to write a multi-event rule, see
+  // https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-overview#single-event_versus_multi-event
+
+  meta:
+    // Allows for storage of arbitrary key-value pairs of rule details - who
+    // wrote it, what it detects on, version control, etc.
+    // The "author" and "severity" fields are special, as they are used as
+    // columns on the rules dashboard. If you'd like to be able to sort based on
+    // these fields on the dashboard, make sure to add them here.
+    // Severity value, by convention, should be "Low", "Medium" or "High"
+    author = "analyst123"
+    description = "8:00 AM local time"
+    severity = "Medium"
+
+  events:
+    $e.metadata.event_type = "USER_CREATION"
+
+  outcome:
+    // For a multi-event rule an aggregation function is required
+    // e.g., risk_score = max(0)
+    // See https://cloud.google.com/chronicle/docs/detection/yara-l-2-0-overview#outcome_conditionals_example_rule
+    $risk_score = 0
+
+  condition:
+    $e
+}

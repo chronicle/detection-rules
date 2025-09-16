@@ -1,0 +1,67 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule ioc_sha256_hash {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect file/process events that match watchlisted hashes in MISP"
+    rule_id = "mr_82df7e96-1bc3-489d-9e17-ff86e8f6e89b"
+    rule_name = "IOC SHA256 Hash"
+    type = "alert"
+    tags = "threat indicators"
+    assumption = "Assumes MISP data has been ingested into entity graph; this rule can be modified to utilize other TI indicators"
+    data_source = "microsoft sysmon"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $process.metadata.event_type = "PROCESS_LAUNCH" or $process.metadata.event_type ="FILE_CREATION"
+    $process.target.process.file.sha256 = $sha256
+
+    // Correlates with MISP data; can be modified based on your MISP parser or other TI
+    $ioc.graph.metadata.product_name = "MISP"
+    $ioc.graph.metadata.entity_type = "FILE"
+    $ioc.graph.metadata.source_type = "ENTITY_CONTEXT"
+    $ioc.graph.entity.file.sha256 = $sha256
+
+  match:
+    $sha256 over 5m
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($process.metadata.id)
+    // added to populate alert graph with additional context
+    $principal_hostname = array_distinct($process.principal.hostname)
+    $principal_process_pid = array_distinct($process.principal.process.pid)
+    $principal_process_command_line = array_distinct($process.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($process.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($process.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($process.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($process.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($process.target.process.pid)
+    $target_process_command_line = array_distinct($process.target.process.command_line)
+    // Commented out target.process.file.sha256 because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$target_process_file_sha256 = array_distinct($process.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($process.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($process.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($process.principal.user.userid)
+    $target_file_sha256 = array_distinct($process.target.file.sha256)
+    $target_file_full_path = array_distinct($process.target.file.full_path)
+
+  condition:
+    $process and $ioc
+}

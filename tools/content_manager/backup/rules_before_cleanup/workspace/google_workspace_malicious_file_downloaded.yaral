@@ -1,0 +1,59 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_malicious_file_downloaded {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identifies when a user downloads a potentially malicious file from Google Drive."
+    rule_id = "mr_72af4504-955b-4c61-9071-bb767c9bae88"
+    rule_name = "Google Workspace Malicious File Downloaded"
+    mitre_attack_tactic = "Execution"
+    mitre_attack_technique = "User Execution: Malicious File"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1204/002/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Workspace Activity"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $ws.metadata.vendor_name = "Google Workspace"
+    $ws.metadata.product_name = "drive"
+    ($ws.metadata.product_event_type = "download" or
+    $ws.metadata.product_event_type = "view" or
+    $ws.metadata.product_event_type = "copy")
+
+    ($ws.target.resource.attribute.labels["visibility"] = "people_with_link" or
+    $ws.target.resource.attribute.labels["visibility"] = "public_on_the_web")
+    $ws.target.resource.name = /.*\.dll|.*\.exe|.*\.scr|.*\.jar|.*\.pif|.*\.app|.*\.dmg|.*\.pkg|.*\.elf|.*\.so|.*\.bin|.*\.deb|.*\.rpm|.*\.sh|.*\.hta|.*\.lnk/
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Execution"
+    $mitre_attack_technique = "User Execution: Malicious File"
+    $mitre_attack_technique_id = "T1204.002"
+    $event_count = count_distinct($ws.metadata.id)
+    $product_event_type = $ws.metadata.product_event_type
+    $userid = $ws.principal.user.userid
+    $doc_type = $ws.src.resource.attribute.labels["doc_type"]
+    $owner = $ws.target.resource.attribute.labels["owner"]
+    $doc_name = $ws.target.resource.name
+    //$doc_id = $ws.target.resource.product_object_id
+
+  condition:
+    $ws
+}

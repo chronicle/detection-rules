@@ -1,0 +1,81 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule aws_successful_login_after_multiple_failed_attempts {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects successful login after multiple failed attempts"
+    rule_id = "mr_8ba028b6-98e3-4983-92e9-c0fe50419a20"
+    rule_name = "AWS Successful Login After Multiple Failed Attempts"
+    mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    mitre_attack_technique = "Valid Accounts"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1078/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "AWS CloudTrail"
+    platform = "AWS"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $fail.metadata.vendor_name = "AMAZON"
+    $fail.metadata.product_name = "AWS CloudTrail"
+    $fail.metadata.event_type = "USER_LOGIN"
+    $fail.metadata.product_event_type = "ConsoleLogin"
+    $fail.security_result.action = "BLOCK"
+    $fail.security_result.description = "Reason: Failed authentication"
+    $fail.target.user.user_display_name = $user
+
+    $success.metadata.vendor_name = "AMAZON"
+    $success.metadata.product_name = "AWS CloudTrail"
+    $success.metadata.event_type = "USER_LOGIN"
+    $success.metadata.product_event_type = "ConsoleLogin"
+    $success.security_result.action = "ALLOW"
+    $success.security_result.summary = "Login to AWS Console succeeded."
+    $success.target.user.user_display_name = $user
+
+    $success.metadata.event_timestamp.seconds > $fail.metadata.event_timestamp.seconds
+
+  match:
+    $user over 15m
+
+  outcome:
+    $risk_score = max(
+        // Country mismatch
+        if($fail.principal.ip_geo_artifact.location.country_or_region = $success.principal.ip_geo_artifact.location.country_or_region, 40) +
+        // Unauthorized geographies
+        if($success.principal.ip_geo_artifact.location.country_or_region = "Cuba", 10) +
+        if($success.principal.ip_geo_artifact.location.country_or_region = "Iran", 10) +
+        if($success.principal.ip_geo_artifact.location.country_or_region = "North Korea" , 10) +
+        if($success.principal.ip_geo_artifact.location.country_or_region = "Russia", 10) +
+        if($success.principal.ip_geo_artifact.location.country_or_region = "Syria", 10)
+    )
+    $mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    $mitre_attack_technique = "Valid Accounts"
+    $mitre_attack_technique_id = "T1078"
+    $event_count = count_distinct($success.metadata.id) + count_distinct($fail.metadata.id)
+    $principal_ip = array_distinct($success.principal.ip)
+    $principal_ip_country = array_distinct($success.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($success.principal.ip_geo_artifact.location.state)
+    $target_user_userid = array_distinct($success.target.user.userid)
+    $is_mfa_used = array_distinct($success.extensions.auth.auth_details)
+    $target_resource_name = array_distinct($success.target.resource.name)
+    $target_resource_product_object_id = array_distinct($success.target.resource.product_object_id)
+
+  condition:
+    #fail > 3 and $success
+}

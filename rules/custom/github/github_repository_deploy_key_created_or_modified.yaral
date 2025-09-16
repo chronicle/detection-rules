@@ -1,0 +1,64 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule github_repository_deploy_key_created_or_modified {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when an SSH deploy key is added or modified in a GitHub repository. A compromised or unauthorized deploy key could allow malicious actors to push unauthorized changes into production environments, potentially bypassing code reviews and testing procedures. This could lead to the introduction of backdoors, malware, or the exfiltration of sensitive data."
+    rule_id = "mr_e10b0f8b-6a90-48af-aecb-95ef2ca10de8"
+    rule_name = "GitHub Repository Deploy Key Created Or Modified"
+    assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
+    type = "alert"
+    severity = "High"
+    priority = "High"
+    platform = "GitHub"
+    data_source = "github"
+    mitre_attack_tactic = "Persistence"
+    mitre_attack_technique = "Account Manipulation: Additional Cloud Credentials"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1098/001/"
+    mitre_attack_version = "v14"
+    reference = "https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise"
+
+  events:
+    $github.metadata.vendor_name = "GITHUB" nocase
+    $github.metadata.product_name = "GITHUB"
+    (
+        $github.metadata.product_event_type = "public_key.create" or
+        $github.metadata.product_event_type = "public_key.update"
+    )
+    $github.principal.user.userid = $user_id
+    $github.target.resource.name = $github_repo_name
+
+  match:
+    $user_id, $github_repo_name over 30m
+
+  outcome:
+    $risk_score = max(65)
+    $mitre_attack_tactic = "Persistence"
+    $mitre_attack_technique = "Account Manipulation: Additional Cloud Credentials"
+    $mitre_attack_technique_id = "T1098.001"
+    $event_count = count_distinct($github.metadata.id)
+    $principal_ip = array_distinct($github.principal.ip)
+    $principal_user_userid = array_distinct($github.principal.user.userid)
+    $principal_ip_country = array_distinct($github.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($github.principal.ip_geo_artifact.location.state)
+    $principal_ip_city = array_distinct($github.principal.location.city)
+    $security_result_summary = array_distinct($github.security_result.summary)
+
+  condition:
+    $github
+}

@@ -1,0 +1,41 @@
+rule jamf_suspicious_process_execution {
+  meta:
+    author = "Google SecOps Engineering"
+    description = "Detects suspicious process execution events from Jamf Protect"
+    severity = "Medium"
+    mitre_attack_tactic = "TA0002" // Execution
+    mitre_attack_technique = "T1059" // Command and Scripting Interpreter
+    reference = "https://attack.mitre.org/techniques/T1059/"
+    version = "1.0"
+    rule_type = "detection"
+
+  events:
+    $jamf.metadata.vendor_name = "Jamf"
+    $jamf.metadata.product_name = "Jamf Protect"
+    $jamf.metadata.product_event_type = "GPProcessEvent"
+    
+    // Look for suspicious process patterns
+    (
+      re.regex($jamf.target.process.command_line, `.*(/bin/sh|/bin/bash|python|perl|ruby|osascript).*`) nocase or
+      re.regex($jamf.target.process.file.full_path, `.*(curl|wget|nc|netcat|telnet).*`) nocase or
+      re.regex($jamf.target.process.command_line, `.*base64.*decode.*`) nocase
+    )
+    
+    // Exclude common legitimate processes
+    not re.regex($jamf.target.process.file.full_path, `.*(/Applications/|/System/Library/|/usr/libexec/).*`) nocase
+    
+    $jamf.principal.hostname = $hostname
+    $jamf.target.process.pid = $process_pid
+
+  match:
+    $hostname over 5m
+
+  outcome:
+    $risk_score = 75
+    $process_commands = array_distinct($jamf.target.process.command_line)
+    $process_paths = array_distinct($jamf.target.process.file.full_path)
+    $principal_users = array_distinct($jamf.principal.user.userid)
+
+  condition:
+    $jamf
+} 

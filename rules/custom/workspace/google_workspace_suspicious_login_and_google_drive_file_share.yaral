@@ -1,0 +1,79 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_suspicious_login_and_google_drive_file_share {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identifies when a Google Workspace user shares a file on Google Drive after a suspicious login event occurred."
+    rule_id = "mr_0ddcbd08-e918-4f7c-918b-3190c8b54ea4"
+    rule_name = "Google Workspace Suspicious Login and Google Drive File Share"
+    mitre_attack_tactic = "Exfiltration"
+    mitre_attack_technique = "Exfiltration Over Web Service"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1567/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Workspace Activity"
+    severity = "High"
+    priority = "High"
+
+  events:
+    // Suspicious Login Event
+    $login.metadata.vendor_name = "Google Workspace"
+    $login.metadata.product_name = "login"
+    $login.metadata.product_event_type = "login_success"
+    $login.about.labels["is_suspicious"] = "true"
+
+    // Document Download Event
+    $share.metadata.vendor_name = "Google Workspace"
+    $share.metadata.product_name = "drive"
+    (
+        $share.metadata.product_event_type = "change_user_access" or
+        $share.metadata.product_event_type = "change_document_visibility" or
+        $share.metadata.product_event_type = "change_document_access_scope" or
+        $share.metadata.product_event_type = "change_acl_editors"
+    )
+
+    // Joining login and download events using userid
+    $login.target.user.userid = $share.principal.user.userid
+
+    // Placeholders for match section
+    $login.principal.ip = $principal_ip
+    $login.target.user.userid = $target_userid
+
+    // First login event occurs later a download event
+    $login.metadata.event_timestamp.seconds < $share.metadata.event_timestamp.seconds
+
+  match:
+    $target_userid, $principal_ip over 1h
+
+  outcome:
+
+    $risk_score = max(75)
+    $mitre_attack_tactic = "Exfiltration"
+    $mitre_attack_technique = "Exfiltration Over Web Service"
+    $mitre_attack_technique_id = "T1567"
+    $event_count = count_distinct($share.metadata.id)
+    $product_event_type = array_distinct($share.metadata.product_event_type)
+    $userid = array_distinct($share.principal.user.userid)
+    $doc_type = array_distinct($share.src.resource.attribute.labels["doc_type"])
+    $owner = array_distinct($share.target.resource.attribute.labels["owner"])
+    $doc_name = array_distinct($share.target.resource.name)
+    $doc_id = array_distinct($share.target.resource.product_object_id)
+
+  condition:
+    $login and $share
+}

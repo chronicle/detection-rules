@@ -1,0 +1,52 @@
+rule jamf_telemetry_process_execution_simple {
+  meta:
+    author = "Security Engineering Team"
+    description = "Detects suspicious process execution patterns from JAMF telemetry data"
+    severity = "MEDIUM"
+    priority = "MEDIUM"
+    mitre_attack_tactic = "TA0002"
+    mitre_attack_technique = "T1059"
+    reference = "https://attack.mitre.org/techniques/T1059/"
+    platform = "macOS"
+    data_source = "JAMF_TELEMETRY"
+    false_positives = "System administration tasks, software installation"
+    
+  events:
+    $event.metadata.vendor_name = "Jamf"
+    $event.metadata.product_name = "Jamf Protect"
+    $event.metadata.log_type = "JAMF_TELEMETRY"
+    $event.metadata.product_event_type = /AUE_(EXECVE|POSIX_SPAWN|FORK)/
+    
+    $process_name = $event.principal.process.file.full_path
+    $parent_process = $event.principal.process.parent_process.file.full_path
+    $user_id = $event.principal.user.userid
+    $hostname = $event.principal.hostname
+    
+    // Focus on suspicious process execution patterns
+    (
+      // Scripts executed from temporary directories
+      $process_name = /^\/tmp\/.*\.(sh|py|pl|rb|php)$/ or
+      // Shell processes spawning network tools
+      ($parent_process = /\/(sh|bash|zsh)$/ and $process_name = /\/(curl|wget|nc)$/) or
+      // Processes in unusual locations
+      $process_name = /^\/var\/tmp\/.*|^\/dev\/shm\/.*/
+    )
+    
+    // Filter out legitimate system processes
+    not $process_name = /^\/System\/.*|^\/usr\/bin\/.*|^\/Applications\/.*/
+
+  match:
+    $hostname, $user_id over 5m
+
+  outcome:
+    $process_count = count_distinct($process_name)
+    $event_count = count($event.metadata.id)
+    $unique_parents = count_distinct($parent_process)
+
+  condition:
+    $event and (
+      $process_count >= 3 or
+      $event_count >= 10 or
+      ($unique_parents >= 2 and $process_count >= 2)
+    )
+} 

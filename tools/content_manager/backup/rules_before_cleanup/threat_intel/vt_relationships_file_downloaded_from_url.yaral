@@ -1,0 +1,86 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule vt_relationships_file_downloaded_from_url {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Alert on downloading a known file hash from a known IP with VT Relationships."
+    rule_id = "mr_2890216d-6106-4841-b714-177f55ecc837"
+    rule_name = "VT Relationships File Downloaded From URL"
+    type = "alert"
+    tags = "vt"
+    data_source = "microsoft login events"
+    severity = "Critical"
+    priority = "Critical"
+
+  events:
+    // NETWORK_HTTP
+    $http.metadata.event_type = "NETWORK_HTTP"
+    $http.principal.user.userid = $userid
+    $http.target.url = $url
+
+    // FILE_CREATION
+    $file.metadata.event_type = "FILE_CREATION"
+    $file.target.user.userid = $userid
+    $file.target.file.sha256 = $file_hash
+    //$vtUrl = strings.concat("https://www.virustotal.com/gui/file/", $file.target.file.sha256)
+
+    // Network HTTP event must occur before the file creation event
+    $http.metadata.event_timestamp.seconds < $file.metadata.event_timestamp.seconds
+
+    // Uses VirusTotal integration via entity graph, this section maps to target file hash
+    $vt.graph.metadata.entity_type = "FILE"
+    $vt.graph.metadata.source_type = "GLOBAL_CONTEXT"
+    $vt.graph.metadata.vendor_name = "VirusTotal"
+    $vt.graph.metadata.product_name = "VirusTotal Relationships"
+    $vt.graph.entity.file.sha256 = $file_hash
+
+    // Uses VirusTotal integration via entity graph, this section maps the hash to the url it is downloaded from
+    $vt.graph.relations.entity_type = "URL"
+    $vt.graph.relations.relationship = "DOWNLOADED_FROM"
+    $vt.graph.relations.entity.url = $url
+
+  match:
+    $userid over 1m
+
+  outcome:
+    $risk_score = 95
+    //added to populate alert graph with additional context
+    $principal_hostname = array_distinct($http.principal.hostname)
+    $target_hostname = array_distinct($file.target.hostname)
+    $principal_process_pid = array_distinct($file.principal.process.pid)
+    $principal_process_command_line = array_distinct($file.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($file.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($file.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($file.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($file.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($file.target.process.pid)
+    $target_process_command_line = array_distinct($file.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($file.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($file.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($file.target.process.product_specific_process_id)
+    $target_process_parent_process_product_specific_process_id = array_distinct($file.target.process.parent_process.product_specific_process_id)
+    $principal_user_userid = array_distinct($file.principal.user.userid)
+    // Commented out target.user.userid because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$target_user_userid = array_distinct($file.target.user.userid)
+    $target_file_sha256 = array_distinct($file.target.file.sha256)
+    $target_file_full_path = array_distinct($file.target.file.full_path)
+    $target_url = array_distinct($http.target.url)
+
+  condition:
+    $http and $file and $vt
+}

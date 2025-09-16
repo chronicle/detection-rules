@@ -1,0 +1,74 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_safebrowsing_file_process_creation {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detection of process/file events that match Safe Browsing hashes, which are files deemed to be malicious"
+    rule_id = "mr_6aa149a9-cae3-4414-b50f-75cf53ac5e11"
+    rule_name = "Google Safebrowsing File Process Creation"
+    type = "alert"
+    tags = "safe browsing"
+    data_source = "microsoft sysmon"
+    severity = "Critical"
+    priority = "High"
+
+  events:
+    ($execution.metadata.event_type = "PROCESS_LAUNCH" or $execution.metadata.event_type = "FILE_CREATION")
+    $execution.principal.hostname = $hostname
+    $execution.target.process.file.sha256 != ""
+    $execution.target.process.file.sha256 = $sha256
+
+    // join execution event with Safe Browsing graph
+    $safebrowse.graph.entity.file.sha256 = $sha256
+
+    // Safe Browsing file hashes provided by GCTI Feed
+    $safebrowse.graph.metadata.product_name = "Google Safe Browsing"
+    $safebrowse.graph.metadata.entity_type = "FILE"
+    $safebrowse.graph.metadata.source_type = "GLOBAL_CONTEXT"
+
+    // Can comment the following two lines to adjust the safe browsing hashes available for correlation
+    $safebrowse.graph.metadata.threat.category = "SOFTWARE_MALICIOUS"
+    $safebrowse.graph.metadata.threat.severity = "CRITICAL"
+
+  match:
+    $hostname over 1h
+
+  outcome:
+    $risk_score = 95
+    $event_count = count_distinct($execution.metadata.id)
+    // added to populate alert graph with additional context
+    // Commented out principal.hostname because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    $principal_hostname = array_distinct($execution.principal.hostname)
+    $principal_process_pid = array_distinct($execution.principal.process.pid)
+    $principal_process_command_line = array_distinct($execution.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($execution.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($execution.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($execution.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($execution.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($execution.target.process.pid)
+    $target_process_command_line = array_distinct($execution.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($execution.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($execution.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($execution.target.process.product_specific_process_id)
+    $principal_user_userid = array_distinct($execution.principal.user.userid)
+    $target_file_sha256 = array_distinct($execution.target.file.sha256)
+    $target_file_full_path = array_distinct($execution.target.file.full_path)
+
+  condition:
+    $execution and $safebrowse
+}

@@ -1,0 +1,55 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule google_workspace_mfa_disabled {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identifies when multi-factor authentication (MFA) is disabled for a Google Workspace organization. Security teams can monitor for changes to MFA configuration that may weaken the organization's security posture."
+    rule_id = "mr_63139204-0d18-4410-b4c4-839bc9ccd456"
+    rule_name = "Google Workspace MFA Disabled"
+    mitre_attack_tactic = "Persistence"
+    mitre_attack_technique = "Modify Authentication Process"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1556/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "Workspace Activity"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $ws.metadata.vendor_name = "Google Workspace"
+    $ws.metadata.product_name = "admin"
+    ($ws.metadata.product_event_type = "ENFORCE_STRONG_AUTHENTICATION" or
+    $ws.metadata.product_event_type =  "ALLOW_STRONG_AUTHENTICATION")
+    $ws.target.labels["new_value"] = "false"
+
+  outcome:
+    $risk_score = max(70)
+    $mitre_attack_tactic = "Persistence"
+    $mitre_attack_technique = "Modify Authentication Process"
+    $mitre_attack_technique_id = "T1556"
+    $event_count = count_distinct($ws.metadata.id)
+    $principal_ip = array_distinct($ws.principal.ip)
+    $principal_country = array_distinct($ws.principal.ip_geo_artifact.location.country_or_region)
+    $principal_state = array_distinct($ws.principal.ip_geo_artifact.location.state)
+    $principal_user_emails = array_distinct($ws.principal.user.email_addresses)
+    $target_user_emails = array_distinct($ws.target.user.email_addresses)
+    $principal_user_id = $ws.principal.user.userid
+
+  condition:
+    $ws
+}

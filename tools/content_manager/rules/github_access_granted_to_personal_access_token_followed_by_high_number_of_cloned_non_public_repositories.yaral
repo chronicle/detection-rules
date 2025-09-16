@@ -1,0 +1,77 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule github_access_granted_to_personal_access_token_followed_by_high_number_of_cloned_non_public_repositories {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when a user grants access to a GitHub Personal Access Token prior to cloning several GitHub non-public GitHub repositories. An adversary may grant access to a Personal Access Token before attempting to steal the contents of several GitHub repositories using a an automated script or offensive tool."
+    rule_id = "mr_11aaa6f7-7fcc-42cb-af2e-42ed39226c43"
+    rule_name = "GitHub Access Granted To Personal Access Token Followed By High Number Of Cloned Non Public Repositories"
+    assumption = "Your GitHub enterprise audit log settings are configured to log the source IP address for events. Reference: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/displaying-ip-addresses-in-the-audit-log-for-your-organization"
+    type = "alert"
+    severity = "High"
+    priority = "High"
+    platform = "GitHub"
+    data_source = "github"
+    mitre_attack_tactic = "Collection"
+    mitre_attack_technique = "Data from Information Repositories: Code Repositories"
+    mitre_attack_url = "https://attack.mitre.org/versions/v14/techniques/T1213/003/"
+    mitre_attack_version = "v14"
+    reference = "https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise"
+
+  events:
+    // GitHub Personal Access Token (PAT) access granted event
+    $github_pat.metadata.vendor_name = "GITHUB" nocase
+    $github_pat.metadata.product_name = "GITHUB"
+    $github_pat.metadata.product_event_type = "personal_access_token.access_granted"
+
+    // GitHub repository clone event
+    $github_pat.metadata.vendor_name = "GITHUB" nocase
+    $github_clone.metadata.product_name = "GITHUB"
+    $github_clone.metadata.product_event_type = "git.clone"
+    $github_clone.target.resource.name = $github_repo_name
+
+    // Join GitHub PAT access granted event to GitHub repository clone event
+    $github_pat.principal.user.userid = $github_clone.principal.user.userid
+
+    // Placeholder for match section
+    $github_pat.principal.user.userid = $user_id
+
+    // Ensure PAT access granted event occurred before repository clone events
+    $github_pat.metadata.event_timestamp.seconds < $github_clone.metadata.event_timestamp.seconds
+
+  match:
+    $user_id over 30m
+
+  outcome:
+    $github_repo_name_distinct_count = count_distinct($github_repo_name)
+    $risk_score = max(85)
+    $mitre_attack_tactic = "Collection"
+    $mitre_attack_technique = "Data from Information Repositories: Code Repositories"
+    $mitre_attack_technique_id = "T1213.003"
+    $event_count = count_distinct($github_clone.metadata.id)
+    $principal_ip = array_distinct($github_pat.principal.ip)
+    $principal_user_userid = array_distinct($github_pat.principal.user.userid)
+    $principal_ip_country = array_distinct($github_pat.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($github_pat.principal.ip_geo_artifact.location.state)
+    $principal_ip_city = array_distinct($github_pat.principal.location.city)
+    $security_result_summary = array_distinct($github_pat.security_result.summary)
+
+  condition:
+    // Customize GitHub repo count to fit your environment
+    $github_pat and $github_clone and $github_repo_name_distinct_count > 5
+}

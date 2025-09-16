@@ -1,0 +1,64 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ rule gcp_exempt_principals_from_audit_log  {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect when GCP Cloud Audit logs are exempted for principals in all services at project or organization level. Audit logging helps organizations maintain security and minimize risk."
+    rule_id = "mr_6ebf472c-bf50-468c-a0b1-e0f53dd91a61"
+    rule_name = "GCP Exempt Principals From Audit Log"
+    mitre_attack_tactic = "Defense Evasion"
+    mitre_attack_technique = "Impair Defenses: Disable Cloud Logs"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1562/008/"
+    mitre_attack_version = "v14.1"
+    type = "Alert"
+    data_source = "GCP Cloud Audit"
+    platform = "GCP"
+    severity = "High"
+    priority = "High"
+
+  events:
+    $gcp.metadata.event_type = "USER_RESOURCE_UPDATE_PERMISSIONS"
+    $gcp.metadata.log_type = "GCP_CLOUDAUDIT"
+    $gcp.metadata.product_event_type = "SetIamPolicy"
+    $gcp.security_result.action = "ALLOW"
+    $gcp.target.application = "cloudresourcemanager.googleapis.com"
+    any $gcp.target.resource.attribute.labels.value = "ADD"
+    any $gcp.target.resource.attribute.labels.value = "allServices"
+    any $gcp.target.resource.attribute.labels.key = /service_data_policy_delta_audit_config_delta_.*_exempted_member/
+
+  outcome:
+    //Increase risk score if it is organization wide
+    $risk_score = max(45 +
+      if($gcp.target.resource.name = /organizations/,30,0)
+    )
+    $mitre_attack_tactic = "Defense Evasion"
+    $mitre_attack_technique = "Impair Defenses: Disable Cloud Logs"
+    $mitre_attack_technique_id = "T1562.008"
+    $event_count = count_distinct($gcp.metadata.id)
+    $network_http_user_agent = array_distinct($gcp.network.http.user_agent)
+    $principal_ip = array_distinct($gcp.principal.ip)
+    $principal_ip_country = array_distinct($gcp.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($gcp.principal.ip_geo_artifact.location.state)
+    $principal_user_id = $gcp.principal.user.userid
+    $principal_user_display_name = $gcp.principal.user.user_display_name
+    $target_resource_name = $gcp.target.resource.name
+    $event_name = $gcp.metadata.product_event_type
+
+  condition:
+    $gcp
+}

@@ -1,0 +1,64 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule aws_high_number_of_unknown_user_authentication_attempts {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects when a high number of failed authentication attempts happen for unknown users."
+    rule_id = "mr_3ddfee11-c959-4283-8fb4-1f57bdaaf2b1"
+    rule_name = "AWS High Number Of Unknown User Authentication Attempts"
+    mitre_attack_tactic = "Credential Access"
+    mitre_attack_technique = "Brute Force: Credential Stuffing"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1110/004/"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    data_source = "AWS CloudTrail"
+    platform = "AWS"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $fail.metadata.vendor_name = "AMAZON"
+    $fail.metadata.product_name = "AWS CloudTrail"
+    $fail.metadata.event_type = "USER_LOGIN"
+    $fail.metadata.product_event_type = "ConsoleLogin"
+    $fail.security_result.action = "BLOCK"
+    $fail.security_result.description = "Reason: No username found in supplied account"
+    $fail.principal.ip = $ip
+
+  match:
+    $ip over 10m
+
+  outcome:
+    $risk_score = max(35)
+    $mitre_attack_tactic = "Credential Access"
+    $mitre_attack_technique = "Brute Force: Credential Stuffing"
+    $mitre_attack_technique_id = "T1110.004"
+    $event_count = count_distinct($fail.metadata.id)
+    $network_http_user_agent = array_distinct($fail.network.http.user_agent)
+    $principal_ip = array_distinct($fail.principal.ip)
+    $principal_ip_country = array_distinct($fail.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($fail.principal.ip_geo_artifact.location.state)
+    $target_user_display_name = array_distinct($fail.target.user.user_display_name)
+    $recipient_aws_account_id = array_distinct($fail.additional.fields["recipientAccountId"])
+    $target_resource_name = array_distinct($fail.target.resource.name)
+    $target_resource_product_object_id = array_distinct($fail.target.resource.product_object_id)
+    $security_result_description = array_distinct($fail.security_result.description)
+
+  condition:
+    #fail >= 10
+}

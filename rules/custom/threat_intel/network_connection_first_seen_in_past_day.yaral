@@ -1,0 +1,74 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule network_connection_first_seen_in_past_day {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect network connection to an ip address that was only seen for the first time in the past 24 hours"
+    rule_id = "mr_c3c9e4d3-eaa5-4f5b-9c64-70ce93247c51"
+    rule_name = "Network Connection First Seen In Past Day"
+    type = "alert"
+    tags = "first last seen"
+    data_source = "microsoft windows , gcp firewall, microsoft sysmon, crowdstrike, gcp scc, zeek"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $network.metadata.event_type = "NETWORK_CONNECTION"
+    $network.target.ip = $ip
+    //Target IP is not part of RFC1918 space, can modify as needed
+    not net.ip_in_range_cidr ($network.target.ip, "10.0.0.0/24")
+    not net.ip_in_range_cidr ($network.target.ip, "172.16.0.0/20")
+    not net.ip_in_range_cidr ($network.target.ip, "192.168.0.0/16")
+
+    //derived from events ingested by Chronicle
+    $entity.graph.entity.artifact.ip  = $ip
+    $entity.graph.metadata.entity_type = "IP_ADDRESS"
+    $entity.graph.metadata.source_type = "DERIVED_CONTEXT"
+    $entity.graph.entity.artifact.first_seen_time.seconds > 0
+
+    //calculate the different between current time and the first time the ip was listed as seen in the entity graph
+    86400 > timestamp.current_seconds() - $entity.graph.entity.artifact.first_seen_time.seconds
+
+  match:
+    $ip over 24h
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($network.metadata.id)
+    //added to populate alert graph with additional context
+    $principal_ip = array_distinct($network.principal.ip)
+    // Commented out target.ip because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$target_ip = array_distinct($network.target.ip)
+    $principal_process_pid = array_distinct($network.principal.process.pid)
+    $principal_process_command_line = array_distinct($network.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($network.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($network.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($network.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($network.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($network.target.process.pid)
+    $target_process_command_line = array_distinct($network.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($network.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($network.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($network.target.process.product_specific_process_id)
+    $target_process_parent_process_product_specific_process_id = array_distinct($network.target.process.parent_process.product_specific_process_id)
+    $principal_user_userid = array_distinct($network.principal.user.userid)
+    $target_user_userid = array_distinct($network.target.user.userid)
+
+  condition:
+    $network and $entity
+}

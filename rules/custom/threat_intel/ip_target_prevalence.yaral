@@ -1,0 +1,69 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule ip_target_prevalence {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect events that are communicating to IP addresses that have a low rolling max prevalence."
+    rule_id = "mr_0de02f28-2a7d-4128-aa31-02308491e744"
+    rule_name = "IP Target Prevalence"
+    type = "alert"
+    tags = "prevalence"
+    data_source = "crowdstrike, gcp firewall, microsoft sysmon, gcp scc, microsoft defender atp, corelight zeek, microsoft windows events"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $network.metadata.event_type = "NETWORK_CONNECTION"
+    $network.target.ip = $ip
+
+    // derived from events ingested by Google SecOps
+    $prevalence.graph.metadata.entity_type = "IP_ADDRESS"
+    $prevalence.graph.metadata.source_type = "DERIVED_CONTEXT"
+    $prevalence.graph.entity.artifact.prevalence.day_count = 10
+    $prevalence.graph.entity.artifact.prevalence.rolling_max <= 3
+    $prevalence.graph.entity.artifact.prevalence.rolling_max > 0
+    $prevalence.graph.entity.artifact.ip = $ip
+
+  match:
+    $ip over 5m
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($network.metadata.id)
+    // added to populate alert graph with additional context
+    $principal_ip = array_distinct($network.principal.ip)
+    // Commented out target.ip because it is already represented in graph as match variable. If match changes, can uncomment to add to results
+    //$target_ip = array_distinct($network.target.ip)
+    $principal_process_pid = array_distinct($network.principal.process.pid)
+    $principal_process_command_line = array_distinct($network.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($network.principal.process.file.sha256)
+    $principal_process_file_full_path = array_distinct($network.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($network.principal.process.product_specific_process_id)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($network.principal.process.parent_process.product_specific_process_id)
+    $target_process_pid = array_distinct($network.target.process.pid)
+    $target_process_command_line = array_distinct($network.target.process.command_line)
+    $target_process_file_sha256 = array_distinct($network.target.process.file.sha256)
+    $target_process_file_full_path = array_distinct($network.target.process.file.full_path)
+    $target_process_product_specific_process_id = array_distinct($network.target.process.product_specific_process_id)
+    $target_process_parent_process_product_specific_process_id = array_distinct($network.target.process.parent_process.product_specific_process_id)
+    $principal_user_userid = array_distinct($network.principal.user.userid)
+    $target_user_userid = array_distinct($network.target.user.userid)
+
+  condition:
+    $network and $prevalence
+}

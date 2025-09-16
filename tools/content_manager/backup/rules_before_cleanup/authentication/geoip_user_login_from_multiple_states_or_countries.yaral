@@ -1,0 +1,66 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule geoip_user_login_from_multiple_states_or_countries {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detect multiple user logins from multiple states or countries using Chronicle GeoIP enrichment."
+    rule_id = "mr_3fa832e4-1ac0-42cd-9f0a-357d6b8fb12f"
+    rule_name = "GeoIP User Login From Multiple States Or Countries"
+    type = "alert"
+    data_source = "microsoft ad, azure ad, okta, aws cloudtrail, google scc"
+    tags = "geoip enrichment"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.security_result.action = "ALLOW"
+    $login.principal.ip_geo_artifact.location.country_or_region != ""
+
+    $login.principal.ip_geo_artifact.location.country_or_region = $country
+    $login.principal.ip_geo_artifact.location.state  = $state
+    $login.metadata.product_name = $product
+    $login.target.user.userid = $user
+
+  match:
+    $user, $product over 1h
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($login.metadata.id)
+    $state_login_threshold = 2
+    $dc_state = count_distinct($login.principal.ip_geo_artifact.location.state)
+    $array_state = array_distinct($login.principal.ip_geo_artifact.location.state)
+    $dc_country_or_region = count_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $array_country_or_region = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $array_asn = array_distinct($login.principal.ip_geo_artifact.network.asn)
+    $array_carrier_name = array_distinct($login.principal.ip_geo_artifact.network.carrier_name)
+    //added to populate alert graph with additional context
+    $principal_hostname = array_distinct($login.principal.hostname)
+    $principal_ip = array_distinct($login.principal.ip)
+    $target_hostname = array_distinct($login.target.hostname)
+    $target_ip = array_distinct($login.target.ip)
+    $principal_user_userid = array_distinct($login.principal.user.userid)
+    $target_user_userid = array_distinct($login.target.user.userid)
+    $principal_resource_name = array_distinct($login.principal.resource.name)
+    $target_resource_name = array_distinct($login.target.resource.name)
+    $target_url = array_distinct($login.target.url)
+
+  condition:
+    #country >= 1 and #state >= 2
+}

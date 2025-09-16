@@ -440,8 +440,10 @@ class Rules:
   @classmethod
   def check_for_duplicate_rule_names(cls, rules: List[Rule]):
     """Check for duplicate rule names in a list of rules."""
+    # Only check active (non-archived) rules for duplicates
+    active_rules = [rule for rule in rules if not rule.archived]
     rule_name_counts = collections.Counter(
-        [rule.name.lower() for rule in rules]
+        [rule.name.lower() for rule in active_rules]
     )
     duplicate_rule_names = [
         rule_name_count

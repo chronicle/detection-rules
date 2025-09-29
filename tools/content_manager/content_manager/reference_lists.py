@@ -22,6 +22,7 @@ import logging
 import pathlib
 from typing import Any, List, Literal, Mapping, Sequence, Tuple
 
+from content_manager.common.constants import Constants
 from content_manager.common.custom_exceptions import ReferenceListConfigError
 from google.auth.transport import requests
 from google_secops_api.reference_lists.create_reference_list import create_reference_list
@@ -34,9 +35,8 @@ import yaml
 
 LOGGER = logging.getLogger()
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
-REF_LISTS_DIR = ROOT_DIR / "reference_lists"
-REF_LIST_CONFIG_FILE = ROOT_DIR / "reference_list_config.yaml"
+REF_LISTS_DIR = Constants.ROOT_DIR / "reference_lists"
+REF_LIST_CONFIG_FILE = Constants.ROOT_DIR / "reference_list_config.yaml"
 REF_LIST_SYNTAX_TYPES = Literal[  # pylint: disable="invalid-name"
     "REFERENCE_LIST_SYNTAX_TYPE_UNSPECIFIED",
     "REFERENCE_LIST_SYNTAX_TYPE_PLAIN_TEXT_STRING",
@@ -322,7 +322,7 @@ class ReferenceLists:
           exclude={"name"}
       )
 
-    ref_list_config_file_path = ROOT_DIR / "reference_list_config.yaml"
+    ref_list_config_file_path = Constants.ROOT_DIR / "reference_list_config.yaml"
 
     LOGGER.info(
         "Writing reference list config to %s", ref_list_config_file_path

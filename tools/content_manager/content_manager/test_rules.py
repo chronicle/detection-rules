@@ -21,6 +21,7 @@ import json
 import pathlib
 from typing import Any, Mapping, Sequence
 
+from content_manager.common.constants import Constants
 from content_manager.common.custom_exceptions import DuplicateRuleIdError
 from content_manager.common.custom_exceptions import DuplicateRuleNameError
 from content_manager.common.custom_exceptions import RuleConfigError
@@ -32,9 +33,8 @@ import pydantic
 import pytest
 import ruamel.yaml.constructor
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
-RULES_DIR = ROOT_DIR / "rules"
-RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
+RULES_DIR = Constants.ROOT_DIR / "rules"
+RULE_CONFIG_FILE = Constants.ROOT_DIR / "rule_config.yaml"
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "test_data"
 TEST_RULES_DIR = TEST_DATA_DIR / "rules"
 TEST_RULE_CONFIG_FILE = TEST_DATA_DIR / "test_rule_config.yaml"

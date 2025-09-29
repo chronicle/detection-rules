@@ -19,6 +19,7 @@ import json
 import pathlib
 from typing import Any, Mapping, Sequence
 
+from content_manager.common.constants import Constants
 from content_manager.common.custom_exceptions import DataTableConfigError
 from content_manager.data_tables import DataTable
 from content_manager.data_tables import DataTableColumn
@@ -29,9 +30,8 @@ import pytest
 import ruamel.yaml.constructor
 
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
-DATA_TABLES_DIR = ROOT_DIR / "data_tables"
-DATA_TABLE_CONFIG_FILE = ROOT_DIR / "data_table_config.yaml"
+DATA_TABLES_DIR = Constants.ROOT_DIR / "data_tables"
+DATA_TABLE_CONFIG_FILE = Constants.ROOT_DIR / "data_table_config.yaml"
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "test_data"
 TEST_DATA_TABLES_DIR = TEST_DATA_DIR / "data_tables"
 TEST_DATA_TABLE_CONFIG_FILE = TEST_DATA_DIR / "test_data_table_config.yaml"

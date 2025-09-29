@@ -23,6 +23,7 @@ import pathlib
 import re
 from typing import Any, Literal, Mapping, Sequence
 
+from content_manager.common.constants import Constants
 from content_manager.common.custom_exceptions import RuleExclusionConfigError
 from google.auth.transport import requests
 from google_secops_api.findings_refinements.create_findings_refinement import create_findings_refinement
@@ -38,8 +39,7 @@ import yaml
 
 LOGGER = logging.getLogger()
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
-RULE_EXCLUSIONS_CONFIG_FILE = ROOT_DIR / "rule_exclusions_config.yaml"
+RULE_EXCLUSIONS_CONFIG_FILE = Constants.ROOT_DIR / "rule_exclusions_config.yaml"
 RULE_EXCLUSION_TYPES = Literal["DETECTION_EXCLUSION"]  # pylint: disable="invalid-name"
 EXCLUSION_APPLICATIONS = Literal["curated_rule_sets", "curated_rules"]  # pylint: disable="invalid-name"
 

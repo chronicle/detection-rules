@@ -19,6 +19,7 @@ import json
 import pathlib
 from typing import Any, Mapping, Sequence
 
+from content_manager.common.constants import Constants
 from content_manager.common.custom_exceptions import ReferenceListConfigError
 from content_manager.reference_lists import ReferenceList
 from content_manager.reference_lists import ReferenceListConfigEntry
@@ -28,9 +29,8 @@ import pytest
 import ruamel.yaml.constructor
 
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
-REF_LISTS_DIR = ROOT_DIR / "reference_lists"
-REF_LIST_CONFIG_FILE = ROOT_DIR / "reference_list_config.yaml"
+REF_LISTS_DIR = Constants.ROOT_DIR / "reference_lists"
+REF_LIST_CONFIG_FILE = Constants.ROOT_DIR / "reference_list_config.yaml"
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "test_data"
 TEST_REF_LISTS_DIR = TEST_DATA_DIR / "reference_lists"
 TEST_REF_LISTS_CONFIG_FILE = TEST_DATA_DIR / "test_reference_list_config.yaml"

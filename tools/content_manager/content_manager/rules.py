@@ -24,6 +24,7 @@ import pathlib
 import re
 from typing import Any, List, Mapping, Sequence, Tuple
 
+from content_manager.common.constants import Constants
 from content_manager.common.custom_exceptions import DuplicateRuleIdError
 from content_manager.common.custom_exceptions import DuplicateRuleNameError
 from content_manager.common.custom_exceptions import RuleConfigError
@@ -43,9 +44,8 @@ import yaml
 
 LOGGER = logging.getLogger()
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
-RULES_DIR = ROOT_DIR / "rules"
-RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
+RULES_DIR = Constants.ROOT_DIR / "rules"
+RULE_CONFIG_FILE = Constants.ROOT_DIR / "rule_config.yaml"
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
 # (i.e. duplicate rule names)
@@ -329,7 +329,7 @@ class Rules:
           exclude={"name"}
       )
 
-    rule_config_file_path = ROOT_DIR / "rule_config.yaml"
+    rule_config_file_path = Constants.ROOT_DIR / "rule_config.yaml"
 
     LOGGER.info("Writing rule config to %s", rule_config_file_path)
     with open(rule_config_file_path, "w", encoding="utf-8") as rule_config_file:

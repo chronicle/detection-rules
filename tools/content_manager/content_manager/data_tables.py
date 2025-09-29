@@ -20,6 +20,7 @@ import logging
 import pathlib
 from typing import Any, Literal, Mapping, Sequence
 
+from content_manager.common.constants import Constants
 from content_manager.common.custom_exceptions import DataTableConfigError
 from google.auth.transport import requests
 from google_secops_api.data_table_rows.bulk_create_data_table_rows import bulk_create_data_table_rows
@@ -34,9 +35,8 @@ import yaml
 
 LOGGER = logging.getLogger()
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
-DATA_TABLES_DIR = ROOT_DIR / "data_tables"
-DATA_TABLE_CONFIG_FILE = ROOT_DIR / "data_table_config.yaml"
+DATA_TABLES_DIR = Constants.ROOT_DIR / "data_tables"
+DATA_TABLE_CONFIG_FILE = Constants.ROOT_DIR / "data_table_config.yaml"
 DATA_TABLE_COLUMN_TYPES = Literal["CIDR", "STRING", "REGEX"]  # pylint: disable="invalid-name"
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
@@ -384,7 +384,7 @@ class DataTables:
           exclude={"name"}
       )
 
-    data_table_config_file_path = ROOT_DIR / "data_table_config.yaml"
+    data_table_config_file_path = Constants.ROOT_DIR / "data_table_config.yaml"
 
     LOGGER.info("Writing data table config to %s", data_table_config_file_path)
     with open(

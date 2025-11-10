@@ -1,175 +1,8 @@
-test2:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/1ca1535f-2363-4440-9017-a56de4aed943
-  query_id: HKFTXyNjRECQF6Vt5K7ZQw==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-10-22T20:57:13.307224Z'
-  update_time: '2025-11-07T16:47:57.527813Z'
-  description: my description
-  query: |-
-    metadata.vendor_name = "Microsoft" AND metadata.product_name = /Windows/ AND metadata.event_type = "USER_LOGIN" AND security_result.action = "HOWDY" AND principal.hostname != ${hostname}
-    $host = principal.hostname
-    $user = target.user.userid
-    match:
-      $host
-    outcome:
-      $user_distinct_count = count_distinct($user)
-      $user_count = count($user)
-      $users_uniq_list = array_distinct($user)
-    order:
-       $user_count desc, $user_distinct_count desc
-  sharing_mode:
-  query_type:
-  placeholder_names:
-  placeholder_descriptions:
-howdy4:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/24646ec3-5ae4-4205-bc72-ce9557d5201a
-  query_id: JGRuw1rkQgW8cs6VV9UgGg==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-10-22T20:38:14.530345Z'
-  update_time: '2025-11-10T20:54:15.290193Z'
-  description: description 123
-  query: |-
-    metadata.vendor_name = "Microsoft" AND metadata.product_name = /Windows/ AND metadata.event_type = "USER_LOGIN" AND security_result.action = "BLOCK" AND principal.hostname != ${hostname}
-    $host = principal.hostname
-    $user = target.user.userid
-    match:
-      $host
-    outcome:
-      $user_distinct_count = count_distinct($user)
-      $user_count = count($user)
-      $users_uniq_list = array_distinct($user)
-    order:
-       $user_count desc, $user_distinct_count desc
-  sharing_mode: MODE_SHARED_WITH_CUSTOMER
-  query_type:
-  placeholder_names:
-  - ${hostname}
-  placeholder_descriptions:
-  - Principal hostname
-Rule Changes 2:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/272f6a12-086b-4dc1-8677-7bcc068ca63d
-  query_id: Jy9qEghrTcGGd3vMBoymPQ==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-04-16T16:19:56.609898Z'
-  update_time: '2025-11-10T17:05:55.914085Z'
-  description: Searches for rule changes in Google SecOps
-  query: |
-    (
-    metadata.product_event_type = "google.cloud.chronicle.v1alpha.RuleService.CreateRule" OR
-    metadata.product_event_type = "google.cloud.chronicle.v1alpha.RuleService.UpdateRule" OR
-    metadata.product_event_type = "google.cloud.chronicle.v1alpha.RuleService.UpdateRuleDeployment" OR
-    metadata.product_event_type = "google.cloud.chronicle.v1alpha.RuleService.DeleteRule"
-    )
-  sharing_mode:
-  query_type:
-  placeholder_names:
-  placeholder_descriptions:
-Zeek - Investigative Search 2211:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/2868bb0b-a372-47ab-9a2f-425458933a1b
-  query_id: KGi7C6NyR6uaL0JUWJM6Gw==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-11-07T17:49:20.536546Z'
-  update_time: '2025-11-10T20:55:53.174167Z'
-  description: new
-  query: metadata.vendor_name = "Zeek"
-  sharing_mode:
-  query_type:
-  placeholder_names:
-  - ${aaa}
-  - ${ddd}
-  placeholder_descriptions:
-  - description for aaa
-  - description for ddd
-Windows Login Events:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/2eff5ee4-cc2f-413b-abea-9acac6f431e9
-  query_id: Lv9e5MwvQTur6prKxvQx6Q==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-11-10T16:27:10.139428Z'
-  update_time: '2025-11-10T20:55:53.519650Z'
-  description: Windows user login events
-  query: metadata.vendor_name = "Microsoft" AND metadata.product_name = 
-    /Windows/ AND metadata.event_type = "USER_LOGIN"
-  sharing_mode: MODE_SHARED_WITH_CUSTOMER
-  query_type:
-  placeholder_names:
-  placeholder_descriptions:
-test1:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/4dc53e81-ae32-49be-86a1-a793cbbeacfa
-  query_id: TcU+ga4ySb6GoaeTy76s+g==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-10-22T20:55:11.139885Z'
-  update_time: '2025-10-22T20:55:11.139885Z'
-  description:
-  query: |-
-    metadata.vendor_name = "Microsoft" AND metadata.product_name = /Windows/ AND metadata.event_type = "USER_LOGIN" AND security_result.action = "BLOCK" AND principal.hostname != ${hostname}
-    $host = principal.hostname
-    $user = target.user.userid
-    match:
-      $host
-    outcome:
-      $user_distinct_count = count_distinct($user)
-      $user_count = count($user)
-      $users_uniq_list = array_distinct($user)
-    order:
-       $user_count desc, $user_distinct_count desc
-  sharing_mode:
-  query_type:
-  placeholder_names:
-  - ${hostname}
-  placeholder_descriptions:
-  - Principal hostname
-Zeek - Investigative Search 1234:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/7b29efe6-f828-4cc4-9224-6c07b2592075
-  query_id: eynv5vgoTMSSJGwHslkgdQ==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-11-10T20:58:49.770745Z'
-  update_time: '2025-11-10T21:01:01.702113Z'
-  description: new
-  query: metadata.vendor_name = "Zeek" AND network.application_protocol = ${aaa}
-    and principal.ip = ${bbb}
-  sharing_mode: MODE_SHARED_WITH_CUSTOMER
-  query_type:
-  placeholder_names:
-  - ${aaa}
-  - ${bbb}
-  placeholder_descriptions:
-  - description for aaa
-  - description for bbb
-Top 10 Suricata Rules:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/8f9cf864-9e39-4978-9f8d-7c793ad01e51
-  query_id: j5z4ZJ45SXifjXx5OtAeUQ==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-11-10T21:24:23.477149Z'
-  update_time: '2025-11-10T21:25:48.380667Z'
-  description: My new description
-  query: |-
-    metadata.vendor_name = "Suricata" nocase
-    $rule_name = security_result.rule_name
-    match:
-        $rule_name
-    outcome:
-      $event_count = count_distinct(metadata.id)
-    order:
-      $event_count desc
-    limit:
-    10
-  sharing_mode: MODE_SHARED_WITH_CUSTOMER
-  query_type:
-  placeholder_names:
-  placeholder_descriptions:
 Blocked Windows Logins by Host:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/b63b04d0-fe80-413e-878c-7e0df15d4427
-  query_id: tjsE0P6AQT6HjH4N8V1EJw==
-  user_id: admin@frenchee.altostrat.com
+  resource_name:
+    projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/users/me/searchQueries/baf471b7-067f-4a73-91c4-8c3ff0c0c29c
+  query_id: tj120P6AQT6HjH4NABE123==
+  user_id: seceng1@example.com
   create_time: '2025-11-07T16:17:40.197090Z'
   update_time: '2025-11-10T21:16:39.194891Z'
   description: Statistical Search Workshop
@@ -189,29 +22,15 @@ Blocked Windows Logins by Host:
   query_type: QUERY_TYPE_STATS_QUERY
   placeholder_names:
   placeholder_descriptions:
-Zeek - Investigative Search 2:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/c921e1d9-c105-4fc1-9dbe-b9f27eac38f7
-  query_id: ySHh2cEFT8Gdvrnyfqw49w==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-11-07T17:43:32.883500Z'
-  update_time: '2025-11-07T17:43:32.883500Z'
-  description: Advanced Search Workshop - Search Templates Exercise
-  query: metadata.vendor_name = "Zeek" AND network.application_protocol = ${aaa}
-    and principal.ip = ${bbb}
-  sharing_mode:
-  query_type:
-  placeholder_names:
-  placeholder_descriptions:
 Zeek - Investigative Search:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/d59549fd-806c-496d-8f77-3345f99e1cca
-  query_id: 1ZVJ/YBsSW2PdzNF+Z4cyg==
-  user_id: admin@frenchee.altostrat.com
+  resource_name:
+    projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/users/me/searchQueries/baf471b7-067f-4a73-91c4-8c3ff0c0c30a
+  query_id: 1ZVJ/TSsSW2PdzNF+Z4c1h==
+  user_id: seceng1@example.com
   create_time: '2025-11-07T15:38:05.403802Z'
   update_time: '2025-11-10T21:17:40.759289Z'
   description: Advanced Search Workshop - Search Templates Exercise
-  query: metadata.vendor_name = "Zeek" AND network.application_protocol = 
+  query: metadata.vendor_name = "Zeek" AND network.application_protocol =
     ${protocol} and principal.ip = ${originating_ip}
   sharing_mode: MODE_SHARED_WITH_CUSTOMER
   query_type: QUERY_TYPE_UDM_QUERY
@@ -221,16 +40,3 @@ Zeek - Investigative Search:
   placeholder_descriptions:
   - Enter the network traffic protocol
   - Enter the IP Address of a system where traffic originated from
-frenchee2:
-  resource_name: 
-    projects/chronicle-402318/locations/us/instances/ebaae93f-57d2-43ef-aa93-eb9eacf64508/users/me/searchQueries/d9b35a70-31d6-4886-a44e-304de97a80a4
-  query_id: 2bNacDHWSIakTjBN6XqApA==
-  user_id: admin@frenchee.altostrat.com
-  create_time: '2025-10-22T20:13:14.627895Z'
-  update_time: '2025-11-10T20:45:32.702608Z'
-  description: frenchee
-  query: metadata.vendor_name = "Microsoft123"
-  sharing_mode:
-  query_type:
-  placeholder_names:
-  placeholder_descriptions:

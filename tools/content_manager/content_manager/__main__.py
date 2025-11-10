@@ -49,7 +49,7 @@ REF_LIST_CONFIG_FILE = ROOT_DIR / "reference_list_config.yaml"
 DATA_TABLES_DIR = ROOT_DIR / "data_tables"
 DATA_TABLE_CONFIG_FILE = ROOT_DIR / "data_table_config.yaml"
 RULE_EXCLUSIONS_CONFIG_FILE = ROOT_DIR / "rule_exclusions_config.yaml"
-SAVED_SEARCHES_CONFIG_FILE = ROOT_DIR / "saved_searches_config.yaml"
+SAVED_SEARCH_CONFIG_FILE = ROOT_DIR / "saved_search_config.yaml"
 
 dotenv.load_dotenv()
 
@@ -816,7 +816,7 @@ if __name__ == "__main__":
   REF_LIST_CONFIG_FILE.touch(exist_ok=True)
   DATA_TABLE_CONFIG_FILE.touch(exist_ok=True)
   RULE_EXCLUSIONS_CONFIG_FILE.touch(exist_ok=True)
-  SAVED_SEARCHES_CONFIG_FILE.touch(exist_ok=True)
+  SAVED_SEARCH_CONFIG_FILE.touch(exist_ok=True)
 
   cli.add_command(rules)
   cli.add_command(data_tables)

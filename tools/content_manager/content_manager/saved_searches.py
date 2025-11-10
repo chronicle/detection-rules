@@ -35,7 +35,7 @@ from ruamel.yaml.scalarstring import LiteralScalarString
 LOGGER = logging.getLogger()
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
-SAVED_SEARCHES_CONFIG_FILE = ROOT_DIR / "saved_searches_config.yaml"
+SAVED_SEARCH_CONFIG_FILE = ROOT_DIR / "saved_search_config.yaml"
 SHARING_MODES = Literal["MODE_SHARED_WITH_CUSTOMER"]  # pylint: disable="invalid-name"
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
@@ -87,18 +87,18 @@ class SavedSearches:
     """Parse a saved search into a SavedSearch object."""
     try:
       parsed_saved_search = SavedSearch(
-        name=saved_search["displayName"],
-        resource_name=saved_search.get("name"),
-        query_id=saved_search.get("queryId"),
-        user_id=saved_search.get("userId"),
-        create_time=saved_search["metadata"]["createTime"],
-        update_time=saved_search["metadata"]["updateTime"],
-        description=saved_search.get("description"),
-        query=saved_search["query"],
-        sharing_mode=saved_search.get("sharingMode"),
-        query_type=saved_search.get("queryType"),
-        placeholder_names=saved_search.get("placeholderNames"),
-        placeholder_descriptions=saved_search.get("placeholderDescriptions"),
+          name=saved_search["displayName"],
+          resource_name=saved_search.get("name"),
+          query_id=saved_search.get("queryId"),
+          user_id=saved_search.get("userId"),
+          create_time=saved_search["metadata"]["createTime"],
+          update_time=saved_search["metadata"]["updateTime"],
+          description=saved_search.get("description"),
+          query=saved_search["query"],
+          sharing_mode=saved_search["metadata"].get("sharingMode"),
+          query_type=saved_search.get("queryType"),
+          placeholder_names=saved_search.get("placeholderNames"),
+          placeholder_descriptions=saved_search.get("placeholderDescriptions"),
       )
     except pydantic.ValidationError as e:
       LOGGER.error(
@@ -125,8 +125,7 @@ class SavedSearches:
 
   @classmethod
   def load_saved_search_config(
-      cls,
-      saved_search_config_file: pathlib.Path = SAVED_SEARCHES_CONFIG_FILE
+      cls, saved_search_config_file: pathlib.Path = SAVED_SEARCH_CONFIG_FILE
   ) -> "SavedSearches":
     """Load saved search config from file."""
     LOGGER.info(
@@ -266,9 +265,9 @@ class SavedSearches:
             saved_search.query
         )
 
-    LOGGER.info("Writing saved search config to %s", SAVED_SEARCHES_CONFIG_FILE)
+    LOGGER.info("Writing saved search config to %s", SAVED_SEARCH_CONFIG_FILE)
     with open(
-        SAVED_SEARCHES_CONFIG_FILE, "w", encoding="utf-8"
+        SAVED_SEARCH_CONFIG_FILE, "w", encoding="utf-8"
     ) as saved_search_config_file:
       ruamel_yaml.dump(
           saved_search_config,
@@ -327,7 +326,7 @@ class SavedSearches:
   def update_remote_saved_searches(
       cls,
       http_session: requests.AuthorizedSession,
-      saved_searches_config_file: pathlib.Path = SAVED_SEARCHES_CONFIG_FILE,
+      saved_searches_config_file: pathlib.Path = SAVED_SEARCH_CONFIG_FILE,
   ) -> Mapping[str, Sequence[tuple[str, str]]] | None:
     """Update saved searches in Google SecOps based on a local config file."""
     LOGGER.info(

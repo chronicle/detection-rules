@@ -1,0 +1,43 @@
+Blocked Windows Logins by Host:
+  resource_name:
+    projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/users/me/searchQueries/74257fc4-cb92-497d-84be-c9b5bfcd287c
+  query_id: Ab9e5XWvQTu46prKxvQx6Q==
+  user_id: player1@example.com
+  create_time: '2025-11-07T16:17:40.197090Z'
+  update_time: '2025-11-07T16:17:40.197090Z'
+  description: Statistical Search Workshop
+  query: |-
+    metadata.vendor_name = "Microsoft" AND metadata.product_name = /Windows/ AND metadata.event_type = "USER_LOGIN" AND security_result.action = "BLOCK" AND principal.hostname != ""
+    $host = principal.hostname
+    $user = target.user.userid
+    match:
+      $host
+    outcome:
+      $user_distinct_count = count_distinct($user)
+      $user_count = count($user)
+      $users_uniq_list = array_distinct($user)
+    order:
+       $user_count desc, $user_distinct_count desc
+  sharing_mode:
+  query_type:
+  placeholder_names:
+  placeholder_descriptions:
+Rule Changes:
+  resource_name:
+    projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/users/me/searchQueries/1ff8cafa-4a34-47eb-b26b-c71abda0ef8b
+  query_id: Jy9qEghrTcAAA3vBxoymPQ==
+  user_id: player1@example.com
+  create_time: '2025-04-16T16:19:56.609898Z'
+  update_time: '2025-11-10T17:05:55.914085Z'
+  description: Searches for rule changes in Google SecOps
+  query: |
+    (
+    metadata.product_event_type = "google.cloud.chronicle.v1alpha.RuleService.CreateRule" OR
+    metadata.product_event_type = "google.cloud.chronicle.v1alpha.RuleService.UpdateRule" OR
+    metadata.product_event_type = "google.cloud.chronicle.v1alpha.RuleService.UpdateRuleDeployment" OR
+    metadata.product_event_type = "google.cloud.chronicle.v1alpha.RuleService.DeleteRule"
+    )
+  sharing_mode:
+  query_type:
+  placeholder_names:
+  placeholder_descriptions:

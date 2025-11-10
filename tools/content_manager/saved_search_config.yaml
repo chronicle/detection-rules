@@ -1,0 +1,42 @@
+Blocked Windows Logins by Host:
+  resource_name:
+    projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/users/me/searchQueries/baf471b7-067f-4a73-91c4-8c3ff0c0c29c
+  query_id: tj120P6AQT6HjH4NABE123==
+  user_id: seceng1@example.com
+  create_time: '2025-11-07T16:17:40.197090Z'
+  update_time: '2025-11-10T21:16:39.194891Z'
+  description: Statistical Search Workshop
+  query: |-
+    metadata.vendor_name = "Microsoft" AND metadata.product_name = /Windows/ AND metadata.event_type = "USER_LOGIN" AND security_result.action = "BLOCK" AND principal.hostname != ""
+    $host = principal.hostname
+    $user = target.user.userid
+    match:
+      $host
+    outcome:
+      $user_distinct_count = count_distinct($user)
+      $user_count = count($user)
+      $users_uniq_list = array_distinct($user)
+    order:
+       $user_count desc, $user_distinct_count desc
+  sharing_mode: MODE_SHARED_WITH_CUSTOMER
+  query_type: QUERY_TYPE_STATS_QUERY
+  placeholder_names:
+  placeholder_descriptions:
+Zeek - Investigative Search:
+  resource_name:
+    projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/users/me/searchQueries/baf471b7-067f-4a73-91c4-8c3ff0c0c30a
+  query_id: 1ZVJ/TSsSW2PdzNF+Z4c1h==
+  user_id: seceng1@example.com
+  create_time: '2025-11-07T15:38:05.403802Z'
+  update_time: '2025-11-10T21:17:40.759289Z'
+  description: Advanced Search Workshop - Search Templates Exercise
+  query: metadata.vendor_name = "Zeek" AND network.application_protocol =
+    ${protocol} and principal.ip = ${originating_ip}
+  sharing_mode: MODE_SHARED_WITH_CUSTOMER
+  query_type: QUERY_TYPE_UDM_QUERY
+  placeholder_names:
+  - ${protocol}
+  - ${originating_ip}
+  placeholder_descriptions:
+  - Enter the network traffic protocol
+  - Enter the IP Address of a system where traffic originated from

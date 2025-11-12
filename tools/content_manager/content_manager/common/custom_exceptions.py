@@ -45,3 +45,7 @@ class ReferenceListConfigError(Exception):
 
 class RuleExclusionConfigError(Exception):
   """Raised when an issue with the rule exclusion config file is found."""
+
+
+class SavedSearchConfigError(Exception):
+  """Raised when an issue with the saved search config file is found."""

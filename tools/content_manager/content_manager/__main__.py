@@ -30,6 +30,7 @@ from content_manager.data_tables import DataTables
 from content_manager.reference_lists import ReferenceLists
 from content_manager.rule_exclusions import RuleExclusions
 from content_manager.rules import Rules
+from content_manager.saved_searches import SavedSearches
 import dotenv
 import google.auth.transport.requests
 from google_secops_api import auth
@@ -48,6 +49,7 @@ REF_LIST_CONFIG_FILE = ROOT_DIR / "reference_list_config.yaml"
 DATA_TABLES_DIR = ROOT_DIR / "data_tables"
 DATA_TABLE_CONFIG_FILE = ROOT_DIR / "data_table_config.yaml"
 RULE_EXCLUSIONS_CONFIG_FILE = ROOT_DIR / "rule_exclusions_config.yaml"
+SAVED_SEARCH_CONFIG_FILE = ROOT_DIR / "saved_search_config.yaml"
 
 dotenv.load_dotenv()
 
@@ -454,6 +456,48 @@ class RuleExclusionOperations:
     RuleExclusionOperations.get()
 
 
+class SavedSearchOperations:
+  """Manage saved searches in Google SecOps."""
+
+  @classmethod
+  def get(cls):
+    """Retrieves the latest version of saved searches from Google SecOps and updates the local config file."""
+    http_session = initialize_http_session()
+
+    remote_saved_searches = SavedSearches.get_remote_saved_searches(
+        http_session=http_session
+    )
+
+    if not remote_saved_searches.saved_searches:
+      LOGGER.info("No saved searches retrieved")
+      return
+
+    remote_saved_searches.dump_saved_search_config()
+
+  @classmethod
+  def update(cls):
+    """Update saved searches in Google SecOps based on local config file."""
+    http_session = initialize_http_session()
+
+    saved_search_updates = SavedSearches.update_remote_saved_searches(
+        http_session=http_session
+    )
+
+    if not saved_search_updates:
+      return
+
+    # Log summary of saved search updates that occurred.
+    LOGGER.info("Logging summary of saved search changes...")
+    for update_type, saved_search_names in saved_search_updates.items():
+      LOGGER.info("Saved searches %s: %s", update_type, len(saved_search_names))
+      for saved_search_name in saved_search_names:
+        LOGGER.info("%s saved search %s", update_type, saved_search_name)
+
+    # Retrieve the latest version of all saved searches after any changes
+    # were made.
+    SavedSearchOperations.get()
+
+
 @click.group()
 def cli():
   """Content Manager - Manage content in Google SecOps such as rules, data tables, reference lists, and exclusions."""
@@ -727,6 +771,39 @@ def update():
   RuleExclusionOperations.update()
 
 
+@click.group()
+def saved_searches():
+  """Manage saved searches."""
+
+
+@saved_searches.command(
+    "get",
+    short_help="""Retrieve the latest version of all saved searches from Google SecOps and updates the local config file.""",
+)
+def get_saved_searches():
+  """Retrieve the latest version of all saved searches from Google SecOps and update the local config file."""
+  LOGGER.info(
+      "Attempting to pull latest version of all saved searches from Google "
+      "SecOps and update the local config file"
+  )
+  SavedSearchOperations.get()
+
+
+@saved_searches.command(
+    "update",
+    short_help=(
+        "Update saved searches in Google SecOps based on the local config file."
+    ),
+)
+def update_saved_searches():
+  """Update saved searches in Google SecOps based on the local config file."""
+  LOGGER.info(
+      "Attempting to update saved searches in Google SecOps based on the local"
+      " config file"
+  )
+  SavedSearchOperations.update()
+
+
 if __name__ == "__main__":
   LOGGER.info("Content Manager started")
 
@@ -740,10 +817,12 @@ if __name__ == "__main__":
   REF_LIST_CONFIG_FILE.touch(exist_ok=True)
   DATA_TABLE_CONFIG_FILE.touch(exist_ok=True)
   RULE_EXCLUSIONS_CONFIG_FILE.touch(exist_ok=True)
+  SAVED_SEARCH_CONFIG_FILE.touch(exist_ok=True)
 
   cli.add_command(rules)
   cli.add_command(data_tables)
   cli.add_command(reference_lists)
   cli.add_command(rule_exclusions)
+  cli.add_command(saved_searches)
 
   cli()

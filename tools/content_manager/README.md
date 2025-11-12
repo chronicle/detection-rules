@@ -4,9 +4,9 @@
 
 Content Manager is a command-line tool that can be used to manage content in
 [Google SecOps](https://cloud.google.com/security/products/security-operations)
-such as rules, data, tables, reference lists, and rule exclusions. Content
-Manager can be utilized in a CI/CD pipeline to implement Detection-as-Code with
-Google SecOps or ran locally using
+such as rules, data, tables, reference lists, rule exclusions, and saved
+searches. Content Manager can be utilized in a CI/CD pipeline to implement
+Detection-as-Code with Google SecOps or ran locally using
 [Application Default Credentials (ADC)](https://cloud.google.com/docs/authentication/application-default-credentials) for authentication.
 
 If you're new to the concept of managing detection rules and other content using
@@ -31,6 +31,7 @@ in a CI/CD pipeline (in GitHub, GitLab, CircleCI, etc) to do the following:
 * Retrieve the latest version of all reference lists from Google SecOps and write them to local files along with their current state/configuration
 * Create or update reference lists in Google SecOps based on local files
 * Manage [rule exclusions](https://cloud.google.com/chronicle/docs/detection/rule-exclusions) in Google SecOps based on a local config file
+* Manage [saved searches](https://docs.cloud.google.com/chronicle/docs/investigation/udm-search#search-manager) in Google SecOps based on a local config file
 
 Sample detection rules can be found in the [Google SecOps Detection Rules](https://github.com/chronicle/detection-rules/tree/main) repo.
 
@@ -136,6 +137,11 @@ chronicle.findingsRefinements.create
 chronicle.findingsRefinements.get
 chronicle.findingsRefinements.list
 chronicle.findingsRefinements.update
+# Permissions required to managed saved searches
+chronicle.searchQueries.get
+chronicle.searchQueries.list
+chronicle.searchQueries.create
+chronicle.searchQueries.update
 ```
 
 If you're unable to configure your CI/CD pipeline to authenticate using Workload
@@ -210,6 +216,7 @@ Commands:
   reference-lists  Manage reference lists.
   rule-exclusions  Manage rule exclusions.
   rules            Manage rules.
+  saved-searches   Manage saved searches.
 ```
 
 A logical first step after reading the contents of this readme file and
@@ -655,6 +662,98 @@ Example output from update remote rule exclusions command.
 01-May-25 12:15:35 MDT | INFO | get_remote_rule_exclusions | Retrieved a total of 19 rule exclusions
 01-May-25 12:15:36 MDT | INFO | get_remote_rule_exclusions | Retrieved deployment state for a total of 19 rule exclusions
 01-May-25 12:15:36 MDT | INFO | dump_rule_exclusion_config | Writing rule exclusion config to /Users/x/Documents/projects/detection-rules/tools/content_manager/rule_exclusions_config.yaml
+```
+
+## Managing saved searches in Google SecOps
+
+### Retrieve saved searches from Google SecOps
+
+The `saved-searches get` command retrieves the latest version of all saved
+searches from Google SecOps and writes them to a `saved_search_config.yaml`
+file.
+
+The saved search content, configuration, and metadata is written to the
+`saved_search_config.yaml` file.
+
+Example output from `saved-searches get` command:
+
+```
+(venv) $ python -m content_manager saved-searches get
+10-Nov-25 14:11:37 MST | INFO | <module> | Content Manager started
+10-Nov-25 14:11:37 MST | INFO | get_saved_searches | Attempting to pull latest version of all saved searches from Google SecOps and update the local config file
+10-Nov-25 14:11:38 MST | INFO | get_remote_saved_searches | Attempting to retrieve all saved searches from Google SecOps
+10-Nov-25 14:11:38 MST | INFO | get_remote_saved_searches | Retrieved 11 saved searches
+10-Nov-25 14:11:38 MST | INFO | get_remote_saved_searches | Retrieved a total of 11 saved searches
+10-Nov-25 14:11:38 MST | INFO | dump_saved_search_config | Writing saved search config to /Users/x/Documents/projects/detection-rules/tools/content_manager/saved_search_config.yaml
+```
+
+### Update saved searches in Google SecOps
+
+The `saved-searches update` command updates saved searches in Google
+SecOps based on the local config file (`saved_search_config.yaml`).
+
+Saved search updates include:
+
+* Create a new saved search
+* Update the display name (title) for a saved search
+* Update the query for a saved search
+* Update the description for a saved search
+* Update the sharing settings for a saved search
+* Update placeholder variable and placeholder variable descriptions for a
+saved search
+
+Please refer to the example saved searches in the `saved_search_config.yaml`
+file to understand the expected format for these files.
+
+To create a new saved search, add a new entry to the
+`saved_search_config.yaml` file and execute the `saved-searches update`
+command. Please see the example below.
+
+```
+Top 10 Suricata Rules:
+  description: Statistical Search Workshop
+  query: |-
+    metadata.vendor_name = "Suricata" nocase
+    $rule_name = security_result.rule_name
+    match:
+        $rule_name
+    outcome:
+      $event_count = count_distinct(metadata.id)
+    order:
+      $event_count desc
+    limit:
+    10
+  sharing_mode: MODE_SHARED_WITH_CUSTOMER
+```
+
+Existing saved searches can be updated by modifying the
+`saved_search_config.yaml` file and executing the `saved-searches update`
+command.
+
+Example output from update saved searches command.
+
+```
+(venv) $ python -m content_manager saved-searches update
+10-Nov-25 14:25:46 MST | INFO | <module> | Content Manager started
+10-Nov-25 14:25:46 MST | INFO | update_saved_searches | Attempting to update saved searches in Google SecOps based on the local config file
+10-Nov-25 14:25:46 MST | INFO | update_remote_saved_searches | Attempting to update saved searches in Google SecOps based on local config file /Users/x/Documents/projects/detection-rules/tools/content_manager/saved_search_config.yaml
+10-Nov-25 14:25:46 MST | INFO | load_saved_search_config | Loading saved search config from /Users/x/Documents/projects/detection-rules/tools/content_manager/saved_search_config.yaml
+10-Nov-25 14:25:46 MST | INFO | load_saved_search_config | Loaded 12 saved search config entries from file /Users/x/Documents/projects/detection-rules/tools/content_manager/saved_search_config.yaml
+10-Nov-25 14:25:46 MST | INFO | update_remote_saved_searches | Attempting to retrieve latest version of all saved searches from Google SecOps
+10-Nov-25 14:25:46 MST | INFO | get_remote_saved_searches | Attempting to retrieve all saved searches from Google SecOps
+10-Nov-25 14:25:47 MST | INFO | get_remote_saved_searches | Retrieved 12 saved searches
+10-Nov-25 14:25:47 MST | INFO | get_remote_saved_searches | Retrieved a total of 12 saved searches
+10-Nov-25 14:25:47 MST | INFO | update_remote_saved_searches | Checking if any saved search updates are required
+10-Nov-25 14:25:47 MST | INFO | update_remote_saved_searches | Saved search Top 10 Suricata Rules - Description for local and remote saved search is different. Remote saved search will be updated
+10-Nov-25 14:25:47 MST | INFO | update_remote_saved_searches | Saved search Top 10 Suricata Rules - Updating remote saved search
+10-Nov-25 14:25:48 MST | INFO | update | Logging summary of saved search changes...
+10-Nov-25 14:25:48 MST | INFO | update | Saved searches created: 0
+10-Nov-25 14:25:48 MST | INFO | update | Saved searches updated: 1
+10-Nov-25 14:25:48 MST | INFO | update | updated saved search ('Top 10 Suricata Rules', 'projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/users/me/searchQueries/baf471b7-067f-4a73-91c4-12cff0c0c29c')
+10-Nov-25 14:25:48 MST | INFO | get_remote_saved_searches | Attempting to retrieve all saved searches from Google SecOps
+10-Nov-25 14:25:49 MST | INFO | get_remote_saved_searches | Retrieved 12 saved searches
+10-Nov-25 14:25:49 MST | INFO | get_remote_saved_searches | Retrieved a total of 12 saved searches
+10-Nov-25 14:25:49 MST | INFO | dump_saved_search_config | Writing saved search config to /Users/x/Documents/projects/detection-rules/tools/content_manager/saved_search_config.yaml
 ```
 
 ## Need help?

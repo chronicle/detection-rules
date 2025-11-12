@@ -26,7 +26,6 @@ from google_secops_api.saved_searches.list_saved_searches import list_saved_sear
 from google_secops_api.saved_searches.update_saved_search import update_saved_search
 import pydantic
 import ruamel.yaml
-import ruamel.yaml.scalarstring.LiteralScalarString
 
 
 LOGGER = logging.getLogger()

@@ -467,6 +467,20 @@ class SavedSearches:
           )
           update_remote_saved_search = True
 
+        # Check if the saved search's query type should be updated
+        LOGGER.debug(
+            "Saved search %s - Comparing the query type of the local and"
+            " remote saved search",
+            saved_search_name,
+        )
+        if local_saved_search.query_type != remote_saved_search.query_type:
+          LOGGER.info(
+              "Saved search %s - Query type for local and remote saved search"
+              " is different. Remote saved search will be updated",
+              saved_search_name,
+          )
+          update_remote_saved_search = True
+
         if update_remote_saved_search:
           LOGGER.info(
               "Saved search %s - Updating remote saved search",
@@ -491,6 +505,7 @@ class SavedSearches:
                       local_saved_search.placeholder_descriptions
                   ),
                   "metadata": {"sharing_mode": local_saved_search.sharing_mode},
+                  "query_type": local_saved_search.query_type,
               },
           )
 

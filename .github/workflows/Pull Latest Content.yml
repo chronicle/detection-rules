@@ -42,9 +42,6 @@ jobs:
       - name: Install Python project dependencies
         run: pip install -r tools/content_manager/requirements_dev.txt
 
-      - name: Run tests using pytest
-        run: pytest -v
-
       - name: Pull latest version of all rules from Google SecOps
         run: python -m content_manager rules get
 

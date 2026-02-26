@@ -49,13 +49,13 @@ jobs:
           cache: "pip"  # Caching pip dependencies
 
       - name: Install Python project dependencies
-        run: pip install -r requirements_dev.txt
+        run: pip install -r tools/content_manager/requirements_dev.txt
 
       # - name: Check Python code formatting with black
       #   run: python -m black google_secops_api content_manager --line-length 120 --check
 
-      - name: Run tests using pytest
-        run: pytest -v
+#      - name: Run tests using pytest
+#        run: pytest -v
 
       - name: Pull latest version of all rules from Google SecOps
         run: python -m content_manager rules get

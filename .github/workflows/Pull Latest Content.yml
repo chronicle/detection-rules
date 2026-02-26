@@ -32,7 +32,7 @@ jobs:
       - name: Authenticate using Service Account
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+          credentials_json: ${{ secrets.credentials_json }}
 
       - uses: actions/setup-python@v5
         with:

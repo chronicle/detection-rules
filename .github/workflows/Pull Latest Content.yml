@@ -35,14 +35,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - uses: google-github-actions/auth@v2
-        with:
-          project_id: ${{ vars.GOOGLE_CLOUD_PROJECT_ID }}
-          workload_identity_provider: ${{ secrets.GOOGLE_CLOUD_WORKLOAD_IDENTITY_PROVIDER}}
-          access_token_lifetime: 180s
-          export_environment_variables: true
-          create_credentials_file: true
-          cleanup_credentials: true
+- name: Authenticate using Service Account
+  uses: google-github-actions/auth@v2
+  with:
+    credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
 
       - uses: actions/setup-python@v5
         with:

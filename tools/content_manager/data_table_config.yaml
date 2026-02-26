@@ -1,20 +1,15 @@
-cisco_umbrella_top_1k_domains:
+networkscanner:
   columns:
   - column_index: 0
-    column_type: STRING
-    key_column: null
+    column_type: REGEX
+    key_column: true
     mapped_column_path: null
-    original_column: rank
-  - column_index: 1
-    column_type: STRING
-    key_column: null
-    mapped_column_path: null
-    original_column: domain
-  create_time: '2025-05-13T20:22:30.616601Z'
-  description: Cisco Umbrella top 1,000 domains
-  resource_name: projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/dataTables/cisco_umbrella_top_1k_domains
+    original_column: scannertools
+  create_time: '2025-12-15T02:31:20.543456Z'
+  description: 'List of networkscanners '
+  resource_name: projects/582443977294/locations/australia-southeast1/instances/600cf364-dd88-4be3-b31d-1e54696ccefd/dataTables/networkscanner
   row_time_to_live: null
   rule_associations_count: null
   rules: null
-  update_time: '2025-05-13T20:22:31.041118Z'
-  uuid: d9b6ce36e9874a50945bf8c1cdfc3812
+  update_time: '2026-02-23T02:11:39.182430Z'
+  uuid: bd4403f7ae7c4e30a3a26feaf187e60f

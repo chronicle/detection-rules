@@ -1,7 +1,33 @@
-example_list_1:
-  description: Description for example reference list 1
-  resource_name: projects/1234567891234/locations/us/instances/3f0ac524-5ae1-4bfd-b86d-53afc953e7e6/referenceLists/example_list_1
-  revision_create_time: '2024-02-26T18:28:49.613087Z'
+Private_IP_Ranges:
+  description: This list contains general Private IP Ranges to be used in Use cases
+  resource_name: projects/582443977294/locations/australia-southeast1/instances/600cf364-dd88-4be3-b31d-1e54696ccefd/referenceLists/Private_IP_Ranges
+  revision_create_time: '2025-11-20T01:23:42.550847Z'
+  rule_associations_count: 5
+  rules:
+  - projects/582443977294/locations/australia-southeast1/instances/600cf364-dd88-4be3-b31d-1e54696ccefd/rules/ru_0b7e45d2-99e2-4050-8e1b-009a5e537968
+  - projects/582443977294/locations/australia-southeast1/instances/600cf364-dd88-4be3-b31d-1e54696ccefd/rules/ru_170216c7-a163-45c5-86f9-0f50cfe45a6b
+  - projects/582443977294/locations/australia-southeast1/instances/600cf364-dd88-4be3-b31d-1e54696ccefd/rules/ru_35fe9bdb-d1d0-45e3-b1a7-542b7e5ff2fc
+  - projects/582443977294/locations/australia-southeast1/instances/600cf364-dd88-4be3-b31d-1e54696ccefd/rules/ru_437f747a-cea5-4fb3-9260-2203add84022
+  - projects/582443977294/locations/australia-southeast1/instances/600cf364-dd88-4be3-b31d-1e54696ccefd/rules/ru_46f64a9c-a2f0-4e6f-8591-4b936dc25006
+  syntax_type: REFERENCE_LIST_SYNTAX_TYPE_CIDR
+first_party_ms_cloud_apps:
+  description: first_party_ms_cloud_apps
+  resource_name: projects/582443977294/locations/australia-southeast1/instances/600cf364-dd88-4be3-b31d-1e54696ccefd/referenceLists/first_party_ms_cloud_apps
+  revision_create_time: '2025-11-05T03:36:59.838351Z'
   rule_associations_count: null
   rules: null
   syntax_type: REFERENCE_LIST_SYNTAX_TYPE_PLAIN_TEXT_STRING
+maliciousPowerShellKeywords:
+  description: 'Contains list of powershell keywords that are well-known from exploitation
+    frameworks.
+
+    Reference sigma rule:
+
+    f62176f3-8128-4faa-bf6c-83261322e5eb
+
+    89819aa4-bbd6-46bc-88ec-c7f7fe30efa6'
+  resource_name: projects/582443977294/locations/australia-southeast1/instances/600cf364-dd88-4be3-b31d-1e54696ccefd/referenceLists/maliciousPowerShellKeywords
+  revision_create_time: '2025-11-20T03:19:49.707343Z'
+  rule_associations_count: null
+  rules: null
+  syntax_type: REFERENCE_LIST_SYNTAX_TYPE_REGEX

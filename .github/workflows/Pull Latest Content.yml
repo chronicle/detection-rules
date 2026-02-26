@@ -55,7 +55,13 @@ jobs:
         run: python -m content_manager reference-lists get
 
       - name: Add files to git staging area
-        run: git add rules rule_config.yaml data_tables data_table_config.yaml reference_lists reference_list_config.yaml
+        run: |
+          git add rules
+          git add tools/content_manager/rule_config.yaml
+          git add tools/content_manager/data_table_config.yaml
+          git add tools/content_manager/reference_list_config.yaml
+          git add tools/content_manager/data_tables
+          git add tools/content_manager/reference_lists
 
       - name: Run git status command
         run: git status

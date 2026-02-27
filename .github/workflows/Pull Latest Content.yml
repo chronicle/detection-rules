@@ -53,7 +53,7 @@ jobs:
 
       - name: Add files to git staging area
         run: |
-          git add rules
+          git add tools/content_manager/rules
           git add tools/content_manager/rule_config.yaml
           git add tools/content_manager/data_table_config.yaml
           git add tools/content_manager/reference_list_config.yaml

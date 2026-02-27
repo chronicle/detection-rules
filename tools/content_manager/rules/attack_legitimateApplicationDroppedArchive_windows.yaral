@@ -1,0 +1,21 @@
+rule attack_legitimateApplicationDroppedArchive_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects programs on a Windows system that should not write an archive to disk"
+    severity = "HIGH"
+    created = "2024-02-04"
+    product = "windows"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/file/file_event/file_event_win_susp_legitimate_app_dropping_archive.yml"
+    mitre = "t1218"
+
+  events:
+    
+    $security.metadata.event_type = "FILE_CREATION" and 
+    (($security.target.process.file.full_path = /.*\\winword.exe$/ nocase or $security.target.process.file.full_path = /.*\\excel.exe$/ nocase or $security.target.process.file.full_path = /.*\\powerpnt.exe$/ nocase or $security.target.process.file.full_path = /.*\\msaccess.exe$/ nocase or $security.target.process.file.full_path = /.*\\mspub.exe$/ nocase or $security.target.process.file.full_path = /.*\\eqnedt32.exe$/ nocase or $security.target.process.file.full_path = /.*\\visio.exe$/ nocase or $security.target.process.file.full_path = /.*\\wordpad.exe$/ nocase or $security.target.process.file.full_path = /.*\\wordview.exe$/ nocase or $security.target.process.file.full_path = /.*\\certutil.exe$/ nocase or $security.target.process.file.full_path = /.*\\certoc.exe$/ nocase or $security.target.process.file.full_path = /.*\\CertReq.exe$/ nocase or $security.target.process.file.full_path = /.*\\Desktopimgdownldr.exe$/ nocase or $security.target.process.file.full_path = /.*\\esentutl.exe$/ nocase or $security.target.process.file.full_path = /.*\\finger.exe$/ nocase or $security.target.process.file.full_path = /.*\\notepad.exe$/ nocase or $security.target.process.file.full_path = /.*\\AcroRd32.exe$/ nocase or $security.target.process.file.full_path = /.*\\RdrCEF.exe$/ nocase or $security.target.process.file.full_path = /.*\\mshta.exe$/ nocase or $security.target.process.file.full_path = /.*\\hh.exe$/ nocase) and ($security.target.file.full_path = /.*.zip$/ nocase or $security.target.file.full_path = /.*.rar$/ nocase or $security.target.file.full_path = /.*.7z$/ nocase or $security.target.file.full_path = /.*.diagcab$/ nocase or $security.target.file.full_path = /.*.appx$/ nocase))
+
+  condition:
+    $security
+}

@@ -1,0 +1,25 @@
+rule defenseEvasion_rootCertificateInstallViaPowerShell_windows {
+  meta:
+    author = "Srijan Kafle"
+    description = "Adversaries may install a root certificate on a compromised system to avoid warnings when connecting to adversary controlled web servers."
+    sigma_id = "42821614-9264-4761-acfc-5772c3286f76"
+    severity = "MEDIUM"
+    created = "2024-02-27"
+    product = "microsoft"
+    tag = "credential"
+    service = "ps_script"
+    status = "test"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/powershell/powershell_script/posh_ps_root_certificate_installed.yml"
+    mitre = "Subvert Trust Controls: Install Root Certificate,t1553.004"
+
+  events:
+    $powershell.metadata.log_type = "POWERSHELL"
+   (((re.regex($powershell.target.process.command_line, `.*Move-Item.*`) nocase) and 
+    (re.regex($powershell.target.process.command_line, `.*Cert:\\LocalMachine\\Root.*`) nocase)) or 
+    ((re.regex($powershell.target.process.command_line, `.*Import-Certificate.*`) nocase) and 
+    (re.regex($powershell.target.process.command_line, `.*Cert:\\LocalMachine\\Root.*`) nocase)))
+
+
+  condition:
+    $powershell
+}

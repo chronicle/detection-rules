@@ -1,0 +1,48 @@
+rule user_login_from_multiple_countries {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Detect multiple user logins from multiple countries using Chronicle GeoIP enrichment."
+    rule_id = "mr_3fa832e4-1ac0-42cd-9f0a-357d6b8fb12f"
+    rule_name = "GeoIP User Login From Multiple Countries"
+    type = "alert"
+    data_source = "microsoft ad, azure ad, okta, aws cloudtrail, google scc"
+    tags = "geoip enrichment"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.security_result.action = "ALLOW"
+    $login.principal.ip_geo_artifact.location.country_or_region != ""
+
+    $login.principal.ip_geo_artifact.location.country_or_region = $country
+    $login.metadata.product_name = $product
+    $login.target.user.userid = $user
+
+  match:
+    $user, $product over 1h
+
+  outcome:
+    $risk_score = 35
+    $event_count = count_distinct($login.metadata.id)
+    $dc_state = count_distinct($login.principal.ip_geo_artifact.location.state)
+    $array_state = array_distinct($login.principal.ip_geo_artifact.location.state)
+    $dc_country_or_region = count_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $array_country_or_region = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    $array_asn = array_distinct($login.principal.ip_geo_artifact.network.asn)
+    $array_carrier_name = array_distinct($login.principal.ip_geo_artifact.network.carrier_name)
+    //added to populate alert graph with additional context
+    $principal_hostname = array_distinct($login.principal.hostname)
+    $principal_ip = array_distinct($login.principal.ip)
+    $target_hostname = array_distinct($login.target.hostname)
+    $target_ip = array_distinct($login.target.ip)
+    $principal_user_userid = array_distinct($login.principal.user.userid)
+    $target_user_userid = array_distinct($login.target.user.userid)
+    $principal_resource_name = array_distinct($login.principal.resource.name)
+    $target_resource_name = array_distinct($login.target.resource.name)
+    $target_url = array_distinct($login.target.url)
+
+  condition:
+    #country > 1 
+}

@@ -1,0 +1,21 @@
+rule exfiltration_possibleExfilOverSMTP_windows {
+  meta:
+    author = "Srijan Kafle"
+    description = "Adversaries may steal data by exfiltrating it over an un-encrypted network protocol other than that of the existing command and control channel. The data may also be sent to an alternate network location from the main command and control server."
+    sigma_id = "9a7afa56-4762-43eb-807d-c3dc9ffe211b"
+    severity = "MEDIUM"
+    created = "2024-02-27"
+    product = "microsoft"
+    tag = "credential"
+    service = "ps_script"
+    status = "test"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/powershell/powershell_script/posh_ps_send_mailmessage.yml"
+    mitre = "Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol,t1048.003"
+
+  events:
+    re.regex($powershell.target.process.command_line, `.*Send-MailMessage*-Attachments.*`) nocase
+
+
+  condition:
+    $powershell
+}

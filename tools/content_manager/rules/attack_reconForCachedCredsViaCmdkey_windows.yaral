@@ -1,0 +1,25 @@
+rule attack_reconForCachedCredsViaCmdkey_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects usage of cmdkey to look for cached credentials on the system"
+    severity = "MEDIUM"
+    created = "2024-01-30"
+    product = "window"
+    tag = "attack_credential_access"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_cmdkey_recon.yml"
+    mitre = "attack.credential_access,t1003.005"
+
+  events:
+    
+   $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\cmdkey\.exe`) nocase) or 
+    ($security.target.file.full_path = "cmdkey.exe" nocase)) and 
+    (re.regex($security.target.process.command_line, `.* -l.*`) nocase or 
+    re.regex($security.target.process.command_line, `.* \/l.*`) nocase)
+
+
+  condition:
+    $security
+}

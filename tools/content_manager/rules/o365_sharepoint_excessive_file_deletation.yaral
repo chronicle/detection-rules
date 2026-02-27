@@ -1,0 +1,33 @@
+rule o365_sharepoint_excessive_file_deletation {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Identifies when an excessive number of files are deleted."
+    mitre_attack_tactic = "Exfiltration"
+    mitre_attack_url = "https://attack.mitre.org/tactics/TA0010/"
+    mitre_attack_version = "v14.1"
+    type = "alert"
+    data_source = "o365"
+    severity = "Medium"
+    priority = "Medium"
+    created = "2025-06-25"
+
+  events:
+
+    $app.metadata.event_type = "FILE_DELETION"
+    $app.metadata.log_type = "OFFICE_365"
+    $app.target.file.full_path = $filename
+    $app.principal.user.userid = $user
+
+match: 
+    $user over 1h
+
+  outcome:
+    $risk_score = 47
+    $mitre_attack_tactic = "Exfiltration"
+    $mitre_attack_technique_id = "TA0010"
+    $uniq_filename = count($filename)
+
+  condition:
+    $app and $uniq_filename >50
+}

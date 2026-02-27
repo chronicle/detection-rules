@@ -1,0 +1,53 @@
+rule suspicious_execution_of_renamed_sysinternals_tools__registry {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects the creation of the accepteula key related to the Sysinternals tools being created from executables with the wrong name (e.g. a renamed Sysinternals tool)"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_add/registry_add_pua_sysinternals_renamed_execution_via_eula.yml"
+    status = "test"
+    tags = "attack.resource-development, attack.t1588.002"
+    falsepositives = "Unlikely"
+    severity = "high"
+    created = "2024-09-02"
+
+  events:
+    (re.regex($security.target.registry.registry_key, `.*\\Active Directory Explorer.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\Handle.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\LiveKd.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\ProcDump.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\Process Explorer.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\PsExec.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\PsLoggedon.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\PsLoglist.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\PsPasswd.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\PsPing.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\PsService.*`) nocase or 
+    re.regex($security.target.registry.registry_key, `.*\\SDelete.*`) nocase) and 
+    re.regex($security.target.registry.registry_key, `.*\\EulaAccepted`) nocase and 
+    not (re.regex($security.target.process.file.full_path, `.*\\ADExplorer\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\ADExplorer64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\handle\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\handle64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\livekd\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\livekd64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\procdump\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\procdump64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\procexp\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\procexp64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\PsExec\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\PsExec64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\PsLoggedon\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\PsLoggedon64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\psloglist\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\psloglist64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\pspasswd\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\pspasswd64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\PsPing\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\PsPing64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\PsService\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\PsService64\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\sdelete\.exe`) nocase)
+
+
+  condition:
+    $security
+}

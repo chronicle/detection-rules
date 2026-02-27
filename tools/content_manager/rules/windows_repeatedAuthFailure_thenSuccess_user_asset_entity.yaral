@@ -1,0 +1,67 @@
+rule windows_repeatedAuthFailure_thenSuccess_user_asset_entity {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Detect Multiple Failed Login Attempts followed by Successful Login"
+    rule_id = "mr_2a9dc1d2-d4b8-4b80-a494-3369c681da60"
+    rule_name = "MITRE ATT&CK T1110.001 Windows Repeated Authentication Failures Before Successful One With User Entity"
+    type = "alert"
+    tags = "user entity, asset entity"
+    assumption = "Assumes ingestion of Windows users and assets to entity graph to entity graph"
+    data_source = "microsoft windows events"
+    platform = "Windows"
+    severity = "Medium"
+    priority = "Medium"
+    tactic = "TA0006"
+    technique = "T1110.001"
+
+  events:
+    $fail.metadata.event_type = "USER_LOGIN"
+    $fail.metadata.vendor_name = "Microsoft"
+    $fail.principal.hostname = $hostname
+    $fail.target.user.userid = $target_user
+    $fail.security_result.action = "BLOCK"
+    $fail.metadata.product_event_type = "4625"
+
+    $fail.metadata.event_timestamp.seconds < $success.metadata.event_timestamp.seconds
+
+    $success.metadata.event_type = "USER_LOGIN"
+    $success.metadata.vendor_name = "Microsoft"
+    $success.target.user.userid = $target_user
+    $success.principal.hostname = $hostname
+    $success.security_result.action = "ALLOW"
+    $success.metadata.product_event_type = "4624"
+
+    $user.graph.entity.user.userid = $target_user
+    $user.graph.metadata.entity_type = "USER"
+    $user.graph.metadata.source_type = "ENTITY_CONTEXT"
+    any $user.graph.relations.entity.group.group_display_name = "Domain Admins"
+
+    
+    $asset.graph.entity.asset.hostname = $hostname
+    $asset.graph.metadata.entity_type = "ASSET"
+    $asset.graph.metadata.source_type = "ENTITY_CONTEXT"
+    any $asset.graph.relations.entity.group.group_display_name = "Domain Controllers"
+
+  match:
+    $target_user, $hostname over 15m
+
+    outcome:
+    $risk_score = max(if($hostname = /activedir/, 75, 50))
+    $failed_login_threshold = 5
+    $impacted_systems = array_distinct($hostname)
+    $impacted_users = array_distinct($target_user)
+    $alert_type = "Successful Brute Force Attack"
+    $tlp = "red"
+    $principal_ip = array_distinct($success.principal.ip)
+    $target_hostname = array_distinct($success.target.hostname)
+    $src_hostname = array_distinct($success.src.hostname)
+    $target_ip = array_distinct($success.target.ip)
+    $principal_user_userid = array_distinct($success.principal.user.userid)
+    $principal_resource_name = array_distinct($success.principal.resource.name)
+    $target_resource_name = array_distinct($success.target.resource.name)
+    $target_url = array_distinct($success.target.url)
+
+  condition:
+    #fail > 4 and $success and $user and $asset
+}

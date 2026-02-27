@@ -1,0 +1,26 @@
+rule potential_command_line_path_traversal_evasion_attempt {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects potential evasion or obfuscation attempts using bogus path traversal via the commandline"
+    reference = "https://detection.fyi/sigmahq/sigma/windows/process_creation/proc_creation_win_susp_commandline_path_traversal_evasion/?query=potential%20command%20line%20path%20traversal%20evasion%20attempt"
+    status = "test"
+    tags = "attack.defense-evasion, attack.t1036"
+    falsepositives = "Google Drive, Citrix"
+    severity = "medium"
+    created = "2024-09-02"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\Windows\\.*`) nocase and 
+    (re.regex($security.target.process.command_line, `.*\\\.\.\\Windows\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\\.\.\\System32\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\\.\.\\\.\.\\.*`) nocase)) or 
+    (re.regex($security.target.process.command_line, `.*\.exe\\\.\.\\.*`) nocase)) and 
+    not ((re.regex($security.target.process.command_line, `.*\\Google\\Drive\\googledrivesync\.exe\\\.\.\\.*`) nocase) or 
+    (re.regex($security.target.process.command_line, `.*\\Citrix\\Virtual Smart Card\\Citrix\.Authentication\.VirtualSmartcard\.Launcher\.exe\\\.\.\\.*`) nocase))
+
+  condition:
+    $security
+
+}

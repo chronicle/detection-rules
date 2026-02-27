@@ -1,0 +1,30 @@
+rule sensitiveFileDumpViaWbadminEXE_windows {
+
+  meta:
+    author = "Hritik Thapa"
+    description = "Detects the dump of highly sensitive files such as \"NTDS.DIT\" and \"SECURITY\" hive. Attackers can leverage the \"wbadmin\" utility in order to dump sensitive files that might contain credential or sensitive information."
+    severity = "HIGH"
+    created = "2024-09-06"
+    product = "microsoft"
+    tag = "sysmon"
+    service = "processCreation"
+    mitre = "Credential Access,T1003.003"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wbadmin_dump_sensitive_files.yml"
+
+  events:
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\wbadmin\.exe`) nocase) or 
+    ($security.target.file.full_path = "WBADMIN.EXE" nocase)) and 
+    (re.regex($security.target.process.command_line, `.*start.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*backup.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*\\config\\SAM.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\config\\SECURITY.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\config\\SYSTEM.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\Windows\\NTDS\\NTDS\.dit.*`) nocase)
+    
+
+  condition:
+    $security
+}
+
+

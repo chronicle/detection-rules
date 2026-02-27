@@ -1,0 +1,25 @@
+rule attack_certificateExportedviaCertutil_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects the execution of the certutil with the 'exportPFX' flag which allows the utility to export certificates."
+    severity = "MEDIUM"
+    created = "2024-01-30"
+    product = "window"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certutil_export_pfx.yml"
+    mitre = "attack.t1027"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\certutil\.exe`) nocase) or 
+    ($security.target.file.full_path = "CertUtil.exe" nocase)) and 
+    (re.regex($security.target.process.command_line, `.*-exportPFX .*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\/exportPFX .*`) nocase)
+
+
+  condition:
+    $security
+}

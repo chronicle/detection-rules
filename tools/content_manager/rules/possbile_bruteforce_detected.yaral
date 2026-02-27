@@ -1,0 +1,38 @@
+rule possbile_bruteforce_detected {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Detects more than 10 authentication failure under 10 min"
+    severity = "WARN"
+    created = "2023-11-15"
+    product = "*"
+    service = "login"
+    mitre = "Brute Force, t1110"
+
+  events:
+    $failure.metadata.event_type = "USER_LOGIN"
+    $failure.security_result.action = "BLOCK"
+
+    $failure.principal.user.userid = $username
+    $failure.principal.namespace = $customer
+
+  match:
+    $customer,$username over 10m
+
+  outcome:
+    $risk_score = max(
+        // Country mismatch
+        if($failure.principal.ip_geo_artifact.location.country_or_region = $failure.principal.ip_geo_artifact.location.country_or_region, 40) +
+        // Unauthorized geographies
+        if($failure.principal.ip_geo_artifact.location.country_or_region = "Cuba", 10) +
+        if($failure.principal.ip_geo_artifact.location.country_or_region = "Iran", 10) +
+        if($failure.principal.ip_geo_artifact.location.country_or_region = "North Korea" , 10) +
+        if($failure.principal.ip_geo_artifact.location.country_or_region = "Russia", 10) +
+        if($failure.principal.ip_geo_artifact.location.country_or_region = "Syria", 10)
+    )
+    
+
+  condition:
+    #failure = 10
+    
+}

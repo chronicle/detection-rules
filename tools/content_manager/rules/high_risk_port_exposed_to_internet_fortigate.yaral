@@ -1,0 +1,32 @@
+rule high_risk_port_exposed_to_internet_fortigate{
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "This rule is triggred whenever hight risk port exposed to internet"
+    type = "alert"
+    severity = "Medium"
+    created = "2025-03-18"
+    product = "Fortinet"
+
+  events:
+
+    $exposed.metadata.vendor_name = "Fortinet"
+    $exposed.security_result.action = "ALLOW"
+    not $exposed.principal.ip in cidr %Private_IP_Ranges
+    $exposed.target.port = 22 or
+    $exposed.target.port = 21 or
+    $exposed.target.port = 25 or
+    $exposed.target.port = 445 or
+    $exposed.target.port = 23 or
+    $exposed.target.port = 3389 or
+    $exposed.target.port = 135
+    $exposed.principal.namespace = $customer
+    $exposed.principal.ip = $sourceip
+
+  match:
+    $customer, $sourceip over 1h
+
+
+  condition:
+    $exposed 
+}

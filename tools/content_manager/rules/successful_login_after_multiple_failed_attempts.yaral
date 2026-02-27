@@ -1,0 +1,57 @@
+rule successful_login_after_multiple_failed_attempts {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Detects successful login after multiple failed attempts"
+    rule_id = "mr_8ba028b6-98e3-4983-92e9-c0fe50419a20"
+    rule_name = "Successful Login After Multiple Failed Attempts"
+    mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    mitre_attack_technique = "Valid Accounts"
+    mitre_attack_version = "v13.1"
+    type = "Alert"
+    severity = "Medium"
+    priority = "Medium"
+    created = "2024-09-13"
+
+  events:
+    NOT $fail.additional.fields["resultType"] = "50055" // Azure - Password Expired Code //SENG-910
+    $fail.metadata.event_type = "USER_LOGIN"
+    $fail.security_result.action = "BLOCK"
+    $fail.target.user.user_display_name = $user
+
+    NOT $success.additional.fields["resultType"] = "50055"
+    $success.metadata.event_type = "USER_LOGIN"
+    $success.security_result.action = "ALLOW"
+    $success.target.user.user_display_name = $user
+
+
+    $success.metadata.event_timestamp.seconds > $fail.metadata.event_timestamp.seconds
+
+  match:
+    $user over 10m
+
+  outcome:
+    $risk_score = max(
+        // Country mismatch
+        if($fail.principal.ip_geo_artifact.location.country_or_region = $success.principal.ip_geo_artifact.location.country_or_region, 40) +
+        // Unauthorized geographies
+        if($success.principal.ip_geo_artifact.location.country_or_region = "Cuba", 10) +
+        if($success.principal.ip_geo_artifact.location.country_or_region = "Iran", 10) +
+        if($success.principal.ip_geo_artifact.location.country_or_region = "North Korea" , 10) +
+        if($success.principal.ip_geo_artifact.location.country_or_region = "Russia", 10) +
+        if($success.principal.ip_geo_artifact.location.country_or_region = "Syria", 10)
+    )
+    $mitre_attack_tactic = "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    $mitre_attack_technique = "Valid Accounts"
+    $mitre_attack_technique_id = "T1078"
+    $event_count = count_distinct($success.metadata.id) + count_distinct($fail.metadata.id)
+    $principal_ip = array_distinct($success.principal.ip)
+    $principal_ip_country = array_distinct($success.principal.ip_geo_artifact.location.country_or_region)
+    $principal_ip_state = array_distinct($success.principal.ip_geo_artifact.location.state)
+    $target_user_userid = array_distinct($success.target.user.userid)
+    $target_resource_name = array_distinct($success.target.resource.name)
+    $target_resource_product_object_id = array_distinct($success.target.resource.product_object_id)
+
+  condition:
+    #fail > 50 and $success
+}

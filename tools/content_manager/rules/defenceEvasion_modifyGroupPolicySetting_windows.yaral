@@ -1,0 +1,26 @@
+rule defenceEvasion_modifyGroupPolicySetting_windows {
+
+  meta:
+    author = "Srijan Kafle"
+    description = "Detect malicious GPO modifications can be used to implement many other malicious behaviors."
+    severity = "MEDIUM"
+    created = "2024-02-05"
+    product = "microsoft"
+    tag = "security_audit"
+    service = "powershell"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/powershell/powershell_script/posh_ps_modify_group_policy_settings.yml"
+    mitre = "Domain Policy Modification: Group Policy Modification,t1484.001"
+
+  events:
+    re.regex($powershellBlock.target.process.command_line, `.*\\SOFTWARE\\Policies\\Microsoft\\Windows\\System.*`) nocase and 
+    (re.regex($powershellBlock.target.process.command_line, `.*GroupPolicyRefreshTimeDC.*`) nocase or 
+    re.regex($powershellBlock.target.process.command_line, `.*GroupPolicyRefreshTimeOffsetDC.*`) nocase or 
+    re.regex($powershellBlock.target.process.command_line, `.*GroupPolicyRefreshTime.*`) nocase or 
+    re.regex($powershellBlock.target.process.command_line, `.*GroupPolicyRefreshTimeOffset.*`) nocase or 
+    re.regex($powershellBlock.target.process.command_line, `.*EnableSmartScreen.*`) nocase or 
+    re.regex($powershellBlock.target.process.command_line, `.*ShellSmartScreenLevel.*`) nocase)
+
+  condition:
+    $powershellBlock
+}

@@ -1,0 +1,56 @@
+rule attack_mshtaSuspiciousExecution_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detection for mshta.exe suspicious execution patterns sometimes involving file polyglotism"
+    severity = "HIGH"
+    created = "2024-02-03"
+    product = "windows"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mshta_susp_execution.yml"
+    mitre = "t1218.005,t1140,t1059.007"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\mshta\.exe`) nocase) or 
+    ($security.target.file.full_path = "mshta.exe" nocase)) and 
+    (re.regex($security.target.process.command_line, `.*\.7z.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.avi.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.bat.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.bmp.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.conf.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.csv.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.dll.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.doc.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.gif.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.gz.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.ini.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.jpe.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.jpg.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.json.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.lnk.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.log.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.mkv.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.mp3.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.mp4.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.pdf.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.png.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.ppt.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.rar.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.rtf.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.svg.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.tar.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.tmp.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.txt.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.xls.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.xml.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.yaml.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.yml.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\.zip.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*vbscript.*`) nocase)
+
+  condition:
+    $security
+}

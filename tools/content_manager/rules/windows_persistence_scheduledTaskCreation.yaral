@@ -1,0 +1,39 @@
+rule windows_persistence_scheduledTaskCreation{
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Detects the creation of scheduled tasks by user accounts via the 'schtasks' utility."
+    severity = "MEDIUM"
+    created = "2024-02-06"
+    product = "microsoft"
+    tag = "persistence,privilege_escalation,execution"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_schtasks_creation.yml"
+    mitre = "Scheduled Task/Job: Scheduled Task,t1053.005"
+
+  events:
+    $security.metadata.event_type = "PROCESS_LAUNCH"
+    $security.target.process.file.full_path = /\\schtasks\.exe$/ nocase AND $security.target.process.command_line = / \/create / nocase AND ($security.target.user.userid != /AUTHORI/ nocase AND $security.target.user.userid != /AUTORI/ nocase)
+
+    not re.regex($security.principal.process.command_line, `C:\\Windows\\system32\\cmd.exe /d /s /c \"schtasks /create /tn` ) nocase AND
+    not re.regex($security.principal.process.command_line, `C:\\Program Files\\Adobe\\Adobe Creative Cloud Experience\\CCXProcess.exe`) nocase//SENG-859
+
+    not re.regex($security.target.process.command_line, `schtasks.exe /Create /tn \"Microsoft\\Office\\Office Serviceability Manager`) nocase AND 
+    not re.regex($security.target.process.command_line, `C:\\Program Files\\Common Files\\Microsoft Shared\\ClickToRun\\OfficeSvcMgrSchedule`) nocase //SENG-859
+
+    not $security.principal.process.file.full_path = "C:\\Program Files (x86)\\Lenovo\\LenovoNow\\x86\\LenovoNow.Task.exe" nocase //SENG-859
+
+    // Office processes 
+    not $security.principal.process.file.full_path = "C:\\Program Files\\Common Files\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe" nocase 
+    not $security.principal.process.file.full_path = "C:\\Program Files\\Microsoft Office\\root\\Integration\\Integrator.exe" nocase 
+    not $security.principal.process.file.full_path = "C:\\Program Files\\Common Files\\microsoft shared\\ClickToRun\\officesvcmgr.exe" nocase 
+    not $security.principal.process.file.full_path = "C:\\Program Files (x86)\\Microsoft Office\\root\\Integration\\Integrator.exe"
+
+    $security.principal.process.file.full_path = $path
+
+    match:
+    $path over 6h
+
+  condition:
+    $security
+}

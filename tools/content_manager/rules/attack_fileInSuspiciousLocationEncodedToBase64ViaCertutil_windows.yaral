@@ -1,0 +1,31 @@
+rule attack_fileInSuspiciousLocationEncodedToBase64ViaCertutil_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects the execution of certutil with the 'encode' flag to encode a file to base64 where the files are located in potentially suspicious locations"
+    severity = "HIGH"
+    created = "2024-02-04"
+    product = "windows"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certutil_encode_susp_location.yml"
+    mitre = "t1027"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\certutil\.exe`) nocase) or 
+    ($security.target.file.full_path = "CertUtil.exe" nocase)) and 
+    (re.regex($security.target.process.command_line, `.*-encode.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\/encode.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*\\AppData\\Roaming\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\Desktop\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\Local\\Temp\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\PerfLogs\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\Users\\Public\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\Windows\\Temp\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\$Recycle\.Bin.*`) nocase)
+
+  condition:
+    $security
+}

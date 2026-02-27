@@ -1,0 +1,22 @@
+rule attack_pubprnProxyExec_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects the use of the 'Pubprn.vbs' Microsoft signed script to execute commands."
+    severity = "MEDIUM"
+    created = "2024-01-30"
+    product = "windows"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_pubprn.yml"
+    mitre = "t1216.001"
+
+  events:
+    // $security.metadata.vendor_name = "Microsoft" nocase and $security.metadata.log_type = "WAZUH"
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ($security.target.process.command_line = /.*\\pubprn.vbs.*/ nocase and $security.target.process.command_line = /.*script:.*/ nocase)
+
+
+  condition:
+    $security
+}

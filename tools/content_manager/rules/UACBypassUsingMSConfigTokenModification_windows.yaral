@@ -1,0 +1,24 @@
+rule UACBypassUsingMSConfigTokenModification_windows {
+  meta:
+    author = "Srijan Kafle"
+    description = "Detects the pattern of UAC Bypass using a msconfig GUI hack (UACMe 55)"
+    sigma_id = "ad92e3f9-7eb6-460e-96b1-582b0ccbb980"
+    severity = "HIGH"
+    created = "2024-02-27"
+    product = "microsoft"
+    tag = "credential"
+    service = "ps_script"
+    status = "test"
+    technique = "Defense Evasion,TA0005"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_uac_bypass_msconfig_gui.yml"
+    mitre = "Abuse Elevation Control Mechanism: Bypass User Account Control,t1548.002"
+
+  events:
+    $powershelll.metadata.event_type = "PROCESS_LAUNCH" and 
+    re.regex($powershelll.principal.process.file.full_path, `.*\\AppData\\Local\\Temp\\pkgmgr\.exe`) nocase and 
+    $powershelll.target.process.command_line = "\"C:\\Windows\\system32\\msconfig.exe\" -5" nocase
+    $powershelll.principal.user.userid = "SYSTEM"
+
+  condition:
+    $powershelll
+}

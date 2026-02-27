@@ -1,0 +1,22 @@
+rule defenseEvasion_SuspiciousRASdialActivity_windows{
+ meta:
+    author = "Ruledev2"
+    description = "Detects suspicious process related to rasdial.exe"
+    severity = "MEDIUM"
+    created = "2024-02-4"
+    product = "microsoft"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_rasdial_execution.yml"
+    mitre = "defense_evasion,t1059"
+
+  events:
+    
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    re.regex($security.target.process.file.full_path, `.*rasdial\.exe`) nocase
+
+
+  condition:
+    $security
+}

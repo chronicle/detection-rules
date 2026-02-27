@@ -1,0 +1,26 @@
+rule lateralMovement_windowsInternetHostedWebDavShareMountViaNetEXE_windows{
+ meta:
+    author = "Ruledev2"
+    description = "Detects when an internet hosted webdav share is mounted using the 'net.exe' utility"
+    severity = "HIGH"
+    created = "2024-02-4"
+    product = "microsoft"
+    tag = "lateral_movement"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_net_use_mount_internet_share.yml"
+    mitre = "lateral_movement,t1021.002"
+
+  events:
+    
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    (((re.regex($security.target.process.file.full_path, `.*\\net\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\net1\.exe`) nocase)) or 
+    (($security.target.file.full_path = "net.exe" nocase or $security.target.file.full_path = "net1.exe" nocase))) and 
+    (re.regex($security.target.process.command_line, `.* use .*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.* http.*`) nocase)
+
+
+  condition:
+    $security
+}

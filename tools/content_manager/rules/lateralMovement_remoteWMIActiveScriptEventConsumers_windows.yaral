@@ -1,0 +1,23 @@
+rule lateralMovement_remoteWMIActiveScriptEventConsumers_windows{
+  meta:
+    author = "Srijan Kafle"
+    description = "Detect potential adversaries leveraging WMI ActiveScriptEventConsumers remotely to move laterally in a network"
+    severity = "HIGH"
+    created = "2024-02-06"
+    product = "microsoft"
+    tag = "lateral_movement,privilege_escalation,persistence"
+    service = "security"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/builtin/security/account_management/win_security_scrcons_remote_wmi_scripteventconsumer.yml"
+    mitre = "Event Triggered Execution: Windows Management Instrumentation Event Subscription,t1546.003"
+
+  events:
+    
+    $security.metadata.product_event_type = "4624" and 
+    $security.extensions.auth.auth_details = "3" and 
+    re.regex($security.target.process.file.full_path, `.*scrcons\.exe`) nocase
+
+
+  condition:
+    $security
+}

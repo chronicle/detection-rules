@@ -1,0 +1,22 @@
+rule attack_legitimateApplicationDroppedScript_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects usage of bitsadmin downloading a file"
+    severity = "HIGH"
+    created = "2024-02-04"
+    product = "windows"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/file/file_event/file_event_win_susp_legitimate_app_dropping_script.yml"
+    mitre = "t1218"
+
+  events:
+    $security.metadata.event_type = "FILE_CREATION" and 
+
+    (($security.target.process.file.full_path = /.*\\eqnedt32.exe$/ nocase or $security.target.process.file.full_path = /.*\\wordpad.exe$/ nocase or $security.target.process.file.full_path = /.*\\wordview.exe$/ nocase or $security.target.process.file.full_path = /.*\\certutil.exe$/ nocase or $security.target.process.file.full_path = /.*\\certoc.exe$/ nocase or $security.target.process.file.full_path = /.*\\CertReq.exe$/ nocase or $security.target.process.file.full_path = /.*\\Desktopimgdownldr.exe$/ nocase or $security.target.process.file.full_path = /.*\\esentutl.exe$/ nocase or $security.target.process.file.full_path = /.*\\mshta.exe$/ nocase or $security.target.process.file.full_path = /.*\\AcroRd32.exe$/ nocase or $security.target.process.file.full_path = /.*\\RdrCEF.exe$/ nocase or $security.target.process.file.full_path = /.*\\hh.exe$/ nocase or $security.target.process.file.full_path = /.*\\finger.exe$/ nocase) and ($security.target.file.full_path = /.*.ps1$/ nocase or $security.target.file.full_path = /.*.bat$/ nocase or $security.target.file.full_path = /.*.vbs$/ nocase or $security.target.file.full_path = /.*.scf$/ nocase or $security.target.file.full_path = /.*.wsf$/ nocase or $security.target.file.full_path = /.*.wsh$/ nocase))
+
+
+  condition:
+    $security
+}

@@ -1,0 +1,35 @@
+rule o365_oneDrive_excessive_file_downloads_with_OAuth_token {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Identifies when an excessive number of files are downloaded from OneDrive using OAuth authentication. Adversaries may conduct phishing campaigns to steal OAuth tokens and impersonate users. These access tokens can then be used to download files from OneDrive."
+    reference = "https://www.elastic.co/docs/reference/security/prebuilt-rules/rules/integrations/o365/collection_onedrive_excessive_file_downloads"
+    mitre_attack_tactic = "Exfiltration"
+    mitre_attack_url = "https://attack.mitre.org/tactics/TA0010/"
+    mitre_attack_version = "v14.1"
+    type = "alert"
+    data_source = "o365"
+    severity = "Medium"
+    priority = "Medium"
+    created = "2025-06-25"
+
+  events:
+    $app.metadata.product_event_type = "FileDownloaded"
+    $app.additional.fields["AuthenticationType"] = "OAuth"
+    not $app.principal.user.userid = "app@sharepoint"
+    $app.src.file.full_path = $filename
+    $app.principal.user.userid = $user
+    $app.principal.namespace = $customer
+
+match: 
+    $customer, $user over 1h
+
+  outcome:
+    $risk_score = 47
+    $mitre_attack_tactic = "Exfiltration"
+    $mitre_attack_technique_id = "TA0010"
+    $uniq_filename = count($filename)
+
+  condition:
+    $app and $uniq_filename >50
+}

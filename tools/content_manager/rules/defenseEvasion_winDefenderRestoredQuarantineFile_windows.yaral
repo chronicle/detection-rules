@@ -1,0 +1,21 @@
+rule defenseEvasion_winDefenderRestoredQuarantineFile_windows{
+ meta:
+    author = "Ruledev2"
+    description = "Windows Defender logs when the history of detected infections is deleted."
+    severity = "HIGH"
+    created = "2024-02-4"
+    product = "microsoft"
+    tag = "defense_evasion"
+    service = "windefend"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/builtin/windefend/win_defender_restored_quarantine_file.yml"
+    mitre = "defense_evasion,t1562.001"
+
+  events:
+    
+    $security.metadata.log_type = "WINDOWS_DEFENDER_AV"
+    $security.metadata.product_event_type = "1009" nocase
+
+  condition:
+    $security
+}

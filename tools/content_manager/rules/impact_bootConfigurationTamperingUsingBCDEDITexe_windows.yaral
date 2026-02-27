@@ -1,0 +1,21 @@
+rule impact_bootConfigurationTamperingUsingBCDEDITexe_windows{
+  meta:
+    author = "Srijan Kafle"
+    description = ""
+    severity = "HIGH"
+    created = "2024-02-14"
+    product = "microsoft"
+    tag = "credential"
+    service = "process_monitor"
+    status = "stable"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_bcdedit_boot_conf_tamper.yml"
+    mitre = "Inhibit System Recovery,t1490"
+
+  events:
+
+    $process.metadata.event_type = "PROCESS_LAUNCH"
+    ($process.target.process.file.full_path = /\\bcdedit\.exe$/ nocase OR $process.target.process.file.names = "bcdedit.exe" nocase) AND $process.target.process.command_line = /set/ nocase AND (($process.target.process.command_line = /bootstatuspolicy/ nocase AND $process.target.process.command_line = /ignoreallfailures/ nocase) OR ($process.target.process.command_line = /recoveryenabled/ nocase AND $process.target.process.command_line = /no/ nocase))
+
+  condition:
+    $process
+}

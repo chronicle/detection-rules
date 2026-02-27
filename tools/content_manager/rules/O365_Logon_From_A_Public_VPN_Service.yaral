@@ -1,0 +1,20 @@
+rule O365_Logon_From_A_Public_VPN_Service {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Detects users logging in from public VPN providers."
+    type = "alert"
+    severity = "Medium"
+    created = "2024-09-13"
+
+  events:
+    
+    $office.metadata.log_type = "OFFICE_365"
+    $office.metadata.product_event_type = "UserLoggedIn"
+    $office.principal.ip_geo_artifact.network.organization_name != /^vpn-consumer-au/ AND $office.principal.ip_geo_artifact.network.organization_name = /nordvpn|proton|vpn/ NOCASE
+    $office.principal.namespace = $customer
+
+
+  condition:
+    $office  
+}

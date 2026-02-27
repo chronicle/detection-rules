@@ -1,0 +1,56 @@
+rule Execution_ProcessCreateViaWMI_Windows {
+meta:
+    subject = "Process Create via WMI"
+    author = "Cywarden"
+    description = "Detects process creation via WMI, which can be used for lateral movement"
+    severity = "High"
+    mitre_category = "Execution"
+    mitre_technique_id = "T1047" // Windows Management Instrumentation
+    rule_creation_date = "11-19-2024"
+    rule_modification_date = ""
+    reference1 = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_susp_process_creation.yml"
+    reference2 = "https://github.com/splunk/security_content/blob/develop/detections/endpoint/process_execution_via_wmi.yml"
+    version = "1.0.0"
+
+events:
+    // $wmi.metadata.log_type = "WAZUH"
+    $wmi.metadata.vendor_name = "Microsoft"
+    $wmi.metadata.product_event_type = "7" // module load event to remove registry events 
+    
+    // all processes that are run by wmiprvse.exe apart from the below list and path
+    // $wmi.metadata.product_event_type = "1"
+    // $wmi.principal.process.file.full_path = /WmiPrvSE\.exe/
+    // $wmi.principal.process.parent_process.file.full_path = /svchost\.exe/
+
+    (
+        // Detect WMIC process execution with suspicious arguments
+        $wmi.principal.process.file.full_path = /WMIC\.exe/ nocase and 
+        $wmi.principal.process.command_line = /process\scall\screate/ nocase and // Matches WMIC's process creation
+        (
+        // susupicious paths and binaries
+            $wmi.principal.process.command_line = /(rundll32|bitsadmin|regsvr32|cmd|powershell|pwsh|certutil|cscript|wscript|mshta)/ nocase or 
+            $wmi.principal.process.command_line = /(\\Users\\Public\\|\\Windows\\Temp\\|\\AppData\\Local\\|\%temp\%|\%tmp\%|\%ProgramData\%|\%appdata\%|\%comspec\%|\%localappdata\%)/ nocase
+        )
+    )
+    or
+    (
+        $wmi.target.process.file.full_path = /WMIC\.exe/ nocase and 
+        $wmi.target.process.command_line = /process\scall\screate/ nocase and  // Matches WMIC's process creation
+        (
+            // susupicious paths and binaries
+            $wmi.target.process.command_line = /(rundll32|bitsadmin|regsvr32|cmd|powershell|pwsh|certutil|cscript|wscript|mshta)/ nocase or 
+            $wmi.target.process.command_line = /(\\Users\\Public\\|\\Windows\\Temp\\|\\AppData\\Local\\|\%temp\%|\%tmp\%|\%ProgramData\%|\%appdata\%|\%comspec\%|\%localappdata\%)/ nocase
+        )
+    )
+
+    $wmi.principal.namespace = $customer
+
+outcome:
+    $risk_score = 64
+    $principal_process_cmdline = array_distinct($wmi.principal.process.command_line )
+    $target_process_cmdline = array_distinct($wmi.target.process.command_line )
+    
+condition:
+    $wmi
+}
+

@@ -1,0 +1,27 @@
+rule defenseEvasion_hidingFilesWithAttribexe_windows {
+ meta:
+    author = "Srijan Kafle"
+    description = "Detects usage of attrib.exe to hide files from users."
+    rule_id = "4281cb20-2994-4580-aa63-c8b86d019934"
+    tags = "attack.defense-evasion, attack.t1564.001"
+    falsepositives = "IgfxCUIService.exe hiding *.cui files via .bat script (attrib.exe a child of cmd.exe and igfxCUIService.exe is the parent of the cmd.exe), Msiexec.exe hiding desktop.ini"
+    severity = "medium"
+    created = "2024-09-02"
+    product = "microsoft"
+    tag = "sysmon"
+    service = "processCreation"
+    reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_attrib_hiding_files.yml"
+
+  events:
+    $sysmon.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($sysmon.target.process.file.full_path, `.*\\attrib\.exe`) nocase) or 
+    ($sysmon.target.file.full_path = "ATTRIB.EXE" nocase)) and 
+    re.regex($sysmon.target.process.command_line, `.* \+h .*`) nocase and 
+    not (re.regex($sysmon.target.process.command_line, `.*\\desktop\.ini .*`) nocase) and 
+    not (re.regex($sysmon.principal.process.file.full_path, `.*\\cmd\.exe`) nocase and 
+    re.regex($sysmon.target.process.command_line, `\+R \+H \+S \+A \\.*\.cui`) nocase and 
+    re.regex($sysmon.principal.process.command_line, `C:\\\\WINDOWS\\\\system32\\.*\.bat`) nocase)
+
+  condition:
+    $sysmon
+}

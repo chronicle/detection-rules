@@ -1,0 +1,51 @@
+rule whois_dns_query_to_typosquatting_domain {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Detecting a DNS query for a domain that contains a specific string and is not registered with the defined domain registrar."
+    rule_id = "mr_32cd8835-d328-4a89-8265-f19cffe89346"
+    rule_name = "WHOIS DNS Query To Typesquatting Domain"
+    type = "hunt"
+    tags = "whois"
+    data_source = "microsoft sysmon"
+    severity = "low"
+    priority = "low"
+
+  events:
+    $dns.metadata.event_type = "NETWORK_DNS"
+    $dns.network.dns.questions.name = /nationalstorage/ nocase
+    $dns.network.dns.questions.name = $dns_query_name
+
+    $whois.graph.entity.hostname = $dns_query_name
+    $whois.graph.metadata.entity_type = "DOMAIN_NAME"
+    $whois.graph.metadata.vendor_name = "WHOIS"
+    $whois.graph.metadata.product_name = "WHOISXMLAPI Simple Whois"
+    $whois.graph.metadata.source_type = "GLOBAL_CONTEXT"
+
+    $whois.graph.entity.domain.registrar != "Corporation Service Company (Aust) Pty Ltd"
+
+    $seen.graph.entity.domain.name = $dns_query_name
+    $seen.graph.entity.domain.first_seen_time.seconds > 0
+    2592000 > timestamp.current_seconds() - $seen.graph.entity.domain.first_seen_time.seconds
+
+  match:
+    $dns_query_name over 1h
+
+  outcome:
+    $event_count = count_distinct($dns.metadata.id)
+    $principal_hostname = array_distinct($dns.principal.hostname)
+    $network_dns_questions_name = array_distinct($dns.network.dns.questions.name)
+    $network_dns_answers_data = array_distinct($dns.network.dns.answers.data)
+    $principal_ip = array_distinct($dns.principal.ip)
+    $target_ip = array_distinct($dns.target.ip)
+    $principal_process_pid = array_distinct($dns.principal.process.pid)
+    $principal_process_file_full_path = array_distinct($dns.principal.process.file.full_path)
+    $principal_process_product_specific_process_id = array_distinct($dns.principal.process.product_specific_process_id)
+    $principal_process_command_line = array_distinct($dns.principal.process.command_line)
+    $principal_process_file_sha256 = array_distinct($dns.principal.process.file.sha256)
+    $principal_process_parent_process_product_specific_process_id = array_distinct($dns.principal.process.parent_process.product_specific_process_id)
+    $principal_user_userid = array_distinct($dns.principal.user.userid)
+
+  condition:
+    $dns and $whois and $seen
+}

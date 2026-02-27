@@ -1,0 +1,21 @@
+rule execution_PotentialWMILateralMovementWmiPrvSESpawnedPowerShell_windows{
+ meta:
+    author = "Ruledev2"
+    description = "Detects Powershell as a child of the WmiPrvSE process. Which could be a sign of lateral movement via WMI."
+    severity = "MEDIUM"
+    created = "2024-02-4"
+    product = "microsoft"
+    tag = "execution"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmiprvse_spawns_powershell.yml"
+    mitre = "execution,t1047"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    $security.principal.process.file.full_path = /\\WmiPrvSE\.exe$/ nocase AND ($security.target.process.file.full_path = /\\powershell\.exe|\\pwsh\.exe/ nocase OR $security.target.process.file.names = /PowerShell.EXE|pwsh.dll/ nocase)
+
+  condition:
+    $security
+}

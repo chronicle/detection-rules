@@ -1,0 +1,51 @@
+rule windows_short_term_account_use {
+
+  meta:
+    author = "Nayan BHattarai"
+    description = "Detects the creation, login, and deletion of a user account over a predefined timeframe"
+    rule_id = "mr_ac28ce76-8197-4354-af0d-d77c5771d9df"
+    rule_name = "Windows Short Term Account Use"
+    type = "alert"
+    platform = "windows"
+    data_source = "microsoft windows events"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    $create.metadata.event_type = "USER_CREATION"
+    $create.target.user.userid = $targetUser
+
+    $create.metadata.event_timestamp.seconds < $login.metadata.event_timestamp.seconds
+
+    $login.metadata.event_type = "USER_LOGIN"
+    $login.metadata.product_event_type = "4624"
+    $login.target.user.userid = $targetUser
+
+    $login.metadata.event_timestamp.seconds < $delete.metadata.event_timestamp.seconds
+
+    $delete.metadata.event_type = "USER_DELETION"
+    $delete.target.user.userid = $targetUser
+
+  match:
+    $targetUser over 4h
+
+  outcome:
+    $risk_score = 65
+    $event_count = count_distinct($login.metadata.id)
+    $principal_hostname = array_distinct($login.principal.hostname)
+    $src_hostname = array_distinct($login.src.hostname)
+    $src_ip = array_distinct($login.src.ip)
+    $principal_user_userid = array_distinct($login.principal.user.userid)
+    $principal_user_employee_id = array_distinct($login.principal.user.employee_id)
+    $user_creation_process_id = array_distinct($create.principal.process.pid)
+    $user_login_process_id = array_distinct($login.principal.process.pid)
+    $user_deletion_process_id = array_distinct($delete.principal.process.pid)
+    $target_process_file_full_path = array_distinct($login.target.process.file.full_path)
+    $principal_resource_name = array_distinct($login.principal.resource.name)
+    $target_resource_name = array_distinct($login.target.resource.name)
+    $target_url = array_distinct($login.target.url)
+
+  condition:
+    $create and $login and $delete
+
+}

@@ -1,0 +1,34 @@
+rule DefenseEvasion_AppLockerBypassPcwutldllToLaunchApplication_Windows {
+
+    meta:
+        subject = "AppLocker Bypass Pcwutl.dll To Launch Application"
+        author = "Cywarden"
+        description = "This alert is triggered when techniques to bypass AppLocker are detected, such as the use of pcwutl.dll to launch applications. AppLocker is a Windows security feature that restricts which applications can be executed on a system. Bypassing AppLocker can allow malicious actors to execute malicious code on a system."
+        severity = "Medium"
+        mitre_category = "Defense Evasion"
+        mitre_technique_id = "T1218" // Trusted Developer Utilities Proxy Execution
+        rule_creation_date = "11-19-2024"
+        rule_modification_date = ""
+        reference1 = "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_lolbin_pcwutl.yml"
+        version = "1.0.0"
+
+    events:
+        // $process_event.metadata.log_type = "WAZUH"
+        // $process_event.metadata.vendor_name = "Microsoft"
+
+        // Match process executable (rundll32.exe)
+        re.regex($process_event.principal.process.command_line, `(?)\\rundll32\.exe`)
+
+        // Match command-line arguments for pcwutl.dll and LaunchApplication
+        re.regex($process_event.principal.process.command_line, `(?i)pcwutl`)
+        re.regex($process_event.principal.process.command_line, `(?i)LaunchApplication`)
+
+        $process_event.principal.namespace = $customer
+
+    outcome:
+        $risk_score = 56
+        $principal_process_cmdline = array_distinct($process_event.principal.process.command_line)
+
+    condition:
+        $process_event
+}

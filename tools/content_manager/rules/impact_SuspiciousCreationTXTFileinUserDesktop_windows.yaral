@@ -1,0 +1,25 @@
+rule impact_SuspiciousCreationTXTFileinUserDesktop_windows{
+ meta:
+    author = "Ruledev2"
+    description = "Ransomware create txt file in the user Desktop"
+    severity = "MEDIUM"
+    created = "2024-02-4"
+    product = "microsoft"
+    tag = "impact"
+    service = "file_event"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/file/file_event/file_event_win_susp_desktop_txt.yml"
+    mitre = "impact,t1059"
+
+  events:
+    
+    $security.metadata.event_type = "FILE_CREATION" and 
+    re.regex($security.target.process.file.full_path, `.*\\cmd\.exe`) nocase and 
+    (re.regex($security.target.file.full_path, `.*\\Users\\.*`) nocase) and 
+    (re.regex($security.target.file.full_path, `.*\\Desktop\\.*`) nocase) and 
+    re.regex($security.target.file.full_path, `.*\.txt`) nocase
+
+
+  condition:
+    $security
+}

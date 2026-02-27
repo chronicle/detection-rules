@@ -1,0 +1,38 @@
+rule DefenseEvasion_UnmountNetworkShareViaNetExe_WindowsSysmon {
+    meta:
+        name = "Unmount Share Via NetExe"
+        author = "cywarden"
+        description = "Detects the unmounting of network shares using net.exe, potentially indicating data exfiltration."
+        severity = "Low"
+        mitre_category = "Defense Evasion"
+        mitre_technique_id = "T1070"
+        rule_creation_date = "01-07-2025"
+        rule_modification_date = ""
+        reference1 = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_net_share_unmount.yml"
+        version = "1.0.0"
+
+    events:
+        // $unmounted_share.metadata.log_type = "WAZUH"
+        // $unmounted_share.metadata.vendor_name = "Microsoft"
+        $unmounted_share.metadata.product_event_type = "1" //process launch
+        
+      // Match suspicious process executable names ending with net.exe or net1.exe
+        re.regex($unmounted_share.target.process.file.full_path, `(net|net1)\.exe$`) nocase 
+
+      // Match suspicious executable
+        re.regex($unmounted_share.target.process.command_line, `share`) nocase  and  // Match commands involving "share"
+      
+        re.regex($unmounted_share.target.process.command_line, `\/delete`) nocase  // Match commands involving "/delete"
+
+       // Whitelist users
+       // not re.regex ($unmounted_share.target.user.userid) in %list
+       $unmounted_share.target.namespace = $customer
+
+
+    outcome:
+        $risk_score = 40
+        $target_cmdline = array_distinct($unmounted_share.target.process.command_line)
+
+    condition:
+        $unmounted_share
+}

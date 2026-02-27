@@ -1,0 +1,25 @@
+rule attack_runPowerShellScriptfromADS_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects PowerShell script execution from Alternate Data Stream (ADS)"
+    severity = "HIGH"
+    created = "2024-02-03"
+    product = "windows"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_run_script_from_ads.yml"
+    mitre = "t1564.004"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    $security.principal.process.file.full_path = /\\powershell\.exe|\\pwsh\.exe/ nocase AND $security.target.process.file.full_path = /\\powershell\.exe|\\pwsh\.exe/ nocase AND $security.target.process.command_line = /Get-Content/ nocase AND $security.target.process.command_line = /-Stream/ nocase
+
+    outcome:
+    $risk_score = 90
+
+
+  condition:
+    $security
+}

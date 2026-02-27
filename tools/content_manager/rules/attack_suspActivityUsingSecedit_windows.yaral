@@ -1,0 +1,21 @@
+rule attack_suspActivityUsingSecedit_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects potential suspicious behaviour using secedit.exe. Such as exporting or modifying the security policy"
+    severity = "MEDIUM"
+    created = "2024-01-30"
+    product = "windows"
+    tag = "discovery"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_secedit_execution.yml"
+    mitre = "attack.discovery,attack.persistence,attack.defense_evasion,attack.credential_access,attack.privilege_escalation,attack.t1562.002,attack.t1547.001,attack.t1505.005,attack.t1556.002,attack.t1562,attack.t1574.007,attack.t1564.002,attack.t1546.008,attack.t1546.007,attack.t1547.014,attack.t1547.010,attack.t1547.002,attack.t1557,attack.t1082"
+
+  events:
+    
+    $security.metadata.event_type = "PROCESS_LAUNCH"
+    ($security.target.process.file.full_path = /\\secedit\.exe$/ nocase OR $security.target.process.file.names = "SeCEdit" nocase) AND (($security.target.process.command_line = /\/export/ nocase AND $security.target.process.command_line = /\/cfg/ nocase) OR ($security.target.process.command_line = /\/configure/ nocase AND $security.target.process.command_line = /\/db/ nocase)) AND $security.principal.user.userid != /\$$/ nocase
+
+  condition:
+    $security
+}

@@ -1,0 +1,45 @@
+rule CommandAndControl_SuspiciousFromBase64StringUsageOnGzipArchiveProcessCreation_WindowsSysmon
+{
+  meta:
+    subject = "Suspicious FromBase64String Usage on Gzip Archive"
+    author = "Cywarden"
+    description = "Detects suspicious use of FromBase64String with Gzip archives in process creation, often indicating attempts to obfuscate malicious activity."
+    severity = "Medium"
+    mitre_category = "Command And Control"
+    mitre_technique_id = "T1132"
+    rule_creation_date = "01-14-2025"
+    rule_modification_date = ""
+    reference1 = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_frombase64string_archive.yml"
+    version = "1.0.0"
+
+  events:
+    // Log source and relevant metadata
+    // $base64_gzip.metadata.log_type = "WAZUH"
+    // $base64_gzip.metadata.vendor_name = "Microsoft"
+    $base64_gzip.metadata.event_type = "PROCESS_LAUNCH"
+    // $base64_gzip.metadata.product_event_type = "1" // Adjust as per your source specifics
+
+    // Detect suspicious command-line arguments
+    (
+        $base64_gzip.target.process.command_line = /FromBase64String/ nocase and 
+        $base64_gzip.target.process.command_line = /MemoryStream/ nocase and 
+        $base64_gzip.target.process.command_line = /H4sI/ nocase 
+    ) 
+    or 
+    (
+        $base64_gzip.principal.process.command_line = /FromBase64String/ nocase and 
+        $base64_gzip.principal.process.command_line = /MemoryStream/ nocase and 
+        $base64_gzip.principal.process.command_line = /H4sI/ nocase 
+    ) 
+
+    // Capture namespace details
+    $base64_gzip.principal.namespace = $customer
+
+  outcome:
+    $risk_score = 60
+    $target_commandline = array_distinct($base64_gzip.target.process.command_line)
+    $principal_commandline = array_distinct($base64_gzip.principal.process.command_line)
+
+  condition:
+    $base64_gzip
+}

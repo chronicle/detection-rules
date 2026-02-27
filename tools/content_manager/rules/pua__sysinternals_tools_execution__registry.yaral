@@ -1,0 +1,19 @@
+rule pua__sysinternals_tools_execution__registry {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects the execution of some potentially unwanted tools such as PsExec, Procdump, etc. (part of the Sysinternals suite) via the creation of the accepteula registry key."
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_add/registry_add_pua_sysinternals_susp_execution_via_eula.yml"
+    status = "test"
+    tags = "attack.resource-development, attack.t1588.002"
+    falsepositives = "Legitimate use of SysInternals tools. Filter the legitimate paths used in your environment"
+    severity = "medium"
+    created = "2024-09-02"
+
+  events:
+
+    ((re.regex($security.target.registry.registry_key, `.*\\Active Directory Explorer.*`) or re.regex($security.target.registry.registry_key, `.*\\Handle.*`) or re.regex($security.target.registry.registry_key, `.*\\LiveKd.*`) or re.regex($security.target.registry.registry_key, `.*\\Process Explorer.*`) or re.regex($security.target.registry.registry_key, `.*\\ProcDump.*`) or re.regex($security.target.registry.registry_key, `.*\\PsExec.*`) or re.regex($security.target.registry.registry_key, `.*\\PsLoglist.*`) or re.regex($security.target.registry.registry_key, `.*\\PsPasswd.*`) or re.regex($security.target.registry.registry_key, `.*\\SDelete.*`) or re.regex($security.target.registry.registry_key, `.*\\Sysinternals.*`)) and re.regex($security.target.registry.registry_key, `.*\\EulaAccepted`))
+
+
+  condition:
+    $security
+}

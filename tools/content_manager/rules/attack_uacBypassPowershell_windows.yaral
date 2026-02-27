@@ -1,0 +1,24 @@
+rule attack_uacBypassPowershell_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects some Empire PowerShell UAC bypass methods"
+    severity = "CRITICAL"
+    created = "2024-02-02"
+    product = "windows"
+    tag = "defense_evasion, privilege_escalation"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_empire_powershell_uac_bypass.yml"
+    mitre = "t1548.002"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    $security.target.process.command_line = / -NoP -NonI -w Hidden -c \$x=\$\(\(gp HKCU:Software\\Microsoft\\Windows Update\)\.Update\)| -NoP -NonI -c \$x=\$\(\(gp HKCU:Software\\Microsoft\\Windows Update\)\.Update\);/ nocase
+
+    outcome:
+    $risk_score = 100
+
+  condition:
+    $security
+}

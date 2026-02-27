@@ -1,0 +1,25 @@
+rule defenseEvasion_ConsoleHistoryCleared_windows{
+  meta:
+    author = "Srijan Kafle"
+    description = "Identifies when a user attempts to clear console history. An adversary may clear the command history of a compromised account to conceal the actions undertaken during an intrusion."
+    sigma_id = "bde47d4b-9987-405c-94c7-b080410e8ea7"
+    severity = "HIGH"
+    created = "2024-02-21"
+    product = "microsoft"
+    tag = "credential"
+    service = "ps_script"
+    status = "test"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/powershell/powershell_script/posh_ps_clearing_windows_console_history.yml"
+    mitre = "Indicator Removal: Clear Command History,t1070/003"
+
+  events:
+
+    ((re.regex($powershell.target.process.command_line, `.*Clear-History.*`) nocase) or 
+    ((re.regex($powershell.target.process.command_line, `.*Remove-Item.*`) nocase or 
+    re.regex($powershell.target.process.command_line, `.*rm.*`) nocase) and 
+    (re.regex($powershell.target.process.command_line, `.*ConsoleHost_history\.txt.*`) nocase or 
+    re.regex($powershell.target.process.command_line, `.*\(Get-PSReadlineOption\)\.HistorySavePath.*`) nocase)))
+
+  condition:
+    $powershell
+}

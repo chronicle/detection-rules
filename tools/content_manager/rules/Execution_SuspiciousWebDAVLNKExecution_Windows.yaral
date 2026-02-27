@@ -1,0 +1,29 @@
+rule Execution_SuspiciousWebDAVLNKExecution_Windows {
+    meta:
+        subject = "Suspicious WebDAV LNK Execution"
+        author = "Cywarden"
+        description = "Detects possible execution via LNK file accessed on a WebDAV server"
+        severity = "Medium"
+        mitre_category = "Execution"
+        mitre_technique_id = "T1059"
+        rule_creation_date = "01-04-2025"
+        rule_modification_date = ""
+        reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_webdav_lnk_execution.yml"
+        version = "1.0.0"
+
+    events:
+        // Detect a LNK file execution
+        // $webdev_lnk.metadata.log_type = "WAZUH"
+        $webdev_lnk.metadata.vendor_name = "Microsoft"
+        $webdev_lnk.principal.process.file.full_path = /explorer\.exe/ nocase 
+        $webdev_lnk.target.process.file.full_path = /(cmd|cscript|mshta|powershell|pwsh|wscript)\.exe/ nocase 
+        $webdev_lnk.target.process.command_line = /DavWWWRoot/ nocase 
+        $webdev_lnk.principal.namespace = $customer
+
+    outcome:
+        $risk_score = 60
+        $target_cmdline = array_distinct($webdev_lnk.target.process.command_line)
+
+    condition:
+        $webdev_lnk
+}

@@ -1,0 +1,24 @@
+rule attack_explorerProcessTreeBreak_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects a command line process that uses explorer.exe to launch arbitrary commands or binaries, which is similar to cmd.exe /c, only it breaks the process tree and makes its parent a new instance of explorer spawning from 'svchost'"
+    severity = "MEDIUM"
+    created = "2024-02-03"
+    product = "windows"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_explorer_break_process_tree.yml"
+    mitre = "t1036"
+
+  events:
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.command_line, `.*\/factory,\{75dff2b7-6936-4c06-a8bb-676a7b00b24b\}.*`) nocase) or 
+    (re.regex($security.target.process.command_line, `.*explorer\.exe.*`) nocase and 
+    (re.regex($security.target.process.command_line, `.* -root,.*`) nocase or 
+    re.regex($security.target.process.command_line, `.* \/root,.*`) nocase)))
+
+
+  condition:
+    $security
+}

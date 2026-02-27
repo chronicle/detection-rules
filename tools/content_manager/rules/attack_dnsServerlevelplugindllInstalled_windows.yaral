@@ -1,0 +1,23 @@
+rule attack_dnsServerlevelplugindllInstalled_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects the installation of a DNS plugin DLL via ServerLevelPluginDll parameter in registry, which can be used to execute code in context of the DNS server (restart required)"
+    severity = "HIGH"
+    created = "2024-01-30"
+    product = "windows"
+    tag = "execution,persistence"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dnscmd_install_new_server_level_plugin_dll.yml"
+    mitre = "t1112,t1574.002"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    re.regex($security.target.process.file.full_path, `.*\\dnscmd\.exe`) nocase and 
+    (re.regex($security.target.process.command_line, `.*\/config.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*\/serverlevelplugindll.*`) nocase)
+    
+  condition:
+    $security
+}

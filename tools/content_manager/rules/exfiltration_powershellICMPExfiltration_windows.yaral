@@ -1,0 +1,23 @@
+rule exfiltration_powershellICMPExfiltration_windows{
+  meta:
+    author = "Srijan Kafle"
+    description = "Detects Exfiltration Over Alternative Protocol - ICMP. Adversaries may steal data by exfiltrating it over an un-encrypted network protocol other than that of the existing command and control channel."
+    sigma_id = "4c4af3cd-2115-479c-8193-6b8bfce9001c"
+    severity = "MEDIUM"
+    created = "2024-02-27"
+    product = "microsoft"
+    tag = "credential"
+    service = "ps_script"
+    status = "test"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/powershell/powershell_script/posh_ps_icmp_exfiltration.yml"
+    mitre = "Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol,t1048.003"
+
+  events:
+    $powershell.metadata.log_type = "POWERSHELL"
+    (re.regex($powershell.target.process.command_line, `.*New-Object.*`) nocase) and 
+    (re.regex($powershell.target.process.command_line, `.*System\.Net\.NetworkInformation\.Ping.*`) nocase) and 
+    (re.regex($powershell.target.process.command_line, `.*\.Send\(.*`) nocase)
+
+  condition:
+    $powershell
+}

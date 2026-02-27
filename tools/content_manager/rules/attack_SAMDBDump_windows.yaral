@@ -1,0 +1,39 @@
+rule attack_SAMDBDump_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects the creation of files that look like exports of the local SAM (Security Account Manager)"
+    severity = "HIGH"
+    created = "2024-01-30"
+    product = "window"
+    tag = "attack_credential_access"
+    service = "file_event"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/file/file_event/file_event_win_sam_dump.yml"
+    mitre = "attack.credential_access,t1003.002"
+
+  events:
+
+    $security.metadata.event_type = "FILE_CREATION" and 
+    (((re.regex($security.target.file.full_path, `.*\\Temp\\sam`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\sam\.sav`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\Intel\\sam`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\sam\.hive`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\Perflogs\\sam`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\ProgramData\\sam`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\Users\\Public\\sam`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\AppData\\Local\\sam`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\AppData\\Roaming\\sam`) nocase or 
+    re.regex($security.target.file.full_path, `.*_ShadowSteal\.zip`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\Documents\\SAM\.export`) nocase or 
+    re.regex($security.target.file.full_path, `.*:\\sam`) nocase)) or 
+    ((re.regex($security.target.file.full_path, `.*\\hive_sam_.*`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\sam\.save.*`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\sam\.export.*`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\~reg_sam\.save.*`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\sam_backup.*`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\sam\.bck.*`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\sam\.backup.*`) nocase)))
+
+  condition:
+    $security
+}

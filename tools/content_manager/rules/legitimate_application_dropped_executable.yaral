@@ -1,0 +1,34 @@
+rule legitimate_application_dropped_executable {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects programs on a Windows system that should not write executables to disk"
+    reference = "https://detection.fyi/sigmahq/sigma/windows/file/file_event/file_event_win_susp_legitimate_app_dropping_exe/"
+    status = "test"
+    tags = "attack.defense-evasion, attack.t1218"
+    falsepositives = "Unknown"
+    severity = "high"
+    created = "2022-08-21"
+
+  events:
+      $security.metadata.event_type = "FILE_CREATION" and 
+    (re.regex($security.target.process.file.full_path, `.*\\eqnedt32\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\wordpad\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\wordview\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\certutil\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\certoc\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\CertReq\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\Desktopimgdownldr\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\esentutl\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\mshta\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\AcroRd32\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\RdrCEF\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\hh\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\finger\.exe`) nocase) and 
+    (re.regex($security.target.file.full_path, `.*\.exe`) nocase or 
+    re.regex($security.target.file.full_path, `.*\.dll`) nocase or 
+    re.regex($security.target.file.full_path, `.*\.ocx`) nocase)
+
+
+  condition:
+    $security
+}

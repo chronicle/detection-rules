@@ -1,0 +1,23 @@
+rule MSbuild_connecting_to_external_ip_addresses_windows {
+    meta:
+    author = "Nayan BHattarai"
+    description = "This detection identifies the communication of Microsoft command line tool MSbuild.exe to external IP addresses related to CobaltStrike. Threat actors utilizes living-off-the-land (LoTL) techniques in order to drop additional payload and evade detection."
+    severity = "High"
+    rule_creation_date = ""
+    rule_modification_date = ""
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_trufflesnout.yml"
+    version = "1.0.0"
+
+    events:
+    $network_connection.metadata.event_type = "NETWORK_CONNECTION"
+    re.regex($network_connection.principal.process.file.full_path, `MSBuild\.exe`) nocase 
+    not $network_connection.target.ip IN cidr %Private_IP_Ranges 
+
+    $network_connection.principal.namespace = $customer
+
+    outcome:
+        $risk_score = 75
+
+    condition:
+        $network_connection
+}

@@ -1,0 +1,22 @@
+rule defenseEvasion_firewallDisabledViaNetsh_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects netsh commands that turns off the Windows firewall"
+    sigma_id = "57c4bf16-227f-4394-8ec7-1b745ee061c3 and 347906f3-e207-4d18-ae5b-a9403d6bcdef"
+    severity = "HIGH"
+    created = "2024-02-04"
+    product = "windows"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_fw_disable.yml"
+    mitre = "t1562.004,s0108"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    $security.target.process.file.full_path = /.*\\netsh.exe$/ nocase and (($security.target.process.command_line = /.*firewall.*/ nocase and $security.target.process.command_line = /.*set.*/ nocase and $security.target.process.command_line = /.*opmode.*/ nocase and $security.target.process.command_line = /.*disable.*/ nocase) or ($security.target.process.command_line = /.*advfirewall.*/ nocase and $security.target.process.command_line = /.*set.*/ nocase and $security.target.process.command_line = /.*state.*/ nocase and $security.target.process.command_line = /.*off.*/ nocase) or ($security.target.process.command_line = /advfirewall/ and $security.target.process.command_line = /firewall/ and $security.target.process.command_line = /set/ and $security.target.process.command_line = /rule/ and $security.target.process.command_line = /group=/ and $security.target.process.command_line = /new/ and $security.target.process.command_line = /enable=Yes/))
+
+  condition:
+    $security
+}

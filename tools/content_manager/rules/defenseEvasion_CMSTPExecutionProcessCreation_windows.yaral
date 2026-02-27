@@ -1,0 +1,21 @@
+rule defenseEvasion_CMSTPExecutionProcessCreation_windows {
+  meta:
+    author = "Ruledev2"
+    description = "CMSTP Execution Process Creation"
+    severity = "LOW"
+    created = "2024-01-30"
+    product = "microsoft"
+    tag = "attack_defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_cmstp_execution_by_creation.yml"
+    mitre = "privilege_escalation,t1218.003"
+
+  events:
+    
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    re.regex($security.principal.process.file.full_path, `.*\\cmstp\.exe`) nocase
+
+  condition:
+    $security
+}

@@ -1,0 +1,44 @@
+rule Execution_PowerShellBase64EncodedInvokeKeyword_Windows {
+    meta:
+        subject = "PowerShell Base64 Encoded Invoke Keyword"
+        author = "Cywarden"
+        description = "This alert is triggered when a UTF_8 or UTF_16 Base64 encoded powershell 'Invoke-' call is detected. It is used to detect malicious activity, such as malicious scripts, that are attempting to execute commands on the system. This alert can help identify and prevent malicious activity from occurring."
+        severity = "Critical"
+        mitre_category = "Execution"
+        mitre_technique_id = "T1059"
+        rule_creation_date = "11-19-2024"
+        rule_modification_date = ""
+        reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_base64_invoke.yml"
+        version = "1.0.0"
+
+    events:
+        // Detects PowerShell and Pwsh Executables
+        re.regex($ps_base64.target.process.file.full_path , `(powershell|pwsh)\.exe`) nocase
+        or re.regex($ps_base64.target.process.file.full_path , `pwsh\.dll`) nocase
+        
+
+        // Detects Base64 Encoded Commands with -e flag
+        // re.regex($ps_base64.target.process.command_line , `-e`) and
+        // above line is applicable but the log aren't properly ingested.
+        
+        
+        // Detects Base 64 encoded commands with UTF-16BE
+        re.regex($ps_base64.target.process.command_line, `(AEkAbgB2AG8AawBlAC0=|AHAAbgB2AG8AawBlAC0A|AApAQQc0QWRnQnZva3NhMQk1XytQJw==)`) nocase 
+
+        //Detects Base 64 encoded commands with UTF-16LE
+        or re.regex($ps_base64.target.process.command_line, `(SQBuAHYAbwBrAGUALQ|kAbgB2AG8AawBlAC0A|JAG4AdgBvAGsAZQAtA)`) nocase 
+
+        // Detects Base 64 encoded commands with UTF-8
+        or re.regex($ps_base64.target.process.command_line, `(SW52b2tlLQ==|SW52b2tlL|ludm9rZS|JbnZva2Ut)`) nocase
+        
+
+        $ps_base64.principal.namespace = $customer
+
+
+    outcome:
+        $riskscore = 72
+        $target_process_cmdline = array_distinct($ps_base64.target.process.command_line )
+
+    condition:
+        $ps_base64
+}

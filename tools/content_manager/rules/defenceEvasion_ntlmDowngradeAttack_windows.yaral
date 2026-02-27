@@ -1,0 +1,27 @@
+rule defenceEvasion_ntlmDowngradeAttack_windows {
+
+  meta:
+    author = "Srijan Kafle"
+    description = "Detects NetNTLM downgrade attack"
+    severity = "HIGH"
+    created = "2024-01-29"
+    product = "microsoft"
+    tag = "security_audit"
+    service = "registry_event"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/registry/registry_event/registry_event_net_ntlm_downgrade.yml"
+
+  events:
+    $security.metadata.event_type = "REGISTRY_MODIFICATION" and 
+    (re.regex($security.target.registry.registry_key, `.*SYSTEM\\.*`) nocase) and 
+    (re.regex($security.target.registry.registry_key, `.*ControlSet.*`) nocase) and 
+    (re.regex($security.target.registry.registry_key, `.*\\Control\\Lsa.*`) nocase) and 
+    ((re.regex($security.target.registry.registry_key, `.*\\lmcompatibilitylevel`) nocase and 
+    ($security.target.registry.registry_value_data = "DWORD (0x00000000)" nocase or $security.target.registry.registry_value_data = "DWORD (0x00000001)" nocase or $security.target.registry.registry_value_data = "DWORD (0x00000002)" nocase)) or 
+    (re.regex($security.target.registry.registry_key, `.*\\NtlmMinClientSec`) nocase and 
+    ($security.target.registry.registry_value_data = "DWORD (0x00000000)" nocase or $security.target.registry.registry_value_data = "DWORD (0x00000010)" nocase or $security.target.registry.registry_value_data = "DWORD (0x00000020)" nocase or $security.target.registry.registry_value_data = "DWORD (0x00000030)" nocase)) or 
+    (re.regex($security.target.registry.registry_key, `.*\\RestrictSendingNTLMTraffic`) nocase))
+
+  condition:
+    $security
+}

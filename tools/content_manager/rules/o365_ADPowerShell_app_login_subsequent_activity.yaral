@@ -1,0 +1,78 @@
+rule o365_ADPowerShell_app_login_subsequent_activity {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Once a user authenticates to the Azure AD PowerShell application, if they take multiple admin actions indicative of establishing their own persistence with an Entra ID application within a portion of the access token time, alert for additional investigation"
+    rule_id = "mr_2d781f34-05f3-43aa-b5ec-257c03787a66"
+    rule_name = "O365 AD PowerShell App Login Subsequent Activity"
+    assumption = "This does not take into account attempts that were blocked, just any logging of attempts for any of these actions"
+    tactic = "TA0003"
+    technique = "T1098.001"
+    type = "alert"
+    platform = "azure"
+    data_source = "o365"
+    severity = "Medium"
+    priority = "Medium"
+
+  events:
+    (
+        $login.metadata.event_type = "USER_LOGIN" and
+        $login.metadata.product_event_type = "UserLoggedIn" and
+        $login.metadata.product_name = "Office 365" and
+        $login.metadata.vendor_name = "Microsoft" and
+        $login.target.resource.product_object_id = "1b730954-1685-4b74-9bfd-dac224a7b894" and
+        $login.security_result.action = "ALLOW"
+    )
+    $login.target.user.userid = $userid
+    $login.metadata.event_timestamp.seconds < $other.metadata.event_timestamp.seconds
+    (
+        (
+            $other.metadata.event_type = "USER_RESOURCE_CREATION" and
+            $other.metadata.product_event_type = "Add application." and
+            $other.metadata.product_name = "Office 365" and
+            $other.metadata.vendor_name = "Microsoft"
+        )
+        or
+        (
+            $other.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT" and
+            $other.metadata.product_event_type = "Update application." and
+            $other.metadata.product_name = "Office 365" and
+            $other.metadata.vendor_name = "Microsoft"
+        )
+        or
+        (
+            $other.metadata.event_type = "USER_RESOURCE_UPDATE_PERMISSIONS" and
+            $other.metadata.product_event_type = "Add delegated permission grant." and
+            $other.metadata.product_name = "Office 365" and
+            $other.metadata.vendor_name = "Microsoft"
+        )
+        or
+        (
+            $other.metadata.event_type = "USER_RESOURCE_UPDATE_CONTENT" and
+            $other.metadata.product_event_type = /Update application.*Certificates and secrets management/ nocase and
+            $other.metadata.product_name = "Office 365" and
+            $other.metadata.vendor_name = "Microsoft"
+        )
+    )
+    $other.principal.user.userid = $userid
+    $other.metadata.product_event_type = $other_event
+
+  match:
+    $userid over 90m
+
+  outcome:
+    $risk_score = max(if($other.metadata.product_event_type = "Add application.", 10, 0) +
+                        if($other.metadata.product_event_type = "Update application.", 10, 0) +
+                        if($other.metadata.product_event_type = "Add delegated permission grant.", 10, 0) +
+                        if($other.metadata.product_event_type = /Update application.*Certificates and secrets management/ nocase, 55, 0))
+    $subsequent_action_threshold = 1
+    $product_event_type = array_distinct($other.metadata.product_event_type)
+    $country_region_login_attempt = array_distinct($login.principal.ip_geo_artifact.location.country_or_region)
+    //added to populate alert graph with additional context
+    $principal_ip = array_distinct($login.principal.ip)
+    //$principal_user_userid = array_distinct($other.principal.user.userid)
+    $target_resource_name = array_distinct($other.target.resource.name)
+
+  condition:
+    $login and #other_event > 0
+}

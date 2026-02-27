@@ -1,0 +1,34 @@
+rule privilegeEscalation_alwaysInstallElevatedWindowsInstaller_windows{
+  meta:
+    author = "Srijan Kafle"
+    description = "Detects Windows Installer service (msiexec.exe) trying to install MSI packages with SYSTEM privilege"
+    severity = "MEDIUM"
+    created = "2024-02-14"
+    product = "microsoft"
+    tag = "credential"
+    service = "process_monitor"
+    status = "test"
+    Reference = "https://detection.fyi/sigmahq/sigma/windows/process_creation/proc_creation_win_susp_always_install_elevated_windows_installer/"
+    mitre = "OS Credential Dumping: NTDS,t1548.002"
+
+  events:
+    $process.metadata.event_type = "PROCESS_LAUNCH" and 
+    (((re.regex($process.target.process.file.full_path, `.*\\Windows\\Installer\\.*`) nocase) and 
+    (re.regex($process.target.process.file.full_path, `.*msi.*`) nocase) and 
+    re.regex($process.target.process.file.full_path, `.*tmp`) nocase) or 
+    (re.regex($process.target.process.file.full_path, `.*\\msiexec\.exe`) nocase)) and 
+    (re.regex($process.principal.user.user_display_name, `.*AUTHORI.*`) nocase or 
+    re.regex($process.principal.user.user_display_name, `.*AUTORI.*`) nocase) and 
+    not (($process.principal.process.file.full_path = "C:\\Windows\\System32\\services.exe" nocase) or 
+    (((re.regex($process.target.process.command_line, `.*\\system32\\msiexec\.exe \/V`) nocase) or 
+    (re.regex($process.principal.process.command_line, `.*\\system32\\msiexec\.exe \/V`) nocase))) or 
+    (re.regex($process.principal.process.file.full_path, `C:\\ProgramData\\Sophos\\.*`) nocase) or 
+    (re.regex($process.principal.process.file.full_path, `C:\\ProgramData\\Avira\\.*`) nocase) or 
+    ((re.regex($process.principal.process.file.full_path, `C:\\Program Files\\Avast Software\\.*`) nocase or 
+    re.regex($process.principal.process.file.full_path, `C:\\Program Files \(x86\)\\Avast Software\\.*`) nocase)) or 
+    ((re.regex($process.principal.process.file.full_path, `C:\\Program Files\\Google\\Update\\.*`) nocase or 
+    re.regex($process.principal.process.file.full_path, `C:\\Program Files \(x86\)\\Google\\Update\\.*`) nocase)))
+
+  condition:
+    $process
+}

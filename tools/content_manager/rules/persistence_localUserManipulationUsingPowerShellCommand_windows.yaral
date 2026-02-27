@@ -1,0 +1,21 @@
+rule persistence_localUserManipulationUsingPowerShellCommand_windows {
+  meta:
+    author = "Srijan Kafle"
+    description = "Adversaries may manipulate accounts to maintain access to victim systems. Account manipulation may consist of any action that preserves adversary access to a compromised account, such as modifying credentials or permission groups"
+    sigma_id = "4fdc44df-bfe9-4fcc-b041-68f5a2d3031c"
+    severity = "MEDIUM"
+    created = "2024-02-27"
+    product = "microsoft"
+    tag = "credential"
+    service = "ps_script"
+    status = "test"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/powershell/powershell_script/posh_ps_localuser.yml"
+    mitre = "Account Manipulation,t1098"
+
+  events:
+    $powershell.target.process.command_line = /Disable-LocalUser|Enable-LocalUser|Get-LocalUser|Set-LocalUser|New-LocalUser|Rename-LocalUser|Remove-LocalUser/ nocase and 
+    not $powershell.target.process.file.full_path = /C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\DataCollection\\.*ps1$/
+
+  condition:
+    $powershell
+}

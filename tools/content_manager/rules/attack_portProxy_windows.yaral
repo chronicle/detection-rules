@@ -1,0 +1,22 @@
+rule attack_portProxy_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects the modification of PortProxy registry key which is used for port forwarding. For command execution see rule win_netsh_port_fwd.yml."
+    severity = "MEDIUM"
+    created = "2024-02-02"
+    product = "windows"
+    tag = "lateral_movement,defense_evasion,command_and_control"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dsim_remove.yml"
+    mitre = "t1090"
+
+  events:
+    // $security.metadata.vendor_name = "Microsoft" nocase and $security.metadata.log_type = "WAZUH"
+
+    $security.target.registry.registry_key = "HKLM\\SYSTEM\\CurrentControlSet\\Services\\PortProxy\\v4tov4\\tcp" nocase
+
+
+  condition:
+    $security
+}

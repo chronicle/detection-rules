@@ -1,0 +1,21 @@
+rule impact_fsutilSuspiciousInvocation_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects shell32.dll executing a DLL in a suspicious directory"
+    severity = "HIGH"
+    created = "2024-02-04"
+    product = "windows"
+    tag = "defense_evasion, impact"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_fsutil_usage.yml"
+    mitre = "Indicator Removal,t1070/Data Destruction,t1485"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ($security.target.process.file.full_path = /.*\\fsutil.exe$/ nocase and ($security.target.process.command_line = /.*deletejournal.*/ nocase or $security.target.process.command_line = /.*createjournal.*/ nocase or $security.target.process.command_line = /.*setZeroData.*/ nocase))
+
+  condition:
+    $security
+}

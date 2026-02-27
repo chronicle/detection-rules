@@ -1,0 +1,30 @@
+rule defenseEvasion_SuspiciousProcessStartLocations_windows{
+  meta:
+    author = "Ruledev2"
+    description = "Detects suspicious process run from unusual locations"
+    severity = "MEDIUM"
+    created = "2024-02-1"
+    product = "microsoft"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_rundll32_run_locations.yml"
+    mitre = "defense_evasion,t1036"
+
+  events:
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    (((re.regex($security.target.process.file.full_path, `.*:\\RECYCLER\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*:\\SystemVolumeInformation\\.*`) nocase)) or 
+    ((re.regex($security.target.process.file.full_path, `C:\\Windows\\Tasks\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `C:\\Windows\\debug\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `C:\\Windows\\fonts\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `C:\\Windows\\help\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `C:\\Windows\\drivers\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `C:\\Windows\\addins\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `C:\\Windows\\cursors\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `C:\\Windows\\system32\\tasks\\.*`) nocase)))
+
+
+  condition:
+    $security
+}

@@ -1,0 +1,38 @@
+rule metric_Outbound_Data_Transfer_Volume_Spike_Detection {
+
+meta:
+  author = "Nayan Bhattarai"
+  description = "This detection monitors daily data transfer volumes over a rolling 30-day window. It calculates both the maximum and average data transfer sizes for each day. If a day's data transfer exceeds 2 times the 30-day average, it triggers an alert to indicate a potential anomaly, such as data exfiltration or misuse"
+events:
+    $transfer.metadata.event_type = "NETWORK_CONNECTION"
+
+    $transfer.network.sent_bytes > 0
+    
+    $transfer.target.port = $port
+    $transfer.principal.namespace =$customer
+    $transfer.principal.asset.ip =$ip
+    $transfer.principal.ip = $sourceip
+    $transfer.target.ip = $destination
+
+match:
+    $customer,$sourceip, $destination, $port over 1d
+
+outcome:
+  $max_byte_count_window = max(metrics.network_bytes_outbound(
+      period:1d, window:30d,
+      metric:value_sum,
+      agg:max,
+      principal.asset.ip: $ip
+  ))
+  $avg_byte_count = max(metrics.network_bytes_outbound(
+      period:1d, window:30d,
+      metric:value_sum,
+      agg:avg,
+      principal.asset.ip: $ip
+  ))
+  $avg_byte_count_x2 = $avg_byte_count * 2
+  $daily_byte_count = sum($transfer.network.sent_bytes)
+
+condition:
+  $transfer and $daily_byte_count > $avg_byte_count_x2
+}

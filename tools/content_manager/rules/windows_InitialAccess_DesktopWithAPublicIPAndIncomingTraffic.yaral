@@ -1,0 +1,46 @@
+rule windows_InitialAccess_DesktopWithAPublicIPAndIncomingTraffic
+{
+  meta:
+   subject = "Desktop With A Public IP & Incoming Traffic"
+   author = "Nayan Bhattarai"
+   description = "Detects external servers attempting to connect to an internal desktop exposed with a public IP (e.g., via RDP, SSH, HTTP, HTTPS)"
+   severity = "High"
+   mitre_category = "Initial Access"
+   mitre_technique_id = "T1210"
+   rule_creation_date = "11-05-2024" 
+   rule_modification_date = ""
+   referance = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/account_management/win_security_successful_external_remote_smb_login.yml"
+   version = "1.0.0"
+
+  events:
+    $endpoint_public_ip.metadata.product_event_type = "3" 
+
+    // Target IP should not match private ranges
+    not $endpoint_public_ip.target.ip in cidr %Private_IP_Ranges 
+
+    $endpoint_public_ip.principal.network.ip_subnet_range  in cidr %Private_IP_Ranges and 
+    // Principal IP should not match private ranges
+    not re.regex($endpoint_public_ip.principal.ip, `^10\.\d+\.\d+\.\d+$`) and
+    not re.regex($endpoint_public_ip.principal.ip, `^192\.168\.\d+\.\d+$`) and
+    not re.regex($endpoint_public_ip.principal.ip, `^172\.(1[6-9]|2[0-9]|3[01])\.\d+\.\d+$`)
+
+    $endpoint_public_ip.target.port = 3389 or 
+    $endpoint_public_ip.target.port = 22 or 
+    $endpoint_public_ip.target.port = 80 or 
+    $endpoint_public_ip.target.port = 443 or 
+    $endpoint_public_ip.target.port = 445 or 
+    $endpoint_public_ip.target.port = 21 or 
+    $endpoint_public_ip.target.port = 23 or 
+    $endpoint_public_ip.target.port = 3306 or 
+    $endpoint_public_ip.target.port = 5432  
+    
+    $endpoint_public_ip.principal.namespace = $customer
+
+  outcome:
+    $risk_score = 90
+    $principal_ip = array_distinct($endpoint_public_ip.principal.ip)
+    $target_ip = array_distinct($endpoint_public_ip.target.ip)
+
+  condition:
+    $endpoint_public_ip
+}

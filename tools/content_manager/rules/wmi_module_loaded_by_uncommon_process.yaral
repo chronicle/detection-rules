@@ -1,0 +1,47 @@
+rule wmi_module_loaded_by_uncommon_process {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects WMI modules being loaded by an uncommon process."
+    license = "https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md"
+    reference = "https://threathunterplaybook.com/hunts/windows/190811-WMIModuleLoad/notebook.html"
+    version = "0.01"
+    sigma_id = "671bb7e3-a020-4824-a00e-2ee5b55f385e"
+    status = "test"
+    tags = "attack.execution, attack.t1047, detection.threat-hunting"
+    falsepositives = "Unknown" 
+    severity = "low"
+    created = "2019-08-10"
+    category = "image_load"
+    product = "windows"
+
+  events:
+    $wmi.metadata.event_type = "PROCESS_MODULE_LOAD" and 
+    (re.regex($wmi.target.process.file.full_path, `.*\\fastprox\.dll`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\wbemcomn\.dll`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\wbemprox\.dll`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\wbemsvc\.dll`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\WmiApRpl\.dll`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\wmiclnt\.dll`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\WMINet_Utils\.dll`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\wmiprov\.dll`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\wmiutils\.dll`) nocase) and 
+    not ((re.regex($wmi.target.process.file.full_path, `.*:\\Program Files \(x86\)\\.*`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*:\\Program Files\\.*`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*:\\Windows\\explorer\.exe.*`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*:\\Windows\\Microsoft\.NET\\Framework\\.*`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*:\\Windows\\Microsoft\.NET\\Framework64\\.*`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*:\\Windows\\System32\\.*`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*:\\Windows\\SysWOW64\\.*`) nocase)) and 
+    not (((re.regex($wmi.target.process.file.full_path, `.*\\WindowsAzureGuestAgent\.exe`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\WaAppAgent\.exe`) nocase)) or 
+    ((re.regex($wmi.target.process.file.full_path, `.*\\thor\.exe`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\thor64\.exe`) nocase)) or 
+    (re.regex($wmi.target.process.file.full_path, `.*\\MsMpEng\.exe`) nocase) or 
+    ((re.regex($wmi.target.process.file.full_path, `.*\\Microsoft\\Teams\\current\\Teams\.exe.*`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*\\Microsoft\\Teams\\Update\.exe.*`) nocase)) or 
+    ((re.regex($wmi.target.process.file.full_path, `.*:\\Windows\\Sysmon\.exe`) nocase or 
+    re.regex($wmi.target.process.file.full_path, `.*:\\Windows\\Sysmon64\.exe`) nocase)))
+
+  condition:
+    $wmi
+}

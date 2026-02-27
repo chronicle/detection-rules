@@ -1,0 +1,22 @@
+rule attack_rundll32ExecWithoutParam_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects rundll32 execution without parameters as observed when running Metasploit windows/smb/psexec exploit module"
+    severity = "HIGH"
+    created = "2024-01-30"
+    product = "windows"
+    tag = "attack.lateral_movement"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_js_runhtmlapplication.yml"
+    mitre = "t1569.002"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ($security.target.process.command_line = "rundll32.exe" nocase or $security.target.process.command_line = "rundll32" nocase)
+
+
+  condition:
+    $security
+}

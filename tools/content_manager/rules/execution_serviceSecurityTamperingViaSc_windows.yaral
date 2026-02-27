@@ -1,0 +1,23 @@
+rule execution_serviceSecurityTamperingViaSc_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detection of sc.exe utility adding a new service with special permission which hides that service."
+    severity = "MEDIUM"
+    created = "2024-01-30"
+    product = "windows"
+    tag = "defense_evasion, presistence, privilege_escalation"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sc_sdset_modification.yml"
+    mitre = "attack.t1574.011"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\sc\.exe`) nocase) or 
+    ($security.target.file.full_path = "sc.exe" nocase)) and 
+    re.regex($security.target.process.command_line, `.*sdset.*`) nocase
+
+  condition:
+    $security
+}

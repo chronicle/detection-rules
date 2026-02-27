@@ -1,0 +1,23 @@
+rule attack_remoteHTAExecutedViaMshta_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects execution of the 'mshta' utility with an argument containing the 'http' keyword, which could indicate that an attacker is executing a remotely hosted malicious hta file"
+    severity = "HIGH"
+    created = "2024-01-30"
+    product = "windows"
+    tag = "defense_evasion, execution"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mshta_http.yml"
+    mitre = "t1218.005"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ($security.target.process.file.full_path = /.*\\mshta.exe$/ nocase and ($security.target.process.command_line = /.*http:.*/ nocase or $security.target.process.command_line = /.*https:.*/ nocase or $security.target.process.command_line = /.*ftp:.*/ nocase))
+
+
+
+  condition:
+    $security
+}

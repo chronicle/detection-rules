@@ -1,0 +1,25 @@
+rule hacktool__powerup_write_hijack_dll {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Powerup tool's Write Hijack DLL exploits DLL hijacking for privilege escalation.In it's default mode, it builds a self deleting .bat file which executes malicious command.The detection rule relies on creation of the malicious bat file (debug.bat by default).    "
+    reference = "https://detection.fyi/sigmahq/sigma/windows/file/file_event/file_event_win_hktl_powerup_dllhijacking/"
+    status = "test"
+    tags = "attack.defense-evasion, attack.persistence, attack.privilege-escalation, attack.t1574.001"
+    falsepositives = "Any powershell script that creates bat files"
+    severity = "high"
+    created = "2024-09-03"
+
+  events:
+    $security.metadata.event_type = "FILE_CREATION" and 
+    (re.regex($security.target.process.file.full_path, `.*\\powershell\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\pwsh\.exe`) nocase) and 
+    re.regex($security.target.file.full_path, `.*\.bat`) nocase
+    $security.principal.namespace = $customer
+
+
+  condition:
+    $security
+
+
+    
+}

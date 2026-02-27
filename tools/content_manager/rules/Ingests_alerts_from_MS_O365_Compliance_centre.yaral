@@ -1,0 +1,25 @@
+rule Ingests_alerts_from_MS_O365_Compliance_centre{
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Ingests alerts from MS O365 Compliance centre."
+    severity = "WARN"
+    created = "2024-09-13"
+    product = "O365"
+    service = "Exchange"
+  events:
+    $o365.metadata.product_name = "Office 365"
+    $o365.metadata.product_event_type = "AlertTriggered"
+    $o365.target.application = "SecurityComplianceCenter"
+    $o365.security_result.action = "ALLOW"
+
+    $user = $o365.target.user.userid
+    $tenant = $o365.principal.namespace
+    
+    //whitelisting as per SENG-104
+    not ($o365.security_result.summary = "eDiscovery search started or exported")
+
+
+  condition:
+    $o365
+}

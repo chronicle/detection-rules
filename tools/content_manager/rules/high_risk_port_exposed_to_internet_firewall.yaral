@@ -1,0 +1,27 @@
+rule high_risk_port_exposed_to_internet_firewall{
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "This rule is triggred whenever hight risk port exposed to internet"
+    type = "alert"
+    severity = "Medium"
+    created = "2025-03-18"
+    source = "Firewall"
+
+  events:
+
+    $exposed.metadata.log_type = "FORTINET_FIREWALL"
+
+    not $exposed.principal.ip in cidr %Private_IP_Ranges 
+    $exposed.network.application_protocol = "SSH" or $exposed.network.application_protocol  = "RDP" or $exposed.network.application_protocol  = "SMB" or $exposed.network.application_protocol = "LDAP" or $exposed.target.port = 21 or $exposed.target.port = 25 
+    $exposed.security_result.action = "ALLOW"
+    $exposed.principal.namespace = $customer
+
+
+  match:
+    $customer over 20m
+
+
+  condition:
+    $exposed 
+}

@@ -1,0 +1,22 @@
+rule execution_CMSTPExecutionProcessCreated_windows {
+
+  meta:
+    author = "ruledev1"
+    description = "Detects various indicators of Microsoft Connection Manager Profile Installer execution"
+    severity = "MEDIUM"
+    created = "2024-01-30"
+    product = "windows"
+    tag = "execution"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_cmstp_execution_by_creation.yml"
+    mitre = "attack.defense_evasion, attack.execution, attack.t1218.003, attack.g0069,car.2019-04-001"
+
+  events:
+    
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    re.regex($security.principal.process.file.full_path, `.*\\cmstp\.exe`)
+
+  condition:
+    $security
+}

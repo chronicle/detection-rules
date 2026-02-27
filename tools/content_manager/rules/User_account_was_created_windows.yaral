@@ -1,0 +1,28 @@
+rule  User_account_was_created_windows{
+ meta:
+    author = "Nayan Bhattari"
+    description = "User account was created"
+    status = "test"
+    severity = "Medium"
+    created = "2024-09-06"
+
+  events:
+    $security.metadata.log_type = "WINEVTLOG"
+    $security.metadata.event_type = "USER_CREATION"
+    $security.principal.user.userid = $creator
+    $security.target.user.userid = $username
+
+    // Tenant whitelisting
+    and 
+    not ($security.principal.user.userid = "jcampbell2su" OR $security.principal.user.userid = "ecroftsu" OR $security.principal.user.userid = "smarshsu" OR $security.principal.user.userid = "lwyethsu" OR $security.principal.user.userid = "ibearzattosu" OR $security.principal.user.userid = "jcampbell2su" OR $security.principal.user.userid = "rtongsu") //SENG-857 
+
+outcome: 
+    $risk_score = max(if($creator = /adm|adminstrator|admin|root/ nocase, 50 ,90))
+    $target_user = array_distinct($username)
+    $performed_by = array_distinct($creator)
+
+  condition:
+    $security
+
+    
+}

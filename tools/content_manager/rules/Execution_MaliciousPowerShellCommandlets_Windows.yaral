@@ -1,0 +1,48 @@
+rule Execution_MaliciousPowerShellCommandlets_Windows {
+    meta:
+        subject = "Malicious PowerShell Commandlets"
+        author = "Cywarden"
+        Description = "Detects the execution of PowerShell cmdlets known to be used in malicious activities"
+        Severity = "High"
+        Mitre_category = "Execution"
+        Mitre_technique_id = "T1059"
+        rule_creation_date = "11-19-2024"
+        rule_modification_date = ""
+        Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/powershell/powershell_script/malicious_commandlets.yml"
+        Version = "1.0.0"
+
+    events:
+
+        // $malicious_commandlets.metadata.log_type = "WAZUH"
+        // $malicious_commandlets.metadata.vendor_name = "Microsoft"
+
+        $malicious_commandlets.target.application = "Microsoft-Windows-PowerShell"
+
+        //Detect common PowerShell cmdlets associated with exploitation frameworks
+
+        $malicious_commandlets.additional.fields["ScriptBlockText"] = /Get\-(ADIDNSNodeAttribute|ADIDNSNodeOwner|ADIDNSNodeTombstoned|ADIDNSPermission|ADIDNSZone|ChromeDump|ClipboardContents|FoxDump|GPPPassword|IndexedItem|KerberosAESKey|Keystrokes|LSASecret|PassHashes|RegAlwaysInstallElevated|RegAutoLogon|RemoteBootKey|RemoteCachedCredential|RemoteLocalAccountHash|RemoteLSAKey|RemoteMachineAccountHash|RemoteNLKMKey|RickAstley|SecurityPackages|ServiceFilePermission|ServicePermission|ServiceUnquoted|SiteListPassword|System|TimedScreenshot|UnattendedInstallFile|Unconstrained|USBKeystrokes|VaultCredential|VulnAutoRun|VulnSchTask)/ nocase
+        or $malicious_commandlets.additional.fields["ScriptBlockText"] = /Invoke\-(ACLScanner|ADRecon|ADSBackdoor|AgentSmith|AllChecks|ARPScan|AzureHound|BackdoorLNK|BadPotato|BetterSafetyKatz|BypassUAC|Carbuncle|Certify|ConPtyShell|CredentialInjection|DAFT|DCSync|DinvokeKatz|DllInjection|DNSUpdate|DomainPasswordSpray|DowngradeAccount|EgressCheck|Eyewitness|FakeLogonScreen|Farmer|Get-RBCD-Threaded|Gopher|Grouper|HandleKatz|ImpersonatedProcess|ImpersonateSystem|InteractiveSystemPowerShell|Internalmonologue|Inveigh|InveighRelay|KrbRelay|LdapSignCheck|Lockless|MalSCCM|Mimikatz|Mimikittenz|MITM6|NanoDump|NetRipper|Nightmare|NinjaCopy|OfficeScrape|OxidResolver|P0wnedshell|Paranoia|PortScan|PoshRatHttp|PostExfil|PowerDump|PowerShellTCP|PowerShellWMI|PPLDump|PsExec|PSInject|PsUaCme|ReflectivePEInjection|ReverseDNSLookup|Rubeus|RunAs|SafetyKatz|SauronEye|SCShell|Seatbelt|ServiceAbuse|ShadowSpray|Sharp|Shellcode|SMBScanner|Snaffler|Spoolsample|SpraySinglePassword|SSHCommand|StandIn|StickyNotesExtract|SystemCommand|Tasksbackdoor|Tater|Thunderfox|ThunderStruck|TokenManipulation|Tokenvator|TotalExec|UrbanBishop|UserHunter|VoiceTroll|Whisker|WinEnum|winPEAS|WireTap|WmiCommand|WMIExec|WScriptBypassUAC|Zerologon)/ nocase 
+        or $malicious_commandlets.additional.fields["ScriptBlockText"] = /Add\-(Exfiltration|Persistence|RegBackdoor|RemoteRegBackdoor|ScrnSaveBackdoor)/ nocase 
+        or $malicious_commandlets.additional.fields["ScriptBlockText"] =  /Remove\-(ADIDNSNode|Update)/ nocase 
+        or $malicious_commandlets.additional.fields["ScriptBlockText"] =  /Set\-(ADIDNSNode|ADIDNSNodeAttribute|ADIDNSNodeOwner)/ nocase 
+        or $malicious_commandlets.additional.fields["ScriptBlockText"] =  /Export\-(ADRCSV|ADRExcel|ADRHTML|ADRJSON|ADRXML)/ nocase 
+        or $malicious_commandlets.additional.fields["ScriptBlockText"] = /New\-(ADIDNSNode|HoneyHash|InMemoryModule|SOASerialNumberArray)/ nocase 
+        or $malicious_commandlets.additional.fields["ScriptBlockText"] = /(ConvertTo-Rc4ByteStream|Decrypt-Hash|Disable-ADIDNSNode|Do-Exfiltration|Enable-ADIDNSNode|Enabled-DuplicateToken|Exploit-Jboss|Find-Fruit|Find-GPOLocation|Find-TrustedDocuments|Grant-ADIDNSPermission|Gupt-Backdoor|MailRaider|Out-Minidump|PowerBreach|powercat|PowerUp|PowerView|Rename-ADIDNSNode|Revoke-ADIDNSPermission|Show-TargetScreen|Start-CaptureServer|Start-Dnscat2|Start-WebcamRecorder|VolumeShadowCopyTools)/ nocase 
+
+
+        // // false positive form Amazon EC2
+        // not $malicious_commandlets.additional.fields["ScriptBlockText"] =  `^C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Module\\.*$`) nocase 
+
+        // Exclude legitimate admin scripts by ignoring harmless modules (add some trusted admins)
+        // not $malicious_commandlets.principal.process.command_line, `(#administrative|#internal|safe usage)`)
+        $malicious_commandlets.principal.namespace =$customer
+
+
+    outcome:
+        $riskscore = 60
+        $cmdline = array_distinct($malicious_commandlets.additional.fields["ScriptBlockText"])
+        $principal_hostname = array_distinct($malicious_commandlets.principal.hostname)
+
+    condition:
+        $malicious_commandlets
+}

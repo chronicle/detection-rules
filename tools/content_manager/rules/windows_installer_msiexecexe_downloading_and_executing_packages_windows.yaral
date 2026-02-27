@@ -1,0 +1,23 @@
+rule windows_installer_msiexecexe_downloading_and_executing_packages_windows {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "To detect suspicious use of msiexec.exe by Raspberry Robin or other threats, it’s essential to take a look at the command line and the URL. Detecting msiexec.exe making outbound network connections to download and install packages in the command-line interface will give you the opportunity to examine the activity and determine if it’s malicious or not. Part of the RedCanary 2024 Threat Detection Report."
+    reference = "https://detection.fyi/mbabinski/sigma-rules/2024_redcanary_threatdetectionreport/threat_raspberry_robin_msiexec_download/"
+    rule_id = "2b09f558-14dc-40ac-b962-66386b5785c1"
+    status = "experimental"
+    tags = "attack.defense_evasion, attack.t1218, attack.t1218.007"
+    falsepositives = "Unknown"
+    severity = "low"
+    created = "2025-12-15"
+
+   events:
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    re.regex($security.target.process.file.full_path, `.*\\msiexec`) nocase and 
+    (re.regex($security.target.process.command_line, `.*http:.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*https:.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*-q.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\/q.*`) nocase)
+
+  condition:
+    $security
+}

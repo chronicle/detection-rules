@@ -1,0 +1,20 @@
+rule attack_fileDownloadViaBitsadminUncommonTargetFolder_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects usage of bitsadmin downloading a file to uncommon target folder"
+    severity = "MEDIUM"
+    created = "2024-02-04"
+    product = "windows"
+    tag = "defense_evasion,persistence"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_bitsadmin_download_uncommon_targetfolder.yml"
+    mitre = "t1197,s0190,t1036.003"
+
+  events:
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ($security.target.process.file.full_path = /.*\\bitsadmin.exe$/ nocase and ($security.target.process.command_line = /.* \/transfer .*/ nocase or $security.target.process.command_line = /.* \/create .*/ nocase or $security.target.process.command_line = /.* \/addfile .*/ nocase) and ($security.target.process.command_line = /.*%AppData%.*/ nocase or $security.target.process.command_line = /.*%temp%.*/ nocase or $security.target.process.command_line = /.*%tmp%.*/ nocase or $security.target.process.command_line = /.*\\AppData\\Local\\.*/ nocase or $security.target.process.command_line = /.*C:\\Windows\\Temp\\.*/ nocase))
+
+  condition:
+    $security
+}

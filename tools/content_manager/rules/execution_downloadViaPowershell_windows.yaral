@@ -1,0 +1,24 @@
+rule execution_downloadViaPowershell_windows{
+  meta:
+    author = "Srijan Kafle"
+    description = "Detects a Powershell process that contains download commands in its command line string"
+    severity = "MEDIUM"
+    created = "2024-02-08"
+    product = "microsoft"
+    tag = "execution"
+    service = "process_monitor"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_download_patterns.yml"
+    mitre = "Command and Scripting Interpreter: PowerShell,t1059.001"
+
+events:
+
+    $powershell.metadata.event_type = "PROCESS_LAUNCH" and 
+    ($powershell.target.process.file.full_path = /\\powershell\.exe|\\pwsh\.exe/ nocase OR $powershell.target.process.file.names = /PowerShell.EXE|pwsh.dll/ nocase) AND $powershell.target.process.command_line = /new-object/ nocase AND $powershell.target.process.command_line = /net\.webclient\)\./ nocase AND $powershell.target.process.command_line = /download/ nocase AND $powershell.target.process.command_line = /string\(|file\(/ nocase
+
+outcome:
+    $risk_score = 40
+
+condition:
+    $powershell
+}

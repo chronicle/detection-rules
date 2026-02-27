@@ -1,0 +1,22 @@
+rule persistance_WMIPersistence_ScriptEventConsumer_windows{
+  meta:
+    author = "Ruledev2"
+    description = " Detects WMI script event consumers"
+    severity = "MEDIUM"
+    created = "2024-02-3"
+    product = "microsoft"
+    tag = "persistance"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmi_persistence_script_event_consumer.yml"
+    mitre = "persistance,t1546.003"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    $security.target.process.file.full_path = "C:\\WINDOWS\\system32\\wbem\\scrcons.exe" nocase and 
+    $security.principal.process.file.full_path = "C:\\Windows\\System32\\svchost.exe" nocase
+
+  condition:
+    $security
+}

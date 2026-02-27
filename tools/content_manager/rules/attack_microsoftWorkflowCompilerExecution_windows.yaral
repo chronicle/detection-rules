@@ -1,0 +1,22 @@
+rule attack_microsoftWorkflowCompilerExecution_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects invocation of Microsoft Workflow Compiler, which may permit the execution of arbitrary unsigned code."
+    severity = "HIGH"
+    created = "2024-02-03"
+    product = "windows"
+    tag = "defense_evasion, execution"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_workflow_compiler.yml"
+    mitre = "t1127,t1218"
+
+  events:
+    
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\Microsoft\.Workflow\.Compiler\.exe`) nocase) or 
+    ($security.target.file.full_path = "Microsoft.Workflow.Compiler.exe" nocase))
+
+  condition:
+    $security
+}

@@ -1,0 +1,34 @@
+rule attack_fileDownloadViaBitsadminSuspiciousTargetFolder_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects usage of bitsadmin downloading a file to a suspicious target folder"
+    severity = "HIGH"
+    created = "2024-02-04"
+    product = "windows"
+    tag = "defense_evasion,persistence"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_bitsadmin_download_susp_targetfolder.yml"
+    mitre = "t1197,s0190,t1036.003"
+
+  events:
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\bitsadmin\.exe`) nocase) or 
+    ($security.target.file.full_path = "bitsadmin.exe" nocase)) and 
+    (re.regex($security.target.process.command_line, `.* \/transfer .*`) nocase or 
+    re.regex($security.target.process.command_line, `.* \/create .*`) nocase or 
+    re.regex($security.target.process.command_line, `.* \/addfile .*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*:\\Perflogs.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*:\\ProgramData\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*:\\Temp\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*:\\Users\\Public\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*:\\Windows\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\AppData\\Local\\Temp\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\AppData\\Roaming\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\Desktop\\.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*%ProgramData%.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*%public%.*`) nocase)
+
+  condition:
+    $security
+}

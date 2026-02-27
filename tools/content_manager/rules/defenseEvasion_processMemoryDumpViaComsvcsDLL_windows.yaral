@@ -1,0 +1,39 @@
+rule  defenseEvasion_processMemoryDumpViaComsvcsDLL_windows {
+  meta:
+    author = "Ruledev2"
+    description = "Detects a process memory dump via 'comsvcs.dll' using rundll32, covering multiple different techniques (ordinal, minidump function, etc.)"
+    severity = "HIGH"
+    created = "2024-01-31"
+    product = "microsoft"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_rundll32_process_dump_via_comsvcs.yml"
+    mitre = "defense_evasion,t1036"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((((re.regex($security.target.process.file.full_path, `.*\\rundll32\.exe`) nocase) or 
+    ($security.target.file.full_path = "RUNDLL32.EXE" nocase) or 
+    (re.regex($security.target.process.command_line, `.*rundll32.*`) nocase)) and 
+    (re.regex($security.target.process.command_line, `.*comsvcs.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*full.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*#-.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*#\+.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*#24.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*24 .*`) nocase or 
+    re.regex($security.target.process.command_line, `.*MiniDump.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*#65560.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*24.*`)) and 
+    (re.regex($security.target.process.command_line, `.*comsvcs.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*full.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.* #.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*,#.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*, #.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\"#.*`) nocase)))
+
+
+  condition:
+    $security
+}

@@ -1,0 +1,20 @@
+rule wmiexec_default_output_file {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects the creation of the default output filename used by the wmiexec tool"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/file/file_event/file_event_win_wmiexec_default_filename.yml"
+    status = "test"
+    tags = "attack.lateral-movement, attack.t1047"
+    falsepositives = "Unlikely"
+    severity = "critical"
+    created ="2024-08-29"
+
+  events:
+  $security.metadata.event_type = "FILE_CREATION"
+  (re.regex($security.target.file.full_path, `\\\\Windows\\\\__1\\d\{9\}\\\.\\d\{1,7\}\$`) or re.regex($security.target.file.full_path, `C:\\\\__1\\d\{9\}\\\.\\d\{1,7\}\$`) or re.regex($security.target.file.full_path, `D:\\\\__1\\d\{9\}\\\.\\d\{1,7\}\$`))
+
+  $security.principal.namespace = $customer
+
+  condition:
+    $security
+}

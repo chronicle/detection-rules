@@ -1,0 +1,24 @@
+rule defenseEvasion_powershellExecutionViaSQLPS_windows{
+  meta:
+    author = "Srijan Kafle"
+    description = "This rule detects execution of a PowerShell code through the sqlps.exe utility, which is included in the standard set of utilities supplied with the MSSQL Server. Script blocks are not logged in this case, so this utility helps to bypass protection mechanisms based on the analysis of these logs."
+    severity = "MEDIUM"
+    created = "2024-02-12"
+    product = "microsoft"
+    tag = "defenseEvasion,Execution"
+    service = "process_monitor"
+    status = "test"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mssql_sqlps_susp_execution.yml"
+    mitre = "Inhibit System Recovery,t1490"
+
+  events:
+    
+    $process.metadata.event_type = "PROCESS_LAUNCH" and 
+    $process.principal.process.file.full_path = /\\sqlps\.exe$/ nocase OR (($process.target.process.file.full_path = /\\sqlps\.exe$/ nocase OR $process.target.process.file.names = "sqlps.exe" nocase) AND $process.principal.process.file.full_path != /\\sqlagent\.exe$/ nocase)
+
+    outcome:
+    $risk_score = 40
+
+  condition:
+    $process
+}

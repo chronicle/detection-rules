@@ -1,0 +1,27 @@
+rule cmstpUACBypassViaCOMObjectAccess_windows {
+  meta:
+    author = "Hritik Thapa"
+    description = "Detects UAC Bypass Attempt Using Microsoft Connection Manager Profile Installer Autoelevate-capable COM Objects (e.g. UACMe ID of 41, 43, 58 or 65)"
+    sigma_id = "4b60e6f2-bf39-47b4-b4ea-398e33cfe253"
+    severity = "HIGH"
+    priority = "HIGH"
+    created = "2024-09-02"
+    product = "microsoft"
+    tag = "sysmon"
+    service = "processCreation"
+    mitre = "Privilege Escalation, Defense Evasion, Execution, T1548.002, T1218.003"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_uac_bypass_eventvwr.yml"
+
+  events:
+    
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    re.regex($security.principal.process.file.full_path, `.*\\DllHost\.exe`) nocase and 
+    (re.regex($security.principal.process.command_line, `.* \/Processid:\{3E5FC7F9-9A51-4367-9063-A120244FBEC7\}.*`) nocase or 
+    re.regex($security.principal.process.command_line, `.* \/Processid:\{3E000D72-A845-4CD9-BD83-80C07C3B881F\}.*`) nocase or 
+    re.regex($security.principal.process.command_line, `.* \/Processid:\{BD54C901-076B-434E-B6C7-17C531F4AB41\}.*`) nocase or 
+    re.regex($security.principal.process.command_line, `.* \/Processid:\{D2E7041B-2927-42FB-8E9F-7CE93B6DC937\}.*`) nocase or 
+    re.regex($security.principal.process.command_line, `.* \/Processid:\{E9495B87-D950-4AB5-87A5-FF6D70BF3E90\}.*`) nocase)
+  condition:
+    $security
+    
+}

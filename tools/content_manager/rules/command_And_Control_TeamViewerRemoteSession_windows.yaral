@@ -1,0 +1,25 @@
+rule command_And_Control_TeamViewerRemoteSession_windows{
+  meta:
+    author = "Ruledev2"
+    description = "Detects the creation of log files during a TeamViewer remote session"
+    severity = "MEDIUM"
+    created = "2024-02-3"
+    product = "microsoft"
+    tag = "command_and_Control"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/file/file_event/file_event_win_susp_teamviewer_remote_session.yml"
+    mitre = "command_and_Control,t1219"
+
+  events:
+
+    $security.metadata.event_type = "FILE_CREATION" and 
+    (((re.regex($security.target.file.full_path, `.*\\TeamViewer\\RemotePrinting\\tvprint\.db`) nocase or 
+    re.regex($security.target.file.full_path, `.*\\TeamViewer\\TVNetwork\.log`) nocase)) or 
+    ((re.regex($security.target.file.full_path, `.*\\TeamViewer.*`) nocase) and 
+    (re.regex($security.target.file.full_path, `.*_Logfile\.log.*`) nocase)))
+
+
+  condition:
+    $security
+}

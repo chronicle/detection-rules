@@ -1,0 +1,26 @@
+rule ie4uinit_lolbin_use_from_invalid_path_windows {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detect use of ie4uinit.exe to execute commands from a specially prepared ie4uinit.inf file from a directory other than the usual directories."
+    license = "https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md"
+    reference = "https://lolbas-project.github.io/lolbas/Binaries/Ie4uinit/, https://bohops.com/2018/03/10/leveraging-inf-sct-fetch-execute-techniques-for-bypass-evasion-persistence-part-2/"
+    version = "0.01"
+    sigma_id = "d3bf399f-b0cf-4250-8bb4-dfc192ab81dc"
+    status = "test"
+    tags = "attack.defense-evasion, attack.t1218"
+    falsepositives = "ViberPC updater calls this binary with the following commandline \"ie4uinit.exe -ClearIconCache\""
+    severity = "medium"
+    created = "2025-12-15"
+    product = "windows"
+    category = "process_creation"
+
+  events:
+    $lolbin.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($lolbin.target.process.file.full_path, `.*\\ie4uinit\.exe`) nocase) or 
+    ($lolbin.target.file.full_path = "IE4UINIT.EXE" nocase))
+    not (re.regex($lolbin.target.process.file.full_path, `^C:\\Windows\\System32\\ie4uinit\.exe$`) nocase or re.regex($lolbin.target.process.file.full_path, `^C:\\Windows\\SysWOW64\\ie4uinit\.exe$`) nocase)
+
+
+  condition:
+    $lolbin
+}

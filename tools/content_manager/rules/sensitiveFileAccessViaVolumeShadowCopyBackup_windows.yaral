@@ -1,0 +1,27 @@
+rule sensitiveFileAccessViaVolumeShadowCopyBackup_windows {
+
+  meta:
+    author = "Hritik Thapa"
+    description = "Detects a command that accesses the VolumeShadowCopy in order to extract sensitive files such as the Security or SAM registry hives or the AD database (ntds.dit)"
+    severity = "HIGH"
+    created = "2024-09-06"
+    product = "microsoft"
+    tag = "sysmon"
+    service = "processCreation"
+    mitre = "Impact,T1490"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_sensitive_file_access_shadowcopy.yml"
+
+  events:
+    
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    re.regex($security.target.process.command_line, `.*\\\\\\\\\\\?\\\\GLOBALROOT\\\\Device\\\\HarddiskVolumeShadowCopy.*`) nocase and 
+    (re.regex($security.target.process.command_line, `.*\\\\NTDS\.dit.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\\\SYSTEM.*`) nocase or 
+    re.regex($security.target.process.command_line, `.*\\\\SECURITY.*`) nocase)
+
+
+  condition:
+    $security
+}
+
+

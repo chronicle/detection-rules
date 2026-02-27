@@ -1,0 +1,36 @@
+rule external_remote_SMB_logon_from_public_IP_windows {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects successful logon from public IP address via SMB. This can indicate a publicly-exposed SMB port."
+    license = "https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/account_management/win_security_successful_external_remote_smb_login.yml"
+    version = "0.01"
+    sigma_id = "78d5cab4-557e-454f-9fb9-a222bd0d5edc"
+    status = "derived"
+    tags = "attack.initial-access, attack.t1133"
+    severity = "medium"
+    created = "2025-02-25"
+    category = "security"
+    product = "windows"
+    falsepositives = "Legitimate or intentional inbound connections from public IP addresses on the SMB port"
+
+  events:
+    $smb.metadata.product_event_type = "4624"
+    $smb.extensions.auth.auth_details = "3"
+    $smb.src.ip = /./
+    not $smb.src.ip in cidr %Private_IP_Ranges 
+
+
+    $smb.principal.namespace = $customer
+    $smb.principal.user.user_display_name = $username
+    $smb.principal.asset.ip = $IP
+
+  match:
+    $customer over 10m
+
+   outcome:
+      $risk_score = 70
+
+  condition:
+    $smb
+}

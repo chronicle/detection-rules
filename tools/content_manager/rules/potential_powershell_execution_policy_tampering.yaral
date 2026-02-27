@@ -1,0 +1,27 @@
+rule potential_powershell_execution_policy_tampering {
+ meta:
+    author = "Nayan BHattarai"
+    description = "Detects changes to the PowerShell execution policy in order to bypass signing requirements for script execution."
+    license = "https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md"
+    reference = "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7.3"
+    version = "0.01"
+    sigma_id = "fad91067-08c5-4d1a-8d8c-d96a21b37814"
+    status = "test"
+    tags = "attack.defense-evasion"
+    falsepositives = "Unknown"
+    severity = "medium"
+    created = "2025-12-15"
+    category = "registry_set"
+    product = "windows"
+
+  events:
+    (re.regex($registry.target.registry.registry_key, `.*\\ShellIds\\Microsoft\.PowerShell\\ExecutionPolicy`) nocase or 
+    re.regex($registry.target.registry.registry_key, `.*\\Policies\\Microsoft\\Windows\\PowerShell\\ExecutionPolicy`) nocase) and 
+    not ((re.regex($registry.target.process.file.full_path, `.*:\\Windows\\System32\\.*`) nocase or 
+    re.regex($registry.target.process.file.full_path, `.*:\\Windows\\SysWOW64\\.*`) nocase))
+    NOT re.regex($registry.principal.process.command_line, `C:\\ProgramData\\Lenovo\\Vantage\\Addins\\LenovoSystemUpdateAddin`)
+    re.regex($registry.principal.process.command_line, `resources\\DMC_PM\\Off_DMC.ps1`)
+
+  condition:
+    $registry
+}

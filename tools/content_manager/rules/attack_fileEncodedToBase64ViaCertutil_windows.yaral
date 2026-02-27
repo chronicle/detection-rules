@@ -1,0 +1,22 @@
+rule attack_fileEncodedToBase64ViaCertutil_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects the execution of certutil with the 'encode' flag to encode a file to base64. This can be abused by threat actors and attackers for data exfiltration"
+    severity = "HIGH"
+    created = "2024-02-04"
+    product = "windows"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certutil_encode.yml"
+    mitre = "t1027"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ($security.target.process.file.full_path = /\\certutil\.exe$/ nocase OR $security.target.process.file.names = "CertUtil.exe" nocase) AND ($security.target.process.command_line = /-encode/ nocase OR $security.target.process.command_line = /\/encode/ nocase OR $security.target.process.command_line = /–encode/ nocase OR $security.target.process.command_line = /—encode/ nocase OR $security.target.process.command_line = /―encode/ nocase)
+
+
+  condition:
+    $security
+}

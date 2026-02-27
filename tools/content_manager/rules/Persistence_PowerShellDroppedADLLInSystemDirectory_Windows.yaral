@@ -1,0 +1,35 @@
+rule Persistence_PowerShellDroppedADLLInSystemDirectory_Windows {
+    meta:
+        Subject = "PowerShell Dropped A DLL In System Directory"
+        Author = "Cywarden"
+        Description = "This alert is triggered when a PowerShell command is used to install or copy a file into a system directory such as System32 or SysWOW64. This could be an indication of malicious activity, as these directories are typically used to store important system files. The alert will provide details of the PowerShell command used, the file name, and the system directory."
+        Severity = "High"
+        Mitre_category = "Persistence"
+        Mitre_technique_id = "T1574"
+        rule_creation_date = "11-19-2024"
+        rule_modification_date = ""
+        Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/powershell/powershell_script/posh_ps_copy_item_system_directory.yml"
+        Version = "1.0.0"
+
+    events:
+        // $ps_dll.metadata.log_type = "WAZUH"
+        // $ps_dll.metadata.vendor_name = "Microsoft"
+
+        // $ps_dll.target.application = "Microsoft-Windows-PowerShell"
+
+        $ps_dll.additional.fields["ScriptBlockText"] = /(Copy-Item|cpi)\s.{2,128}\s\-(Destination|D)\s.{1,32}\\Windows\\\\(System32|SysWOW64)/ nocase or 
+        $ps_dll.additional.fields["ScriptBlockText"] = /(Copy-Item|cpi)\s\-Path.{2,128}\s\-(Destination|D)\s.{1,32}\\Windows\\\\(System32|SysWOW64)/ nocase
+
+        or ($ps_dll.target.process.command_line = /(Copy-Item|cpi)\s.{2,128}\s\-(Destination|D)\s.{1,32}\\Windows\\\\(System32|SysWOW64)/ nocase or 
+        $ps_dll.target.process.command_line = /(Copy-Item|cpi)\s\-Path.{2,128}\s\-(Destination|D)\s.{1,32}\\Windows\\\\(System32|SysWOW64)/ nocase)
+
+
+
+        $ps_dll.principal.namespace = $customer
+
+    outcome:
+        $riskscore = 64
+
+    condition:
+        $ps_dll
+}

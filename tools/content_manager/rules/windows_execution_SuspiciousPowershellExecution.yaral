@@ -1,0 +1,29 @@
+rule windows_execution_SuspiciousPowershellExecution {
+    meta:
+        subject = "Possible Malicious Powershell Execution"
+        author = "Nayan Bhattarai"
+        description = "Detect if the powershell command line len is more than 500. This is consider suspecious execution."
+        severity = "Medium"
+        mitre_category = "Execution"
+        mitre_technique_id = "T1059"
+        rule_creation_date = "2025-06-20" // MM-DD-YYYY
+        rule_modification_date = ""
+        reference1 = "https://attack.mitre.org/techniques/T1059/001/"
+        version = "1.0.0"
+
+    events:
+
+        $powershell_modules.metadata.event_type = "PROCESS_LAUNCH"
+        re.regex($powershell_modules.principal.process.file.full_path, `powershell\.exe`) nocase
+        strings.length($powershell_modules.target.process.command_line ) > 500
+        $powershell_modules.principal.namespace = $customer
+        
+
+    outcome:
+        $risk_score = 47
+        $command_line = array_distinct($powershell_modules.target.process.command_line)
+        $module_path = array_distinct($powershell_modules.target.file.full_path)
+
+    condition:
+        $powershell_modules
+}

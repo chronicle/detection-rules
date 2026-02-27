@@ -1,0 +1,40 @@
+rule suspicious_loading_of_dbgcoredbghelp_dlls_from_uncommon_location_windows {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects loading of dbgcore.dll or dbghelp.dll from uncommon locations such as user directories.These DLLs contain the MiniDumpWriteDump function, which can be abused for credential dumping purposes or in some cases for evading EDR/AV detection by suspending processes.."
+    license = "https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md"
+    reference = "https://blog.axelarator.net/hunting-for-edr-freeze/, https://www.zerosalarium.com/2025/09/EDR-Freeze-Puts-EDRs-Antivirus-Into-Coma.html, https://www.splunk.com/en_us/blog/security/you-bet-your-lsass-hunting-lsass-access.html"
+    version = "0.01"
+    sigma_id = "416bc4a2-7217-4519-8dc7-c3271817f1d5"
+    status = "experimental"
+    tags = "attack.credential-access, attack.t1003, attack.defense-evasion, attack.t1562.001"
+    falsepositives = "Possibly during software installation or update processes"
+    severity = "high"
+    created = "2025-11-27"
+    category = "image_load"
+    product = "windows"
+
+  events:
+    $image_load.metadata.event_type = "PROCESS_MODULE_LOAD" and 
+    (re.regex($image_load.target.process.file.full_path, `.*:\\Perflogs\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*:\\Temp\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*:\\Users\\Public\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\\$Recycle\.Bin\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Contacts\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Desktop\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Documents\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Downloads\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Favorites\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Favourites\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\inetpub\\wwwroot\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Music\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Pictures\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Start Menu\\Programs\\Startup\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Users\\Default\\.*`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\Videos\\.*`) nocase) and 
+    (re.regex($image_load.target.process.file.full_path, `.*\\dbgcore\.dll`) nocase or 
+    re.regex($image_load.target.process.file.full_path, `.*\\dbghelp\.dll`) nocase)
+
+  condition:
+    $image_load
+}

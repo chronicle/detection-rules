@@ -1,0 +1,29 @@
+rule Persistence_SuspiciousRunKeyFromDownload_WindowsSysmon {
+    meta:
+        name = "Suspicious Run Key from Download"
+        author = "Cywarden"
+        description = "Detects suspicious RUN keys created by software located in Download or temporary Outlook/Internet Explorer directories."
+        severity = "High"
+        mitre_category = "Persistence"
+        mitre_technique_id = "T1547"
+        rule_creation_date = "2025-01-29"
+        reference1 = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_event/registry_event_susp_download_run_key.yml"
+        version = "1.0.0"
+
+    events:
+        $registry_run.metadata.vendor_name = "Microsoft"
+        $registry_run.metadata.product_event_type = "13" // Sysmon Event ID for Registry Value Set
+
+        $registry_run.target.registry.registry_key = /SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run/
+
+        $registry_run.target.registry.registry_value_data = /\\Downloads\\|\\Temporary\sInternet\sFiles\\Content\.Outlook\\|\\Local\sSettings\\Temporary\sInternet\sFiles\\/ nocase 
+        $registry_run.principal.namespace = $customer
+
+    outcome:
+        $risk_score = 60
+        $principal_process = array_distinct($registry_run.principal.process.file.full_path)
+        $software_path = array_distinct($registry_run.principal.process.file.full_path)
+
+    condition:
+        $registry_run
+}

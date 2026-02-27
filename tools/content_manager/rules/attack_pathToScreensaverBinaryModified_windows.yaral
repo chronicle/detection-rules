@@ -1,0 +1,23 @@
+rule attack_pathToScreensaverBinaryModified_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects value modification of registry key containing path to binary used as screensaver."
+    severity = "MEDIUM"
+    created = "2024-02-03"
+    product = "windows"
+    tag = "persistence, privilege_escalation"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_event/registry_event_modify_screensaver_binary_path.yml"
+    mitre = "t1546.002"
+
+  events:
+    
+    $security.metadata.event_type = "REGISTRY_MODIFICATION" and 
+    re.regex($security.target.registry.registry_key, `.*\\Control Panel\\Desktop\\SCRNSAVE\.EXE`) nocase and 
+    not (re.regex($security.target.process.file.full_path, `.*\\rundll32\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\explorer\.exe`) nocase)
+
+  condition:
+    $security
+}

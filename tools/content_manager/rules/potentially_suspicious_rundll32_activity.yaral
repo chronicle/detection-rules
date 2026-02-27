@@ -1,0 +1,80 @@
+rule potentially_suspicious_rundll32_activity {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects suspicious execution of rundll32, with specific calls to some DLLs with known LOLBIN functionalities"
+    reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_susp_activity.yml"
+    status = "test"
+    tags = "attack.defense-evasion, attack.t1218.011"
+    falsepositives = "False positives depend on scripts and administrative tools used in the monitored environment"
+    severity = "medium"
+    created = "2024-09-03"
+
+  events:
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    (((re.regex($security.target.process.command_line, `.*javascript:.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*\.RegisterXLL.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*url\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*OpenURL.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*url\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*OpenURLA.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*url\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*FileProtocolHandler.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*zipfldr\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*RouteTheCall.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*shell32\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*Control_RunDLL.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*shell32\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*ShellExec_RunDLL.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*mshtml\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*PrintHTML.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*advpack\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*LaunchINFSection.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*advpack\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*RegisterOCX.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*ieadvpack\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*LaunchINFSection.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*ieadvpack\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*RegisterOCX.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*ieframe\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*OpenURL.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*shdocvw\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*OpenURL.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*syssetup\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*SetupInfObjectInstallAction.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*setupapi\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*InstallHinfSection.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*pcwutl\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*LaunchApplication.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*dfshim\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*ShOpenVerbApplication.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*dfshim\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*ShOpenVerbShortcut.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*scrobj\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*GenerateTypeLib.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*http.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*shimgvw\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*ImageView_Fullscreen.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*http.*`) nocase)) or 
+    ((re.regex($security.target.process.command_line, `.*comsvcs\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*MiniDump.*`) nocase))) and 
+    not ((re.regex($security.target.process.command_line, `.*shell32\.dll,Control_RunDLL desk\.cpl,screensaver,@screensaver.*`) nocase) or 
+    ($security.principal.process.file.full_path = "C:\\Windows\\System32\\control.exe" nocase and 
+    re.regex($security.principal.process.command_line, `.*\.cpl.*`) nocase and 
+    (re.regex($security.target.process.command_line, `.*Shell32\.dll.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*Control_RunDLL.*`) nocase) and 
+    (re.regex($security.target.process.command_line, `.*\.cpl.*`) nocase)) or 
+    ($security.principal.process.file.full_path = "C:\\Windows\\System32\\control.exe" nocase and 
+    re.regex($security.target.process.command_line, `\"C:\\Windows\\system32\\rundll32\.exe\" Shell32\.dll,Control_RunDLL \"C:\\Windows\\System32\\.*`) nocase and 
+    re.regex($security.target.process.command_line, `.*\.cpl\",`) nocase))
+
+    NOT re.regex($security.principal.process.file.full_path, `C:\\Program Files\\Microsoft OneDrive\\OneDrive.exe`)
+
+  condition:
+    $security
+
+
+    
+
+
+
+}

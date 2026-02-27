@@ -1,0 +1,51 @@
+rule windows_suspicious_unusual_location_lnk_file {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Detects creation and movement of .lnk files to specific folders"
+    rule_id = "mr_efb341aa-57c5-47b6-bde5-b409b4395c8f"
+    rule_name = "Suspicious Unusual Location LNK File"
+    type = "alert"
+    data_source = "microsoft sysmon"
+    platform = "Windows"
+    severity = "Low"
+    priority = "Low"
+
+  events:
+    (
+      $file.metadata.event_type = "FILE_CREATION" or
+      $file.metadata.event_type = "FILE_MODIFICATION" or
+      $file.metadata.event_type = "FILE_COPY" or
+      $file.metadata.event_type = "FILE_MOVE"
+    )
+    //and is optional, implied when broken out by line
+    and
+    $file.target.file.full_path = /\.lnk$/ nocase and
+    //Looking in the desktop, documents and start menu folders, can be modified to look in different folders
+    $file.target.file.full_path = /\\(Desktop|Documents|Start Menu)\\.*/ nocase
+
+        // Tenant exclusion
+    not ($file.principal.namespace = "nationalstorage" and  $file.principal.process.parent_process.file.full_path = "C:\\Program Files\\Microsoft OneDrive\\Update\\OneDriveSetup.exe" nocase  and $file.principal.process.parent_process.command_line = "C:\\Program Files\\Microsoft OneDrive\\Update\\OneDriveSetup.exe /allusers /update /restart") and $file.target.file.full_path = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\OneDrive.lnk" nocase // SENG-850
+    not $file.principal.process.file.full_path = "C:\\Program Files\\Microsoft OneDrive\\StandaloneUpdater\\OneDriveSetup.exe" nocase 
+  outcome:
+    $risk_score = 35
+    //added to populate alert graph with additional context
+    $principal_hostname = $file.principal.hostname
+    $target_hostname = $file.target.hostname
+    $src_hostname = $file.src.hostname
+    $principal_process_pid = $file.principal.process.pid
+    $principal_process_command_line = $file.principal.process.command_line
+    $principal_process_file_sha256 = $file.principal.process.file.sha256
+    $principal_process_file_full_path = $file.principal.process.file.full_path
+    $principal_process_product_specific_process_id = $file.principal.process.product_specific_process_id
+    $principal_process_parent_process_product_specific_process_id = $file.principal.process.parent_process.product_specific_process_id
+    $principal_user_userid = $file.principal.user.userid
+    $src_user_userid = $file.principal.user.userid
+    $target_file_sha256 = $file.target.file.sha256
+    $target_file_full_path = $file.target.file.full_path
+    $src_file_sha256 = $file.src.file.sha256
+    $src_file_full_path = $file.src.file.full_path
+
+  condition:
+    $file
+}

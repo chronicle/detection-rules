@@ -1,0 +1,21 @@
+rule persistance_WMIPersistenceScriptEventConsumerFileWrite_windows{
+  meta:
+    author = "Ruledev2"
+    description = " Detects WMI script event consumers"
+    severity = "HIGH"
+    created = "2024-02-3"
+    product = "microsoft"
+    tag = "persistance"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/file/file_event/file_event_win_wmi_persistence_script_event_consumer_write.yml"
+    mitre = "persistance,t1546.003"
+
+  events:
+
+    $security.metadata.event_type = "FILE_CREATION" and 
+    $security.target.process.file.full_path = "C:\\WINDOWS\\system32\\wbem\\scrcons.exe" nocase
+
+  condition:
+    $security
+}

@@ -1,0 +1,21 @@
+rule execution_hackToolCovenantPowershellLauncher_windows {
+  meta:
+    author = "Ruledev2"
+    description = "Detects suspicious command lines used in Covenant luanchers"
+    severity = "HIGH"
+    created = "2024-02-12"
+    product = "microsoft"
+    tag = "defense_evasion"
+    service = "process_monitoring"
+    status = "test"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_hktl_covenant.yml"
+    mitre = "Hide Artifacts: Hidden Window,t1564.003;Command and Scripting Interpreter: PowerShell,t1059.001"
+
+  events:
+
+    $command.metadata.event_type = "PROCESS_LAUNCH" and 
+    ($command.target.process.command_line = /-Sta/ nocase AND $command.target.process.command_line = /-Nop/ nocase AND $command.target.process.command_line = /-Window/ nocase AND $command.target.process.command_line = /Hidden/ nocase AND $command.target.process.command_line = /-Command|-EncodedCommand/ nocase) OR $command.target.process.command_line = /sv o \(New-Object IO\.MemorySteam\);sv d |mshta file\.hta|GruntHTTP|-EncodedCommand cwB2ACAAbwAgA/ nocase
+
+  condition:
+    $command
+}

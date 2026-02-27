@@ -1,0 +1,24 @@
+rule agent_disconnected_alert_bindplane {
+
+  meta:
+    author = "Nayan Bhattarai"
+    description = "This detection will be triggered whenever agent alert is detected"
+    type = "alert"
+    severity = "MEDIUM"
+    created = "2026-01-22"
+
+  events:
+    $bindplane.metadata.log_type = "STCKN_SM_HEARTBEAT"
+    $bindplane.metadata.product_name = "Custos"
+    $bindplane.additional.fields["OSName"] != /Microsoft Windows 11 Pro|Microsoft Windows 11 Enterprise|Microsoft Windows 10|Microsoft Windows 10/ nocase 
+    $bindplane.additional.fields["OSName"] != "Microsoft Windows 11 Home" nocase 
+
+    $bindplane.principal.namespace = $customer
+
+outcome:
+    $risk_score = 60
+    $event_count = count_distinct($bindplane.metadata.id)
+
+  condition:
+    $bindplane
+}

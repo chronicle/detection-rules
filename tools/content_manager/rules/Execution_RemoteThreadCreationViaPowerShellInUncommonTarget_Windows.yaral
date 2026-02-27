@@ -1,0 +1,33 @@
+rule Execution_RemoteThreadCreationViaPowerShellInUncommonTarget_Windows {
+    meta:
+        subject = "Remote Thread Creation Via PowerShell In Uncommon Target"
+        author = "Cywarden"
+        description = "Detects the creation of a remote thread from a PowerShell process in an uncommon target process."
+        severity = "Medium"
+        mitre_category = "Exection"
+        mitre_technique_id = "T1218"
+        rule_creation_date = "01-04-2025" // MM-DD-YYYY
+        rule_modification_date = ""
+        reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/create_remote_thread/create_remote_thread_win_powershell_susp_targets.yml"
+        version = "1.0.0"
+
+    events:
+        // Detect remote thread creation from PowerShell
+        // $powershell_thread.metadata.log_type = "WAZUH"
+        // $powershell_thread.metadata.vendor_name = "Microsoft"
+        $powershell_thread.principal.process.file.full_path = /(powershell|pwsh)\.exe/
+        $powershell_thread.target.process.file.full_path = /(rundll32|regsvr32)\.exe/ 
+        not $powershell_thread.target.process.command_line = /C\:\\ProgramData\\Lenovo\\/ nocase // to remove false positive
+        not $powershell_thread.principal.process.command_line = /Microsoft\s+Intune\s+Management\s+Extension/ nocase // to remove false positive
+
+        $powershell_thread.principal.namespace = $customer
+
+
+    outcome:
+        $risk_score = 60
+        $target_process = array_distinct($powershell_thread.target.process.file.full_path)
+        $target_process_cmdline = array_distinct($powershell_thread.target.process.command_line)
+
+    condition:
+        $powershell_thread
+}

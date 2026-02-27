@@ -1,0 +1,36 @@
+rule metric_outbound_data_transfer_more_than_2GB {
+  meta:
+    author = "Nayan Bhattarai"
+    description = "Detects data transfer more than 2GB per day."
+
+ events:
+    $outbound.metadata.event_type = "NETWORK_CONNECTION"
+    $outbound.network.sent_bytes > 0
+    $outbound.target.port != 443
+    $outbound.target.port != 80
+    $outbound.target.port = $port
+
+    $outbound.principal.namespace =$customer
+    $outbound.principal.asset.ip =$ip
+    $outbound.principal.ip = $sourceip
+    $outbound.target.ip = $destination
+
+match:
+    $customer,$ip, $destination, $port over 1d
+
+    
+outcome:
+$max_bytes_per_day = max(metrics.network_bytes_outbound(
+    period:1d, window:30d,
+    metric:value_sum,
+    agg:max,
+    principal.asset.ip:$ip))
+
+    $daily_byte_sum = sum($outbound.network.sent_bytes)
+    $source_ip = count_distinct($sourceip)
+    $destination_ip = count_distinct($destination)
+
+
+condition:
+    $outbound and $daily_byte_sum >= 2000000000
+}

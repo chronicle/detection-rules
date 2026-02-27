@@ -1,0 +1,56 @@
+rule defenseEvasion_CscExecutionFormPotentiallySuspiciousParent_windows{
+  meta:
+    author = "Ruledev2"
+    description = "Detects a potentially suspicious parent of 'csc.exe', which could be a sign of payload delivery."
+    severity = "HIGH"
+    created = "2024-02-4"
+    product = "microsoft"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_csc_susp_parent.yml"
+    mitre = "defense_evasion,t1218.005"
+
+  events:
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    ((re.regex($security.target.process.file.full_path, `.*\\csc\.exe`) nocase) or 
+    ($security.target.file.full_path = "csc.exe" nocase)) and 
+    (((re.regex($security.principal.process.file.full_path, `.*\\cscript\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\excel\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\mshta\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\onenote\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\outlook\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\powerpnt\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\winword\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\wscript\.exe`) nocase)) or 
+    ((re.regex($security.principal.process.file.full_path, `.*\\powershell\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\pwsh\.exe`) nocase) and 
+    (re.regex($security.principal.process.command_line, `.*-Encoded .*`) nocase or 
+    re.regex($security.principal.process.command_line, `.*FromBase64String.*`) nocase)) or 
+    (((re.regex($security.principal.process.command_line, `\(\[Pp\]rogram\[Dd\]ata\|%\(\[Ll\]ocal\)\?\[Aa\]pp\[Dd\]ata%\|\\\\\[Aa\]pp\[Dd\]ata\\\\\(\[Ll\]ocal\(\[Ll\]ow\)\?\|\[Rr\]oaming\)\)\\\\\[\^\\\\\]\{1,256\}\$`) nocase) or 
+    ((re.regex($security.principal.process.command_line, `.*:\\PerfLogs\\.*`) nocase or 
+    re.regex($security.principal.process.command_line, `.*:\\Users\\Public\\.*`) nocase or 
+    re.regex($security.principal.process.command_line, `.*:\\Windows\\Temp\\.*`) nocase or 
+    re.regex($security.principal.process.command_line, `.*\\Temporary Internet.*`) nocase)) or 
+    ((re.regex($security.principal.process.command_line, `.*:\\Users\\.*`) nocase) and 
+    (re.regex($security.principal.process.command_line, `.*\\Favorites\\.*`) nocase)) or 
+    ((re.regex($security.principal.process.command_line, `.*:\\Users\\.*`) nocase) and 
+    (re.regex($security.principal.process.command_line, `.*\\Favourites\\.*`) nocase)) or 
+    ((re.regex($security.principal.process.command_line, `.*:\\Users\\.*`) nocase) and 
+    (re.regex($security.principal.process.command_line, `.*\\Contacts\\.*`) nocase)) or 
+    ((re.regex($security.principal.process.command_line, `.*:\\Users\\.*`) nocase) and 
+    (re.regex($security.principal.process.command_line, `.*\\Pictures\\.*`) nocase))))) and 
+    not (((re.regex($security.principal.process.file.full_path, `C:\\Program Files \(x86\)\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `C:\\Program Files\\.*`) nocase)) or 
+    ($security.principal.process.file.full_path = "C:\\Windows\\System32\\sdiagnhost.exe" nocase) or 
+    ($security.principal.process.file.full_path = "C:\\Windows\\System32\\inetsrv\\w3wp.exe" nocase)) and 
+    not (($security.principal.process.file.full_path = "C:\\ProgramData\\chocolatey\\choco.exe" nocase) or 
+    (re.regex($security.principal.process.command_line, `.*\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection.*`) nocase) or 
+    ((re.regex($security.principal.process.command_line, `.*JwB7ACIAZgBhAGkAbABlAGQAIgA6AHQAcgB1AGUALAAiAG0AcwBnACIAOgAiAEEAbgBzAGkAYgBsAGUAIAByAGUAcQB1AGkAcgBlAHMAIABQAG8AdwBlAHIAUwBoAGUAbABsACAAdgAzAC4AMAAgAG8AcgAgAG4AZQB3AGUAcgAiAH0AJw.*`) nocase or 
+    re.regex($security.principal.process.command_line, `.*cAewAiAGYAYQBpAGwAZQBkACIAOgB0AHIAdQBlACwAIgBtAHMAZwAiADoAIgBBAG4AcwBpAGIAbABlACAAcgBlAHEAdQBpAHIAZQBzACAAUABvAHcAZQByAFMAaABlAGwAbAAgAHYAMwAuADAAIABvAHIAIABuAGUAdwBlAHIAIgB9ACcA.*`) nocase or 
+    re.regex($security.principal.process.command_line, `.*nAHsAIgBmAGEAaQBsAGUAZAAiADoAdAByAHUAZQAsACIAbQBzAGcAIgA6ACIAQQBuAHMAaQBiAGwAZQAgAHIAZQBxAHUAaQByAGUAcwAgAFAAbwB3AGUAcgBTAGgAZQBsAGwAIAB2ADMALgAwACAAbwByACAAbgBlAHcAZQByACIAfQAnA.*`) nocase)))
+
+
+  condition:
+    $security
+}

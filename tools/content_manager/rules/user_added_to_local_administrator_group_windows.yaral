@@ -1,0 +1,26 @@
+rule user_added_to_local_administrator_group_windows {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects the addition of a new member to the local administrator group, which could be legitimate activity or a sign of privilege escalation activity."
+    license = "https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md"
+    reference = "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4732, https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers"
+    version = "0.01"
+    sigma_id = "c265cf08-3f99-46c1-8d59-328247057d57"
+    status = "stable"
+    tags = "attack.initial-access, attack.defense-evasion, attack.privilege-escalation, attack.t1078, attack.persistence, attack.t1098"
+    falsepositives = "Legitimate administrative activity"
+    severity = "medium"
+    created = "2025-12-15"
+    product = "windows"
+    service = "security"
+
+  events:
+    
+    $selection_eid.metadata.product_event_type = "4732" and 
+    not (re.regex($selection_eid.principal.user.user_display_name, `.*\$`) nocase)
+    $selection_eid.target.group.windows_sid = "S-1-5-32-544"
+    $selection_eid.target.group.group_display_name = "Administrators"
+
+  condition:
+    $selection_eid
+}

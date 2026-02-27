@@ -1,0 +1,107 @@
+rule hacktool_generic_process_access_windows {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects process access requests from hacktool processes based on their default image name."
+    license = "https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md"
+    reference = "https://jsecurity101.medium.com/bypassing-access-mask-auditing-strategies-480fb641c158, https://www.splunk.com/en_us/blog/security/you-bet-your-lsass-hunting-lsass-access.html"
+    version = "0.01"
+    sigma_id = "d0d2f720-d14f-448d-8242-51ff396a334e"
+    status = "test"
+    tags = "attack.credential-access, attack.t1003.001, attack.s0002"
+    falsepositives = "Unlikely"
+    severity = "high"
+    created = "2023-11-27"
+    category = "process_access"
+    product = "windows"
+
+  events:
+    (((re.regex($security.principal.process.file.full_path, `.*\\Akagi\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Akagi64\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\atexec_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Certify\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Certipy\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\CoercedPotato\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\crackmapexec\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\CreateMiniDump\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\dcomexec_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\dpapi_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\findDelegation_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\GetADUsers_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\GetNPUsers_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\getPac_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\getST_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\getTGT_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\GetUserSPNs_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\gmer\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\hashcat\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\htran\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\ifmap_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\impersonate\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Inveigh\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\LocalPotato\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\mimikatz_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\mimikatz\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\netview_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\nmapAnswerMachine_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\opdump_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\PasswordDump\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Potato\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\PowerTool\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\PowerTool64\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\psexec_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\PurpleSharp\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\pypykatz\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\QuarksPwDump\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\rdp_check_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Rubeus\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SafetyKatz\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\sambaPipe_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SelectMyParent\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SharpChisel\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SharPersist\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SharpEvtMute\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SharpImpersonation\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SharpLDAPmonitor\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SharpLdapWhoami\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SharpUp\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SharpView\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\smbclient_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\smbserver_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\sniff_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\sniffer_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\split_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SpoolSample\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Stracciatella\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\SysmonEOP\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\temp\\rot\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\ticketer_windows\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\TruffleSnout\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\winPEASany_ofs\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\winPEASany\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\winPEASx64_ofs\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\winPEASx64\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\winPEASx86_ofs\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\winPEASx86\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\xordump\.exe`) nocase)) or 
+    ((re.regex($security.principal.process.file.full_path, `.*\\goldenPac.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\just_dce_.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\karmaSMB.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\kintercept.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\LocalPotato.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\ntlmrelayx.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\rpcdump.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\samrdump.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\secretsdump.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\smbexec.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\smbrelayx.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\wmiexec.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\wmipersist.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*HotPotato.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*Juicy Potato.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*JuicyPotato.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*PetitPotam.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*RottenPotato.*`) nocase)))
+
+  condition:
+    $security
+}

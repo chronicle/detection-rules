@@ -1,0 +1,40 @@
+rule DefenseEvasion_NetshAllowGroupPolicyOnMicrosoftDefenderFirewall_WindowsSysmon {
+    meta:
+        subject = "Netsh Allow Group Policy on Microsoft Defender Firewall"
+        author = "Cywarden"
+        description = "Detects changes to Windows Defender Firewall settings via Group Policy using netsh commands"
+        severity = "Medium"
+        mitre_category = "Defense Evasion"
+        mitre_technique_id = "T1562"
+        rule_creation_date = "12-02-2024" // MM-DD-YYYY
+        rule_modification_date = ""
+        reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_fw_enable_group_rule.yml"
+        version = "1.0.0"
+
+    events:
+        // $firewall.metadata.log_type = "WAZUH"
+        $firewall.metadata.event_type = "PROCESS_LAUNCH" and 
+        //$firewall.metadata.product_event_id = "1" // Sysmon Event ID 1 - Process Creation
+
+        $firewall.principal.process.file.full_path = /.*(netsh\.exe)$/ nocase 
+        (    
+            
+            $firewall.principal.process.command_line = /netsh/ nocase or
+            $firewall.principal.process.command_line = /advfirewall/ nocase or
+            $firewall.principal.process.command_line = /set/ nocase or
+            $firewall.principal.process.command_line = /new/ nocase or
+            $firewall.principal.process.command_line = /rule/ nocase or
+            $firewall.principal.process.command_line = /group/ nocase or
+            $firewall.principal.process.command_line = /enable\=yes/ nocase 
+            
+        )
+        $firewall.principal.namespace = $customer
+
+    outcome:
+        $risk_score = 56
+        $principal_process_cmdline = array_distinct($firewall.principal.process.command_line)
+        $principal_userid = array_distinct($firewall.principal.user.userid)
+
+    condition:
+        $firewall
+}

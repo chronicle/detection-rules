@@ -1,0 +1,41 @@
+rule google_safebrowsing_process_launch {
+  meta:
+    author      = "Nayan Bhattarai"
+    description = "Detects File Creation events against Critical or High severity Google's SafeBrowsing database.  Optionally apply File Prevalence to detect uncommon or never seen before detections."
+    response    = "Not expected to alert.  Evaluate the $risk_score to see if binary is unsigned or running from an unusual location. Investigate the Hash using VT Enhance widget, and escalate case in Chronicle SOAR."
+    severity    = "MEDIUM"
+    priority    = "HIGH"
+    date        = "2026-01-23"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.target.process.file.sha256 = $hash
+    $e.principal.hostname = $host
+    $e.principal.process.file.full_path = $file 
+
+    $g.graph.metadata.entity_type = "FILE"
+    $g.graph.entity.file.sha256 = $hash
+    $g.graph.metadata.product_name = "Google Safe Browsing"
+    $g.graph.metadata.source_type = "GLOBAL_CONTEXT"
+   
+    $g.graph.metadata.threat.severity = "CRITICAL" or
+        $g.graph.metadata.threat.severity = "HIGH"
+
+  match:
+    $hash, $host, $file over 10m
+
+  outcome:
+    $risk_score = max(
+        if ($g.graph.metadata.threat.severity = "HIGH", 20) +        
+        if ($g.graph.metadata.threat.severity = "CRITICAL", 30) +
+        // malicious software is higher risk than unwanted 
+        if ($g.graph.metadata.threat.category = "SOFTWARE_MALICIOUS", 10) + 
+        // raise risk score for unsigned images
+        if ($e.target.resource.attribute.labels["Signed"] = "false", 20) +
+        // raise risk score for uncommon paths
+        if ($e.principal.process.file.full_path = /Downloads|Temp|Tmp/ nocase, 20 )
+    )
+
+condition:
+    $e and $g
+}

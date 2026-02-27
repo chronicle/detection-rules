@@ -1,0 +1,21 @@
+rule attack_shell32DLLExecutionInSuspiciousDirectory_windows {
+  meta:
+    author = "Ruledev1"
+    description = "Detects shell32.dll executing a DLL in a suspicious directory"
+    severity = "HIGH"
+    created = "2024-02-04"
+    product = "windows"
+    tag = "defense_evasion, execution"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_shell32_susp_execution.yml"
+    mitre = "t1218.011"
+
+  events:
+
+    ($security.metadata.event_type = "PROCESS_LAUNCH" and ($security.target.process.file.full_path = /\\rundll32\.exe$/ nocase OR $security.target.process.file.names = "RUNDLL32.EXE" nocase) AND $security.target.process.command_line = /shell32\.dll/ nocase AND $security.target.process.command_line = /Control_RunDLL/ nocase AND $security.target.process.command_line = /%AppData%|%LocalAppData%|%Temp%|%tmp%|\\AppData\\|\\Temp\\|\\Users\\Public\\/ nocase )
+
+
+  condition:
+    $security
+}

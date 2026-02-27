@@ -1,0 +1,42 @@
+rule suspicious_process_access_to_lsass_with_dbgcoredbghelp_dlls_windows {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects suspicious process access to LSASS.exe from processes located in uncommon locations with dbgcore.dll or dbghelp.dll in the call trace.These DLLs contain functions like MiniDumpWriteDump that can be abused for credential dumping purposes. While modern tools like Mimikatz have moved to using ntdll.dll,dbgcore.dll and dbghelp.dll are still used by basic credential dumping utilities and legacy tools for LSASS memory access and process suspension techniques.."
+    license = "https://github.com/Neo23x0/sigma/blob/master/LICENSE.Detection.Rules.md"
+    reference = "https://www.splunk.com/en_us/blog/security/you-bet-your-lsass-hunting-lsass-access.html, https://docs.microsoft.com/en-us/windows/win32/api/minidumpapiset/nf-minidumpwritedump"
+    version = "0.01"
+    sigma_id = "9f5c1d59-33be-4e60-bcab-85d2f566effd"
+    status = "experimental"
+    tags = "attack.credential-access, attack.t1003.001, attack.defense-evasion, attack.t1562.001"
+    falsepositives = "Possibly during software installation or update processes"
+    severity = "high"
+    created = "2025-11-27"
+    category = "process_access"
+    product = "windows"
+
+  events:
+    re.regex($security.target.process.file.full_path, `.*\\lsass\.exe`) nocase and 
+    (re.regex($security.principal.process.file.full_path, `.*dbgcore\.dll.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*dbghelp\.dll.*`) nocase) and 
+    (re.regex($security.principal.process.file.full_path, `.*:\\Perflogs\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*:\\Temp\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*:\\Users\\Public\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\\$Recycle\.Bin\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\AppData\\Roaming\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Contacts\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Desktop\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Documents\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Downloads\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Favorites\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Favourites\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\inetpub\\wwwroot\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Music\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Pictures\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Start Menu\\Programs\\Startup\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Users\\Default\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Videos\\.*`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\Windows\\Temp\\.*`) nocase)
+
+  condition:
+    $security
+}

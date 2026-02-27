@@ -1,0 +1,32 @@
+rule Discovery_PUAAdvancedIPAndPortScannerExecution_WindowsSysmon {
+    meta:
+        subject = "PUA - Advanced IP/Port Scanner Execution"
+        author = "Cywarden"
+        description = "Alerts on the execution of Advanced IP/Port Scanner, often used for network reconnaissance"
+        severity = "Medium"
+        mitre_category = "Discovery"
+        mitre_technique_id = "T1046"
+        rule_creation_date = "12-02-2024" //MM-DD-YYYY
+        rule_modification_date = ""
+        reference1 = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_advanced_ip_scanner.yml"
+        reference2 = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_advanced_port_scanner.yml"
+        version = "1.0.0"
+
+    events:
+        // $advanced_scanner.metadata.log_type = "WAZUH" 
+        $advanced_scanner.metadata.vendor_name = "Microsoft"
+        //$advanced_scanner.metadata.product_event_type = "1" // Sysmon Event ID 1 - Process Creation
+        $advanced_scanner.principal.process.file.full_path = /.*advanced_ip_scanner.*\.exe$/ nocase or
+        $advanced_scanner.principal.process.file.full_path = /.*advanced_port_scanner.*\.exe/ nocase
+
+        $advanced_scanner.principal.hostname = $hostname
+        $advanced_scanner.principal.namespace = $customer
+
+    outcome:
+        $risk_score = 48
+        $principal_process_cmdline = array_distinct($advanced_scanner.principal.process.command_line)
+        $principal_userid = array_distinct($advanced_scanner.principal.user.userid)
+
+    condition:
+        $advanced_scanner
+}

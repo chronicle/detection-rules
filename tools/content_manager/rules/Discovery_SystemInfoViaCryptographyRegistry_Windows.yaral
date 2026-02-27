@@ -1,0 +1,36 @@
+rule Discovery_SystemInfoViaCryptographyRegistry_Windows {
+
+    meta:
+        subject = "System Information Discovery via Cryptography Registry"
+        author = "Cywarden"
+        description = "Detects querying of the MachineGuid in the Cryptography registry, which can indicate attempts to discover unique system information."
+        severity = "Low"
+        mitre_category = "Discovery"
+        mitre_technique_id = "T1082" // System Information Discovery
+        rule_creation_date = "11-19-2024"
+        rule_modification_date = ""
+        reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_machineguid.yml"
+        version = "1.0.0"
+
+    events:
+        // Ensure the source is from Windows Registry operations
+        // $registryevent.metadata.log_type = "WAZUH"
+        $registryevent.metadata.vendor_name = "Microsoft"
+
+        // Match access to the specific registry key
+        $registryevent.target.process.command_line = /SOFTWARE\\Microsoft\\Cryptography/ nocase 
+        $registryevent.target.process.command_line = /\/v/ nocase 
+        $registryevent.target.process.command_line = /MachineGuid/ nocase 
+
+        // to remove false positive
+        not $registryevent.principal.process.file.full_path = /(LogiTune|code|NIIMBOT|Evernote|OnVUE)\.exe/ nocase 
+        not $registryevent.principal.process.parent_process.file.full_path = /LogiTune\.exe/ nocase
+
+        $registryevent.principal.namespace = $customer
+
+    outcome:
+        $risk_score = 21
+
+    condition:
+        $registryevent
+}

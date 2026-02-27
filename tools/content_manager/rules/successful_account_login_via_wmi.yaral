@@ -1,0 +1,19 @@
+rule successful_account_login_via_wmi {
+ meta:
+    author = "Nayan Bhattarai"
+    description = "Detects successful logon attempts performed with WMI"
+    reference = "https://detection.fyi/sigmahq/sigma/windows/builtin/security/account_management/win_security_susp_wmi_login/"
+    status = "stable"
+    tags = "attack.execution, attack.t1047"
+    falsepositives = "Monitoring tools, Legitimate system administration"
+    severity = "low"
+    created = "2024-09-03"
+
+  events:
+    $security.metadata.product_event_type = "4624" and 
+    re.regex($security.target.process.file.full_path, `.*\\WmiPrvSE\.exe`) nocase
+
+  condition:
+    $security
+
+}

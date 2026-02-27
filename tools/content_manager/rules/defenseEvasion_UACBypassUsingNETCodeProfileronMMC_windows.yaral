@@ -1,0 +1,22 @@
+rule defenseEvasion_UACBypassUsingNETCodeProfileronMMC_windows{
+  meta:
+    author = "Ruledev2"
+    description = "Detects the pattern of UAC Bypass using .NET Code Profiler and mmc.exe DLL hijacking (UACMe 39)"
+    severity = "HIGH"
+    created = "2024-02-3"
+    product = "microsoft"
+    tag = "defense_Evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/file/file_event/file_event_win_uac_bypass_dotnet_profiler.yml"
+    mitre = "defense_Evasion,t1548.002"
+
+  events:
+    
+    $security.metadata.event_type = "FILE_CREATION" and 
+    re.regex($security.target.file.full_path, `C:\\Users\\.*`) nocase and 
+    re.regex($security.target.file.full_path, `.*\\AppData\\Local\\Temp\\pe386\.dll`) nocase
+
+  condition:
+    $security
+}

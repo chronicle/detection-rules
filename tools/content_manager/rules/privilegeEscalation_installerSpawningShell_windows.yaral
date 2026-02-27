@@ -1,0 +1,27 @@
+rule privilegeEscalation_installerSpawningShell_windows{
+  meta:
+    author = "Srijan Kafle"
+    description = "Detects Windows Installer service (msiexec.exe) spawning 'cmd' or 'powershell'"
+    severity = "MEDIUM"
+    created = "2024-02-13"
+    product = "microsoft"
+    tag = "defense_evasion,shell"
+    service = "process_monitor"
+    status = "test"
+    Reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_elavated_msi_spawned_shell.yml"
+    mitre = "Abuse Elevation Control Mechanism: Bypass User Account Control,t1548.002"
+
+  events:
+    
+    $process.metadata.event_type = "PROCESS_LAUNCH" and 
+    (((re.regex($process.target.process.file.full_path, `.*\\cmd\.exe`) nocase or 
+    re.regex($process.target.process.file.full_path, `.*\\powershell\.exe`) nocase or 
+    re.regex($process.target.process.file.full_path, `.*\\pwsh\.exe`) nocase)) or 
+    (($process.target.file.full_path = "Cmd.Exe" nocase or $process.target.file.full_path = "PowerShell.EXE" nocase or $process.target.file.full_path = "pwsh.dll" nocase))) and 
+    (re.regex($process.principal.process.file.full_path, `.*\\Windows\\Installer\\.*`) nocase) and 
+    (re.regex($process.principal.process.file.full_path, `.*msi.*`) nocase) and 
+    re.regex($process.principal.process.file.full_path, `.*tmp`) nocase
+
+  condition:
+    $process
+}

@@ -1,0 +1,22 @@
+rule evasion_eventLogsRemoved_windows {
+
+  meta:
+    author = "Srijan Kafle"
+    description = "Detects clearing or configuration of eventlogs using wevtutil, powershell and wmic. Might be used by ransomwares during the attack (seen by NotPetya and others)"
+    severity = "WARNING"
+    created = "2024-01-08"
+    product = "microsoft"
+    tag = "sysmon"
+    service = "command"
+    status = "under development"
+    mitre = "Indicator Removal,t1070"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_susp_eventlog_clear.yml"
+
+  events:
+    
+    $sysmon.metadata.event_type = "PROCESS_LAUNCH"
+    (($sysmon.target.process.file.full_path = /\\wevtutil\.exe$/ nocase OR $sysmon.target.process.file.names = "wevtutil.exe" nocase) AND $sysmon.target.process.command_line = /clear-log | cl |set-log | sl |lfn:/ nocase) OR ($sysmon.target.process.file.full_path = /\\powershell\.exe|\\powershell_ise\.exe|\\pwsh\.exe/ nocase AND ($sysmon.target.process.command_line = /Clear-EventLog |Remove-EventLog |Limit-EventLog |Clear-WinEvent / nocase OR ($sysmon.target.process.command_line = /Eventing\.Reader\.EventLogSession/ nocase AND $sysmon.target.process.command_line = /ClearLog/ nocase) OR ($sysmon.target.process.command_line = /Diagnostics\.EventLog/ nocase AND $sysmon.target.process.command_line = /Clear/ nocase))) OR ($sysmon.target.process.file.full_path = /\\powershell\.exe|\\powershell_ise\.exe|\\pwsh\.exe|\\wmic\.exe/ nocase AND $sysmon.target.process.command_line = /ClearEventLog/ nocase AND $sysmon.principal.process.file.full_path = /C:\\Windows\\SysWOW64\\msiexec.exe|C:\\Windows\\System32\\msiexec.exe/ nocase AND $sysmon.target.process.command_line = / sl / nocase)
+
+  condition:
+    $sysmon
+}

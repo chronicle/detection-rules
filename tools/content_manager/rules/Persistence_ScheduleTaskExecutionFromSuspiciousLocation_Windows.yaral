@@ -1,0 +1,47 @@
+rule Persistence_ScheduleTaskExecutionFromSuspiciousLocation_Windows {
+
+    meta:
+        subject = "Schedule Task Execution From Suspicious Location"
+        author = "Cywarden"
+        description = "This rule will detect the suspicious scheduled tasks that run from the suspicious location."
+        severity = "Medium"
+        mitre_category = "Persistence"
+        mitre_technique_id = "T1053"
+        rule_creation_date = "11-12-2024" // MM-DD-YYYY
+        rule_modification_date = ""
+        reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/taskscheduler/win_taskscheduler_execution_from_susp_locations.yml"
+        version = "1.0.0"
+
+
+    events:
+        // $task.metadata.log_type = "WAZUH"
+        $task.metadata.vendor_name = "Microsoft"
+        $task.metadata.product_event_type = "7" // module load
+
+        $task.principal.process.file.full_path = /schtasks\.exe/ nocase // process path
+        
+        $task.principal.process.command_line = /C\:\\windows\\Temp/ nocase or 
+        $task.principal.process.command_line = /\\AppData\\Local\\Temp/ nocase or 
+        $task.principal.process.command_line = /\\Desktop\\/ nocase or 
+        $task.principal.process.command_line = /\\Downloads\\/ nocase or 
+        $task.principal.process.command_line = /\\Users\\Public\\/ nocase or 
+        $task.principal.process.command_line = /C\:\\Temp\\/ nocase  
+
+
+        $task.principal.user.userid = $user // User initiating/creating the process
+        $task.principal.administrative_domain = $domain // Admin Domain
+        $task.principal.network.session_id = $session_id // Network Session ID
+        $task.principal.namespace = $customer // The Client
+
+
+    outcome:
+        $risk_score = 48
+        $principal_user_userid = array_distinct($user)
+        $administrative_domain = array_distinct($domain) 
+        $network_session_id = array_distinct($session_id)
+        $principal_process_path = array_distinct($task.principal.process.file.full_path)
+        $principal_cmdline = array_distinct($task.principal.process.command_line)
+
+    condition:
+        $task
+}

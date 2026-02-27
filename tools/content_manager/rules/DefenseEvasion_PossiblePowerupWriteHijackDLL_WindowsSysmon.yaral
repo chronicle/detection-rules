@@ -1,0 +1,31 @@
+rule DefenseEvasion_PossiblePowerupWriteHijackDLL_WindowsSysmon {
+    meta:
+        subject = "Possible Powerup Write Hijack DLL"
+        author = "Cywarden"
+        description = "Identifies potential DLL hijacking attempts using PowerUp"
+        severity = "high"
+        mitre_category = "Defense Evasion"
+        mitre_technique_id = "T1574"
+        rule_creation_date = "12-02-2024"
+        rule_modification_date = ""
+        reference = "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/file/file_event/file_event_win_hktl_powerup_dllhijacking.yml"
+        version = "1.0.0"
+
+    events:
+        // $dll_hijack.metadata.log_type = "WAZUH" // Log source is WAZUH.
+        $dll_hijack.metadata.vendor_name = "Microsoft" 
+        // Detect PowerShell or PowerShell Core processes.
+        re.regex($dll_hijack.principal.process.file.full_path, `.*(powershell|pwsh|powershell_ise)\.exe`) nocase
+
+        // Identify target debug file with a .bat extension, indicating batch script.
+        re.regex($dll_hijack.target.file.full_path, `debug\.bat$`) nocase
+
+
+    outcome:
+        $risk_score = 64 
+        $principal_process_path = array_distinct($dll_hijack.principal.process.file.full_path)
+        $target_process_path = array_distinct($dll_hijack.target.process.file.full_path) // Captures unique target process paths.
+
+    condition:
+        $dll_hijack
+}

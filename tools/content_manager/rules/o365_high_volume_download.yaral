@@ -1,0 +1,27 @@
+rule o365_high_volume_download {
+
+  meta:
+    author = "Srijan Kafle "
+    description = "Detects activity when files sizes more than 2GB combined are downloaded by a user within 8 hours"
+    severity = "INFO"
+    created = "2023-12-11"
+    product = "office365"
+    service = "file"
+
+  events:
+    $office.metadata.log_type = "OFFICE_365" and $office.metadata.product_event_type = "FileDownloaded" nocase
+    not $office.principal.user.email_addresses = "app@sharepoint"
+    $office.principal.user.email_addresses = $user
+
+  match:
+    $user over 8h
+
+  outcome:
+    $total_files = sum($office.src.file.size)
+
+  condition:
+
+    $office and ($total_files >= 2147483648) 
+  
+
+}

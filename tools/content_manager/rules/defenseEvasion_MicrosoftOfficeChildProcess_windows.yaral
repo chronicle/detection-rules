@@ -1,0 +1,79 @@
+rule defenseEvasion_MicrosoftOfficeChildProcess_windows{
+  meta:
+    author = "Ruledev2"
+    description = "Detects a suspicious process spawning from one of the Microsoft Office suite products (Word, Excel, PowerPoint, Publisher, Visio, etc.)"
+    severity = "CRITICAL"
+    created = "2024-02-1"
+    product = "microsoft"
+    tag = "defense_evasion"
+    service = "process_creation"
+    status = "under development"
+    Reference = "https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation/proc_creation_win_office_susp_child_processes.yml"
+    mitre = "defense_evasion,t1047"
+
+  events:
+
+    $security.metadata.event_type = "PROCESS_LAUNCH" and 
+    (re.regex($security.principal.process.file.full_path, `.*\\EQNEDT32\.EXE`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\EXCEL\.EXE`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\MSACCESS\.EXE`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\MSPUB\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\ONENOTE\.EXE`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\POWERPNT\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\VISIO\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\WINWORD\.EXE`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\wordpad\.exe`) nocase or 
+    re.regex($security.principal.process.file.full_path, `.*\\wordview\.exe`) nocase) and 
+    ((($security.target.file.full_path = "bitsadmin.exe" nocase or $security.target.file.full_path = "CertOC.exe" nocase or $security.target.file.full_path = "CertUtil.exe" nocase or $security.target.file.full_path = "Cmd.Exe" nocase or $security.target.file.full_path = "CMSTP.EXE" nocase or $security.target.file.full_path = "cscript.exe" nocase or $security.target.file.full_path = "curl.exe" nocase or $security.target.file.full_path = "HH.exe" nocase or $security.target.file.full_path = "IEExec.exe" nocase or $security.target.file.full_path = "InstallUtil.exe" nocase or $security.target.file.full_path = "javaw.exe" nocase or $security.target.file.full_path = "Microsoft.Workflow.Compiler.exe" nocase or $security.target.file.full_path = "msdt.exe" nocase or $security.target.file.full_path = "MSHTA.EXE" nocase or $security.target.file.full_path = "msiexec.exe" nocase or $security.target.file.full_path = "Msxsl.exe" nocase or $security.target.file.full_path = "odbcconf.exe" nocase or $security.target.file.full_path = "pcalua.exe" nocase or $security.target.file.full_path = "PowerShell.EXE" nocase or $security.target.file.full_path = "RegAsm.exe" nocase or $security.target.file.full_path = "RegSvcs.exe" nocase or $security.target.file.full_path = "REGSVR32.exe" nocase or $security.target.file.full_path = "RUNDLL32.exe" nocase or $security.target.file.full_path = "schtasks.exe" nocase or $security.target.file.full_path = "ScriptRunner.exe" nocase or $security.target.file.full_path = "wmic.exe" nocase or $security.target.file.full_path = "WorkFolders.exe" nocase or $security.target.file.full_path = "wscript.exe" nocase)) or 
+    ((re.regex($security.target.process.file.full_path, `.*\\AppVLP\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\bash\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\bitsadmin\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\certoc\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\certutil\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\cmd\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\cmstp\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\control\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\cscript\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\curl\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\forfiles\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\hh\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\ieexec\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\installutil\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\javaw\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\mftrace\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\Microsoft\.Workflow\.Compiler\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\msbuild\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\msdt\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\mshta\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\msidb\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\msiexec\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\msxsl\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\odbcconf\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\pcalua\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\powershell\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\pwsh\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\regasm\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\regsvcs\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\regsvr32\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\rundll32\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\schtasks\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\scrcons\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\scriptrunner\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\sh\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\svchost\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\verclsid\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\wmic\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\workfolders\.exe`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\wscript\.exe`) nocase)) or 
+    ((re.regex($security.target.process.file.full_path, `.*\\AppData\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\Users\\Public\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\ProgramData\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\Windows\\Tasks\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\Windows\\Temp\\.*`) nocase or 
+    re.regex($security.target.process.file.full_path, `.*\\Windows\\System32\\Tasks\\.*`) nocase)))
+
+    
+
+  condition:
+    $security
+}

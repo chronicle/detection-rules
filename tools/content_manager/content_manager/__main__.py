@@ -21,10 +21,19 @@ import json
 import logging
 import os
 import pathlib
+import sys
 from typing import Literal
 
 import click
-from content_manager.common import datetime_converter
+
+# Add the directory containing this file to sys.path to fix imports when
+# running via Blaze
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+  sys.path.insert(0, parent_dir)
+
+from content_manager.common import datetime_converter  # pylint: disable=g-import-not-at-top
 from content_manager.common.custom_exceptions import RuleVerificationError
 from content_manager.data_tables import DataTables
 from content_manager.reference_lists import ReferenceLists
@@ -41,7 +50,11 @@ from google_secops_api.rules.verify_rule import verify_rule
 
 LOGGER = logging.getLogger()
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
+ROOT_DIR = pathlib.Path(
+    os.environ.get(
+        "CONTENT_MANAGER_ROOT", str(pathlib.Path(__file__).parent.parent)
+    )
+)
 RULES_DIR = ROOT_DIR / "rules"
 RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
 REF_LISTS_DIR = ROOT_DIR / "reference_lists"

@@ -1,0 +1,49 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_brute_force_rfc_logon {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Identifies brute force attacks on SAP systems using RFC logons. Detects a single IP attempting to sign in to several systems or clients within a 1-hour interval, indicating potential credential stuffing or internal lateral movement."
+    severity = "Low"
+    tactic = "TA0001"
+    technique = "T1110"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $e.additional.fields["msg_1"] = /^AU6$|^CUZ$/
+
+    $ip = $e.principal.ip
+    $sid = $e.target.application
+    $client = $e.target.resource.attribute.labels["slgmand_1"]
+
+  match:
+    $ip over 1h
+
+
+  outcome:
+    $total_event_count = count($e.metadata.id)
+    $user_ids_attempted = array_distinct($e.principal.user.userid)
+    $systems_targeted = array_distinct($sid)
+    $clients_targeted = array_distinct($client)
+    $source_ip = array_distinct($ip)
+    $terminal_names = array_distinct($e.principal.hostname)
+    $report_names = array_distinct($e.principal.process.file.names)
+
+  condition:
+    #sid >= 2 or #client >= 2
+}

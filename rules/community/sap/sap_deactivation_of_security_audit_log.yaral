@@ -1,0 +1,50 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_deactivation_of_security_audit_log {
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects the deactivation of the SAP Security Audit Log (AUJ). This is a critical event as it stops further security logging."
+    severity = "Critical"
+    tactic = "TA0005"
+    technique = "T1562"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    $e.additional.fields["msg_1"] = "AUJ"
+
+    $e.additional.fields["param1_1"] = "0"
+
+    $sid = $e.target.application
+    $user = $e.principal.user.userid
+
+  match:
+    $sid over 1h
+
+  outcome:
+    $risk_score = 95
+    $source_user = array_distinct($user)
+    $terminal_ip = array_distinct($e.principal.ip)
+    $target_sid = array_distinct($sid)
+    $client = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $instance = array_distinct($e.target.resource.name)
+    $report_name = array_distinct($e.principal.process.file.names)
+    $log_description = array_distinct($e.metadata.description)
+
+  condition:
+    $e
+}

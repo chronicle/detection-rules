@@ -1,0 +1,49 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_sensitive_rfc_function_module_execution {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects the execution of sensitive function modules via RFC (AUK). Targets Parameter 3 for the function module name."
+    severity = "High"
+    tactic = "TA0002"
+    technique = "T1129"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    $e.additional.fields["msg_1"] = "AUK"
+    $e.additional.fields["param3_1"] in %sap_sensitive_function_modules.module
+
+    $function_module = $e.additional.fields["param3_1"]
+    $user = $e.principal.user.userid
+
+    not $user in %sap_admin_users.user
+
+  match:
+    $user, $function_module over 1h
+
+  outcome:
+    $risk_score = 75
+    $target_sid = array_distinct($e.target.application)
+    $function_group = array_distinct($e.additional.fields["param1_1"])
+    $description = array_distinct($e.metadata.description)
+    $t_code = array_distinct($e.security_result.detection_fields["slgtc_1"])
+
+  condition:
+    $e
+}

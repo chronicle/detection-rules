@@ -1,0 +1,54 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_sensitive_role_assignment_correlation {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Correlates SAP Change Documents with Security Audit logs to detect sensitive role assignments and self-assignments."
+    severity = "Medium"
+    tactic = "TA0004"
+    technique = "T1098"
+
+  events:
+    $change.metadata.log_type = "SAP_CHANGE_DOCUMENT"
+    $change.target.resource.name = "PFCG"
+    $change.target.resource.attribute.labels["TABNAME"] = "AGR_USERS"
+    $change.target.resource.attribute.labels["CHANGE_IND"] = "I"
+
+    $client = $change.target.resource.attribute.labels["MANDANT"]
+    $target_user = $change.target.resource.attribute.labels["TABKEY"]
+
+    //joining on user value
+    $user = $change.principal.user.userid
+    $user = $audit.principal.user.userid
+
+    $audit.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $client = $audit.target.resource.attribute.labels["slgmand"]
+
+    not $user in %sap_admin_users.user
+
+  match:
+    $user, $client over 30m
+
+  outcome:
+    $assigned_role = array_distinct($change.target.resource.product_object_id)
+    $principal_ip = array_distinct($audit.principal.ip)
+    $audit_description = array_distinct($audit.metadata.description)
+
+  condition:
+    $change and $audit
+}

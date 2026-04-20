@@ -1,0 +1,54 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_data_changed_during_debugging {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects in-memory data changes (CUL) during an ABAP debugging session. Identifies if the debugger is the same as the session owner."
+    severity = "Critical"
+    tactic = "TA0005"
+    technique = "T1564"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    $e.additional.fields["msg_1"] = "CUL"
+
+    $debugger = $e.additional.fields["param1_1"]
+    $session_owner = $e.principal.user.userid
+
+    // exclusions
+    not $debugger in %sap_admin_users.user
+
+  match:
+    $session_owner over 30m
+
+  outcome:
+    $risk_score = 90
+    $target_sid = array_distinct($e.target.application)
+    $debugging_user = array_distinct($debugger)
+    $source_user = array_distinct($session_owner)
+
+    $source_user_is_debugger = array_distinct(if($debugger = $session_owner, "true", "false"))
+
+    $change_field = array_distinct($e.additional.fields["param2_1"])
+    $change = array_distinct($e.additional.fields["param3_1"])
+    $method = array_distinct(re.capture($e.additional.fields["paramx_1"], `Meth:(.*?),\s`))
+
+  condition:
+    $e
+}

@@ -1,0 +1,59 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_sensitive_role_authorization_modification {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects changes to authorization objects within defined sensitive roles. Correlates with login audit logs for session context."
+    severity = "High"
+    tactic = "TA0004"
+    technique = "T1098"
+
+  events:
+    $change.metadata.log_type = "SAP_CHANGE_DOCUMENT"
+    $change.target.resource.name = "PFCG"
+    $change.target.resource.attribute.labels["TABNAME"] = /1251/
+    $change.target.resource.attribute.labels["CHANGE_IND"] = "U"
+
+    $role_id = $change.target.resource.product_object_id
+    $role_id in %sap_sensitive_roles.role
+
+    //join
+    $user = $change.principal.user.userid
+    $user = $audit.principal.user.userid
+
+    $audit.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $audit.additional.fields["msg_1"] = /^AU1$|^AU5$/
+
+    not $user in %sap_admin_users.user
+
+  match:
+    $user over 12h
+
+  outcome:
+    $risk_score = 85
+    $changed_role = array_distinct($role_id)
+    $auth_objects = array_distinct($change.target.resource.attribute.labels["TABKEY"])
+    $terminal_ip = array_distinct($audit.principal.ip)
+    $terminal_host = array_distinct($audit.principal.hostname)
+    $transaction = array_distinct($change.target.application)
+
+    $time_diff_minutes = max(timestamp.get_minute($change.metadata.event_timestamp.seconds) - timestamp.get_minute($audit.metadata.event_timestamp.seconds))
+
+  condition:
+    $change and $audit
+}

@@ -1,0 +1,55 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_critical_role_assigned_to_new_user {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects the assignment of high-privilege roles by correlating Change Documents (PFCG) with Security Audit logs (AUD) for IP attribution."
+    severity = "Critical"
+    tactic = "TA0004"
+    technique = "T1098"
+
+  events:
+    $change.metadata.log_type = "SAP_CHANGE_DOCUMENT"
+    $change.target.resource.attribute.labels["TABNAME"] = "AGR_USERS"
+    $change.target.resource.attribute.labels["CHNGIND"] = "I"
+
+    $role = $change.target.resource.product_object_id
+
+    $audit.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $audit.additional.fields["msg_1"] = "AU7"
+
+    //join
+    $target_user = re.capture($change.target.resource.attribute.labels["TABKEY"], "^.{33}\\s*(\\S+)\\s*\\d{16}$")
+    $target_user = $audit.additional.fields["param1_1"]
+
+    $role in %sap_sensitive_roles.role
+
+  match:
+    $target_user over 1h
+
+  outcome:
+    $user_that_created_account = array_distinct($audit.principal.user.userid)
+    $user_that_assigned_role = array_distinct($change.principal.user.userid)
+    $source_ip = array_distinct($audit.principal.ip)
+    $assigned_role = array_distinct($role)
+    $system_id = array_distinct($audit.target.application)
+    $risk_score = 95
+
+  condition:
+    $change and $audit
+}

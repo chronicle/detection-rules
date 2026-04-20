@@ -1,0 +1,59 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_user_creates_and_uses_new_user {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects a user creating a new account (AU7) and subsequently logging into it (AU1, AU5) from the same terminal within a short timeframe."
+    severity = "Critical"
+    tactic = "TA0003"
+    technique = "T1136"
+
+  events:
+    $create.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $create.additional.fields["msg_1"] = "AU7"
+    $creator = $create.principal.user.userid
+
+    $login.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $login.additional.fields["msg_1"] = /^AU1$|^AU5$/
+
+    //join
+    $new_user = $create.additional.fields["param1_1"]
+    $new_user = $login.principal.user.userid
+    $terminal = $create.principal.ip
+    $terminal = $login.principal.ip
+    $sid = $create.target.application
+    $sid = $login.target.application
+
+    //sequence
+    $create.metadata.event_timestamp.seconds <= $login.metadata.event_timestamp.seconds
+
+    //exclusions
+    not $create.principal.user.userid in %sap_admin_users.user
+
+  match:
+    $terminal, $sid over 30m
+
+  outcome:
+    $risk_score = 85
+    $creating_user = array_distinct($creator)
+    $created_user = array_distinct($new_user)
+    $description = array_distinct($create.metadata.description)
+
+  condition:
+    $create and $login
+}

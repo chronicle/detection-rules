@@ -1,0 +1,51 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_gateway_ufo_table_access {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects external RFC calls to generic table-read modules via the SAP Gateway."
+    severity = "High"
+    tactic = "TA0007"
+    technique = "T1082"
+
+  events:
+    $e.metadata.product_name = "SAP_GATEWAY"
+
+    (
+      $e.security_result.summary = /RFC_READ_TABLE|BBP_RFC_READ_TABLE|RFC_GET_TABLE_ENTRIES/ nocase or
+      $e.metadata.description = /RFC_READ_TABLE/ nocase
+    )
+
+    $user = $e.principal.user.userid
+    $source_ip = $e.principal.ip
+    $external_tp = $e.target.process.file.full_path
+
+    not $user in %sap_service_accounts.name
+
+  match:
+    $user, $source_ip over 30m
+
+  outcome:
+    $risk_score = 40
+    $calling_program = array_distinct($external_tp)
+    $target_function = array_distinct($e.security_result.summary)
+    $gateway_action = array_distinct($e.security_result.action)
+
+  condition:
+    $e
+}

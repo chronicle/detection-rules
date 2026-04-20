@@ -1,0 +1,45 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_function_module_testing_detected {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects direct execution and testing of SAP Function Modules via SE37 test frame. This identifies correlation between a transaction start (AU7) and a function module call (BU4) in close succession"
+    severity = "Medium"
+    tactic = "TA0002"
+    technique = "T1129"
+
+  events:
+    $e.security_result.detection_fields["slgtc_1"] = /^SE37$|^SE80$|^SEU_INT$/
+    $e.principal.process.file.names = "RS_TESTFRAME_CALL"
+
+    $user = $e.principal.user.userid
+
+  match:
+    $user over 1h
+
+  outcome:
+    $resource_accessed = array_distinct($e.additional.fields["param1_1"])
+    $event_name = array_distinct($e.security_result.summary)
+    $description = array_distinct($e.metadata.description)
+    $msg = array_distinct($e.additional.fields["msg_1"])
+    $src_ip = array_distinct($e.principal.ip)
+
+  condition:
+    $e
+}
+

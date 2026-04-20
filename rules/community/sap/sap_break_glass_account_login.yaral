@@ -1,0 +1,51 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_break_glass_account_login {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Alerts whenever a default SAP administrative account (e.g., SAP*, DDIC, TMSADM) logs into the system. These accounts should be locked and used only for emergency 'break-glass' scenarios"
+    severity = "Low"
+    tactic = "TA0001"
+    technique = "T1078"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    (
+        $e.additional.fields["msg_1"] = /^AU1$|^AU5$/ or
+        $e.metadata.event_type = "USER_LOGIN"
+    )
+    $e.principal.user.userid = $userid
+    $userid = /^DDIC$|^EARLYWATCH$|^SAP\*$|^TMSADM$/ nocase
+
+  match:
+    $userid over 1h
+
+  outcome:
+    $event_count = count_distinct($e.metadata.id)
+    $risk_score = if($event_count < 10, 20, 40)
+    $vendor_name = array_distinct($e.metadata.vendor_name)
+    $product_name = array_distinct($e.metadata.product_name)
+    $product_severity = array_distinct($e.security_result.severity)
+    $event_description = array_distinct($e.metadata.description)
+    $victim_name = array_distinct($e.target.user.userid)
+    $adversary_name = array_distinct($e.principal.user.userid)
+    $result_time = min($e.metadata.event_timestamp.seconds)
+
+  condition:
+    $e
+}

@@ -1,0 +1,49 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_sensitive_tables_direct_access_by_rfc_logon_static_list {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects direct access to highly sensitive SAP tables (USR02, PAYR, P0002) via RFC logon. This specifically monitors for potential theft of user hashes (USR02), payroll data (PAYR), or personal employee information (P0002)."
+    severity = "High"
+    tactic = "TA0009"
+    technique = "T1005"
+    log_source = "SAP_SECURITY_AUDIT"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $e.additional.fields["msg_1"] = "CUZ"
+
+    $sid = $e.target.application
+    $table = $e.additional.fields["param1_1"]
+
+    $table = /USR02|PAYR|P0002/
+
+  match:
+    $table over 1h
+
+  outcome:
+    $user_list = array_distinct($e.principal.user.userid)
+    $source_ips = array_distinct($e.principal.ip)
+    $system_ids = array_distinct($sid)
+    $event_count = count($e.metadata.id)
+    $terminal_names = array_distinct($e.principal.hostname)
+    $client_ids = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+
+  condition:
+    $e
+}

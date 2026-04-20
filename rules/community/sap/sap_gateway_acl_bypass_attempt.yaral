@@ -1,0 +1,48 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_gateway_acl_bypass_attempt {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects rejected connections by Gateway ACLs (secinfo/reginfo), indicating an attempt to bypass network-layer security."
+    severity = "Low"
+    tactic = "TA0001"
+    technique = "T1190"
+
+  events:
+    $e.metadata.product_name = "SAP_GATEWAY"
+
+    $e.additional.fields["event_action"] = /secinfo|reginfo/ nocase
+
+    $e.security_result.action = "BLOCK"
+
+    $source_ip = $e.principal.ip
+
+  match:
+    $source_ip over 30m
+
+  outcome:
+    $risk_score = 5
+    $acl_type = array_distinct($e.additional.fields["event_action"])
+    $attempted_programs = array_distinct($e.target.process.file.full_path)
+    $error_details = array_distinct($e.security_result.description)
+    $user_context = array_distinct($e.principal.user.userid)
+    $total_denials = count($e.metadata.product_log_id)
+
+  condition:
+    $e
+}

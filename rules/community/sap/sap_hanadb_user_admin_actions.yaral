@@ -1,0 +1,53 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_hanadb_user_admin_actions {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Detects administrative user management (Create/Alter/Drop) and schema deletion within SAP HANA DB."
+    severity = "Medium"
+    tactic = "TA0003"
+    technique = "T1136"
+
+  events:
+    $e.metadata.log_type = "SAP_HANA_AUDIT"
+
+    $statement = $e.additional.fields["executed_statement"]
+
+    (
+        $statement = /CREATE USER/ nocase or
+        $statement = /ALTER USER/ nocase or
+        $statement = /DROP USER/ nocase or
+        $statement = /DROP SCHEMA/ nocase
+    )
+
+    $user = $e.principal.user.userid
+
+  match:
+    $user over 30m
+
+  outcome:
+    $risk_score = max(70)
+    $principal_user = array_distinct($user)
+    $target_user = array_distinct($e.target.user.userid)
+    $executed_statements = array_distinct($statement)
+    $system_id = array_distinct($e.target.resource.attribute.labels["system_id"])
+    $db_name = array_distinct($e.target.resource.name)
+
+  condition:
+    $e
+}

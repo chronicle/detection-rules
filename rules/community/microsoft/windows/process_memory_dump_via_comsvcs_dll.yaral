@@ -54,7 +54,6 @@ rule process_memory_dump_via_comsvcs_dll {
                     strings.contains($process.target.process.command_line, "#-") or
                     strings.contains($process.target.process.command_line, "#+") or
                     strings.contains($process.target.process.command_line, "#24") or
-                    strings.contains($process.target.process.command_line, "24 ") or
                     strings.contains(strings.to_lower($process.target.process.command_line), "minidump")
                 )
             )

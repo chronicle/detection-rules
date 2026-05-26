@@ -129,3 +129,9 @@ credentials, or PII.
 | :--- | :--- |
 | **Case Sensitivity** | All entries must be in **UPPERCASE**. SAP logs store User IDs, Roles, and Programs in uppercase; lowercase entries will result in missed detections. |
 | **Maintenance** | Lists should be reviewed quarterly or following any major SAP transport cycle where new `Z` programs or roles are introduced. |
+
+[!WARNING]
+ **Test Before Deploying:** These SAP community detection rules serve as
+ foundational templates. Because every SAP environment is unique, you should
+ thoroughly test all rules against historical data and modify their logic as
+ needed to match your specific logging structures and security use cases.

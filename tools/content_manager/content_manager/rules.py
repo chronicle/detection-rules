@@ -572,6 +572,125 @@ class Rules:
       )
 
   @classmethod
+  def build_rule_update_plan(
+      cls, local_rules: "Rules", remote_rules: "Rules"
+  ) -> Mapping[str, Any]:
+    """Build a deterministic, non-mutating plan for local rule changes."""
+    remote_by_name = {rule.name: rule for rule in remote_rules.rules}
+    remote_by_id = {rule.id: rule for rule in remote_rules.rules if rule.id}
+    changes = []
+    unchanged = 0
+
+    for local_rule in sorted(local_rules.rules, key=lambda rule: rule.name):
+      remote_rule = remote_by_name.get(local_rule.name)
+      matched_by_name = remote_rule is not None
+      rule_changes = []
+
+      if remote_rule is None and local_rule.id is None:
+        rule_changes.append({
+            "action": "create",
+            "rule_name": local_rule.name,
+            "rule_id": None,
+            "remote_revision_id": None,
+            "local_rule_digest": hashlib.sha256(
+                local_rule.text.encode("utf-8")
+            ).hexdigest(),
+            "desired_state": {
+                "enabled": local_rule.enabled,
+                "alerting": local_rule.alerting,
+                "archived": local_rule.archived,
+            },
+        })
+      else:
+        if remote_rule is None:
+          remote_rule = remote_by_id.get(local_rule.id)
+
+        if not matched_by_name or cls.compare_rule_text(
+            rule_text_1=local_rule.text,
+            rule_text_2=remote_rule.text,
+        ):
+          rule_changes.append({
+              "action": "create_revision",
+              "rule_name": local_rule.name,
+              "rule_id": local_rule.id,
+              "remote_revision_id": (
+                  remote_rule.revision_id if remote_rule else None
+              ),
+              "local_rule_digest": hashlib.sha256(
+                  local_rule.text.encode("utf-8")
+              ).hexdigest(),
+          })
+
+        if remote_rule is not None:
+          state_pairs = (
+              ("enabled", local_rule.enabled, remote_rule.enabled),
+              ("alerting", local_rule.alerting, remote_rule.alerting),
+              ("archived", local_rule.archived, remote_rule.archived),
+          )
+          for field, desired, current in state_pairs:
+            if desired is not None and desired != current:
+              rule_changes.append({
+                  "action": f"set_{field}",
+                  "rule_name": local_rule.name,
+                  "rule_id": local_rule.id or remote_rule.id,
+                  "remote_revision_id": remote_rule.revision_id,
+                  "desired_value": desired,
+              })
+
+      if rule_changes:
+        changes.extend(rule_changes)
+      else:
+        unchanged += 1
+
+    action_names = (
+        "create",
+        "create_revision",
+        "set_enabled",
+        "set_alerting",
+        "set_archived",
+    )
+    summary = {
+        action: sum(change["action"] == action for change in changes)
+        for action in action_names
+    }
+    plan_without_digest = {
+        "schema_version": "1",
+        "summary": summary,
+        "unchanged_rules": unchanged,
+        "changes": changes,
+    }
+    canonical_plan = json.dumps(
+        plan_without_digest, sort_keys=True, separators=(",", ":")
+    )
+    return {
+        **plan_without_digest,
+        "plan_digest": hashlib.sha256(
+            canonical_plan.encode("utf-8")
+        ).hexdigest(),
+    }
+
+  @classmethod
+  def plan_remote_rule_updates(
+      cls,
+      http_session: requests.AuthorizedSession,
+      rules_dir: pathlib.Path = RULES_DIR,
+      rule_config_file: pathlib.Path = RULE_CONFIG_FILE,
+  ) -> Mapping[str, Any] | None:
+    """Plan local rule changes without calling any mutating API."""
+    LOGGER.info("Loading local files from %s", rules_dir)
+    local_rules = cls.load_rules(
+        rules_dir=rules_dir, rule_config_file=rule_config_file
+    )
+    if not local_rules.rules:
+      LOGGER.info("No local rule files found")
+      return None
+
+    remote_rules = cls.get_remote_rules(http_session=http_session)
+    return cls.build_rule_update_plan(
+        local_rules=local_rules, remote_rules=remote_rules
+    )
+
+  @classmethod
   def update_remote_rules(
       cls,
       http_session: requests.AuthorizedSession,

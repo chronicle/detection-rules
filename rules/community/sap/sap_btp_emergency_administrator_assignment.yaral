@@ -1,0 +1,52 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_btp_emergency_administrator_assignment {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A user was added to a BTP role collection carrying subaccount, directory, or global account administrator rights"
+    severity = "High"
+    tactic = "TA0004"
+    technique = "T1098"
+
+  events:
+    $e.metadata.log_type = "SAP_BTP"
+
+    $e.security_result.category_details = "audit.configuration"
+    $e.security_result.detection_fields["object_id_crudType"] = "CREATE"
+    $e.security_result.detection_fields["object_id_tableName"] = "xs_rolecollection2user"
+    (
+        $e.security_result.detection_fields["object_id_rolecollection_name"] = "Subaccount Administrator" nocase or
+        $e.security_result.detection_fields["object_id_rolecollection_name"] = "Global Account Administrator" nocase or
+        $e.security_result.detection_fields["object_id_rolecollection_name"] = "Directory Administrator" nocase
+    )
+
+    $user = strings.coalesce($e.principal.user.user_display_name, $e.principal.user.userid)
+
+  match:
+    $user over 15m
+
+
+  outcome:
+    $tenant_id = array_distinct($e.security_result.detection_fields["tenant"])
+    $org_id = array_distinct($e.security_result.detection_fields["org_id"])
+    $role_name = array_distinct($e.security_result.detection_fields["object_id_rolecollection_name"])
+    $risk_score = 75
+
+  condition:
+    $e
+}

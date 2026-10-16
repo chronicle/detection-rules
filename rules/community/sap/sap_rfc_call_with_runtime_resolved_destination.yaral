@@ -1,0 +1,56 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_rfc_call_with_runtime_resolved_destination {
+  meta:
+    author = "Google Cloud Security"
+    description = "An ABAP program invoked a remote function call using a destination resolved at runtime"
+    severity = "Medium"
+    tactic = "TA0008"
+    technique = "T1570"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $e.additional.fields["msg_1"] = "FU1" nocase
+    $user = $e.principal.user.userid
+    $sid = $e.target.application
+
+    not $user in %sap_admin_users.user
+
+    $created_rfc_name = re.capture($e.additional.fields["param3_1"], "ashost=([^,]+)")
+
+  match:
+    $user, $sid over 59m
+
+  outcome:
+    $target_sid = array_distinct($e.target.application)
+    $target_rfc_destination = array_distinct($created_rfc_name)
+    $description = array_distinct($e.metadata.description)
+    $terminal = array_distinct($e.principal.hostname)
+    $terminal_ip = array_distinct($e.principal.ip)
+    $message_ids = array_distinct($e.additional.fields["msg_1"])
+    $abap_program = array_distinct($e.additional.fields["param1_1"])
+    $executed_program = array_distinct($e.additional.fields["param2_1"])
+    $t_code = array_distinct($e.security_result.detection_fields["slgtc_1"])
+    $TXSUBCLSID = array_distinct($e.security_result.summary)
+    $instance = array_distinct($e.target.resource.name)
+    $principal_user = array_distinct($e.principal.user.userid)
+    $user_alias = array_distinct($e.principal.user.user_display_name)
+    $risk_score = 65
+
+  condition:
+    $e
+}

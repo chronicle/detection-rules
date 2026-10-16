@@ -1,0 +1,60 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_unauthorized_execution_of_se09 {
+  meta:
+    author = "Google Cloud Security"
+    name = "SAP - Unauthorized Execution of Transport Organizer (SE09)"
+    description = "Detects the execution of the SAP Transport Organizer transaction (SE09), which is critical for managing development objects and transport requests. Execution by unauthorized users may indicate unauthorized system modification or bypassing of change management controls."
+    severity = "High"
+    tactic = "TA0002"
+    technique = "T1059"
+
+  events:
+    $e.metadata.vendor_name = "SAP"
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    // AU3 = transaction started
+    $e.additional.fields["msg_1"] = "AU3"
+
+    // Match the SE09 transaction code
+    ($e.additional.fields["param1_1"] = "SE09" or $e.security_result.detection_fields["slgtc_1"] = "SE09")
+
+    $user = $e.principal.user.userid
+    $sid  = $e.target.application
+
+    // Exclusions commented out to prevent data table compilation errors
+    // not $user in %sap_authorized_basis_admins.userid
+    // not $user in %sap_excluded_users.userid
+
+  match:
+    $user, $sid over 1h
+
+  outcome:
+    $risk_score = 75
+    $event_count = count($e.metadata.id)
+    $principal_user = array_distinct($user)
+    $target_sid = array_distinct($sid)
+    $executed_tcode = array_distinct($e.additional.fields["param1_1"])
+    $terminal_ip = array_distinct($e.principal.ip)
+    $terminal_names = array_distinct($e.principal.hostname)
+    $sap_client = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $log_description = array_distinct($e.metadata.description)
+    $audit_class = array_distinct($e.security_result.summary)
+
+  condition:
+    $e
+}

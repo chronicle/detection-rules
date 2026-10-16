@@ -34,7 +34,6 @@ rule sap_brute_force_rfc_logon {
   match:
     $ip over 1h
 
-
   outcome:
     $total_event_count = count($e.metadata.id)
     $user_ids_attempted = array_distinct($e.principal.user.userid)

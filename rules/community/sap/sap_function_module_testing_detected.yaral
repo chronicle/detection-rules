@@ -42,4 +42,3 @@ rule sap_function_module_testing_detected {
   condition:
     $e
 }
-

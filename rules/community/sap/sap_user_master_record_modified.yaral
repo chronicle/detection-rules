@@ -1,0 +1,54 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_user_master_record_modified {
+  meta:
+    author = "Google Cloud Security"
+    name = "SAP - User Master Record Modified"
+    description = "Detects the modification of a user's master record via an administrative action within SAP, which may indicate unauthorized account manipulation or privilege escalation."
+    severity = "Medium"
+    tactic = "TA0003"
+    technique = "T1098"
+
+  events:
+    $e.metadata.vendor_name = "SAP"
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    // SAP Message ID 'AUD' corresponds to "User master record modified"
+    $e.additional.fields["msg_1"] = "AUD"
+    $user = $e.principal.user.userid
+    $sid  = $e.target.application
+    $user != ""
+
+  match:
+    $user, $sid over 1h
+
+  outcome:
+    $risk_score       = 65
+    $event_count      = count_distinct($e.metadata.id)
+    $source_user      = array_distinct($user)
+    $target_sid       = array_distinct($sid)
+    $modified_user    = array_distinct($e.additional.fields["param1_1"])
+    $terminal_ip      = array_distinct($e.principal.ip)
+    $terminal_name    = array_distinct($e.principal.hostname)
+    $sap_client       = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $transaction_code = array_distinct($e.security_result.detection_fields["slgtc_1"])
+    $abap_program     = array_distinct($e.principal.process.file.names)
+    $log_description  = array_distinct($e.metadata.description)
+    $event_severity   = array_distinct($e.security_result.severity)
+
+  condition:
+    $e
+}

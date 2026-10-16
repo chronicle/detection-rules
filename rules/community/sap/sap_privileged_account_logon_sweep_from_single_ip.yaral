@@ -1,0 +1,47 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_privileged_account_logon_sweep_from_single_ip {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A privileged SAP account attempted logons across multiple systems or clients from one source IP"
+    severity = "High"
+    tactic = "TA0001"
+    technique = "T1078"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $e.additional.fields["msg_1"] = "AUM"
+
+    $user = $e.principal.user.userid
+    $terminal_ip = $e.principal.ip
+
+    $user in %sap_admin_users.user
+
+  match:
+    $terminal_ip over 6h
+
+  outcome:
+    $risk_score = 80
+    $source_user = array_distinct($user)
+    $target_sid = array_distinct($e.target.application)
+    $sap_client = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $login_by_ip_attempts = count($e.metadata.id)
+
+  condition:
+    $e and $login_by_ip_attempts > 1
+}

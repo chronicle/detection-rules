@@ -1,0 +1,51 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_dynamic_abap_program_observed {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Dynamic ABAP Coding event observed that is not deliberately excluded. Check for usage of \"I\" (Insert)  \"G\" (Generate) \"D\" (Delete)"
+    severity = "medium"
+    tactic = "TA0009"
+    technique = "T1059"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    ($e.additional.fields["msg"] = "BU4" or $e.additional.fields["msg_1"] = "BU4")
+
+    not $e.security_result.detection_fields["slgtc"] in %SAP_Dynamic_ABAP_Progam_Excluded_Transactions
+.transaction_code
+    not $e.security_result.detection_fields["slgtc_1"] in %SAP_Dynamic_ABAP_Progam_Excluded_Transactions
+.transaction_code
+
+    $user = $e.principal.user.userid
+
+  match:
+    $user over 30m
+
+  outcome:
+    $risk_score = 35
+    $abap_programs = array_distinct($e.principal.process.file.names)
+    $ip = array_distinct($e.principal.ip)
+    $hostname = array_distinct($e.principal.hostname)
+    $sap_instance = array_distinct($e.target.resource.name)
+    $instance = array_distinct($e.target.application)
+
+  condition:
+    $e
+}

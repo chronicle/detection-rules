@@ -1,0 +1,55 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_shared_source_ip_across_multiple_users {
+
+
+  meta:
+    author = "Google Cloud Security"
+    description = "Multiple distinct SAP users authenticated from a single source IP address"
+    severity = "medium"
+    tactic = "TA0001"
+    technique = "T1078"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $e.metadata.vendor_name = "SAP"
+    $e.additional.fields["msg_1"] = /AU1|AU5/
+    $e.additional.fields["param1_1"] = /^(A|C|F|R|S|U|H|u)$/
+    $e.principal.ip != ""
+
+    not $e.principal.user.userid in %sap_excluded_users.userid
+    not $e.principal.user.group_identifiers  = "RFC"
+    not $e.principal.user.group_identifiers  = "BATCH"
+
+    $ip = $e.principal.ip
+    $system_id = $e.target.application
+
+  match:
+    $ip, $system_id over 30m
+
+  outcome:
+    $distinct_user_count = count_distinct($e.principal.user.userid)
+    $users = array_distinct($e.principal.user.userid)
+    $instance = array_distinct($e.target.resource.name)
+    $client_id = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $email = array_distinct($e.additional.fields["smtp_addr_1"])
+    $logon_types = array_distinct($e.additional.fields["param1_1"])
+    $risk_score = 60
+
+  condition:
+    $e and $distinct_user_count > 1
+}

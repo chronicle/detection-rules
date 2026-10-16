@@ -1,0 +1,48 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_kerberos_spnego_replay_attempt {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A SPNEGO authentication token was replayed against an SAP system"
+    severity = "Medium"
+    tactic = "T1558.003"
+    technique = "T1558"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $e.additional.fields["msg_1"] = "BUI"
+
+    $user = $e.target.user.userid
+    $system_id = $e.target.application
+
+  match:
+    $user, $system_id over 1h
+
+  outcome:
+    $instance = array_distinct($e.target.resource.name)
+    $system = array_distinct($e.target.application)
+    $client_id = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $affected_user = array_distinct($e.target.user.userid)
+    $email = array_distinct($e.additional.fields["smtp_addr_1"])
+    $terminal_ipv6 = array_distinct($e.principal.ip)
+    $host = array_distinct($e.principal.hostname)
+    $risk_score = 75
+
+  condition:
+    $e
+}

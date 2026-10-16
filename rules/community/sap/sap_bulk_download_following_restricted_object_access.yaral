@@ -1,0 +1,71 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_bulk_download_following_restricted_object_access {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A user downloaded a large volume of data shortly after accessing a restricted table, program, or transaction"
+    severity = "Critical"
+    tactic = "TA0010"
+    technique = "T1020"
+
+  events:
+    $access.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $access.principal.user.userid = $user
+    $access.target.application = $target_sid
+
+    (
+      (
+        $access.additional.fields["msg_1"] = /^(DU9|CUZ)$/ and
+        $access.additional.fields["param1_1"] in %sap_sensitive_tables.name
+      ) or
+      (
+        $access.additional.fields["msg_1"] = "AUW" and
+        $access.additional.fields["param1_1"] in %sap_sensitive_abap_programs.abap_program
+      ) or
+      (
+        $access.additional.fields["msg_1"] = /^(AU3|AU4)$/ and
+        (
+          $access.security_result.detection_fields["slgtc_1"] in %sap_sensitive_transactions.transaction_code or
+          $access.additional.fields["param1_1"] in %sap_sensitive_transactions.transaction_code
+        )
+      )
+    )
+
+    $download.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $download.additional.fields["msg_1"] = "AUY"
+    $download.principal.user.userid = $user
+    $download.target.application = $target_sid
+
+  match:
+    $user, $target_sid over 6h after $access
+
+  outcome:
+    $risk_score = 90
+    $source_user = array_distinct($user)
+    $target_system = array_distinct($target_sid)
+    $total_bytes_downloaded = sum(cast.as_int(re.replace($download.additional.fields["param1_1"], ",", "")))
+    $download_paths = array_distinct($download.additional.fields["param3_1"])
+    $terminal_ip = array_distinct($download.principal.ip)
+    $sap_client = array_distinct($download.target.resource.attribute.labels["slgmand_1"])
+    $accessed_objects = array_distinct($access.additional.fields["param1_1"])
+    $executed_programs = array_distinct($access.principal.process.file.names)
+    $executed_tcodes = array_distinct($access.security_result.detection_fields["slgtc_1"])
+
+  condition:
+    $access and $download and $total_bytes_downloaded > 800000
+}

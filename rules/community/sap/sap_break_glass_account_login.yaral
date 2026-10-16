@@ -29,6 +29,7 @@ rule sap_break_glass_account_login {
         $e.additional.fields["msg_1"] = /^AU1$|^AU5$/ or
         $e.metadata.event_type = "USER_LOGIN"
     )
+
     $e.principal.user.userid = $userid
     $userid = /^DDIC$|^EARLYWATCH$|^SAP\*$|^TMSADM$/ nocase
 

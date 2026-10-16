@@ -1,0 +1,49 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_btp_workzone_site_creation {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A Build Work Zone site was created or its content was modified"
+    severity = "Medium"
+    tactic = "TA0003"
+    technique = "T1505"
+
+  events:
+    $e.metadata.log_type = "SAP_BTP"
+
+    $e.security_result.detection_fields["object_id_json_message"] = "CDM data changed." nocase
+    $e.security_result.category_details = "audit.data-modification" nocase
+    $e.security_result.detection_fields.value = /Operation: (CREATE|UPDATE), entity id: [^,]+, entity type: site/ nocase
+
+    $tenant = $e.security_result.detection_fields["tenant"]
+    $user = strings.coalesce($e.principal.user.user_display_name, $e.principal.user.userid)
+
+    not $e.principal.user.userid            = /^sb-/ nocase
+    not $e.principal.user.user_display_name = /^sb-/ nocase
+
+  match:
+    $user, $tenant over 1h
+
+  outcome:
+    $action             = array_distinct(re.capture($e.security_result.detection_fields.value, `Operation: (.*?),`))
+    $risk_score         = 60
+    $audit_record_count = count_distinct($e.security_result.detection_fields["message_uuid"])
+
+  condition:
+    $e
+}

@@ -1,0 +1,54 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_btp_service_manager_instance_or_binding_change {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A BTP service instance or service binding was created, modified, or deleted through the Service Manager API"
+    severity = "Medium"
+    tactic = "TA0003"
+    technique = "T1098.001"
+
+  events:
+    $e.metadata.log_type = "SAP_BTP"
+
+    $e.security_result.detection_fields["object_type"] = /^\/v1\/service_(instances|bindings)(\/|\?|$)/ nocase
+    $e.security_result.detection_fields["object_id_action"] = /^(POST|PATCH|PUT|DELETE)$/ nocase
+
+    $tenant = $e.security_result.detection_fields["tenant"]
+    $user = strings.coalesce($e.principal.user.user_display_name, $e.principal.user.userid)
+
+    not $e.principal.user.userid            = /^sb-/ nocase
+    not $e.principal.user.user_display_name = /^sb-/ nocase
+
+  match:
+    $user, $tenant over 1h
+
+  outcome:
+    $resource_type = array_distinct(re.capture($e.security_result.detection_fields["object_type"], `/v1/service_(instances|bindings)`))
+    $action = array_distinct($e.security_result.detection_fields["object_id_action"])
+    $resource_id = array_distinct(re.capture($e.security_result.detection_fields["object_type"], `/v1/service_(?:instances|bindings)/([0-9a-f\-]+)`))
+    $resource_name = array_distinct($e.security_result.detection_fields["new_name"])
+    $service_plan_id = array_distinct($e.security_result.detection_fields["new_service_plan_id"])
+    $api_path = array_distinct($e.security_result.detection_fields["object_type"])
+    $correlation_id = array_distinct($e.security_result.detection_fields["object_id_correlation-id"])
+    $space_id = array_distinct($e.security_result.detection_fields["space_id"])
+    $record_count = count_distinct($e.security_result.detection_fields["message_uuid"])
+
+  condition:
+    $e
+}

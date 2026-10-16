@@ -1,0 +1,53 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_dialog_logon_from_unlisted_network_range {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A user authenticated to SAP from an IP address outside every approved network range"
+    severity = "Medium"
+    tactic = "TA0001"
+    technique = "T1133"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+   $e.additional.fields["msg_1"] = /AU1|AU5/
+   $e.security_result.summary = "Dialog Logon"
+   re.regex($e.metadata.description,`type=[A|C||H|R|S|U|u]`)
+
+   //filter out allowed networks from data table based on internal lists
+   $e.principal.ip != ""
+   not $e.principal.ip in cidr %allowlist_networks.CIDR_range
+   not $e.principal.ip in cidr %internal_CIDR_RFC1918.CIDR_range
+
+   $user = $e.principal.user.userid
+   $p_ip = $e.principal.ip
+
+  match:
+    $user over 30m
+
+  outcome:
+    $country = array_distinct($e.principal.ip_geo_artifact.location.country_or_region)
+    $state = array_distinct($e.principal.ip_geo_artifact.location.state)
+    $lat = array_distinct($e.principal.ip_geo_artifact.location.region_coordinates.latitude)
+    $long = array_distinct($e.principal.ip_geo_artifact.location.region_coordinates.longitude)
+    $email = array_distinct($e.principal.user.email_addresses)
+    $policy_name = array_distinct($e.security_result.rule_name)
+
+  condition:
+    $e
+}

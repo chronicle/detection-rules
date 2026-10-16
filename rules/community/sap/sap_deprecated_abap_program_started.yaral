@@ -1,0 +1,48 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_deprecated_abap_program_started {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A user started an ABAP program on the deprecated or unsafe program list"
+    severity = "High"
+    tactic = "TA0002"
+    technique = "T1059"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    $e.additional.fields["msg_1"] = "AUW"
+    $e.principal.process.file.names in %sap_obsolete_programs.program
+
+    $user = $e.principal.user.userid
+
+  match:
+    $user over 1h
+
+  outcome:
+    $risk_score = 75
+    $executed_program = array_distinct($e.principal.process.file.names)
+    $source_user = array_distinct($user)
+    $terminal_ip = array_distinct($e.principal.ip)
+    $target_sid = array_distinct($e.target.application)
+    $sap_client = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $log_description = array_distinct($e.metadata.description)
+
+  condition:
+    $e
+}

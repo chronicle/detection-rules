@@ -1,0 +1,55 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_btp_tenant_audit_log_silent {
+
+/*
+- this rule should be used in conjunction with a silent feed alert, and is only meant to alert on specific tenants going silent
+- this rule will only fire once per outage
+*/
+
+  meta:
+    author = "Google Cloud Security"
+    display_name = "SAP BTP Tenant Audit Log Stream Interrupted"
+    description = "An SAP BTP tenant that was recently active stopped producing audit logs"
+    severity = "High"
+    tactic = "TA0005"
+    technique = "T1562.008"
+
+  events:
+    //creates a list of tenants that have logs greater than 1 hour ago
+    $historical.metadata.log_type = "SAP_BTP"
+    $historical.security_result.detection_fields["tenant"] = $tenant
+    $historical.metadata.event_timestamp.seconds <= timestamp.current_seconds() - 3600
+
+    //creates a list of tenants that have logs within the last hour
+    $recent.metadata.log_type = "SAP_BTP"
+    $recent.security_result.detection_fields["tenant"] = $tenant
+    $recent.metadata.event_timestamp.seconds > timestamp.current_seconds() - 3600
+
+  match:
+    //aggregate by tenant
+    $tenant over 3h
+
+  outcome:
+    $risk_score         = 80
+    $last_log_time      = max($historical.metadata.event_timestamp.seconds)
+    $historical_records = count_distinct($historical.security_result.detection_fields["message_uuid"])
+
+  condition:
+    //checks if that tenant has logs greater than 1 hour old, but not within the most recent hour
+    $historical and !$recent
+}

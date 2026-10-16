@@ -1,0 +1,57 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_restricted_table_read_via_table_browser {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A dialog user read a restricted table through a generic table browser transaction"
+    severity = "High"
+    tactic = "TA0009"
+    technique = "T1005"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $e.additional.fields["msg_1"] = "DU9"
+    $e.security_result.detection_fields["slgtc_1"] = /^(SE11|SE16|SE16N)$/ nocase
+
+    $system = $e.target.application
+    $user = $e.principal.user.userid
+    $table = $e.additional.fields["param1_1"]
+
+    $table in %sap_sensitive_tables.name
+    //not $user in %sap_excluded_users.userid
+
+  match:
+    $user, $table, $system over 2h
+
+
+  outcome:
+    $risk_score = 65
+    $event_count = count($e.metadata.id)
+    $activity_code = array_distinct($e.additional.fields["param2_1"])
+    $client_ids = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $source_ips = array_distinct($e.principal.ip)
+    $terminal_names = array_distinct($e.principal.hostname)
+    $abap_programs = array_distinct($e.principal.process.file.names)
+    $transaction_codes = array_distinct($e.security_result.detection_fields["slgtc_1"])
+    $audit_class = array_distinct($e.security_result.summary)
+    $event_description = array_distinct($e.metadata.description)
+
+
+  condition:
+    $e
+}

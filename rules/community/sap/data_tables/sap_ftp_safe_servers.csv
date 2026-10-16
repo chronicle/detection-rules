@@ -1,0 +1,5 @@
+100,Vendor FTP Server,ftp://vendorfiles.partner.com/,21
+300,Internal FTP Server,ftp://10.0.0.50/,21
+100,Backup FTP Server,ftp://backupserver.company.com/,21
+200,SFTP Server,sftp://securefiles.company.com/,22
+100,Corporate FTP Server,http://ourorgftpserver.com/,21

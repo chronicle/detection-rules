@@ -1,0 +1,46 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_audit_message_id_absent_from_monitoring_config {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "An SAP audit message ID appeared in logs but is missing from the monitoring configuration table"
+    severity = "Medium"
+    tactic = "TA0005"
+    technique = "T1562"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+    $message_id = $e.additional.fields["msg_1"]
+    $message_id != "RZ 792"
+    $sid = $e.target.application
+    $client = $e.target.resource.attribute.labels["slgmand_1"]
+
+     not $message_id in %SAP_Audit_Log_Configuration.MessageID
+
+  match:
+    $message_id, $sid, $client over 24h
+
+  outcome:
+    $risk_score = 60
+    $instance = array_distinct($e.target.resource.name)
+    $user = array_distinct($e.principal.user.userid)
+    $message_text = array_distinct($e.metadata.description)
+
+  condition:
+    $e
+}

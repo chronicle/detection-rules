@@ -1,0 +1,46 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_transaction_code_lock_removed {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A transaction code lock was removed through message ID AUQ"
+    severity = "Medium"
+    tactic = "TA0005"
+    technique = "T1562.001"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    $e.additional.fields["msg_1"] = "AUQ"
+
+    $e.additional.fields["param1_1"] = $transaction_code
+    $e.principal.user.userid = $user
+    $e.target.application = $system_id
+
+  match:
+    $user, $transaction_code, $system_id over 30m
+
+  outcome:
+    $instance = array_distinct($e.target.resource.name)
+    $message_text = array_distinct($e.metadata.description)
+    $host = array_distinct($e.principal.hostname)
+    $terminal_ips = array_distinct($e.principal.ip)
+
+  condition:
+    $e
+}

@@ -1,0 +1,59 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_btp_mass_user_creation_or_deletion {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A single actor created or deleted SAP BTP subaccount users in bulk"
+    severity = "High"
+    tactic = "TA0040"
+    technique = "T1531"
+
+  events:
+    $e.metadata.log_type = "SAP_BTP"
+
+    $e.security_result.detection_fields["object_id_tableName"] = "users" nocase
+    $e.security_result.detection_fields["object_id_crudType"] = /^(CREATE|DELETE)$/ nocase
+
+    $tenant = $e.security_result.detection_fields["tenant"]
+    $user = strings.coalesce($e.principal.user.user_display_name, $e.principal.user.userid)
+
+    not $e.principal.user.userid            = /^sb-/ nocase
+    not $e.principal.user.user_display_name = /^sb-/ nocase
+
+  match:
+    $user, $tenant over 1h
+
+  outcome:
+    $risk_score = 85
+
+    $affected_users = count_distinct($e.security_result.detection_fields["message_uuid"])
+    $request_batches = count_distinct($e.security_result.detection_fields["object_id_correlationId"])
+    $audit_record_count = count_distinct($e.security_result.detection_fields["message_uuid"])
+    $udm_event_count = count_distinct($e.metadata.id)
+    $crud_types = array_distinct($e.security_result.detection_fields["object_id_crudType"])
+    $correlation_ids = array_distinct($e.security_result.detection_fields["object_id_correlationId"])
+    $principal_user = array_distinct($user)
+    $principal_user_raw = array_distinct($e.principal.user.user_display_name)
+    $identity_origin = array_distinct($e.security_result.detection_fields["object_id_origin"])
+    $als_service_id = array_distinct($e.security_result.detection_fields["als_service_id"])
+    $space_id = array_distinct($e.security_result.detection_fields["space_id"])
+    $audit_category = array_distinct($e.security_result.category_details)
+
+  condition:
+    $e and $affected_users >= 6
+}

@@ -1,0 +1,52 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_restricted_transaction_started {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A user started a transaction code on the restricted transaction list"
+    severity = "High"
+    tactic = "TA0009"
+    technique = "T1005"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    $e.additional.fields["msg_1"] = /^(AU3|AU4)$/
+    $tcode = $e.additional.fields["param1_1"]
+    $tcode in %sap_sensitive_transactions.transaction_code
+
+    $user = $e.principal.user.userid
+    $sid  = $e.target.application
+
+    not $user in %sap_excluded_users.userid
+
+  match:
+    $user, $sid over 75m
+
+  outcome:
+    $risk_score = 75
+    $executed_tcode = array_distinct($tcode)
+    $abap_program = array_distinct($e.principal.process.file.names)
+    $terminal_ip = array_distinct($e.principal.ip)
+    $sap_client = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $log_description = array_distinct($e.metadata.description)
+    $event_count = count_distinct($e.metadata.id)
+
+  condition:
+    $e
+}

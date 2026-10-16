@@ -1,0 +1,58 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_abap_debugger_session_activity {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A user started or interacted with the ABAP debugger on a production system"
+    severity = "High"
+    tactic = "TA0004"
+    technique = "T1055"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    $e.target.application = $sid
+    $e.principal.user.userid = $user
+
+    %SAP_Systems_Debug_Test.SystemID = $sid
+    %SAP_Systems_Debug_Test.SystemRole = "Production"
+
+    (
+      $e.additional.fields["msg_1"] =
+        /^(CUK|CUL|CUM|CUN|CUO|CUP)$/
+      or
+      $e.principal.process.file.names = "RSTPDAMAIN"
+    )
+
+  match:
+    $sid, $user over 5m
+
+  outcome:
+    $risk_score = 80
+    $instances = array_distinct($e.target.resource.name)
+    $message_ids = array_distinct($e.additional.fields["msg_1"])
+    $message_texts = array_distinct($e.metadata.description)
+    $abap_programs = array_distinct($e.principal.process.file.names)
+    $transaction_codes = array_distinct($e.security_result.detection_fields["slgtc_1"])
+    $client_ids = array_distinct($e.target.resource.attribute.labels["slgmand_1"])
+    $terminal_ips = array_distinct($e.principal.ip)
+    $hosts = array_distinct($e.principal.hostname)
+
+  condition:
+    $e
+}

@@ -1,0 +1,60 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_btp_subaccount_deleted {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "A BTP subaccount entity was deleted from the global account"
+    severity = "High"
+    tactic = "TA0040"
+    technique = "T1485"
+
+  events:
+    $e.metadata.log_type = "SAP_BTP"
+
+    $e.security_result.detection_fields["object_id_entity"] = "com.sap.core.commercial.service.accounts.model.Subaccount"
+    (
+      $e.security_result.detection_fields["new_stateDetails"] = "DELETE_SUBACCOUNT_ENTITY" nocase or
+      $e.security_result.detection_fields["new_entityState"] = /^(DELETING|DELETED)$/ nocase
+    )
+
+    $user = strings.coalesce($e.principal.user.user_display_name, $e.principal.user.userid)
+    $subaccount_guid = $e.security_result.detection_fields["new_guid"]
+
+  match:
+    $user, $subaccount_guid over 1h
+
+  outcome:
+    $risk_score = max(
+      if($e.security_result.detection_fields["new_usedForProduction"] = "NOT_USED_FOR_PRODUCTION", 70, 95)
+    )
+    $principal_user = array_distinct($user)
+    $subaccount_name = array_distinct($e.security_result.detection_fields["new_displayName"])
+    $subaccount_subdomain = array_distinct($e.security_result.detection_fields["new_subdomain"])
+    $subaccount_id = array_distinct($e.security_result.detection_fields["new_id"])
+    $subaccount_region = array_distinct($e.security_result.detection_fields["new_region"])
+    $used_for_production = array_distinct($e.security_result.detection_fields["new_usedForProduction"])
+    $entity_state = array_distinct($e.security_result.detection_fields["new_entityState"])
+    $state_details = array_distinct($e.security_result.detection_fields["new_stateDetails"])
+    $last_modified_by = array_distinct($e.security_result.detection_fields["new_lastModifiedBy"])
+    $global_account_tenant = array_distinct($e.security_result.detection_fields["tenant"])
+    $audit_category = array_distinct($e.security_result.category_details)
+    $event_count = count_distinct($e.metadata.id)
+
+  condition:
+    $e
+}

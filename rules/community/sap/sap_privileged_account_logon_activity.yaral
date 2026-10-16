@@ -1,0 +1,59 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_privileged_account_logon_activity {
+
+    meta:
+        author = "Google Cloud Security"
+        description = "A privileged SAP account succeeded or failed a logon on a production system"
+        severity = "High"
+        tactic = "TA0004"
+        technique = "T1078"
+
+    events:
+        $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+        (
+            (
+                $e.additional.fields["msg_1"] = "AU1" AND
+                $e.additional.fields["param1_1"] = /^(A|H|R|S)$/
+            ) or
+            $e.additional.fields["msg_1"] = "AU2"
+        )
+
+        $user = strings.coalesce($e.principal.user.userid, $e.target.user.userid)
+        $system_id = $e.target.application
+        $client_id = $e.target.resource.attribute.labels["slgmand_1"]
+
+        $user in %SAP_PrivilegedUsers.userid
+
+    match:
+        $user , $system_id, $client_id over 1h
+
+    outcome:
+        $message_ids = array_distinct($e.additional.fields["msg_1"])
+        $instance = array_distinct($e.target.resource.name)
+        $logon_type_keys = array_distinct($e.additional.fields["param1_1"])
+        $logon_failure_reason_keys = array_distinct($e.additional.fields["param2_1"])
+        $logon_method_keys = array_distinct($e.additional.fields["param3_1"])
+        $message_texts = array_distinct($e.metadata.description)
+        $emails = array_distinct($e.additional.fields["smtp_addr_1"])
+        $terminal_ips = array_distinct($e.principal.ip)
+        $hosts = array_distinct($e.principal.hostname)
+        $risk_score = 85
+
+    condition:
+        $e
+}

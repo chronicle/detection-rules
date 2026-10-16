@@ -1,0 +1,62 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule sap_audit_log_volume_monitor {
+
+  meta:
+    author = "Google Cloud Security"
+    description = "An SAP user generated audit records above the configured hourly threshold for their system"
+    severity = "Medium"
+    tactic = "TA0008"
+    technique = "T1078"
+
+  events:
+    $e.metadata.log_type = "SAP_SECURITY_AUDIT"
+
+    ($e.security_result.severity = "HIGH" or $e.security_result.severity = "MEDIUM")
+
+    $sid = $e.target.application
+    $user = $e.principal.user.userid
+    $sev = $e.security_result.severity
+
+    $sid != ""
+    $user != ""
+
+    not $user in %sap_excluded_users.userid
+
+  match:
+    $sid, $user, $sev over 1h
+
+  outcome:
+    $event_count = count($e.metadata.id)
+    //threshold values will likely require tuning
+    $threshold = min(if($sev = "HIGH", 200, 4000))
+    $is_privileged = max(if($user in %sap_excluded_users.userid, 1, 0))
+    $risk_score = if($is_privileged = 1, 85, 65)
+    $system_id = array_distinct($sid)
+    $sap_user = array_distinct($user)
+    $event_severity = array_distinct($sev)
+    $message_texts = array_distinct($e.security_result.summary)
+    $transaction_codes = array_distinct($e.security_result.detection_fields["slgtc"])
+    $abap_programs = array_distinct($e.principal.process.file.names)
+    $terminal_ips = array_distinct($e.principal.ip)
+    $instance = array_distinct($e.target.resource.name)
+    $user_class = array_distinct($e.principal.user.group_identifiers)
+    $user_is_privileged = array_distinct(if($user in %sap_excluded_users.userid, "true", "false"))
+
+  condition:
+    $e and $event_count > $threshold
+}

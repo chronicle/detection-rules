@@ -108,6 +108,21 @@ class RuleOperations:
     RuleOperations.get()
 
   @classmethod
+  def plan(cls, output_file: pathlib.Path | None = None):
+    """Plan rule updates without modifying Google SecOps."""
+    http_session = initialize_http_session()
+    plan = Rules.plan_remote_rule_updates(http_session=http_session)
+    if plan is None:
+      return
+
+    plan_json = json.dumps(plan, indent=2)
+    if output_file:
+      output_file.write_text(f"{plan_json}\n", encoding="utf-8")
+      LOGGER.info("Wrote rule update plan to %s", output_file)
+    else:
+      click.echo(plan_json)
+
+  @classmethod
   def verify(cls, rule_file_path: pathlib.Path):
     """Verify that a rule is a valid YARA-L rule using Google SecOps' API."""
     http_session = initialize_http_session()
@@ -533,6 +548,23 @@ def update_rules():
       "Attempting to update rules in Google SecOps based on local rule files"
   )
   RuleOperations.update()
+
+
+@rules.command(
+    "plan",
+    short_help="Preview rule changes without modifying Google SecOps.",
+)
+@click.option(
+    "--output-file",
+    "-o",
+    required=False,
+    type=click.Path(file_okay=True, dir_okay=False, path_type=pathlib.Path),
+    help="Optional path for the machine-readable JSON plan.",
+)
+def plan_rules(output_file: pathlib.Path | None):
+  """Preview rule changes without modifying Google SecOps."""
+  LOGGER.info("Planning rule changes without modifying Google SecOps")
+  RuleOperations.plan(output_file=output_file)
 
 
 @rules.command(

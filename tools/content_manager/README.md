@@ -313,6 +313,22 @@ Example output from `rules verify-all` command:
 ...
 ```
 
+### Plan rule updates
+
+The `rules plan` command previews the changes that `rules update` would need to
+make without calling rule creation, revision, or deployment update APIs. The
+plan is emitted as deterministic JSON and includes a SHA-256 digest so it can be
+retained as change-review evidence.
+
+```shell
+python -m content_manager rules plan
+python -m content_manager rules plan --output-file rule-plan.json
+```
+
+The plan lists rule creation, revision creation, and deployment-state changes.
+It includes remote revision identifiers for existing rules, but excludes rule
+text and Google Cloud resource names.
+
 ### Update rules in Google SecOps
 
 The `rules update` command updates detection rules in Google SecOps based

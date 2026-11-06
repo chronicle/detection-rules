@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ TEST_RULE_EXCLUSIONS_CONFIG_FILE = (
 )
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
-ruamel_yaml = ruamel.yaml.YAML(typ="safe")
+safe_yaml_parser = ruamel.yaml.YAML(typ="safe")
 
 
 @pytest.fixture(name="parsed_test_rule_exclusions")
@@ -159,7 +159,7 @@ def test_rule_exclusion_config_entry():
 def test_check_rule_exclusion_config():
   """Tests for rule_exclusions.RuleExclusions.check_rule_exclusion_config."""
   with open(TEST_RULE_EXCLUSIONS_CONFIG_FILE, "r", encoding="utf-8") as f:
-    rule_exclusion_config = ruamel_yaml.load(f)
+    rule_exclusion_config = safe_yaml_parser.load(f)
 
   # Ensure an exception occurs when a rule exclusion config file contains an
   # invalid key

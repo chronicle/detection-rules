@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ DATA_TABLE_COLUMN_TYPES = Literal["CIDR", "STRING", "REGEX"]  # pylint: disable=
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
 # (i.e. duplicate data table names)
-ruamel_yaml = ruamel.yaml.YAML(typ="safe")
+safe_yaml_parser = ruamel.yaml.YAML(typ="safe")
 
 
 class DataTableColumn(pydantic.BaseModel):
@@ -143,7 +143,7 @@ class DataTables:
         "Loading data table config from file %s", data_table_config_file
     )
     with open(data_table_config_file, "r", encoding="utf-8") as f:
-      data_table_config = ruamel_yaml.load(f)
+      data_table_config = safe_yaml_parser.load(f)
 
     if not data_table_config:
       LOGGER.info("Data table config file is empty.")
@@ -390,7 +390,9 @@ class DataTables:
     with open(
         data_table_config_file_path, "w", encoding="utf-8"
     ) as data_table_config_file:
-      yaml.dump(data_table_config, data_table_config_file, sort_keys=True)
+      yaml.safe_dump(
+          data_table_config, data_table_config_file, sort_keys=True
+      )
 
   @classmethod
   def get_remote_data_tables(

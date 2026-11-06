@@ -37,7 +37,7 @@ to the rules editor when creating a new rule.
 Detailed instructions can be found in your Google SecOps instance under
 documentation.
 
-The [rule manager](tools/rule_manager/) tool and accompanying documentation &
+The [content manager](tools/content_manager/) tool and accompanying documentation &
 tutorials can be used to easily implement a Detection-as-Code pipeline for
 managing rules via Google SecOps' [REST API](https://cloud.google.com/chronicle/docs/reference/rest).
 

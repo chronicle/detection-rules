@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ TEST_DATA_DIR = pathlib.Path(__file__).parent / "test_data"
 TEST_SAVED_SEARCH_CONFIG_FILE = TEST_DATA_DIR / "test_saved_search_config.yaml"
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
-ruamel_yaml = ruamel.yaml.YAML(typ="safe")
+safe_yaml_parser = ruamel.yaml.YAML(typ="safe")
 
 
 @pytest.fixture(name="parsed_test_saved_searches")
@@ -54,9 +54,10 @@ def raw_test_saved_searches_fixture() -> list[dict[str, Any]]:
     return json.load(f)
 
 
-def test_load_saved_searches_config():
+def test_load_saved_searches_config(parsed_test_saved_searches: SavedSearches):
   """Tests for saved_searches.SavedSearches.load_saved_search_config."""
   SAVED_SEARCH_CONFIG_FILE.touch(exist_ok=True)
+  assert len(parsed_test_saved_searches.saved_searches) == 2
 
 
 def test_parse_saved_searches(
@@ -141,7 +142,7 @@ def test_check_saved_search_config():
     )
 
   with open(TEST_SAVED_SEARCH_CONFIG_FILE, "r", encoding="utf-8") as f:
-    saved_search_config = ruamel_yaml.load(f)
+    saved_search_config = safe_yaml_parser.load(f)
 
   # Ensure an exception occurs when a saved search config file contains an
   # invalid key

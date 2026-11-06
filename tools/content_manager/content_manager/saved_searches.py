@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,8 +35,9 @@ SAVED_SEARCH_CONFIG_FILE = ROOT_DIR / "saved_search_config.yaml"
 SHARING_MODES = Literal["MODE_SHARED_WITH_CUSTOMER"]  # pylint: disable="invalid-name"
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
-ruamel_yaml = ruamel.yaml.YAML()
-ruamel_yaml.default_flow_style = False
+safe_yaml_parser = ruamel.yaml.YAML(typ="safe")
+round_trip_yaml_dumper = ruamel.yaml.YAML()
+round_trip_yaml_dumper.default_flow_style = False
 
 
 class SavedSearch(pydantic.BaseModel):
@@ -131,7 +132,7 @@ class SavedSearches:
         saved_search_config_file,
     )
     with open(saved_search_config_file, "r", encoding="utf-8") as f:
-      saved_search_config = ruamel_yaml.load(f)
+      saved_search_config = safe_yaml_parser.load(f)
 
     if not saved_search_config:
       LOGGER.info("Saved search config file is empty.")
@@ -264,7 +265,7 @@ class SavedSearches:
     with open(
         SAVED_SEARCH_CONFIG_FILE, "w", encoding="utf-8"
     ) as saved_search_config_file:
-      ruamel_yaml.dump(
+      round_trip_yaml_dumper.dump(
           saved_search_config,
           saved_search_config_file,
       )

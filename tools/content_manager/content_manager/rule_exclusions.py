@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ RULE_EXCLUSION_TYPES = Literal["DETECTION_EXCLUSION"]  # pylint: disable="invali
 EXCLUSION_APPLICATIONS = Literal["curated_rule_sets", "curated_rules"]  # pylint: disable="invalid-name"
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
-ruamel_yaml = ruamel.yaml.YAML(typ="safe")
+safe_yaml_parser = ruamel.yaml.YAML(typ="safe")
 
 
 class ExclusionApplication(pydantic.BaseModel):
@@ -178,7 +178,7 @@ class RuleExclusions:
         rule_exclusion_config_file,
     )
     with open(rule_exclusion_config_file, "r", encoding="utf-8") as f:
-      rule_exclusion_config = ruamel_yaml.load(f)
+      rule_exclusion_config = safe_yaml_parser.load(f)
 
     if not rule_exclusion_config:
       LOGGER.info("Rule exclusion config file is empty.")
@@ -335,7 +335,7 @@ class RuleExclusions:
     with open(
         RULE_EXCLUSIONS_CONFIG_FILE, "w", encoding="utf-8"
     ) as rule_exclusion_config_file:
-      yaml.dump(
+      yaml.safe_dump(
           rule_exclusion_config,
           rule_exclusion_config_file,
           sort_keys=True,

@@ -22,9 +22,10 @@ rule google_workspace_application_added {
     rule_id = "mr_bb4f5ff0-76b8-4b08-8b1b-fcb81e5a10cc"
     rule_name = "Google Workspace Application Added"
     mitre_attack_tactic = "Persistence"
-    mitre_attack_technique = ""
-    mitre_attack_url = ""
-    mitre_attack_version = "v13.1"
+    mitre_attack_technique = "Account Manipulation: Additional Cloud Application"
+    mitre_attack_id = "T1098.003"
+    mitre_attack_url = "https://attack.mitre.org/techniques/T1098/003/"
+    mitre_attack_version = "v17.1"
     type = "Alert"
     data_source = "Workspace Activity"
     severity = "High"
@@ -38,8 +39,9 @@ rule google_workspace_application_added {
   outcome:
     $risk_score = max(75)
     $mitre_attack_tactic = "Persistence"
-    $mitre_attack_technique = ""
-    $mitre_attack_technique_id = ""
+    $mitre_attack_technique = "Account Manipulation: Additional Cloud Application"
+    $mitre_attack_technique_id = "T1098.003"
+    $mitre_attack_id = "T1098.003"
     $event_count = count_distinct($ws.metadata.id)
     $principal_ip = array_distinct($ws.principal.ip)
     $principal_country = array_distinct($ws.principal.ip_geo_artifact.location.country_or_region)

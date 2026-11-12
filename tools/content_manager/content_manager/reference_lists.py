@@ -1,4 +1,4 @@
-# Copyright 2024 Google LLC
+# Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ REF_LIST_SYNTAX_TYPES = Literal[  # pylint: disable="invalid-name"
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
 # (i.e. duplicate reference list names)
-ruamel_yaml = ruamel.yaml.YAML(typ="safe")
+safe_yaml_parser = ruamel.yaml.YAML(typ="safe")
 
 
 class ReferenceList(pydantic.BaseModel):
@@ -206,7 +206,7 @@ class ReferenceLists:
         "Loading reference list config file from %s", ref_list_config_file
     )
     with open(ref_list_config_file, "r", encoding="utf-8") as f:
-      ref_list_config = ruamel_yaml.load(f)
+      ref_list_config = safe_yaml_parser.load(f)
 
     if not ref_list_config:
       LOGGER.info("Reference list config file is empty.")
@@ -330,7 +330,7 @@ class ReferenceLists:
     with open(
         ref_list_config_file_path, "w", encoding="utf-8"
     ) as ref_list_config_file:
-      yaml.dump(ref_list_config, ref_list_config_file, sort_keys=True)
+      yaml.safe_dump(ref_list_config, ref_list_config_file, sort_keys=True)
 
   @classmethod
   def get_remote_ref_lists(

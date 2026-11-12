@@ -1,4 +1,4 @@
-# Copyright 2024 Google LLC
+# Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
 
 # Use ruamel.yaml to raise an exception if a YAML file contains duplicate keys
 # (i.e. duplicate rule names)
-ruamel_yaml = ruamel.yaml.YAML(typ="safe")
+safe_yaml_parser = ruamel.yaml.YAML(typ="safe")
 
 
 class Rule(pydantic.BaseModel):
@@ -235,7 +235,7 @@ class Rules:
 
     LOGGER.info("Loading rule config file from %s", rule_config_file)
     with open(rule_config_file, "r", encoding="utf-8") as f:
-      rule_config = ruamel_yaml.load(f)
+      rule_config = safe_yaml_parser.load(f)
 
     if not rule_config:
       LOGGER.info("Rule config file is empty.")
@@ -333,7 +333,7 @@ class Rules:
 
     LOGGER.info("Writing rule config to %s", rule_config_file_path)
     with open(rule_config_file_path, "w", encoding="utf-8") as rule_config_file:
-      yaml.dump(rule_config, rule_config_file, sort_keys=True)
+      yaml.safe_dump(rule_config, rule_config_file, sort_keys=True)
 
   @classmethod
   def get_remote_rules(

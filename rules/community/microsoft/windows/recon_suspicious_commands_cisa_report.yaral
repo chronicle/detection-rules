@@ -36,22 +36,22 @@ rule recon_suspicious_commands_cisa_report {
     // cisa report referenced cmd /c in their report throughout, can filter this in/out for tuning as needed
     // other wmic switches like /user and /password, these have been excluded to focus on the commands being issued since local access does not require these
     (
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*7z.*a.*-p.*c:\\windows\\temp\\.*.7z`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*c:\\Windows\\system32\\pcwrun.exe.*c:\\Users\\Administrator\\Desktop\\Win.exe`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c|cmdbak.*/c).*ping.*-n.*1.*127\.0\.0\.1.*c:\\Windows\\temp\\(putty|tmp).log`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])7z\b.*?\ba\b.*?\b-p.*?\bc:\\windows\\temp\\.*\.7z`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])pcwrun\.exe\b.*?\bc:\\Users\\Administrator\\Desktop\\Win\.exe`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])(cmd(\.exe)?|cmdbak)\b.*?[/c]\b.*?\bping\b.*?\b-n\b.*?\b1\b.*?\b127\.0\.0\.1\b.*?\bc:\\Windows\\temp\\(putty|tmp)\.log`) nocase or
         // The following line could be swapped for the previous line for a looser match. It was observed during testing that a c2 running powershell logged putty.log as a file creation but not in the command line process event
-        //re.regex($process.target.process.command_line, `(|cmd.*/c).*ping.*-n.*1.*127\.0\.0\.1`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*dir.*127\.0\.0\.1\\c\$.*/od`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*ping.*-a.*-n.*1`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*wmic.*process.*call.*create.*net.*stop.*C:\\Windows\\Temp\\tmp.log"`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*\\ADMIN\$\\__.*2&gt;&amp;1`) nocase or
+        //re.regex($process.target.process.command_line, `(^|[\\/])ping\b.*?\b-n\b.*?\b1\b.*?\b127\.0\.0\.1`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])(cmd(\.exe)?|cmdbak)\b.*?[/c]\b.*?\bdir\b.*?\b127\.0\.0\.1\\c\$.*?/od`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])ping\b.*?\b-a\b.*?\b-n\b.*?\b1\b`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])wmic\b.*?\bprocess\b.*?\bcall\b.*?\bcreate\b.*?\bnet\b.*?\bstop\b.*?\bC:\\Windows\\Temp\\tmp\.log"`) nocase or
+        re.regex($process.target.process.command_line, `\\ADMIN\$\\__.*2>&1`) nocase or
         //The following line could be swapped for the previous line for a looser match, but potentially noisier
-        //re.regex($process.target.process.command_line, `(|cmd.*/c).*\\ADMIN\$\\__`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*net.*use.*127\.0\.0\.1\\ipc\$.*/y.*/d`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*powershell.*start-process.*-filepath.*c:\\windows\\temp\\.*.bat.*-windowstyle.*Hidden`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*rar\.exe.*a.*c:\\Windows\\temp\\.*D:\\.*`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*wmic.*cmd.*/c.*whoami`) nocase or
-        re.regex($process.target.process.command_line, `(|cmd.*/c).*xcopy.*c:\\windows\\temp\\hp.*d:\\`) nocase
+        //re.regex($process.target.process.command_line, `\\ADMIN\$\\__`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])net\b.*?\buse\b.*?\b127\.0\.0\.1\\ipc\$.*?/y.*?/d`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])powershell\b.*?\bstart-process\b.*?\b-filepath\b.*?\bc:\\windows\\temp\\.*\.bat\b.*?\b-windowstyle\b.*?\bHidden`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])rar\.exe\b.*?\ba\b.*?\bc:\\Windows\\temp\\.*?D:\\`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])wmic\b.*?\b(cmd(\.exe)?|cmdbak)\b.*?[/c]\b.*?\bwhoami`) nocase or
+        re.regex($process.target.process.command_line, `(^|[\\/])xcopy\b.*?\bc:\\windows\\temp\\hp\b.*?\bd:\\`) nocase
     )
 
   match:

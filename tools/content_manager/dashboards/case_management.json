@@ -1,0 +1,1117 @@
+{
+  "dashboards": [
+    {
+      "dashboard": {
+        "name": "347c3ac7-a15b-4508-9109-f2cf929bb74e",
+        "displayName": "Case Management",
+        "definition": {
+          "filters": [
+            {
+              "id": "GlobalTimeFilter",
+              "dataSource": "GLOBAL",
+              "filterOperatorAndFieldValues": [
+                {
+                  "filterOperator": "PAST",
+                  "fieldValues": [
+                    "7",
+                    "DAY"
+                  ]
+                }
+              ],
+              "displayName": "Global Time Filter",
+              "chartIds": [
+                "ea35c065-7c78-468f-819a-383d342ee4a5",
+                "c578f369-c57c-49bc-9a24-2d2c88be4f42",
+                "f4893075-74d4-4f9a-a19f-f7b20702eaca",
+                "292f395e-8357-4157-8632-7bc44813aecc",
+                "eb595384-f9c3-45b0-9806-a74dcaaa599d",
+                "64b4b234-8b8f-403b-8638-b5caa30a358b",
+                "2b5347ce-161f-4fc5-864b-95d2b277455c",
+                "7b0655f7-633f-4a0e-9960-306a97180dad",
+                "625230a7-5400-411f-8c8d-6e090f3c3d7c"
+              ],
+              "isStandardTimeRangeFilter": true,
+              "isStandardTimeRangeFilterEnabled": true
+            },
+            {
+              "id": "f58c8183-de01-4b4b-b3d4-ebc3bf57e193",
+              "dataSource": "SOAR_CASES",
+              "fieldPath": "case.status",
+              "filterOperatorAndFieldValues": [
+                {
+                  "filterOperator": "EQUAL",
+                  "fieldValues": [
+                    ""
+                  ]
+                }
+              ],
+              "displayName": "Case Status",
+              "chartIds": [
+                "c578f369-c57c-49bc-9a24-2d2c88be4f42"
+              ]
+            },
+            {
+              "id": "2158ac53-170c-4449-b0a5-b6ad888b1508",
+              "dataSource": "SOAR_CASES",
+              "fieldPath": "case.stage",
+              "filterOperatorAndFieldValues": [
+                {
+                  "filterOperator": "EQUAL",
+                  "fieldValues": [
+                    ""
+                  ]
+                }
+              ],
+              "displayName": "Case Stage",
+              "chartIds": [
+                "c578f369-c57c-49bc-9a24-2d2c88be4f42"
+              ]
+            },
+            {
+              "id": "02152994-9fab-4e51-9739-d77092f972d5",
+              "dataSource": "SOAR_CASES",
+              "fieldPath": "case.assignee.given_name",
+              "filterOperatorAndFieldValues": [
+                {
+                  "filterOperator": "EQUAL",
+                  "fieldValues": [
+                    ""
+                  ]
+                }
+              ],
+              "displayName": "Case Assignee",
+              "chartIds": [
+                "c578f369-c57c-49bc-9a24-2d2c88be4f42"
+              ]
+            }
+          ],
+          "charts": [
+            {
+              "dashboardChart": "c578f369-c57c-49bc-9a24-2d2c88be4f42",
+              "chartLayout": {
+                "startX": 0,
+                "spanX": 96,
+                "startY": 37,
+                "spanY": 28
+              },
+              "filtersIds": [
+                "GlobalTimeFilter",
+                "f58c8183-de01-4b4b-b3d4-ebc3bf57e193",
+                "2158ac53-170c-4449-b0a5-b6ad888b1508",
+                "02152994-9fab-4e51-9739-d77092f972d5"
+              ]
+            },
+            {
+              "dashboardChart": "ea35c065-7c78-468f-819a-383d342ee4a5",
+              "chartLayout": {
+                "startX": 0,
+                "spanX": 25,
+                "startY": 14,
+                "spanY": 23
+              },
+              "filtersIds": [
+                "GlobalTimeFilter"
+              ]
+            },
+            {
+              "dashboardChart": "f4893075-74d4-4f9a-a19f-f7b20702eaca",
+              "chartLayout": {
+                "startX": 25,
+                "spanX": 31,
+                "startY": 14,
+                "spanY": 23
+              },
+              "filtersIds": [
+                "GlobalTimeFilter"
+              ]
+            },
+            {
+              "dashboardChart": "eb595384-f9c3-45b0-9806-a74dcaaa599d",
+              "chartLayout": {
+                "startX": 0,
+                "spanX": 21,
+                "startY": 0,
+                "spanY": 14
+              },
+              "filtersIds": [
+                "GlobalTimeFilter"
+              ]
+            },
+            {
+              "dashboardChart": "64b4b234-8b8f-403b-8638-b5caa30a358b",
+              "chartLayout": {
+                "startX": 21,
+                "spanX": 20,
+                "startY": 0,
+                "spanY": 14
+              },
+              "filtersIds": [
+                "GlobalTimeFilter"
+              ]
+            },
+            {
+              "dashboardChart": "7b0655f7-633f-4a0e-9960-306a97180dad",
+              "chartLayout": {
+                "startX": 41,
+                "spanX": 18,
+                "startY": 0,
+                "spanY": 14
+              },
+              "filtersIds": [
+                "GlobalTimeFilter"
+              ]
+            },
+            {
+              "dashboardChart": "625230a7-5400-411f-8c8d-6e090f3c3d7c",
+              "chartLayout": {
+                "startX": 77,
+                "spanX": 19,
+                "startY": 0,
+                "spanY": 14
+              },
+              "filtersIds": [
+                "GlobalTimeFilter"
+              ]
+            },
+            {
+              "dashboardChart": "2b5347ce-161f-4fc5-864b-95d2b277455c",
+              "chartLayout": {
+                "startX": 59,
+                "spanX": 18,
+                "startY": 0,
+                "spanY": 14
+              },
+              "filtersIds": [
+                "GlobalTimeFilter"
+              ]
+            },
+            {
+              "dashboardChart": "292f395e-8357-4157-8632-7bc44813aecc",
+              "chartLayout": {
+                "startX": 56,
+                "spanX": 40,
+                "startY": 14,
+                "spanY": 23
+              },
+              "filtersIds": [
+                "GlobalTimeFilter"
+              ]
+            }
+          ]
+        },
+        "type": "CUSTOM",
+        "etag": "b0aaa051d697a6b993b7f014030e1b7aa7aefb40689feaab6a5185831b59eda5",
+        "access": "DASHBOARD_PRIVATE"
+      },
+      "dashboardCharts": [
+        {
+          "name": "ea35c065-7c78-468f-819a-383d342ee4a5",
+          "displayName": "Cases by State",
+          "chartDatasource": {
+            "dashboardQuery": "85ab4118-54da-4736-a8ba-66ee0ce10ee6",
+            "dataSources": [
+              "SOAR_CASES"
+            ]
+          },
+          "visualization": {
+            "series": [
+              {
+                "seriesType": "PIE",
+                "encode": {
+                  "value": "case_count",
+                  "itemName": "case_status"
+                },
+                "dataLabel": {
+                  "show": true
+                },
+                "radius": [
+                  "0%",
+                  "70%"
+                ],
+                "itemStyle": {
+                  "color": "b=>{var {map:c}=w3f(this.theme);b=O4f(b,fLg(this.form.controls.seriesConfig.getRawValue()),a);a=b.nextColorIndex;var d;return(d=\nc.get(b.color))!=null?d:b.color}"
+                },
+                "itemColors": {
+                  "colors": [
+                    {
+                      "key": "OPENED",
+                      "value": {
+                        "color": "#1a73e8",
+                        "label": "OPENED"
+                      }
+                    },
+                    {
+                      "key": "CLOSED",
+                      "value": {
+                        "color": "#eb730a",
+                        "label": "CLOSED"
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "xAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "yAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "legends": [
+              {
+                "top": 12,
+                "legendOrient": "HORIZONTAL"
+              }
+            ],
+            "groupingType": "Off"
+          },
+          "tileType": "TILE_TYPE_VISUALIZATION",
+          "etag": "6aaee750aeb6704b454c2d5503d95f8672cc51ba969481b1154ca0fbe85bbc5d",
+          "drillDownConfig": {
+            "leftDrillDowns": [
+              {
+                "id": "A09372E0-A673-4B5F-94EB-AD00911E33C5",
+                "displayName": "Apply Filter",
+                "customSettings": {
+                  "newTab": true,
+                  "filter": {
+                    "dashboardFilters": [
+                      {
+                        "dashboardFilterId": "f58c8183-de01-4b4b-b3d4-ebc3bf57e193",
+                        "filterOperatorAndValues": [
+                          {
+                            "filterOperator": "EQUAL",
+                            "fieldValues": [
+                              "${case_status}"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "rightDrillDowns": [
+              {
+                "id": "00CF55A9-4075-4856-AA5A-8925A13072A8",
+                "displayName": "Drill Down Search",
+                "customSettings": {
+                  "newTab": true,
+                  "query": {
+                    "query": "case.status = ${case_status}\n",
+                    "dialect": "YL2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "64b4b234-8b8f-403b-8638-b5caa30a358b",
+          "displayName": "Cases in Assessment",
+          "chartDatasource": {
+            "dashboardQuery": "a7e984fa-e7c5-4e54-837b-332e4a2b7e49",
+            "dataSources": [
+              "SOAR_CASES"
+            ]
+          },
+          "visualization": {
+            "series": [
+              {
+                "seriesType": "TEXT",
+                "label": "Assessment",
+                "field": "case_count",
+                "metricTrendConfig": {
+                  "metricFormat": "METRIC_FORMAT_NUMBER",
+                  "metricDisplayTrend": "METRIC_DISPLAY_TREND_ABSOLUTE_VALUE",
+                  "metricTrendType": "METRIC_TREND_TYPE_REGULAR"
+                }
+              }
+            ],
+            "xAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "yAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "legends": [
+              {
+                "legendOrient": "HORIZONTAL"
+              }
+            ],
+            "groupingType": "Off"
+          },
+          "tileType": "TILE_TYPE_VISUALIZATION",
+          "etag": "9acbbda67aff152362b7a6c602e21b74b0feabf8f23509f819486d6f859a695c",
+          "drillDownConfig": {
+            "leftDrillDowns": [
+              {
+                "id": "A09372E0-A673-4B5F-94EB-AD00911E33C5",
+                "displayName": "Apply Filter",
+                "customSettings": {
+                  "newTab": true,
+                  "filter": {
+                    "dashboardFilters": [
+                      {
+                        "dashboardFilterId": "2158ac53-170c-4449-b0a5-b6ad888b1508",
+                        "filterOperatorAndValues": [
+                          {
+                            "filterOperator": "EQUAL",
+                            "fieldValues": [
+                              "${case_stage}"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "rightDrillDowns": [
+              {
+                "id": "00CF55A9-4075-4856-AA5A-8925A13072A8",
+                "displayName": "Drill Down Search",
+                "customSettings": {
+                  "newTab": true,
+                  "query": {
+                    "query": "case.stage = ${case_stage}\n",
+                    "dialect": "YL2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "f4893075-74d4-4f9a-a19f-f7b20702eaca",
+          "displayName": "Cases By Stage",
+          "chartDatasource": {
+            "dashboardQuery": "db6f53c0-6cd7-470d-a120-ac3238c81828",
+            "dataSources": [
+              "SOAR_CASES"
+            ]
+          },
+          "visualization": {
+            "series": [
+              {
+                "seriesType": "PIE",
+                "encode": {
+                  "value": "case_count",
+                  "itemName": "case_stage"
+                },
+                "dataLabel": {
+                  "show": true
+                },
+                "radius": [
+                  "0%",
+                  "70%"
+                ],
+                "itemStyle": {
+                  "color": "b=>{var {map:c}=w3f(this.theme);b=O4f(b,fLg(this.form.controls.seriesConfig.getRawValue()),a);a=b.nextColorIndex;var d;return(d=\nc.get(b.color))!=null?d:b.color}"
+                },
+                "itemColors": {
+                  "colors": [
+                    {
+                      "key": "Assessment",
+                      "value": {
+                        "color": "#eb730a",
+                        "label": "Assessment"
+                      }
+                    },
+                    {
+                      "key": "Improvement",
+                      "value": {
+                        "color": "#10a3b7",
+                        "label": "Improvement"
+                      }
+                    },
+                    {
+                      "key": "Investigation",
+                      "value": {
+                        "color": "#ec453b",
+                        "label": "Investigation"
+                      }
+                    },
+                    {
+                      "key": "Triage",
+                      "value": {
+                        "color": "#1a73e8",
+                        "label": "Triage"
+                      }
+                    },
+                    {
+                      "key": "Incident",
+                      "value": {
+                        "color": "#e51f8f",
+                        "label": "Incident"
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "xAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "yAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "legends": [
+              {
+                "top": 12,
+                "legendOrient": "HORIZONTAL"
+              }
+            ],
+            "groupingType": "Off"
+          },
+          "tileType": "TILE_TYPE_VISUALIZATION",
+          "etag": "3d5de1cad4b52cfe126e78e8e8db44136ba9a8f31a484e77d57c7c11806dccb1",
+          "drillDownConfig": {
+            "leftDrillDowns": [
+              {
+                "id": "A09372E0-A673-4B5F-94EB-AD00911E33C5",
+                "displayName": "Apply Filter",
+                "customSettings": {
+                  "newTab": true,
+                  "filter": {
+                    "dashboardFilters": [
+                      {
+                        "dashboardFilterId": "2158ac53-170c-4449-b0a5-b6ad888b1508",
+                        "filterOperatorAndValues": [
+                          {
+                            "filterOperator": "EQUAL",
+                            "fieldValues": [
+                              "${case_stage}"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "rightDrillDowns": [
+              {
+                "id": "00CF55A9-4075-4856-AA5A-8925A13072A8",
+                "displayName": "Drill Down Search",
+                "customSettings": {
+                  "newTab": true,
+                  "query": {
+                    "query": "case.stage = ${case_stage}\n",
+                    "dialect": "YL2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "292f395e-8357-4157-8632-7bc44813aecc",
+          "displayName": "Cases By Assignee",
+          "chartDatasource": {
+            "dashboardQuery": "fc0820b5-b763-451d-aa7e-fbf9557c0684",
+            "dataSources": [
+              "SOAR_CASES"
+            ]
+          },
+          "visualization": {
+            "series": [
+              {
+                "seriesName": "none",
+                "seriesType": "BAR",
+                "encode": {
+                  "x": "case_assignee",
+                  "y": "case_count"
+                },
+                "dataLabel": {},
+                "itemStyle": {
+                  "color": "#1a73e8"
+                },
+                "seriesUniqueValue": "none"
+              }
+            ],
+            "xAxes": [
+              {
+                "axisType": "CATEGORY",
+                "displayName": "case_assignee"
+              }
+            ],
+            "yAxes": [
+              {
+                "axisType": "VALUE",
+                "displayName": "case_count"
+              }
+            ],
+            "legends": [
+              {
+                "legendOrient": "HORIZONTAL"
+              }
+            ],
+            "groupingType": "Off"
+          },
+          "tileType": "TILE_TYPE_VISUALIZATION",
+          "etag": "23073b34ade4d4e02948aacdadd40e13147855601d1ff4b95f46ebbdd69b47bd",
+          "drillDownConfig": {
+            "leftDrillDowns": [
+              {
+                "id": "A09372E0-A673-4B5F-94EB-AD00911E33C5",
+                "displayName": "Apply Filter",
+                "customSettings": {
+                  "newTab": true,
+                  "filter": {
+                    "dashboardFilters": [
+                      {
+                        "dashboardFilterId": "02152994-9fab-4e51-9739-d77092f972d5",
+                        "filterOperatorAndValues": [
+                          {
+                            "filterOperator": "EQUAL",
+                            "fieldValues": [
+                              "${case_assignee}"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "rightDrillDowns": [
+              {
+                "id": "00CF55A9-4075-4856-AA5A-8925A13072A8",
+                "displayName": "Drill Down Search",
+                "customSettings": {
+                  "newTab": true,
+                  "query": {
+                    "query": "case.assignee.given_name = ${case_assignee}\n",
+                    "dialect": "YL2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "eb595384-f9c3-45b0-9806-a74dcaaa599d",
+          "displayName": "Cases in Triage",
+          "chartDatasource": {
+            "dashboardQuery": "79113c39-5f12-4b6f-9175-18dbe8e64ce1",
+            "dataSources": [
+              "SOAR_CASES"
+            ]
+          },
+          "visualization": {
+            "series": [
+              {
+                "seriesType": "TEXT",
+                "label": "Triage",
+                "field": "case_count",
+                "metricTrendConfig": {
+                  "metricFormat": "METRIC_FORMAT_NUMBER",
+                  "metricDisplayTrend": "METRIC_DISPLAY_TREND_ABSOLUTE_VALUE",
+                  "metricTrendType": "METRIC_TREND_TYPE_REGULAR"
+                }
+              }
+            ],
+            "xAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "yAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "legends": [
+              {
+                "legendOrient": "HORIZONTAL"
+              }
+            ],
+            "groupingType": "Off"
+          },
+          "tileType": "TILE_TYPE_VISUALIZATION",
+          "etag": "8e3b188fe7940dd0b8aca370bc6623128657c65ef9412295d2fb2fefb6e9ea4a",
+          "drillDownConfig": {
+            "leftDrillDowns": [
+              {
+                "id": "A09372E0-A673-4B5F-94EB-AD00911E33C5",
+                "displayName": "Apply Filter",
+                "customSettings": {
+                  "newTab": true,
+                  "filter": {
+                    "dashboardFilters": [
+                      {
+                        "dashboardFilterId": "2158ac53-170c-4449-b0a5-b6ad888b1508",
+                        "filterOperatorAndValues": [
+                          {
+                            "filterOperator": "EQUAL",
+                            "fieldValues": [
+                              "${case_stage}"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "rightDrillDowns": [
+              {
+                "id": "00CF55A9-4075-4856-AA5A-8925A13072A8",
+                "displayName": "Drill Down Search",
+                "customSettings": {
+                  "newTab": true,
+                  "query": {
+                    "query": "case.stage = ${case_stage}\n",
+                    "dialect": "YL2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "2b5347ce-161f-4fc5-864b-95d2b277455c",
+          "displayName": "Cases in Incident",
+          "chartDatasource": {
+            "dashboardQuery": "7366a981-7a48-4efd-adea-611224158543",
+            "dataSources": [
+              "SOAR_CASES"
+            ]
+          },
+          "visualization": {
+            "series": [
+              {
+                "seriesType": "TEXT",
+                "label": "Incident",
+                "field": "case_count",
+                "metricTrendConfig": {
+                  "metricFormat": "METRIC_FORMAT_NUMBER",
+                  "metricDisplayTrend": "METRIC_DISPLAY_TREND_ABSOLUTE_VALUE",
+                  "metricTrendType": "METRIC_TREND_TYPE_REGULAR"
+                }
+              }
+            ],
+            "xAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "yAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "legends": [
+              {
+                "legendOrient": "HORIZONTAL"
+              }
+            ],
+            "groupingType": "Off"
+          },
+          "tileType": "TILE_TYPE_VISUALIZATION",
+          "etag": "8885a7e9846b1b2a6eee49786957b4aafdfe991b93ec4cf034b6f8399e430328",
+          "drillDownConfig": {
+            "leftDrillDowns": [
+              {
+                "id": "A09372E0-A673-4B5F-94EB-AD00911E33C5",
+                "displayName": "Apply Filter",
+                "customSettings": {
+                  "newTab": true,
+                  "filter": {
+                    "dashboardFilters": [
+                      {
+                        "dashboardFilterId": "f58c8183-de01-4b4b-b3d4-ebc3bf57e193",
+                        "filterOperatorAndValues": [
+                          {
+                            "filterOperator": "EQUAL",
+                            "fieldValues": [
+                              "${case_status}"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "rightDrillDowns": [
+              {
+                "id": "00CF55A9-4075-4856-AA5A-8925A13072A8",
+                "displayName": "Drill Down Search",
+                "customSettings": {
+                  "newTab": true,
+                  "query": {
+                    "query": "case.stage = ${case_stage}\n",
+                    "dialect": "YL2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "7b0655f7-633f-4a0e-9960-306a97180dad",
+          "displayName": "Cases in Investigation",
+          "chartDatasource": {
+            "dashboardQuery": "8aabe03a-58f5-447e-be77-ad7171936fcd",
+            "dataSources": [
+              "SOAR_CASES"
+            ]
+          },
+          "visualization": {
+            "series": [
+              {
+                "seriesType": "TEXT",
+                "label": "Investigation",
+                "field": "case_count",
+                "metricTrendConfig": {
+                  "metricFormat": "METRIC_FORMAT_NUMBER",
+                  "metricDisplayTrend": "METRIC_DISPLAY_TREND_ABSOLUTE_VALUE",
+                  "metricTrendType": "METRIC_TREND_TYPE_REGULAR"
+                }
+              }
+            ],
+            "xAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "yAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "legends": [
+              {
+                "legendOrient": "HORIZONTAL"
+              }
+            ],
+            "groupingType": "Off"
+          },
+          "tileType": "TILE_TYPE_VISUALIZATION",
+          "etag": "5aca0af430535f22d502f30dcfd19aa84ecf6fa492f3e5adcfcb303b350b6ad6",
+          "drillDownConfig": {
+            "leftDrillDowns": [
+              {
+                "id": "A09372E0-A673-4B5F-94EB-AD00911E33C5",
+                "displayName": "Apply Filter",
+                "customSettings": {
+                  "newTab": true,
+                  "filter": {
+                    "dashboardFilters": [
+                      {
+                        "dashboardFilterId": "2158ac53-170c-4449-b0a5-b6ad888b1508",
+                        "filterOperatorAndValues": [
+                          {
+                            "filterOperator": "EQUAL",
+                            "fieldValues": [
+                              "${case_stage}"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "rightDrillDowns": [
+              {
+                "id": "00CF55A9-4075-4856-AA5A-8925A13072A8",
+                "displayName": "Drill Down Search",
+                "customSettings": {
+                  "newTab": true,
+                  "query": {
+                    "query": "case.stage = ${case_stage}\n",
+                    "dialect": "YL2"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "c578f369-c57c-49bc-9a24-2d2c88be4f42",
+          "displayName": "Cases Detail",
+          "chartDatasource": {
+            "dashboardQuery": "d87bd674-1bf3-4a84-96de-7793f7e33ecb",
+            "dataSources": [
+              "SOAR_CASES"
+            ]
+          },
+          "visualization": {
+            "xAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "yAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "legends": [
+              {
+                "legendOrient": "HORIZONTAL"
+              }
+            ],
+            "columnDefs": [
+              {
+                "field": "case_id",
+                "header": "case_id"
+              },
+              {
+                "field": "case_name",
+                "header": "case_name"
+              },
+              {
+                "field": "case_status",
+                "header": "case_status"
+              },
+              {
+                "field": "case_stage",
+                "header": "case_stage"
+              },
+              {
+                "field": "creation_time",
+                "header": "creation_time"
+              },
+              {
+                "field": "last_update",
+                "header": "last_update"
+              },
+              {
+                "field": "assignee",
+                "header": "assignee"
+              }
+            ],
+            "groupingType": "Off"
+          },
+          "tileType": "TILE_TYPE_VISUALIZATION",
+          "etag": "b5078a171ddb9418f7a08203fee7f5b967639acd40b56d158a6fe016b667477c",
+          "drillDownConfig": {
+            "leftDrillDowns": [
+              {
+                "id": "case_id",
+                "displayName": "Open External Link on case_id",
+                "defaultSettings": {
+                  "enabled": true
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "625230a7-5400-411f-8c8d-6e090f3c3d7c",
+          "displayName": "Cases in Improvement",
+          "chartDatasource": {
+            "dashboardQuery": "23d5ae1d-379a-49b8-9baa-9ec2bf308244",
+            "dataSources": [
+              "SOAR_CASES"
+            ]
+          },
+          "visualization": {
+            "series": [
+              {
+                "seriesType": "TEXT",
+                "label": "Improvement",
+                "field": "case_count",
+                "metricTrendConfig": {
+                  "metricFormat": "METRIC_FORMAT_NUMBER",
+                  "metricDisplayTrend": "METRIC_DISPLAY_TREND_ABSOLUTE_VALUE",
+                  "metricTrendType": "METRIC_TREND_TYPE_REGULAR"
+                }
+              }
+            ],
+            "xAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "yAxes": [
+              {
+                "axisType": "VALUE"
+              }
+            ],
+            "legends": [
+              {
+                "legendOrient": "HORIZONTAL"
+              }
+            ],
+            "groupingType": "Off"
+          },
+          "tileType": "TILE_TYPE_VISUALIZATION",
+          "etag": "7b2f7e9897ba041646a48dd0ab0183ef1df8a68159dcc8ebef636306b6e996e9",
+          "drillDownConfig": {
+            "leftDrillDowns": [
+              {
+                "id": "A09372E0-A673-4B5F-94EB-AD00911E33C5",
+                "displayName": "Apply Filter",
+                "customSettings": {
+                  "newTab": true,
+                  "filter": {
+                    "dashboardFilters": [
+                      {
+                        "dashboardFilterId": "2158ac53-170c-4449-b0a5-b6ad888b1508",
+                        "filterOperatorAndValues": [
+                          {
+                            "filterOperator": "EQUAL",
+                            "fieldValues": [
+                              "${case_stage}"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "rightDrillDowns": [
+              {
+                "id": "00CF55A9-4075-4856-AA5A-8925A13072A8",
+                "displayName": "Drill Down Search",
+                "customSettings": {
+                  "newTab": true,
+                  "query": {
+                    "query": "case.stage = ${case_stage}\n",
+                    "dialect": "YL2"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "dashboardQueries": [
+        {
+          "name": "85ab4118-54da-4736-a8ba-66ee0ce10ee6",
+          "query": "$case_status = case.status\n\nmatch:\n  $case_status\noutcome:\n  $case_count = count(case.status)",
+          "input": {
+            "relativeTime": {
+              "timeUnit": "DAY",
+              "startTimeVal": "7"
+            }
+          },
+          "etag": "6e0a76a28ac736898e31d0e724670b281d6fa4e2814ba00bc4d9015f7ec32b31",
+          "dialect": "YL2"
+        },
+        {
+          "name": "fc0820b5-b763-451d-aa7e-fbf9557c0684",
+          "query": "$case_id = case.response_platform_info.response_platform_id\n$case_name = case.display_name\n$case_status = case.status\n$case_assignee = if(case.assignee.given_name = \"\", \"Unassigned\", case.assignee.given_name)\nmatch:\n  $case_assignee\noutcome:\n  $case_count = count(case.assignee.given_name)\norder:\n  $case_count desc",
+          "input": {
+            "relativeTime": {
+              "timeUnit": "DAY",
+              "startTimeVal": "7"
+            }
+          },
+          "etag": "0112b96e1cb378cb01a08004e22094c3f6e786c958bf754745a1f78f0fe337b6",
+          "dialect": "YL2"
+        },
+        {
+          "name": "79113c39-5f12-4b6f-9175-18dbe8e64ce1",
+          "query": "$case_id = case.response_platform_info.response_platform_id\n$case_name = case.display_name\ncase.stage = \"Triage\"\n\noutcome:\n  $case_count = count(case.name)\n  $case_stage = array_distinct(case.stage)",
+          "input": {
+            "relativeTime": {
+              "timeUnit": "DAY",
+              "startTimeVal": "7"
+            }
+          },
+          "etag": "4ba483b3a0a71463dd4ca0f10a3d53c7de63e47b6377243d615bc4215892896e",
+          "dialect": "YL2"
+        },
+        {
+          "name": "a7e984fa-e7c5-4e54-837b-332e4a2b7e49",
+          "query": "case.stage = \"Assessment\"\n\noutcome:\n  $case_count = count(case.name)\n  $case_stage = array_distinct(case.stage)",
+          "input": {
+            "relativeTime": {
+              "timeUnit": "DAY",
+              "startTimeVal": "7"
+            }
+          },
+          "etag": "83c975cf615bf45c5fd787b8df04f6a5edc8f8b1eecc93e63c86106cf038451c",
+          "dialect": "YL2"
+        },
+        {
+          "name": "8aabe03a-58f5-447e-be77-ad7171936fcd",
+          "query": "case.stage = \"Investigation\"\n\noutcome:\n  $case_count = count(case.name)\n  $case_stage = array_distinct(case.stage)",
+          "input": {
+            "relativeTime": {
+              "timeUnit": "DAY",
+              "startTimeVal": "7"
+            }
+          },
+          "etag": "bea49914e8c3007a9f0907f5051cd3ae8f78d38920f67a171b420e0201a2f9c7",
+          "dialect": "YL2"
+        },
+        {
+          "name": "d87bd674-1bf3-4a84-96de-7793f7e33ecb",
+          "query": "$case_id = case.response_platform_info.response_platform_id\n$case_name = case.display_name\n$case_status = case.status\n$case_stage = case.stage\nmatch:\n    $case_id, $case_name, $case_status, $case_stage\noutcome:\n    $creation_time = timestamp.get_timestamp(max(case.create_time.seconds))\n    $last_update = timestamp.get_timestamp(max(case.update_time.seconds))\n    $assignee = array_distinct(case.assignee.given_name)\norder:\n    $last_update desc",
+          "input": {
+            "relativeTime": {
+              "timeUnit": "DAY",
+              "startTimeVal": "7"
+            }
+          },
+          "etag": "6ccfb5767c0835090eab7b0fdad800b4664f237ca3fc7541b73a4d69a8c04e1d",
+          "dialect": "YL2"
+        },
+        {
+          "name": "7366a981-7a48-4efd-adea-611224158543",
+          "query": "case.stage = \"Incident\"\n\noutcome:\n  $case_count = count(case.name)\n  $case_stage = array_distinct(case.stage)",
+          "input": {
+            "relativeTime": {
+              "timeUnit": "DAY",
+              "startTimeVal": "7"
+            }
+          },
+          "etag": "b1e78a39d97cfcafef4921c32b79e606c47042e9149d4ac3c6c6e5d29a2af6af",
+          "dialect": "YL2"
+        },
+        {
+          "name": "db6f53c0-6cd7-470d-a120-ac3238c81828",
+          "query": "$case_stage = case.stage\nmatch:\n  $case_stage\noutcome:\n  $case_count = count(case.stage)",
+          "input": {
+            "relativeTime": {
+              "timeUnit": "DAY",
+              "startTimeVal": "7"
+            }
+          },
+          "etag": "f969007c2b90e10847db69a93801917d8698ed38c8eddc091faca9f65e260a17",
+          "dialect": "YL2"
+        },
+        {
+          "name": "23d5ae1d-379a-49b8-9baa-9ec2bf308244",
+          "query": "case.stage = \"Improvement\"\n\noutcome:\n  $case_count = count(case.name)\n  $case_stage = array_distinct(case.stage)",
+          "input": {
+            "relativeTime": {
+              "timeUnit": "DAY",
+              "startTimeVal": "7"
+            }
+          },
+          "etag": "2c17f88404d30d2bf64823e42f0c20f85cd3f4e1200e037ca54ed9778a97ac71",
+          "dialect": "YL2"
+        }
+      ]
+    }
+  ]
+}

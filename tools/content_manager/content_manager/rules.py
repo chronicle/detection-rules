@@ -20,12 +20,12 @@ import collections
 import hashlib
 import json
 import logging
+import os
 import pathlib
 import re
 from typing import Any, List, Mapping, Sequence, Tuple
 
 from content_manager.common.custom_exceptions import DuplicateRuleIdError
-from content_manager.common.custom_exceptions import DuplicateRuleNameError
 from content_manager.common.custom_exceptions import RuleConfigError
 from content_manager.common.custom_exceptions import RuleError
 from google.auth.transport import requests
@@ -43,7 +43,9 @@ import yaml
 
 LOGGER = logging.getLogger()
 
-ROOT_DIR = pathlib.Path(__file__).parent.parent
+ROOT_DIR = pathlib.Path(
+    os.environ.get("CONTENT_MANAGER_ROOT", pathlib.Path(__file__).parent.parent)
+)
 RULES_DIR = ROOT_DIR / "rules"
 RULE_CONFIG_FILE = ROOT_DIR / "rule_config.yaml"
 
@@ -451,8 +453,9 @@ class Rules:
     if duplicate_rule_names:
       for rule_name, count in duplicate_rule_names:
         LOGGER.info("%s rules found with the same name %s", count, rule_name)
-      raise DuplicateRuleNameError(
-          f"Duplicate rule names found {duplicate_rule_names}."
+      LOGGER.warning(
+          "Duplicate rule names found %s. Overwriting will occur.",
+          duplicate_rule_names,
       )
 
   @classmethod

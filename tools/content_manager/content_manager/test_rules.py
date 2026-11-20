@@ -217,6 +217,106 @@ def test_check_for_duplicate_rule_ids(parsed_test_rules):
   assert "Duplicate rule IDs found" in str(excinfo.value)
 
 
+def test_build_rule_update_plan_unchanged(parsed_test_rules):
+  """An unchanged ruleset produces a stable, empty plan."""
+  remote_rules = copy.deepcopy(parsed_test_rules)
+
+  plan = Rules.build_rule_update_plan(parsed_test_rules, remote_rules)
+  reversed_plan = Rules.build_rule_update_plan(
+      Rules(rules=list(reversed(parsed_test_rules.rules))), remote_rules
+  )
+
+  assert plan["changes"] == []
+  assert plan["unchanged_rules"] == len(parsed_test_rules.rules)
+  assert plan["plan_digest"] == reversed_plan["plan_digest"]
+
+
+def test_build_rule_update_plan_revision_and_state(parsed_test_rules):
+  """Text and deployment differences are represented as separate changes."""
+  remote_rules = copy.deepcopy(parsed_test_rules)
+  remote_rule = remote_rules.rules[0]
+  remote_rule.text = f"{remote_rule.text}\n// remote-only change"
+  remote_rule.enabled = not parsed_test_rules.rules[0].enabled
+  remote_rule.alerting = not parsed_test_rules.rules[0].alerting
+
+  plan = Rules.build_rule_update_plan(parsed_test_rules, remote_rules)
+  rule_changes = [
+      change
+      for change in plan["changes"]
+      if change["rule_name"] == parsed_test_rules.rules[0].name
+  ]
+
+  assert [change["action"] for change in rule_changes] == [
+      "create_revision",
+      "set_enabled",
+      "set_alerting",
+  ]
+  assert rule_changes[0]["remote_revision_id"] == remote_rule.revision_id
+  assert "text" not in json.dumps(plan)
+  assert "projects/" not in json.dumps(plan)
+
+
+def test_build_rule_update_plan_create_and_rename(parsed_test_rules):
+  """New and renamed rules retain state and revision evidence."""
+  local_rules = copy.deepcopy(parsed_test_rules)
+  remote_rules = copy.deepcopy(parsed_test_rules)
+  new_rule = local_rules.rules[0].model_copy(update={
+      "name": "new_rule",
+      "id": None,
+      "resource_name": None,
+      "revision_id": None,
+  })
+  renamed_rule = local_rules.rules[1].model_copy(
+      update={"name": "renamed_rule"}
+  )
+  local_rules.rules = [new_rule, renamed_rule]
+
+  plan = Rules.build_rule_update_plan(local_rules, remote_rules)
+
+  assert plan["changes"][0]["action"] == "create"
+  assert plan["changes"][0]["desired_state"] == {
+      "enabled": new_rule.enabled,
+      "alerting": new_rule.alerting,
+      "archived": new_rule.archived,
+  }
+  assert plan["changes"][1]["action"] == "create_revision"
+  assert (
+      plan["changes"][1]["remote_revision_id"]
+      == remote_rules.rules[1].revision_id
+  )
+
+
+def test_plan_remote_rule_updates_never_mutates(monkeypatch, parsed_test_rules):
+  """Planning may read remote state but must never call a mutating API."""
+  remote_rules = copy.deepcopy(parsed_test_rules)
+  mutation_calls = []
+
+  monkeypatch.setattr(
+      Rules,
+      "load_rules",
+      classmethod(lambda cls, rules_dir, rule_config_file: parsed_test_rules),
+  )
+  monkeypatch.setattr(
+      Rules,
+      "get_remote_rules",
+      classmethod(lambda cls, http_session: remote_rules),
+  )
+
+  def record_mutation(*args, **kwargs):
+    mutation_calls.append((args, kwargs))
+
+  monkeypatch.setattr("content_manager.rules.create_rule", record_mutation)
+  monkeypatch.setattr("content_manager.rules.update_rule", record_mutation)
+  monkeypatch.setattr(
+      "content_manager.rules.update_rule_deployment", record_mutation
+  )
+
+  plan = Rules.plan_remote_rule_updates(http_session=object())
+
+  assert plan is not None
+  assert mutation_calls == []
+
+
 def test_extract_rule_name(parsed_test_rules: Rules):
   """Tests for rules.Rules.extract_rule_name."""
   rule = copy.deepcopy(parsed_test_rules.rules[0])
